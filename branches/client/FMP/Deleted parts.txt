@@ -1,0 +1,7 @@
+VirtualProtect((PVOID)(0xD43964+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
+strcpy((PCHAR)0xD43964+dwLoadOffset,"popcycle_.dat");
+VirtualProtect((PVOID)(0xDE2D00+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
+strcpy((PCHAR)0xDE2D00+dwLoadOffset,"platform:/textures/loadingscreensx");
+VirtualProtect((PVOID)(0xDE2D50+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
+strcpy((PCHAR)0xDE2D50+dwLoadOffset,"platform:/textures/loadingscreensx");
+VirtualProtect((PVOID)(0x175B793+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
