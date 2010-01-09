@@ -352,11 +352,6 @@ void FMPHook::StatusSync()
 		gPlayer[MyID].health = hp;
 		gPlayer[MyID].armour = arm;
 
-		if(hp <= 100)
-		{
-			FadeScreenIn(100);
-		}
-
 		RakNet::BitStream bsSend;
 		bsSend.Write(hp);
 		bsSend.Write(arm);

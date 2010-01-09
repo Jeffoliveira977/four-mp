@@ -127,6 +127,10 @@ void LoadConfig()
 	strcpy(Conf.Name, buff);
 	fclose(f);
 	Log("AT '%s:%d' AS '%s'", Conf.server, Conf.port, Conf.Name);
+
+	Conf.SkinSelect = 0;
+	Conf.ComponentSelect = 0;
+	Conf.NumSkins = 0;
 }
 
 void FMPHook::CreateCar(int id, int model, float x, float y, float z, float r, int color1, int color2)
@@ -312,24 +316,22 @@ void FMPHook::GameThread()
 {
 	Beep(500, 500);
 	Debug("GameThread");
-	FadeScreenIn(100);
-	/* Удаляем инфо файлы */
-	debug_clear();
-	log_clear();
 
 	LoadConfig();
 	// Мутим RakNet
 	Log("MainThread");
+	Packet *pack;
 	net = RakNetworkFactory::GetRakPeerInterface();
 	SocketDescriptor s(0, 0);
 	net->Startup(8, 1, &s, 1);
 	// Регим RPC
 	Log("MainThread RPC");
 
-	REGISTER_STATIC_RPC(net, ::Check);
-	REGISTER_STATIC_RPC(net, ::ErrorConnect);
 	REGISTER_STATIC_RPC(net, ::ConnectPlayer);
 	REGISTER_STATIC_RPC(net, ::Disconnect);
+
+	REGISTER_STATIC_RPC(net, ::Check);
+	REGISTER_STATIC_RPC(net, ::ErrorConnect);
 	REGISTER_STATIC_RPC(net, ::MovePlayer);
 	REGISTER_STATIC_RPC(net, ::JumpPlayer);
 	REGISTER_STATIC_RPC(net, ::DuckPlayer);
@@ -343,6 +345,8 @@ void FMPHook::GameThread()
 	REGISTER_STATIC_RPC(net, ::SwapGun);
 	REGISTER_STATIC_RPC(net, ::PlayerFire);
 	REGISTER_STATIC_RPC(net, ::PlayerAim);
+
+	REGISTER_STATIC_RPC(net, ::PlayerParams);
 
 	REGISTER_STATIC_RPC(net, ::ClassSync);
 	REGISTER_STATIC_RPC(net, ::SyncSkin);
@@ -376,14 +380,15 @@ void FMPHook::GameThread()
 		}
 		else if(mp_state == 2 && Conf.SkinSelect == 1)
 		{
+			FreezeCharPosition(_GetPlayerPed(), 1);
 			if(GetAsyncKeyState(VK_SHIFT) != 0)
 			{
 				gPlayer[MyID].model = pClass[sel_cl].model;	
-				Conf.SkinSelect = 0;
+				FreezeCharPosition(_GetPlayerPed(), 0);
+				mp_state = 3;
 
 				if(Conf.ComponentSelect == 0)
 				{
-					FadeScreenIn(100);
 					RakNet::BitStream bsSend;
 					net->RPC("PlayerSpawn",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 					Log("Player Spawn");
@@ -392,7 +397,7 @@ void FMPHook::GameThread()
 			else if(GetAsyncKeyState(VK_RIGHT) != 0)
 			{
 				sel_cl++;
-				if(pClass[sel_cl].free == 1)
+				if(sel_cl == Conf.NumSkins)
 					sel_cl = 0;
 				gPlayer[MyID].model = pClass[sel_cl].model;
 
@@ -411,9 +416,8 @@ void FMPHook::GameThread()
 			else if(GetAsyncKeyState(VK_LEFT) != 0)
 			{
 				sel_cl--;
-				if(sel_cl == 0)
-					for(int i = MAX_PCLASS - 1; i > 0; i--)
-						if(pClass[i].free = 0) {sel_cl = i; break; }
+				if(sel_cl == -1)
+					sel_cl = Conf.NumSkins - 1;
 				gPlayer[MyID].model = pClass[sel_cl].model;
 
 				RakNet::BitStream bsSend;
@@ -429,19 +433,19 @@ void FMPHook::GameThread()
 				sprintf(model_select_text, "Sellected model id %d", sel_cl);
 			}
 		}
-		else if(mp_state == 2 && Conf.ComponentSelect == 1)
+		else if(mp_state == 3 && Conf.ComponentSelect == 1)
 		{
+			FreezeCharPosition(_GetPlayerPed(), 1);
 			if(GetAsyncKeyState(VK_SHIFT) != 0)
 			{
-				Conf.ComponentSelect = 0;
+				FreezeCharPosition(_GetPlayerPed(), 0);
+				mp_state = 4;
 
 				for(int i = 0; i < 11; i++)
 				{
 					gPlayer[MyID].CompD[i] = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)i);
 					gPlayer[MyID].CompT[i] = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)i);
 				}
-
-				FadeScreenIn(100);
 
 				RakNet::BitStream bsSend;
 				bsSend.Write(gPlayer[MyID].CompD);
@@ -460,7 +464,7 @@ void FMPHook::GameThread()
 
 				SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)sel_cl, t, d);
 
-				sprintf(model_select_text, "Sellected model id %d", sel_cl);
+				sprintf(model_select_text, "Selected model id %d", sel_cl);
 			}
 			else if(GetAsyncKeyState(VK_LEFT) != 0)
 			{
@@ -470,24 +474,24 @@ void FMPHook::GameThread()
 				if(d == -1) t = 0;
 
 				SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)sel_cl, t, d);
-				sprintf(model_select_text, "Sellected model id %d", sel_cl);
+				sprintf(model_select_text, "Selected model id %d", sel_cl);
 			}
 			else if(GetAsyncKeyState(VK_DOWN) != 0)
 			{
 				sel_cl++;
 				if(sel_cl == 11)
 					sel_cl = 0;
-				sprintf(model_select_text, "Sellected model id %d", sel_cl);
+				sprintf(model_select_text, "Selected model id %d", sel_cl);
 			}
 			else if(GetAsyncKeyState(VK_UP) != 0)
 			{
 				sel_cl--;
 				if(sel_cl == -1)
 					sel_cl = 10;
-				sprintf(model_select_text, "Sellected model id %d", sel_cl);
+				sprintf(model_select_text, "Selected model id %d", sel_cl);
 			}
 		}
-		else if(mp_state == 2)
+		else if(mp_state >= 2)
 		{
 			Debug("MPSTATE");
 			if(GetAsyncKeyState(192) != 0)
@@ -512,7 +516,7 @@ void FMPHook::GameThread()
 		if(mp_state != 0)
 		{
 			Debug("PACKIFPACK");
-			Packet *pack = net->Receive();
+			pack = net->Receive();
 			Debug("PACKPACKPACK");
 			if(pack)
 			{
@@ -574,8 +578,12 @@ void GameStart()
 
 void MainThread(void* dummy)
 {
+	/* Удаляем инфо файлы */
+	debug_clear();
+	log_clear();
+
 	DWORD d,c;
-	VirtualProtect((PVOID)(0xDEA1C0+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
+	/*VirtualProtect((PVOID)(0xDEA1C0+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
 	strcpy((PCHAR)0xDEA1C0+dwLoadOffset,"GTA IV:Four-MultiPlayer");
 	VirtualProtect((PVOID)(0xDEA1C0+dwLoadOffset),2,d,&c);
 
@@ -583,7 +591,7 @@ void MainThread(void* dummy)
 	strcpy((PCHAR)0xDE2D00+dwLoadOffset,"platform:/textures/loadingscreensx");
 	VirtualProtect((PVOID)(0xDE2D50+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
 	strcpy((PCHAR)0xDE2D50+dwLoadOffset,"platform:/textures/loadingscreensx");
-	VirtualProtect((PVOID)(0x175B793+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
+	VirtualProtect((PVOID)(0x175B793+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);*/
 
 
 	Sleep(1000);

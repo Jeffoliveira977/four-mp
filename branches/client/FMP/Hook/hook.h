@@ -12,13 +12,13 @@ DWORD dwLoadOffset = ((DWORD)GetModuleHandle (NULL)-0x400000);
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                            Адреса игры                                                */
 /* ----------------------------------------------------------------------------------------------------- */
-#define ADDRESS_HASH_GET (0x61A1D0+dwLoadOffset)
-#define ADDRESS_THREAD_ID (0x16257BC+dwLoadOffset)
-#define ADDRESS_SCRIPTS_COUNT (0x16257B4+dwLoadOffset)
+#define ADDRESS_HASH_GET (0x6CF530+dwLoadOffset)
+#define ADDRESS_THREAD_ID (0x17DF36C+dwLoadOffset)
+#define ADDRESS_SCRIPTS_COUNT (0x17DF364+dwLoadOffset)
 /* Threads */
-#define ADDRESS_ACTIVE_THREAD (0x16257C0+dwLoadOffset)
-#define ADDRESS_THREADS_ARRAY (0x17A02B8+dwLoadOffset)
-#define ADDRESS_THREAD_TICK (0xA2C4C0+dwLoadOffset)
+#define ADDRESS_ACTIVE_THREAD (0x17DF370+dwLoadOffset)
+#define ADDRESS_THREADS_ARRAY (0x18DF6C8+dwLoadOffset)
+#define ADDRESS_THREAD_TICK (0xB4E1F0+dwLoadOffset)
 /* Pools */
 #define ADDRESS_PED_POOL (0x175B77C+dwLoadOffset)
 #define ADDRESS_PLAYER_POOL (0x1033058+dwLoadOffset)
@@ -29,6 +29,7 @@ DWORD dwLoadOffset = ((DWORD)GetModuleHandle (NULL)-0x400000);
 #define OFFSET_PLAYER_MAX_ARMOUR 0x53C
 #define OFFSET_PLAYER_COLOR 0x560
 #define OFFSET_PLAYER_PED 0x578
+
 
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                            Функции хука                                               */

@@ -49,7 +49,6 @@ struct PlayerClass
 	float x, y, z;
 	float angle;
 	int gun[3], ammo[3];
-	bool free;
 };
 
 struct SpawnInfo
@@ -81,5 +80,6 @@ struct FConfig
 	char Name[32];
 
 	bool ComponentSelect;
+	int NumSkins;
 	bool SkinSelect;
 };

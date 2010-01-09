@@ -2169,12 +2169,7 @@ static void (__cdecl * SetSleepModeActive)(bool) = (void(__cdecl *)(bool))(0xA0D
 static void (__cdecl * SetTimeOfDay)(int, int) = (void(__cdecl *)(int, int))(0x9CB170 + dwLoadOffset);
 static int (__cdecl * IsControlPressed)(int, int) = (int(__cdecl *)(int, int))(0xA0B050 + dwLoadOffset);
 */
-static void (__cdecl * FadeScreenIn)(int) = (void (__cdecl*)(int))(0xA19CA0+dwLoadOffset);
-static void (__cdecl * FadeScreenOut)(int) = (void (__cdecl*)(int))(0xA19CC0+dwLoadOffset);
-static void (__cdecl * ForceLoadScreen)(int) = (void (__cdecl*)(int))(0x9BFF00+dwLoadOffset);
-static void (__cdecl * SetMsgForLoadScreen)(char*) = (void (__cdecl*)(char*))(0x9C6CB0+dwLoadOffset);
-static bool (__cdecl * IsScreenFadeIn)() = (bool (__cdecl*)())(0xA19AC0+dwLoadOffset);
-static bool (__cdecl * IsScreenFadeOut)() = (bool (__cdecl*)())(0xA19AB0+dwLoadOffset);
+
 /*
 // Camera
 static void (__cdecl * GetGameCam)(Camera *cam) = (void (__cdecl *)(Camera*))(0xA19860 + dwLoadOffset);

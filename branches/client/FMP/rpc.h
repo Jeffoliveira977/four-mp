@@ -24,6 +24,8 @@ void PlayerFire(RPCParameters *rpcParameters);
 void PlayerAim(RPCParameters *rpcParameters);
 void SwapGun(RPCParameters *rpcParameters);
 
+void PlayerParams(RPCParameters *rpcParameters);
+
 void ClassSync(RPCParameters *rpcParameters);
 void SyncSkin(RPCParameters *rpcParameters);
 void SyncSkinVariation(RPCParameters *rpcParameters);

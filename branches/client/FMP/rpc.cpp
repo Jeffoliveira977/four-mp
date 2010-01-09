@@ -351,6 +351,24 @@ void SwapGun(RPCParameters *rpcParameters)
 	Log("SwapGun End\r\n");
 }
 
+void PlayerParams(RPCParameters *rpcParameters)
+{
+	Log("PlayerParams Start\r\n");
+	LastUpdate = GetTickCount();
+	unsigned char* Data = rpcParameters->input; 
+	int iBitLength = rpcParameters->numberOfBitsOfData;
+
+	int playerid, hp, arm;
+
+	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
+	bsData.Read(playerid);
+	bsData.Read(hp);
+	bsData.Read(arm);
+
+	// ... Do it ...
+	Log("PlayerParams End\r\n");
+}
+
 void SyncSkin(RPCParameters *rpcParameters)
 {
 	Log("SyncSkin Start\r\n");
@@ -396,9 +414,10 @@ void ClassSync(RPCParameters *rpcParameters)
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(pClass);
 	bsData.Read(Conf.ComponentSelect);
-
+	bsData.Read(Conf.NumSkins);
+	for(int i = 0; i < Conf.NumSkins; i++)
+		bsData.Read(pClass[i]);
 	Log("ClassSync Center\r\n");
 	Conf.SkinSelect = 1; 
 	Log("ClassSync End\r\n");
