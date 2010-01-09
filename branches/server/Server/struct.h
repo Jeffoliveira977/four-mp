@@ -88,7 +88,6 @@ struct PlayerClass
 	float x, y, z;
 	float angle;
 	int gun[3], ammo[3];
-	bool free;
 };
 
 struct Vehicle
@@ -117,6 +116,7 @@ struct Server
 	char ServerURL[128];
 
 	bool ComponentSelect;
+	int NumSkins;
 };
 
 #define STRUCTS

@@ -9,6 +9,8 @@ function OnGameModeInit()
 	CreateCar(418536135,-44.4, -18.53, 14.83, 0.0, 0, 0);
 	CreateCar(1348744438,-42.4, -18.53, 14.83, 0.0, 0, 0);
 	CreateCar(2948279460,-46.4, -18.53, 14.83, 0.0, 0, 0);
+
+	addPlayerClass(0x98E29920, 0, 0, 0, 0, 16, 100, 0, 0, 0, 0);
 }
 
 function OnGameModeExit()

@@ -114,7 +114,8 @@ void ClientConnect(RPCParameters *rpcParameters)
 			bsSend.Write(gPlayer[index].color);
 
 			debug("ClientConnect ME SEND TO %s:%d  - %d", gPlayer[index].ip, gPlayer[index].port, gPlayer[index].model);
-			net->RPC("ConnectPlayer",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
+			bool rs = net->RPC("ConnectPlayer",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
+			printf("%d", rs);
 			debug("ClientConnect ME END");
 
 			for(int i = 0; i < MAX_PLAYERS; i++)
@@ -221,14 +222,13 @@ void ClientConnect(RPCParameters *rpcParameters)
 					net->RPC("CreateVehicle",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa ,false, 0, UNASSIGNED_NETWORK_ID, 0);
 				}
 			}
-			if(pClass[0].free == 0)
-			{
-				RakNet::BitStream bsSend;
-				bsSend.Write(pClass);
-				bsSend.Write(sConf.ComponentSelect);
+			RakNet::BitStream bSend;
+			bSend.Write(sConf.ComponentSelect);
+			bSend.Write(sConf.NumSkins);
+			for(int j = 0; j < sConf.NumSkins; j++)
+				bSend.Write(pClass[j]);
 
-				net->RPC("ClassSync",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa ,false, 0, UNASSIGNED_NETWORK_ID, 0);
-			}
+			net->RPC("ClassSync",&bSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa ,false, 0, UNASSIGNED_NETWORK_ID, 0);
 			debug("------------------");
 			return;
 		}
@@ -579,4 +579,17 @@ void PlayerParams(RPCParameters *rpcParameters)
 			net->RPC("PlayerParams",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[i].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
 		}
 	}
+}
+
+void PlayerSpawn(RPCParameters *rpcParameters)
+{
+	debug("PlayerSpawn");
+}
+void Select_ModelChanged(RPCParameters *rpcParameters)
+{
+	debug("ModelChanged [select]");
+}
+void SyncSkinVariation(RPCParameters *rpcParameters)
+{
+	debug("SyncSkinVariation");
 }

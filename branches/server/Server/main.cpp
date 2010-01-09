@@ -115,6 +115,10 @@ int main()
 	REGISTER_STATIC_RPC(net, SwapGun);
 	REGISTER_STATIC_RPC(net, PlayerParams);
 
+	REGISTER_STATIC_RPC(net, PlayerSpawn);
+	REGISTER_STATIC_RPC(net, Select_ModelChanged);
+	REGISTER_STATIC_RPC(net, SyncSkinVariation);
+
 	// Init Squerrel
 	v = sq_open(1024); 
     sqstd_seterrorhandlers(v);

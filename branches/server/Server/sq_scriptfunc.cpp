@@ -110,8 +110,8 @@ void sq_GiveWeapon(HSQUIRRELVM v)
 
 void sq_addPlayerClass(HSQUIRRELVM v) 
 { 
-	int id = GetFreePlayerClass();
-	if(id == -1) 
+	int id = sConf.NumSkins;
+	if(id == MAX_PCLASS) 
 	{
 		print("Not free player class (MAX CLASSES = %d)", MAX_PCLASS);
 		sq_pushinteger(v, -1);
@@ -129,8 +129,7 @@ void sq_addPlayerClass(HSQUIRRELVM v)
 	sq_getinteger(v, 11, &pClass[id].gun[2]);
 	sq_getinteger(v, 12, &pClass[id].ammo[2]);
 
-	pClass[id].free = 0;
-
+	sConf.NumSkins++;
 	sq_pushinteger(v, id);
 } 
 

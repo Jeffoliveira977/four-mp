@@ -54,12 +54,3 @@ void PlayerDisconnect(int index)
 	sc_OnPlayerDisconnect(v, index);
 }
 
-int GetFreePlayerClass()
-{
-	for(int i = 0; i < MAX_PCLASS; i++)
-	{
-		if(pClass[i].free == 1)
-			return i;
-	}
-	return -1;
-}
