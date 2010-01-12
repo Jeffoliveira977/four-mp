@@ -57,7 +57,7 @@ void print(const char *string, ...)
 		FILE *f = fopen("server.log", "a");
 		SYSTEMTIME time;
 		GetSystemTime(&time);
-		fprintf(f, "[%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond);
+		fprintf(f, "[%02d.%02d %02d:%02d:%02d] ", time.wDay, time.wMonth, time.wHour, time.wMinute, time.wSecond);
 		vfprintf(f, string, arglist);
 		fprintf(f, "\n");
 		fclose(f);
@@ -75,7 +75,7 @@ void debug(const char *string, ...)
 		FILE *f = fopen("server.log", "a");
 		SYSTEMTIME time;
 		GetSystemTime(&time);
-		fprintf(f, "<%02d:%02d:%02d> ", time.wHour, time.wMinute, time.wSecond);
+		fprintf(f, "<%02d.%02d %02d:%02d:%02d> ", time.wDay, time.wMonth, time.wHour, time.wMinute, time.wSecond);
 		vfprintf(f, string, arglist);
 		fprintf(f, "\n");
 		fclose(f);
