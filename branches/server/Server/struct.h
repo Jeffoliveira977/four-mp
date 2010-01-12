@@ -108,7 +108,7 @@ struct Server
 	bool Run;
 	int Port;
 	char GameMode[4][64];
-	char FilterScripts[4][64];
+	char FilterScripts[512];
 	char Name[128];
 	char Lang[32];
 	char Password[32];

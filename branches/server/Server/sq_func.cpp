@@ -36,6 +36,14 @@ void printfunc(HSQUIRRELVM v, const SQChar *s, ...)
 	va_list arglist; 
     va_start(arglist, s); 
     scvprintf(s, arglist); 
+
+	FILE *f = fopen("server.log", "a");
+	SYSTEMTIME time;
+	GetSystemTime(&time);
+	fprintf(f, "[%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond);
+	vfprintf(f, s, arglist);
+	fclose(f);
+
     va_end(arglist); 
 } 
 
@@ -47,5 +55,11 @@ void sq_printr(HSQUIRRELVM v)
 	sq_getstring(v, 2, &str);
 	CharToOem(str, txt);
 	printf(txt);
+	FILE *f = fopen("server.log", "a");
+	SYSTEMTIME time;
+	GetSystemTime(&time);
+	fprintf(f, "[%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond);
+	fprintf(f, str);
+	fclose(f);
 	delete txt, str;
 } 

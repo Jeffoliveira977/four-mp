@@ -34,6 +34,7 @@
 #include "rpc.h"
 #include "sq.h"
 #include "manager.h"
+#include "cfg.h"
 
 ///////////////////////////////////////////////
 //                V  A  R  S                 //
@@ -87,12 +88,26 @@ void LoadConfig()
 	sConf.Run = 1;
 	strcpy(sConf.GameMode[0], "blank.nut");
 	sConf.Port = 7777;
+
+	CFG *config = new CFG("server.cfg");
+	strcpy(sConf.Name, config->GetVara("Name"));
+	sConf.Port = config->GetVari("Port");
+	strcpy(sConf.GameMode[0], config->GetVara("GameMode0"));
+	strcpy(sConf.GameMode[1], config->GetVara("GameMode1"));
+	strcpy(sConf.GameMode[2], config->GetVara("GameMode2"));
+	strcpy(sConf.GameMode[3], config->GetVara("GameMode3"));
+	strcpy(sConf.FilterScripts, config->GetVara("FilterScript")); 
+	strcpy(sConf.Lang, config->GetVara("Lang")); 
+	strcpy(sConf.Password, config->GetVara("Password")); 
+	strcpy(sConf.RconPassword, config->GetVara("RconPassword")); 
+	strcpy(sConf.ServerURL, config->GetVara("ServerURL")); 
 }
 
 int main()
 {
 	print("Starting...");
 	LoadConfig();
+
 	// Init RakNet
 	net = RakNetworkFactory::GetRakPeerInterface();
 	SocketDescriptor s(sConf.Port, 0);
@@ -140,7 +155,9 @@ int main()
     sqstd_seterrorhandlers(v);
 
 	// Load Game Mode
-	if(!SQ_SUCCEEDED(sqstd_dofile(v, _SC(sConf.GameMode[0]), 0, 1))) 
+	char gamemode[256];
+	sprintf(gamemode, "gamemodes/%s", sConf.GameMode[0]);
+	if(!SQ_SUCCEEDED(sqstd_dofile(v, _SC(gamemode), 0, 1))) 
     {
 		print("Can't load gamemode");
 		return 1;
@@ -151,6 +168,7 @@ int main()
 	// Body
 	Packet *pack;
 	debug("Started");
+	
 	while(sConf.Run == 1)
 	{
 		pack = net->Receive();
@@ -199,7 +217,7 @@ int main()
 				}
 			}
 		}
-
+		net->DeallocatePacket(pack);
 		Sleep(100);
 	}
 

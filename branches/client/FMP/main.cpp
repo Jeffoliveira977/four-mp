@@ -30,6 +30,7 @@
 #include "net\NetworkIDManager.h"
 
 #include "Check\check.h"
+#include "d3d9\d3d9hook.h"
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                     Потоки для работы с игрой                                         */
 /* ----------------------------------------------------------------------------------------------------- */
@@ -37,7 +38,7 @@ FMPHook HOOK;
 RakPeerInterface *net;
 SystemAddress servAddr;
 
-int mp_state = 0;
+int mp_state = -2;
 int MyID = 0;
 int LastUpdate = 0;
 bool myEnter = 0;
@@ -50,7 +51,6 @@ FPlayer gPlayer[MAX_PLAYERS];
 FVehicle gCar[MAX_CARS];
 FConfig Conf;
 PlayerClass pClass[MAX_PCLASS];
-
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                           Ф У Н К Ц И И                                               */
 /* ----------------------------------------------------------------------------------------------------- */
@@ -353,11 +353,7 @@ void FMPHook::GameThread()
 	REGISTER_STATIC_RPC(net, ::SyncSkinVariation);
 	REGISTER_STATIC_RPC(net, ::PlayerSpawn);
 
-	// Коннект
-	Log("MainThread Connect");
-	net->Connect(Conf.server, Conf.port, 0, 0, 0);
-	servAddr.SetBinaryAddress(Conf.server);
-	servAddr.port = Conf.port;
+	mp_state = -1;
 	//-------------------
 	Log("GameThread");
 	
@@ -366,12 +362,22 @@ void FMPHook::GameThread()
 		//player_dump();
 		//car_dump();
 		Debug("FIBERFIBERFIBER");
-		if(mp_state == 0)
+		if(mp_state == -1)
+		{
+			
+		}
+		else if(mp_state == 0)
 		{
 			RunMP();
 			mp_state++;
 			Log("mp_state++");
 			LastUpdate = GetTickCount();
+
+			// Коннект
+			Log("MainThread Connect");
+			net->Connect(Conf.server, Conf.port, 0, 0, 0);
+			servAddr.SetBinaryAddress(Conf.server);
+			servAddr.port = Conf.port;
 		}
 		else if(mp_state == 1 && GetTickCount() - LastUpdate > 15*1000)
 		{
@@ -599,7 +605,7 @@ void MainThread(void* dummy)
 	/*while(!*(BYTE*)(0xfc3fff+dwLoadOffset)) { Sleep(100); }
 	GameStart();*/
 
-	Debug("START");
+	Debug("START (0x%x)", dwLoadOffset);
 
 	/* Зацепляем наш GtaThread к игре */
 	HOOK.AttachGtaThread();
@@ -612,7 +618,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
 		if(CheckSum() == 1 && FileExists("fmp.dll") && !FileExists("dsound.dll"))
+		{
+			DisableThreadLibraryCalls(hModule);
+			DetourFunc((BYTE*)(0xCE32AC+dwLoadOffset),(BYTE*)hkDirect3DCreate9, 5);
+
 			_beginthread(&MainThread, 0, NULL );
+		}
 		else
 		{
 			MessageBox(NULL, "Вы используете моды, которые могут мешать нормально синхронизировать вас с другими игроками\nПодробное описание ошибки можно прочитать в readme.txt или на сайте four-mp.com",

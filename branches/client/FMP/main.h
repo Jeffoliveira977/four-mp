@@ -10,6 +10,7 @@
 #ifndef main_cpp
 
 extern int MyID;
+extern int mp_state;
 
 extern FPlayer gPlayer[MAX_PLAYERS];
 extern FVehicle gCar[MAX_CARS];

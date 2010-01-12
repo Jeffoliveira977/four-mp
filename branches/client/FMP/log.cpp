@@ -23,7 +23,7 @@ void debug(const char* string)
 	temp = fopen("FMP_debug.txt","a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);
-	fprintf(temp, "[%d:%d:%d:%d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
+	fprintf(temp, "[%02d:%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 	fputs(string,temp);
 	fputs("\n",temp);
 	fclose(temp);
@@ -44,7 +44,7 @@ void log(const char* string)
 	temp = fopen("FMP_log.txt","a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);
-	fprintf(temp, "[%d:%d:%d:%d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
+	fprintf(temp, "[%02d:%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 	fputs(string,temp);
 	fputs("\n",temp);
 	fclose(temp);
@@ -69,7 +69,7 @@ void Debug(const char *string, ...)
 	temp = fopen("FMP_debug.txt","a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);
-	fprintf(temp, "[%d:%d:%d:%d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
+	fprintf(temp, "[%02d:%02d:%02d:%03d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 	fputs(buff,temp);
 	fputs("\n",temp);
 	fclose(temp);
@@ -88,7 +88,7 @@ void DebugEx(const char *file, const char *string, ...)
 	temp = fopen(file,"a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);
-	fprintf(temp, "[%d:%d:%d:%d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
+	fprintf(temp, "[%02d:%02d:%02d:%03d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 	fputs(buff,temp);
 	fputs("\n",temp);
 	fclose(temp);

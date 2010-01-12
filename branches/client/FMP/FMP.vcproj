@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="FMP"
+	Name="Client"
 	ProjectGUID="{F5F35527-C522-496E-96C7-70B635CF5AB8}"
 	RootNamespace="FMPHook"
 	Keyword="Win32Proj"
@@ -207,6 +207,38 @@
 				RelativePath=".\rpc.cpp"
 				>
 			</File>
+			<Filter
+				Name="d3d9"
+				>
+				<File
+					RelativePath=".\d3d9dev.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\d3d9hook.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\d3d9int.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\d3d9tex.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Hook"
+				>
+				<File
+					RelativePath=".\Hook\hook.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Hook\thread.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Заголовочные файлы"
@@ -258,6 +290,26 @@
 				</File>
 				<File
 					RelativePath=".\Hook\types.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="d3d9"
+				>
+				<File
+					RelativePath=".\d3d9dev.h"
+					>
+				</File>
+				<File
+					RelativePath=".\d3d9hook.h"
+					>
+				</File>
+				<File
+					RelativePath=".\d3d9int.h"
+					>
+				</File>
+				<File
+					RelativePath=".\d3d9tex.h"
 					>
 				</File>
 			</Filter>
