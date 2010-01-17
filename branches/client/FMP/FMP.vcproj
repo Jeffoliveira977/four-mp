@@ -175,7 +175,7 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Файлы исходного кода"
+			Name="Source Files"
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
@@ -211,19 +211,19 @@
 				Name="d3d9"
 				>
 				<File
-					RelativePath=".\d3d9dev.cpp"
+					RelativePath=".\d3d9\d3d9dev.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\d3d9hook.cpp"
+					RelativePath=".\d3d9\d3d9hook.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\d3d9int.cpp"
+					RelativePath=".\d3d9\d3d9int.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\d3d9tex.cpp"
+					RelativePath=".\d3d9\d3d9tex.cpp"
 					>
 				</File>
 			</Filter>
@@ -241,7 +241,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Заголовочные файлы"
+			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
@@ -297,40 +297,22 @@
 				Name="d3d9"
 				>
 				<File
-					RelativePath=".\d3d9dev.h"
+					RelativePath=".\d3d9\d3d9dev.h"
 					>
 				</File>
 				<File
-					RelativePath=".\d3d9hook.h"
+					RelativePath=".\d3d9\d3d9hook.h"
 					>
 				</File>
 				<File
-					RelativePath=".\d3d9int.h"
+					RelativePath=".\d3d9\d3d9int.h"
 					>
 				</File>
 				<File
-					RelativePath=".\d3d9tex.h"
+					RelativePath=".\d3d9\d3d9tex.h"
 					>
 				</File>
 			</Filter>
-		</Filter>
-		<Filter
-			Name="Файлы ресурсов"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath=".\Deleted parts.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\Game structures.txt"
-				>
-			</File>
-			<File
-				RelativePath=".\Project.txt"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Check"
@@ -349,6 +331,24 @@
 			</File>
 			<File
 				RelativePath=".\Check\crc.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
+			>
+			<File
+				RelativePath=".\Deleted parts.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\Game structures.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\Project.txt"
 				>
 			</File>
 		</Filter>
