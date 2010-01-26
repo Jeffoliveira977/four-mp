@@ -1,7 +1,7 @@
 /*	Direct3D9 Device */
 
 #include <windows.h>
-#include "main.h"
+#include "../main.h"
 #include "d3d9hook.h"
 
 #define D3DHOOK_TEXTURES //comment this to disable texture hooking

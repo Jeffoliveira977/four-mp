@@ -1,7 +1,7 @@
 /*	Direct3D9 Texture */
 
 #include <windows.h>
-#include "main.h"
+#include "../main.h"
 #include "d3d9hook.h"
 
 HRESULT APIENTRY hkIDirect3DTexture9::QueryInterface(REFIID riid, void** ppvObj)

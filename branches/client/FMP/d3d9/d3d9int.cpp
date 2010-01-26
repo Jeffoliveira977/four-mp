@@ -1,7 +1,7 @@
 /*	Direct3D9 Interface */
 
 #include <windows.h>
-#include "main.h"
+#include "../main.h"
 #include "d3d9hook.h"
 
 extern LPD3DXFONT pFont;
