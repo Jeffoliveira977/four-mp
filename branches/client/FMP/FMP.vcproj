@@ -285,6 +285,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\natives_list.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Hook\scripting.h"
 					>
 				</File>

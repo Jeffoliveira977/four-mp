@@ -152,7 +152,8 @@ void FMPHook::CarDoSync()
 	else if(GetAsyncKeyState(71) != 0 && !IsCharInAnyCar(_GetPlayerPed()) && myEnter == 0)
 	{
 		Log("GGGGG");
-		int carid, seatid = 0, max;
+		int carid, seatid = 0; 
+		unsigned int max;
 		float x, y, z;
 		GetCharCoordinates(_GetPlayerPed(), &x, &y, &z);
 		carid = _GetClosestCar(x, y, z, 10);
@@ -269,7 +270,7 @@ void FMPHook::GunSync()
 		PlayerDamage dam;
 		dam.pid = -1; dam.hp = 0; dam.armour = 0;
 
-		int hp, ar;
+		unsigned int hp, ar;
 		for(int i=0; i<MAX_PLAYERS; i++)
 		{
 			if(gPlayer[i].connected == 1)
@@ -344,7 +345,7 @@ void FMPHook::GunSync()
 
 void FMPHook::StatusSync()
 {
-	int hp, arm;
+	unsigned int hp, arm;
 	GetCharHealth(_GetPlayerPed(), &hp);
 	GetCharArmour(_GetPlayerPed(), &arm);
 	if(hp != gPlayer[MyID].health || arm != gPlayer[MyID].armour)

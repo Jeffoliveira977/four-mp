@@ -28,3 +28,11 @@ extern DWORD dwLoadOffset;
 sysArray<GtaThread>* GetThreadsArray();
 scrThread* GetActiveThread();
 void SetActiveThread(scrThread* thread);
+
+void InstallMethodHook(DWORD dwInstallAddress,DWORD dwHookFunction);
+void InstallHook(DWORD dwInstallAddress,DWORD dwHookFunction,DWORD dwHookStorage,BYTE* pbyteJmpCode,int iJmpCodeSize);
+
+bool Unlock(void *address, int len);
+void Call(DWORD from, DWORD to);
+
+#define POINTER_TO_MEMBER(m,n,o) temp = n, m = *(o *)&temp

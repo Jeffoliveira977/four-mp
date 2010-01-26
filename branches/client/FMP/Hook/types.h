@@ -7,6 +7,7 @@
 #include "enums.h"
 
 #define DefineScriptHandle(name) typedef struct : FMPHookHandle {} name
+#define DefineInheritedScriptHandle(name, baseName) typedef struct : baseName {} name
 
 typedef struct _FMPHookHandle
 {
@@ -27,12 +28,15 @@ typedef struct _FMPHookHandle
 		inline bool operator != (const unsigned int handle) { return Handle != handle; }
 } FMPHookHandle;
 
+typedef unsigned int Player;     // Left as u32 for legacy support
+typedef unsigned int FireId;
+
 DefineScriptHandle(Ped);
 DefineScriptHandle(Vehicle);
 DefineScriptHandle(Cam);
 DefineScriptHandle(CarGenerator);
 DefineScriptHandle(Group);
-DefineScriptHandle(Train);
+DefineInheritedScriptHandle(Train, Vehicle);
 DefineScriptHandle(Pickup);
 DefineScriptHandle(Object);
 DefineScriptHandle(Interior);
@@ -43,6 +47,12 @@ DefineScriptHandle(CoverPoint);
 DefineScriptHandle(DecisionMaker);
 DefineScriptHandle(Camera);
 DefineScriptHandle(TaskSequence);
+
+// For legacy script support...
+typedef Ped Char;
+typedef Vehicle Car;
+
+typedef unsigned int ColourIndex;  
 
 typedef unsigned int ScriptVoid;
 typedef unsigned int ScriptAny;

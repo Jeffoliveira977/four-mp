@@ -203,6 +203,7 @@ void FMPHook::RunMP()
 	SetIntStat(STAT_PROGRESS_WITH_BARBARA, 0);
 	SetIntStat(STAT_PROGRESS_WITH_KATIE, 0);
 	SetIntStat(STAT_PROGRESS_WITH_MILLIE, 0);
+	
 	Log("RunMP FloatStat");
 	SetFloatStat(STAT_TOTAL_PROGRESS, 100);
 	SetFloatStat(STAT_ROMAN_LIKE, 100);
@@ -242,6 +243,7 @@ void FMPHook::RunMP()
 	SetFloatStat(STAT_KATE_FONDNESS, 100);
 	SetFloatStat(STAT_KATE_TRUST, 100);
 	SetFloatStat(STAT_GAME_PROGRESS, 100);
+	
 	Log("RunMP: Terminate");
 	TerminateAllScriptsWithThisName("initial");
 	TerminateAllScriptsWithThisName("main");
@@ -297,9 +299,11 @@ void FMPHook::RunMP()
 	TerminateAllScriptsWithThisName("foodserver");
 	TerminateAllScriptsWithThisName("garbage_trucks");
 	TerminateAllScriptsWithThisName("stunt");
-
+	
+	
 	ClearAreaOfChars(0,0,0, 2000);
-	ClearAreaOfCops(0,0,0, 2000);
+	//ClearAreaOfCops(0,0,0, 2000);
+	
 	Log("RunMP: Ped");
 
 	Ped Player;
@@ -364,7 +368,7 @@ void FMPHook::GameThread()
 		Debug("FIBERFIBERFIBER");
 		if(mp_state == -1)
 		{
-			
+			mp_state = 0;
 		}
 		else if(mp_state == 0)
 		{
@@ -617,7 +621,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 {
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
-		if(CheckSum() == 1 && FileExists("fmp.dll") && !FileExists("dsound.dll"))
+		if(CheckSum() == 1 && FileExists("client.asi") && !FileExists("dsound.dll"))
 		{
 			DisableThreadLibraryCalls(hModule);
 			DetourFunc((BYTE*)(0xCE32AC+dwLoadOffset),(BYTE*)hkDirect3DCreate9, 5);
