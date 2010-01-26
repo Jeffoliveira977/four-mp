@@ -177,6 +177,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Console.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -208,6 +212,10 @@
 			>
 			<File
 				RelativePath=".\cfg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Console.h"
 				>
 			</File>
 			<File
