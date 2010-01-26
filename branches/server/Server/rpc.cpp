@@ -32,7 +32,7 @@ net->RPC("FUNC",&bsSend,HIGH_PRIORITY,RELIABLE,0,sender,false, 0, UNASSIGNED_NET
 
 void ClientConnect(RPCParameters *rpcParameters)
 {
-	debug("ClientConnect Start");
+	con.Debug("ClientConnect Start");
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 	SystemAddress sender = rpcParameters->sender;
@@ -44,7 +44,7 @@ void ClientConnect(RPCParameters *rpcParameters)
 	bsData.Read(size);
 	bsData.Read(name, size);
 	name[size] = '\0';
-	debug("ClientConnect FOR 1 %s[%d]", name, size);
+	con.Debug("ClientConnect FOR 1 %s[%d]", name, size);
 	for(int i=0; i < MAX_PLAYERS; i++)
 	{
 		if(gPlayer[i].connected == 1 && strcmp(gPlayer[i].name, name) == 0)
@@ -55,12 +55,12 @@ void ClientConnect(RPCParameters *rpcParameters)
 			return;
 		}
 	}
-	debug("ClientConnect FOR 2");
+	con.Debug("ClientConnect FOR 2");
 	for(int index=0; index < MAX_PLAYERS; index++)
 	{
 		if(gPlayer[index].connected != 1)
 		{
-			print("New player %s[%d] connected", name, index);
+			con.Print("New player %s[%d] connected", name, index);
 
 			int r = PlayerConnect(name, index);
 			if(r != 0)
@@ -113,16 +113,16 @@ void ClientConnect(RPCParameters *rpcParameters)
 
 			bsSend.Write(gPlayer[index].color);
 
-			debug("ClientConnect ME SEND TO %s:%d  - %d", gPlayer[index].ip, gPlayer[index].port, gPlayer[index].model);
+			con.Debug("ClientConnect ME SEND TO %s:%d  - %d", gPlayer[index].ip, gPlayer[index].port, gPlayer[index].model);
 			bool rs = net->RPC("ConnectPlayer",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
 			printf("%d", rs);
-			debug("ClientConnect ME END");
+			con.Debug("ClientConnect ME END");
 
 			for(int i = 0; i < MAX_PLAYERS; i++)
 			{
 				if(gPlayer[i].connected == 1 && i != index)
 				{
-					debug("+++ %d != %d | %d", i, index, gPlayer[i].connected);
+					con.Debug("+++ %d != %d | %d", i, index, gPlayer[i].connected);
 
 					bsSend.Reset();
 					bsSend.Write(strlen(gPlayer[index].name));
@@ -160,9 +160,9 @@ void ClientConnect(RPCParameters *rpcParameters)
 
 					bsSend.Write(gPlayer[index].color);
 
-					debug("ClientConnect SEND TO %s:%d  - %d", gPlayer[i].ip, gPlayer[i].port, gPlayer[index].model);
+					con.Debug("ClientConnect SEND TO %s:%d  - %d", gPlayer[i].ip, gPlayer[i].port, gPlayer[index].model);
 					net->RPC("ConnectPlayer",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[i].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
-					debug("ClientConnect END");
+					con.Debug("ClientConnect END");
 
 					bsSend.Reset();
 					bsSend.Write(strlen(gPlayer[i].name));
@@ -199,12 +199,12 @@ void ClientConnect(RPCParameters *rpcParameters)
 					bsSend.Write(gPlayer[i].gAmmo[7]);
 
 					bsSend.Write(gPlayer[i].color);
-					debug("+++ ClientConnect SEND TO %s - %d", gPlayer[i].name, gPlayer[i].model);
+					con.Debug("+++ ClientConnect SEND TO %s - %d", gPlayer[i].name, gPlayer[i].model);
 					net->RPC("ConnectPlayer",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
-					debug("+++ ClientConnect END");
+					con.Debug("+++ ClientConnect END");
 				}
 			}
-			debug("+++--------------------+++");
+			con.Debug("+++--------------------+++");
 			for(int i = 0; i < MAX_VEHICLES; i++)
 			{
 				if(gVehicle[i].exist == 1)
@@ -229,7 +229,7 @@ void ClientConnect(RPCParameters *rpcParameters)
 				bSend.Write(pClass[j]);
 
 			net->RPC("ClassSync",&bSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa ,false, 0, UNASSIGNED_NETWORK_ID, 0);
-			debug("------------------");
+			con.Debug("------------------");
 			return;
 		}
 	}
@@ -281,7 +281,7 @@ void MovePlayer(RPCParameters *rpcParameters)
 	gPlayer[index].z = z;
 	gPlayer[index].angle = a;
 
-	debug("PlayerMove %d to (%f,%f,%f)", index, x, y, z);
+	con.Debug("PlayerMove %d to (%f,%f,%f)", index, x, y, z);
 
 	if(gPlayer[index].car_enter == 1) return;
 
@@ -309,7 +309,7 @@ void JumpPlayer(RPCParameters *rpcParameters)
 	
 	int index = GetPlayerID(sender);
 
-	debug("JUMP %d", index);
+	con.Debug("JUMP %d", index);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -337,7 +337,7 @@ void DuckPlayer(RPCParameters *rpcParameters)
 
 	gPlayer[index].duck = duck;
 
-	debug("DUCK %d to %d", index, duck);
+	con.Debug("DUCK %d to %d", index, duck);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -370,7 +370,7 @@ void PlayerEnterInVehicle(RPCParameters *rpcParameters)
 		gPlayer[index].car_enter = 1;
 		gPlayer[index].seat_id = seat;
 
-		debug("ENTER To CAR %d to %d as %d", index, car, seat);
+		con.Debug("ENTER To CAR %d to %d as %d", index, car, seat);
 
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -400,7 +400,7 @@ void PlayerCancelEnterInVehicle(RPCParameters *rpcParameters)
 	gPlayer[index].car_id = -1;
 	gPlayer[index].car_enter = 0;
 
-	debug("PlayerCancelEnterInVehicle %d", index);
+	con.Debug("PlayerCancelEnterInVehicle %d", index);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -423,7 +423,7 @@ void PlayerExitFromVehicle(RPCParameters *rpcParameters)
 	gPlayer[index].car_id = -1;
 	gPlayer[index].car_enter = 0;
 
-	debug("PlayerExitFromVehicle %d", index);
+	con.Debug("PlayerExitFromVehicle %d", index);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -464,7 +464,7 @@ void PlayerFire(RPCParameters *rpcParameters)
 		gPlayer[dam.pid].armour = dam.armour;
 	}
 
-	debug("FIRE %d to %d", index, gun);
+	con.Debug("FIRE %d to %d", index, gun);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -502,7 +502,7 @@ void PlayerAim(RPCParameters *rpcParameters)
 
 	gPlayer[index].gun = gun;
 
-	debug("AIM %d to %d", index, gun);
+	con.Debug("AIM %d to %d", index, gun);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -535,7 +535,7 @@ void SwapGun(RPCParameters *rpcParameters)
 
 	gPlayer[index].gun = gun;
 
-	debug("SWAP %d to %d", index, gun);
+	con.Debug("SWAP %d to %d", index, gun);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -566,7 +566,7 @@ void PlayerParams(RPCParameters *rpcParameters)
 	gPlayer[index].health = hp;
 	gPlayer[index].armour = arm;
 
-	debug("PlayerParams %d to %d", index, hp);
+	con.Debug("PlayerParams %d to %d", index, hp);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -583,13 +583,13 @@ void PlayerParams(RPCParameters *rpcParameters)
 
 void PlayerSpawn(RPCParameters *rpcParameters)
 {
-	debug("PlayerSpawn");
+	con.Debug("PlayerSpawn");
 }
 void Select_ModelChanged(RPCParameters *rpcParameters)
 {
-	debug("ModelChanged [select]");
+	con.Debug("ModelChanged [select]");
 }
 void SyncSkinVariation(RPCParameters *rpcParameters)
 {
-	debug("SyncSkinVariation");
+	con.Debug("SyncSkinVariation");
 }

@@ -36,7 +36,7 @@ int PlayerConnect(char *name, int index)
 {
 	gPlayer[index].Clean();
 	
-	debug("### I'm set PLAYER MODEL");
+	con.Debug("### I'm set PLAYER MODEL");
 	if(sc_OnPlayerConnect(v, index, name) == 0)
 	{
 		return 3;

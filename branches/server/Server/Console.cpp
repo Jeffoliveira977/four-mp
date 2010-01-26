@@ -3,6 +3,7 @@
 #include <conio.h>
 #include <string.h>
 #include <stdarg.h>
+#include <windows.h>
 
 #include "Console.h"
 
@@ -198,8 +199,36 @@ void Console::Print(const char *string, ...)
 	char *tempstring = (char *)calloc(stringsize+1, sizeof(char));
 	vsprintf(tempstring, string, arglist);
 	va_end(arglist);
-	this->WriteToOutputBuffer(string);
+	this->WriteToOutputBuffer(tempstring);
 	this->UpdateScreen();
+	//FMP specific
+	FILE *f = fopen("server.log", "a");
+	SYSTEMTIME time;
+	GetSystemTime(&time);
+	fprintf(f, "[%02d.%02d %02d:%02d:%02d] %s\n", time.wDay, time.wMonth, time.wHour, time.wMinute, time.wSecond, tempstring);
+	fclose(f);
+	//END FMP specific
+	free(tempstring);
+}
+
+void Console::Debug(const char *string, ...)
+{
+	va_list arglist; 
+    va_start(arglist, string);
+	int stringsize = _vscprintf(string, arglist);
+	char *tempstring = (char *)calloc(stringsize+1, sizeof(char));
+	vsprintf(tempstring, string, arglist);
+	va_end(arglist);
+	this->WriteToOutputBuffer(tempstring);
+	this->UpdateScreen();
+	//FMP specific
+	FILE *f = fopen("server.log", "a");
+	SYSTEMTIME time;
+	GetSystemTime(&time);
+	fprintf(f, "<%02d.%02d %02d:%02d:%02d> %s\n", time.wDay, time.wMonth, time.wHour, time.wMinute, time.wSecond, tempstring);
+	fclose(f);
+	//END FMP specific
+	free(tempstring);
 }
 
 void Console::ClearScreen(void)

@@ -39,6 +39,7 @@
 ///////////////////////////////////////////////
 //                V  A  R  S                 //
 ///////////////////////////////////////////////
+Console con;
 RakPeerInterface *net;
 HSQUIRRELVM v; 
 Player gPlayer[MAX_PLAYERS];
@@ -105,7 +106,7 @@ void LoadConfig()
 
 int main()
 {
-	print("Starting...");
+	con.Print("Starting...");
 	LoadConfig();
 
 	// Init RakNet
@@ -159,7 +160,7 @@ int main()
 	sprintf(gamemode, "gamemodes/%s", sConf.GameMode[0]);
 	if(!SQ_SUCCEEDED(sqstd_dofile(v, _SC(gamemode), 0, 1))) 
     {
-		print("Can't load gamemode");
+		con.Print("Can't load gamemode");
 		return 1;
     }
 
@@ -167,18 +168,19 @@ int main()
 
 	// Body
 	Packet *pack;
-	debug("Started");
+	con.Debug("Started");
 	
 	while(sConf.Run == 1)
 	{
+		con.CheckUserInput();
 		pack = net->Receive();
 		if(pack)
 		{
-			debug("Pack: %s[%d], %s", pack->data, pack->data[0], pack->systemAddress.ToString());
+			con.Debug("Pack: %s[%d], %s", pack->data, pack->data[0], pack->systemAddress.ToString());
 			if((pack->data[0] == ID_DISCONNECTION_NOTIFICATION) || (pack->data[0] == ID_CONNECTION_LOST)) // Disconnect
 			{
 				int index = GetPlayerID(pack->systemAddress);
-				print("Player %s[%d] disconnected", gPlayer[GetPlayerID(pack->systemAddress)].name, GetPlayerID(pack->systemAddress));
+				con.Print("Player %s[%d] disconnected", gPlayer[GetPlayerID(pack->systemAddress)].name, GetPlayerID(pack->systemAddress));
 				PlayerDisconnect(index);
 				for(int i=0; i<MAX_PLAYERS;i++)
 				{
@@ -192,11 +194,11 @@ int main()
 			}
 			else if(pack->data[0] == ID_NEW_INCOMING_CONNECTION)
 			{
-				debug("New connection from %s:%d", pack->systemAddress.ToString(0), pack->systemAddress.port);
+				con.Debug("New connection from %s:%d", pack->systemAddress.ToString(0), pack->systemAddress.port);
 			}
 			else if(pack->data[0] == ID_CONNECTION_REQUEST)
 			{
-				debug("New connection request");
+				con.Debug("New connection request");
 			}
 		}
 		if(GetTickCount() - LastCheck >= 30000)
@@ -213,7 +215,7 @@ int main()
 
 					RakNet::BitStream bsSend;
 					net->RPC("Check",&bsSend,HIGH_PRIORITY,RELIABLE,0,client,false, 0, UNASSIGNED_NETWORK_ID, 0);
-					debug("Check %d", i);
+					con.Debug("Check %d", i);
 				}
 			}
 		}

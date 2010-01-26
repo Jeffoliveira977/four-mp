@@ -7,6 +7,7 @@ public:
 	~Console(void);
 	void CheckUserInput(void); //Handles keyboard input
 	void Print(const char *string, ...); //Prints string to the output page
+	void Debug(const char *string, ...);
 private:
 	char **outputbuffer;
 	char **inputbuffer;
