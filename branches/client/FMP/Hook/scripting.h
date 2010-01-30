@@ -19,7 +19,7 @@ namespace Natives
 	static void SetPedDensityMultiplier(unsigned int den) { NativeInvoke::Invoke<NATIVE_SET_PED_DENSITY_MULTIPLIER, ScriptVoid>(den); }
 	static void SetCarDensityMultiplier(unsigned int den) { NativeInvoke::Invoke<NATIVE_SET_CAR_DENSITY_MULTIPLIER, ScriptVoid>(den); }
 	static void DisableCarGenerators(ScriptAny p0) { NativeInvoke::Invoke<NATIVE_DISABLE_CAR_GENERATORS, ScriptVoid>(p0); }
-	static void DisableCarGeneratorsWithHeli(ScriptAny p0) {/* NativeInvoke::Invoke<NATIVE_DISABLE_CAR_GENERATORS_WITH_HELI, ScriptVoid>(p0); */}
+	//static void DisableCarGeneratorsWithHeli(ScriptAny p0) { NativeInvoke::Invoke<NATIVE_DISABLE_CAR_GENERATORS_WITH_HELI, ScriptVoid>(p0); }
 	static void SetNoResprays(bool no) { NativeInvoke::Invoke<NATIVE_SET_NO_RESPRAYS,ScriptVoid>(no); }
 	static void TerminateAllScriptsWithThisName(char * name) { NativeInvoke::Invoke<NATIVE_TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME,ScriptVoid>(name); }
 	static void SetMaxWantedLevel(unsigned int max) { NativeInvoke::Invoke<NATIVE_SET_MAX_WANTED_LEVEL,ScriptVoid>(max); }
@@ -80,7 +80,7 @@ namespace Natives
 	static void CreateCar(unsigned int nameHash, float x, float y, float z, Vehicle *pVehicle, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_CREATE_CAR, ScriptVoid>(nameHash, x, y, z, pVehicle, unknownTrue); }
 	static void SetCarHeading(Vehicle vehicle, float dir) { NativeInvoke::Invoke<NATIVE_SET_CAR_HEADING, ScriptVoid>(vehicle, dir); }
 	static void GetCarCharIsUsing(Ped ped, Vehicle *pVehicle) { NativeInvoke::Invoke<NATIVE_GET_CAR_CHAR_IS_USING, ScriptVoid>(ped, pVehicle); }
-	static void AllowEmergencyServices(bool allow) {/* NativeInvoke::Invoke<NATIVE_ALLOW_EMERGENCY_SERVICES, ScriptVoid>(allow); */}
+	//static void AllowEmergencyServices(bool allow) { NativeInvoke::Invoke<NATIVE_ALLOW_EMERGENCY_SERVICES, ScriptVoid>(allow); }
 	static void SwitchAmbientPlanes(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_AMBIENT_PLANES, ScriptVoid>(on); }  
 	static void SwitchArrowAboveBlippedPickups(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_ARROW_ABOVE_BLIPPED_PICKUPS, ScriptVoid>(on); }
 	static void SwitchRandomBoats(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_RANDOM_BOATS, ScriptVoid>(on); }
@@ -94,25 +94,25 @@ namespace Natives
 	static unsigned int GetCharDrawableVariation(Ped ped, ePedComponent component) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_DRAWABLE_VARIATION, ScriptAny>(ped, component); }
 	static unsigned int GetCharTextureVariation(Ped ped, ePedComponent component) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_TEXTURE_VARIATION, unsigned int>(ped, component); }
 	static void PrintStringWithLiteralStringNow(const char *gxtName, const char *text, unsigned int timeMS, bool enable) { NativeInvoke::Invoke<NATIVE_PRINT_STRING_WITH_LITERAL_STRING_NOW, ScriptVoid>(gxtName, text, timeMS, enable); }
+	
 
-
-/*
+///////////////////////////////////
 
     static void AddScore(Player playerIndex, int score) { NativeInvoke::Invoke<NATIVE_ADD_SCORE, ScriptVoid>(playerIndex, score); }
     static void AllowPlayerToCarryNonMissionObjects(Player playerIndex, bool allow) { NativeInvoke::Invoke<NATIVE_ALLOW_PLAYER_TO_CARRY_NON_MISSION_OBJECTS, ScriptVoid>(playerIndex, allow); }
     static void AlterWantedLevel(Player playerIndex,  unsigned int level) { NativeInvoke::Invoke<NATIVE_ALTER_WANTED_LEVEL, ScriptVoid>(playerIndex, level); }
     static void AlterWantedLevelNoDrop(Player playerIndex, unsigned int level) { NativeInvoke::Invoke<NATIVE_ALTER_WANTED_LEVEL_NO_DROP, ScriptVoid>(playerIndex, level); }
     static void ApplyWantedLevelChangeNow(Player playerIndex) { NativeInvoke::Invoke<NATIVE_APPLY_WANTED_LEVEL_CHANGE_NOW, ScriptVoid>(playerIndex); }
-    static void ChangePlayerModel(Player playerIndex, eModel model) { NativeInvoke::Invoke<NATIVE_CHANGE_PLAYER_MODEL, ScriptVoid>(playerIndex, model); }
+    //static void ChangePlayerModel(Player playerIndex, eModel model) { NativeInvoke::Invoke<NATIVE_CHANGE_PLAYER_MODEL, ScriptVoid>(playerIndex, model); }
     static void ClearPlayerHasDamagedAtLeastOnePed(Player playerIndex) { NativeInvoke::Invoke<NATIVE_CLEAR_PLAYER_HAS_DAMAGED_AT_LEAST_ONE_PED, ScriptVoid>(playerIndex); }
-    static Player ConvertIntToPlayerIndex(unsigned int playerId) { return NativeInvoke::Invoke<NATIVE_CONVERT_INT_TO_PLAYERINDEX, Player>(playerId); }
+    //static Player ConvertIntToPlayerIndex(unsigned int playerId) { return NativeInvoke::Invoke<NATIVE_CONVERT_INT_TO_PLAYERINDEX, Player>(playerId); }
     static void ClearWantedLevel(Player playerIndex) { NativeInvoke::Invoke<NATIVE_CLEAR_WANTED_LEVEL, ScriptVoid>(playerIndex); }
     static void CreatePlayer(unsigned int playerId, float x, float y, float z, Player *pPlayerIndex) { NativeInvoke::Invoke<NATIVE_CREATE_PLAYER, ScriptVoid>(playerId, x, y, z, pPlayerIndex); }
     static void DisablePlayerLockon(Player playerIndex, bool disabled) { NativeInvoke::Invoke<NATIVE_DISABLE_PLAYER_LOCKON, ScriptVoid>(playerIndex, disabled); }
     static void DisablePlayerSprint(Player playerIndex, bool disabled) { NativeInvoke::Invoke<NATIVE_DISABLE_PLAYER_SPRINT, ScriptVoid>(playerIndex, disabled); }
-    static void GetPlayerChar(Player playerIndex, Ped *pPed) { NativeInvoke::Invoke<NATIVE_GET_PLAYER_CHAR, ScriptVoid>(playerIndex, pPed); }
+    //static void GetPlayerChar(Player playerIndex, Ped *pPed) { NativeInvoke::Invoke<NATIVE_GET_PLAYER_CHAR, ScriptVoid>(playerIndex, pPed); }
     static void GetPlayerGroup(Player playerIndex, Group *pGroup) { NativeInvoke::Invoke<NATIVE_GET_PLAYER_GROUP, ScriptVoid>(playerIndex, pGroup); }
-    static unsigned int GetPlayerId() { return NativeInvoke::Invoke<NATIVE_GET_PLAYER_ID, unsigned int>(); }
+    //static unsigned int GetPlayerId() { return NativeInvoke::Invoke<NATIVE_GET_PLAYER_ID, unsigned int>(); }
     static void GetPlayersLastCarNoSave(Vehicle* pVehicle) { NativeInvoke::Invoke<NATIVE_GET_PLAYERS_LAST_CAR_NO_SAVE, ScriptVoid>(pVehicle); }
     static void GetPlayerMaxArmour(Player playerIndex, unsigned int *pMaxArmour) { NativeInvoke::Invoke<NATIVE_GET_PLAYER_MAX_ARMOUR, ScriptVoid>(playerIndex, pMaxArmour); }
     static const char *GetPlayerName(Player playerIndex) { return NativeInvoke::Invoke<NATIVE_GET_PLAYER_NAME, const char *>(playerIndex); }
@@ -164,7 +164,7 @@ namespace Natives
 
     // Ped
     static void AddAmmoToChar(Ped ped, eWeapon weapon, unsigned int amount) { NativeInvoke::Invoke<NATIVE_ADD_AMMO_TO_CHAR, ScriptVoid>(ped, weapon, amount); }
-    static void AddArmourToChar(Ped ped, unsigned int amount) { NativeInvoke::Invoke<NATIVE_ADD_ARMOUR_TO_CHAR, ScriptVoid>(ped, amount); }
+    //static void AddArmourToChar(Ped ped, unsigned int amount) { NativeInvoke::Invoke<NATIVE_ADD_ARMOUR_TO_CHAR, ScriptVoid>(ped, amount); }
     static void ApplyForceToPed(Ped ped, unsigned int unknown0_3, float x, float y, float z, float spinX, float spinY, float spinZ, unsigned int unknown4_0, unsigned int unknown5_1, unsigned int unknown6_1, unsigned int unknown7_1) { NativeInvoke::Invoke<NATIVE_APPLY_FORCE_TO_PED, ScriptVoid>(ped, unknown0_3, x, y, z, spinX, spinY, spinZ, unknown4_0, unknown5_1, unknown6_1, unknown7_1); }
     static void AttachPedToCar(Ped ped, Vehicle vehicle, unsigned int unknown0_0, float offsetX, float offsetY, float offsetZ, float unknown1_276, float unknown2_0, unsigned int unknown3_0, unsigned int unknown4_0) { NativeInvoke::Invoke<NATIVE_ATTACH_PED_TO_CAR, ScriptVoid>(ped, vehicle, unknown0_0, offsetX, offsetY, offsetZ, unknown1_276, unknown2_0, unknown3_0, unknown4_0); }
     static void BlockCharGestureAnims(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_BLOCK_CHAR_GESTURE_ANIMS, ScriptVoid>(ped, value); }
@@ -176,20 +176,20 @@ namespace Natives
     static void ClearCharLastWeaponDamage(Ped ped) { NativeInvoke::Invoke<NATIVE_CLEAR_CHAR_LAST_WEAPON_DAMAGE, ScriptVoid>(ped); } 
     static void ClearCharProp(Ped ped, bool unknown) { NativeInvoke::Invoke<NATIVE_CLEAR_CHAR_PROP, ScriptVoid>(ped, unknown); }
     static void ClearCharSecondaryTask(Ped ped) { NativeInvoke::Invoke<NATIVE_CLEAR_CHAR_SECONDARY_TASK, ScriptVoid>(ped); }
-    static void ClearCharTasks(Ped ped) { NativeInvoke::Invoke<NATIVE_CLEAR_CHAR_TASKS, ScriptVoid>(ped); }
+    //static void ClearCharTasks(Ped ped) { NativeInvoke::Invoke<NATIVE_CLEAR_CHAR_TASKS, ScriptVoid>(ped); }
     static void ClearCharTasksImmediately(Ped ped) { NativeInvoke::Invoke<NATIVE_CLEAR_CHAR_TASKS_IMMEDIATELY, ScriptVoid>(ped); }
     static void ClearRoomForChar(Ped ped) { NativeInvoke::Invoke<NATIVE_CLEAR_ROOM_FOR_CHAR, ScriptVoid>(ped); }
-    static void CreateChar(unsigned int type, eModel model, float x, float y, float z, Ped *pPed, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_CREATE_CHAR, ScriptVoid>(type, model, x, y, z, pPed, unknownTrue); }
+    //static void CreateChar(unsigned int type, eModel model, float x, float y, float z, Ped *pPed, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_CREATE_CHAR, ScriptVoid>(type, model, x, y, z, pPed, unknownTrue); }
     static void CreateRandomChar(float x, float y, float z, Ped *pPed) { NativeInvoke::Invoke<NATIVE_CREATE_RANDOM_CHAR, ScriptVoid>(x, y, z, pPed); }
     static void CreateRandomCharAsDriver(Vehicle vehicle, Ped *pPed) { NativeInvoke::Invoke<NATIVE_CREATE_RANDOM_CHAR_AS_DRIVER, ScriptVoid>(vehicle, pPed); }
     static void CreateRandomFemaleChar(float x, float y, float z, Ped *pPed) { NativeInvoke::Invoke<NATIVE_CREATE_RANDOM_FEMALE_CHAR, ScriptVoid>(x, y, z, pPed); }
     static void CreateRandomMaleChar(float x, float y, float z, Ped *pPed) { NativeInvoke::Invoke<NATIVE_CREATE_RANDOM_MALE_CHAR, ScriptVoid>(x, y, z, pPed); }
     static void DamageChar(Ped ped, unsigned int hitPoints, bool unknown) { NativeInvoke::Invoke<NATIVE_DAMAGE_CHAR, ScriptVoid>(ped, hitPoints, unknown); }
     static void DamagePedBodyPart(Ped ped, ePedBodyPart part, unsigned int hitPoints) { NativeInvoke::Invoke<NATIVE_DAMAGE_PED_BODY_PART, ScriptVoid>(ped, part, hitPoints); }
-    static void DeleteChar(Ped *pPed) { NativeInvoke::Invoke<NATIVE_DELETE_CHAR, ScriptVoid>(pPed); }
+    //static void DeleteChar(Ped *pPed) { NativeInvoke::Invoke<NATIVE_DELETE_CHAR, ScriptVoid>(pPed); }
     static void DetachPed(Ped ped, bool unknown) { NativeInvoke::Invoke<NATIVE_DETACH_PED, ScriptVoid>(ped, unknown); }
     static void DetachPedFromWithinCar(Ped ped, bool unknown) { NativeInvoke::Invoke<NATIVE_DETACH_PED_FROM_WITHIN_CAR, ScriptVoid>(ped, unknown); }
-    static bool DoesCharExist(Ped ped) { return NativeInvoke::Invoke<NATIVE_DOES_CHAR_EXIST, bool>(ped); }
+    //static bool DoesCharExist(Ped ped) { return NativeInvoke::Invoke<NATIVE_DOES_CHAR_EXIST, bool>(ped); }
     static void DropObject(Ped ped, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_DROP_OBJECT, ScriptVoid>(ped, unknownTrue); }
     static void ExplodeCharHead(Ped ped) { NativeInvoke::Invoke<NATIVE_EXPLODE_CHAR_HEAD, ScriptVoid>(ped); }
     static void ExtinguishCharFire(Ped ped) { NativeInvoke::Invoke<NATIVE_EXTINGUISH_CHAR_FIRE, ScriptVoid>(ped); }
@@ -197,34 +197,34 @@ namespace Natives
     static void ForceCharToDropWeapon(Ped ped) { NativeInvoke::Invoke<NATIVE_FORCE_CHAR_TO_DROP_WEAPON, ScriptVoid>(ped); }
     static ScriptAny ForcePedPinnedDown(Ped ped, bool force, unsigned int timerMaybe) { return NativeInvoke::Invoke<NATIVE_FORCE_PED_PINNED_DOWN, ScriptAny>(ped, force, timerMaybe); }
     static void ForcePedToFleeWhilstDrivingVehicle(Ped ped, Vehicle vehicle) { NativeInvoke::Invoke<NATIVE_FORCE_PED_TO_FLEE_WHILST_DRIVING_VEHICLE, ScriptVoid>(ped, vehicle); }
-    static void FreezeCharPosition(Ped ped, bool frozen) { NativeInvoke::Invoke<NATIVE_FREEZE_CHAR_POSITION, ScriptVoid>(ped, frozen); }
+    //static void FreezeCharPosition(Ped ped, bool frozen) { NativeInvoke::Invoke<NATIVE_FREEZE_CHAR_POSITION, ScriptVoid>(ped, frozen); }
     static void FreezeCharPositionAndDontLoadCollision(Ped ped, bool frozen) { NativeInvoke::Invoke<NATIVE_FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION, ScriptVoid>(ped, frozen); }
     static void GetAmmoInCharWeapon(Ped ped, eWeapon weapon, unsigned int *pAmmo) { NativeInvoke::Invoke<NATIVE_GET_AMMO_IN_CHAR_WEAPON, ScriptVoid>(ped, weapon, pAmmo); }
     static bool GetAmmoInClip(Ped ped, eWeapon weapon, unsigned int *pAmmo) { return NativeInvoke::Invoke<NATIVE_GET_AMMO_IN_CLIP, bool>(ped, weapon, pAmmo); }
     static const char *GetAnimGroupFromChar(Ped ped) { return NativeInvoke::Invoke<NATIVE_GET_ANIM_GROUP_FROM_CHAR, const char *>(ped); }
-    static void GetCharCoordinates(Ped ped, float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_CHAR_COORDINATES, ScriptVoid>(ped, pX, pY, pZ); }
-    static void GetCharHealth(Ped ped, unsigned int *pHealth) { NativeInvoke::Invoke<NATIVE_GET_CHAR_HEALTH, ScriptVoid>(ped, pHealth); }
+    //static void GetCharCoordinates(Ped ped, float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_CHAR_COORDINATES, ScriptVoid>(ped, pX, pY, pZ); }
+    //static void GetCharHealth(Ped ped, unsigned int *pHealth) { NativeInvoke::Invoke<NATIVE_GET_CHAR_HEALTH, ScriptVoid>(ped, pHealth); }
     static void GetCharAnimCurrentTime(Ped ped, const char *animGroup, const char *animName, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CHAR_ANIM_CURRENT_TIME, ScriptVoid>(ped, animGroup, animName, pValue); }
     static void GetCharAnimTotalTime(Ped ped, const char *animGroup, const char *animName, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CHAR_ANIM_TOTAL_TIME, ScriptVoid>(ped, animGroup, animName, pValue); }
-    static void GetCharArmour(Ped ped, unsigned int *pArmour) { NativeInvoke::Invoke<NATIVE_GET_CHAR_ARMOUR, ScriptVoid>(ped, pArmour); }
-    static unsigned int GetCharDrawableVariation(Ped ped, ePedComponent component) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_DRAWABLE_VARIATION, ScriptAny>(ped, component); }
+    //static void GetCharArmour(Ped ped, unsigned int *pArmour) { NativeInvoke::Invoke<NATIVE_GET_CHAR_ARMOUR, ScriptVoid>(ped, pArmour); }
+    //static unsigned int GetCharDrawableVariation(Ped ped, ePedComponent component) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_DRAWABLE_VARIATION, ScriptAny>(ped, component); }
     static void GetCharExtractedDisplacement(Ped ped, bool unknown, float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_CHAR_EXTRACTED_DISPLACEMENT, ScriptVoid>(ped, unknown, pX, pY, pZ); }
-    static void GetCharHeading(Ped ped, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CHAR_HEADING, ScriptVoid>(ped, pValue); }
+    //static void GetCharHeading(Ped ped, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CHAR_HEADING, ScriptVoid>(ped, pValue); }
     static void GetCharHeightAboveGround(Ped ped, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CHAR_HEIGHT_ABOVE_GROUND, ScriptVoid>(ped, pValue); }
     static ScriptAny GetCharLastDamageBone(Ped ped, ePedBone *pBone) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_LAST_DAMAGE_BONE, ScriptAny>(ped, pBone); }
     static bool GetCharMeleeActionFlag0(Ped ped) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_MELEE_ACTION_FLAG0, bool>(ped); }
     static bool GetCharMeleeActionFlag1(Ped ped) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_MELEE_ACTION_FLAG1, bool>(ped); }
-    static void GetCharModel(Ped ped, eModel *pModel) { NativeInvoke::Invoke<NATIVE_GET_CHAR_MODEL, ScriptVoid>(ped, pModel); }
+    //static void GetCharModel(Ped ped, eModel *pModel) { NativeInvoke::Invoke<NATIVE_GET_CHAR_MODEL, ScriptVoid>(ped, pModel); }
     static unsigned int GetCharMoney(Ped ped) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_MONEY, unsigned int>(ped); }
     static void GetCharPropIndex(Ped ped, bool unknown, unsigned int *pIndex) { NativeInvoke::Invoke<NATIVE_GET_CHAR_PROP_INDEX, ScriptVoid>(ped, unknown, pIndex); }
     static bool GetCharReadyToBeExecuted(Ped ped) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_READY_TO_BE_EXECUTED, bool>(ped); }
     static bool GetCharReadyToBeStunned(Ped ped) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_READY_TO_BE_STUNNED, bool>(ped); }
     static void GetCharSpeed(Ped ped, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CHAR_SPEED, ScriptVoid>(ped, pValue); }
-    static unsigned int GetCharTextureVariation(Ped ped, ePedComponent component) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_TEXTURE_VARIATION, unsigned int>(ped, component); }
+    //static unsigned int GetCharTextureVariation(Ped ped, ePedComponent component) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_TEXTURE_VARIATION, unsigned int>(ped, component); }
     static void GetCharVelocity(Ped ped, float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_CHAR_VELOCITY, ScriptVoid>(ped, pX, pY, pZ); }
     static void GetCharWeaponInSlot(Ped ped, eWeaponSlot slot, eWeapon *pWeapon, ScriptAny *pUnknown1, ScriptAny *pUnknown2) { NativeInvoke::Invoke<NATIVE_GET_CHAR_WEAPON_IN_SLOT, ScriptVoid>(ped, slot, pWeapon, pUnknown1, pUnknown2); }
     static bool GetCharWillCowerInsteadOfFleeing(Ped ped) { return NativeInvoke::Invoke<NATIVE_GET_CHAR_WILL_COWER_INSTEAD_OF_FLEEING, bool>(ped); }
-    static ScriptAny GetCurrentCharWeapon(Ped ped, eWeapon *pWeapon) { return NativeInvoke::Invoke<NATIVE_GET_CURRENT_CHAR_WEAPON, ScriptAny>(ped, pWeapon); }
+    //static ScriptAny GetCurrentCharWeapon(Ped ped, eWeapon *pWeapon) { return NativeInvoke::Invoke<NATIVE_GET_CURRENT_CHAR_WEAPON, ScriptAny>(ped, pWeapon); }
     static unsigned int GetDamageToPedBodyPart(Ped ped, ePedBodyPart part) { return NativeInvoke::Invoke<NATIVE_GET_DAMAGE_TO_PED_BODY_PART, unsigned int>(ped, part); }
     static void GetDeadCharCoordinates(Ped ped, float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_DEAD_CHAR_COORDINATES, ScriptVoid>(ped, pX, pY, pZ); }
     static void GetDeadCharPickupCoords(Ped ped, float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_DEAD_CHAR_PICKUP_COORDS, ScriptVoid>(ped, pX, pY, pZ); }
@@ -240,7 +240,7 @@ namespace Natives
     static void GetPedGroupIndex(Ped ped, unsigned int* pIndex) { NativeInvoke::Invoke<NATIVE_GET_PED_GROUP_INDEX, ScriptVoid>(ped, pIndex); }
     static void GetPedType(Ped ped, ePedType *pType) { NativeInvoke::Invoke<NATIVE_GET_PED_TYPE, ScriptVoid>(ped, pType); }
     static void GivePedHelmet(Ped ped) { NativeInvoke::Invoke<NATIVE_GIVE_PED_HELMET, ScriptVoid>(ped); }
-    static void GiveWeaponToChar(Ped ped, eWeapon weapon, unsigned int ammo, bool unknown0) { NativeInvoke::Invoke<NATIVE_GIVE_WEAPON_TO_CHAR, ScriptVoid>(ped, weapon, ammo, unknown0); }
+    //static void GiveWeaponToChar(Ped ped, eWeapon weapon, unsigned int ammo, bool unknown0) { NativeInvoke::Invoke<NATIVE_GIVE_WEAPON_TO_CHAR, ScriptVoid>(ped, weapon, ammo, unknown0); }
     static bool HasCharBeenDamagedByCar(Ped ped, Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_HAS_CHAR_BEEN_DAMAGED_BY_CAR, bool>(ped, vehicle); }
     static bool HasCharBeenDamagedByChar(Ped ped, Ped otherChar, bool unknownFalse) { return NativeInvoke::Invoke<NATIVE_HAS_CHAR_BEEN_DAMAGED_BY_CHAR, bool>(ped, otherChar, unknownFalse); }
     static bool HasCharBeenDamagedByWeapon(Ped ped, eWeapon weapon) { return NativeInvoke::Invoke<NATIVE_HAS_CHAR_BEEN_DAMAGED_BY_WEAPON, bool>(ped, weapon); }
@@ -250,18 +250,18 @@ namespace Natives
     static bool IsAmbientSpeechPlaying(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_AMBIENT_SPEECH_PLAYING, bool>(ped); }
     static bool IsCharArmed(Ped ped, eWeaponSlot slot) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_ARMED, bool>(ped, slot); }
     static bool IsCharDead(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_DEAD, bool>(ped); }
-    static bool IsCharDucking(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_DUCKING, bool>(ped); }
+    //static bool IsCharDucking(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_DUCKING, bool>(ped); }
     static bool IsCharFacingChar(Ped ped, Ped otherChar, float angle) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_FACING_CHAR, bool>(ped, otherChar, angle); }
     static bool IsCharFatallyInjured(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_FATALLY_INJURED, bool>(ped); }
     static bool IsCharGesturing(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_GESTURING, bool>(ped); }
     static bool IsCharGettingInToACar(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_GETTING_IN_TO_A_CAR, bool>(ped); }
     static bool IsCharGettingUp(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_GETTING_UP, bool>(ped); }
     static bool IsCharHealthGreater(Ped ped, unsigned int health) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_HEALTH_GREATER, bool>(ped, health); }
-    static bool IsCharInAir(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_IN_AIR, bool>(ped); } 
+    //static bool IsCharInAir(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_IN_AIR, bool>(ped); } 
     static bool IsCharInAngledArea2D(Ped ped, float x1, float y1, float x2, float y2, float unknown, bool unknownFalse) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_IN_ANGLED_AREA_2D, bool>(ped, x1, y1, x2, y2, unknown, unknownFalse); }
     static bool IsCharInAngledArea3D(Ped ped, float x1, float y1, float z1, float x2, float y2, float z2, float unknown, bool unknownFalse) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_IN_ANGLED_AREA_3D, bool>(ped, x1, y1, z1, x2, y2, z2, unknown, unknownFalse); }
     static bool IsCharInAnyBoat(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_IN_ANY_BOAT, bool>(ped); }
-    static bool IsCharInAnyCar(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_IN_ANY_CAR, bool>(ped); }
+    //static bool IsCharInAnyCar(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_IN_ANY_CAR, bool>(ped); }
     static bool IsCharInAnyHeli(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_IN_ANY_HELI, bool>(ped); }
     static bool IsCharInAnyPlane(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_IN_ANY_PLANE, bool>(ped); }
     static bool IsCharInAnyPoliceVehicle(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_IN_ANY_POLICE_VEHICLE, bool>(ped); }
@@ -280,13 +280,13 @@ namespace Natives
     static bool IsCharModel(Ped ped, eModel model) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_MODEL, bool>(ped, model); }
     static bool IsCharOnAnyBike(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_ON_ANY_BIKE, bool>(ped); }
     static bool IsCharOnFire(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_ON_FIRE, bool>(ped); }
-    static bool IsCharOnFoot(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_ON_FOOT, bool>(ped); }
+    //static bool IsCharOnFoot(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_ON_FOOT, bool>(ped); }
     static bool IsCharOnScreen(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_ON_SCREEN, bool>(ped); }
     static bool IsCharPlayingAnim(Ped ped, char *animSet, char *animName) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_PLAYING_ANIM, bool>(ped, animSet, animName); }
     static bool IsCharShooting(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_SHOOTING, bool>(ped); }
     static bool IsCharShootingInArea(Ped ped, float x1, float y1, float x2, float y2, bool unknownFalse) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_SHOOTING_IN_AREA, bool>(ped, x1, y1, x2, y2, unknownFalse); }
     static bool IsCharSittingIdle(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_SITTING_IDLE, bool>(ped); }
-    static bool IsCharSittingInAnyCar(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_SITTING_IN_ANY_CAR, bool>(ped); }
+    //static bool IsCharSittingInAnyCar(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_SITTING_IN_ANY_CAR, bool>(ped); }
     static bool IsCharSittingInCar(Ped ped, Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_SITTING_IN_CAR, bool>(ped, vehicle); }
     static bool IsCharStopped(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_STOPPED, bool>(ped); }
     static bool IsCharStuckUnderCar(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_CHAR_STUCK_UNDER_CAR, bool>(ped); }
@@ -317,7 +317,7 @@ namespace Natives
     static bool IsScriptedSpeechPlaying(Ped ped) { return NativeInvoke::Invoke<NATIVE_IS_SCRIPTED_SPEECH_PLAYING, bool>(ped); }
     static void MarkCharAsNoLongerNeeded(Ped *pPed) { NativeInvoke::Invoke<NATIVE_MARK_CHAR_AS_NO_LONGER_NEEDED, ScriptVoid>(pPed); }
     static void ModifyCharMoveState(Ped ped, ePedMoveState state) { NativeInvoke::Invoke<NATIVE_MODIFY_CHAR_MOVE_STATE, ScriptVoid>(ped, state); }
-    static void RemoveAllCharWeapons(Ped ped) { NativeInvoke::Invoke<NATIVE_REMOVE_ALL_CHAR_WEAPONS, ScriptVoid>(ped); }
+    //static void RemoveAllCharWeapons(Ped ped) { NativeInvoke::Invoke<NATIVE_REMOVE_ALL_CHAR_WEAPONS, ScriptVoid>(ped); }
     static void RemoveCharDefensiveArea(Ped ped) { NativeInvoke::Invoke<NATIVE_REMOVE_CHAR_DEFENSIVE_AREA, ScriptVoid>(ped); }
     static void RemoveCharElegantly(Ped ped) { NativeInvoke::Invoke<NATIVE_REMOVE_CHAR_ELEGANTLY, ScriptVoid>(ped); }
     static void RemoveCharFromGroup(Ped ped) { NativeInvoke::Invoke<NATIVE_REMOVE_CHAR_FROM_GROUP, ScriptVoid>(ped); }
@@ -332,20 +332,20 @@ namespace Natives
     static void SetCharCanBeKnockedOffBike(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_CHAR_CAN_BE_KNOCKED_OFF_BIKE, ScriptVoid>(ped, value); }
     static void SetCharCanBeShotInVehicle(Ped ped, bool enabled) { NativeInvoke::Invoke<NATIVE_SET_CHAR_CAN_BE_SHOT_IN_VEHICLE, ScriptVoid>(ped, enabled); }
     static void SetCharCantBeDraggedOut(Ped ped, bool enabled) { NativeInvoke::Invoke<NATIVE_SET_CHAR_CANT_BE_DRAGGED_OUT, ScriptVoid>(ped, enabled); }
-    static void SetCharComponentVariation(Ped ped, ePedComponent component, unsigned int modelVariation, unsigned int textureVariation) { NativeInvoke::Invoke<NATIVE_SET_CHAR_COMPONENT_VARIATION, ScriptVoid>(ped, component, modelVariation, textureVariation); }
-    static void SetCharCoordinates(Ped ped, float x, float y, float z) { NativeInvoke::Invoke<NATIVE_SET_CHAR_COORDINATES, ScriptVoid>(ped, x, y, z); }
-    static void SetCharDefaultComponentVariation(Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CHAR_DEFAULT_COMPONENT_VARIATION, ScriptVoid>(ped); }
+    //static void SetCharComponentVariation(Ped ped, ePedComponent component, unsigned int modelVariation, unsigned int textureVariation) { NativeInvoke::Invoke<NATIVE_SET_CHAR_COMPONENT_VARIATION, ScriptVoid>(ped, component, modelVariation, textureVariation); }
+    //static void SetCharCoordinates(Ped ped, float x, float y, float z) { NativeInvoke::Invoke<NATIVE_SET_CHAR_COORDINATES, ScriptVoid>(ped, x, y, z); }
+    //static void SetCharDefaultComponentVariation(Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CHAR_DEFAULT_COMPONENT_VARIATION, ScriptVoid>(ped); }
     static void SetCharDesiredHeading(Ped ped, float heading) { NativeInvoke::Invoke<NATIVE_SET_CHAR_DESIRED_HEADING, ScriptVoid>(ped, heading); }
     static void SetCharDropsWeaponsWhenDead(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_CHAR_DROPS_WEAPONS_WHEN_DEAD, ScriptVoid>(ped, value); }
     static void SetCharDruggedUp(Ped ped, bool drugged) { NativeInvoke::Invoke<NATIVE_SET_CHAR_DRUGGED_UP, ScriptVoid>(ped, drugged); }
     static void SetCharFireDamageMultiplier(Ped ped, float multiplier) { NativeInvoke::Invoke<NATIVE_SET_CHAR_FIRE_DAMAGE_MULTIPLIER, ScriptVoid>(ped, multiplier); }
     static void SetCharGravity(Ped ped, float value) { NativeInvoke::Invoke<NATIVE_SET_CHAR_GRAVITY, ScriptVoid>(ped, value); }
-    static void SetCharHeading(Ped ped, float heading) { NativeInvoke::Invoke<NATIVE_SET_CHAR_HEADING, ScriptVoid>(ped, heading); }
-    static void SetCharHealth(Ped ped, unsigned int health) { NativeInvoke::Invoke<NATIVE_SET_CHAR_HEALTH, ScriptVoid>(ped, health); }
+    //static void SetCharHeading(Ped ped, float heading) { NativeInvoke::Invoke<NATIVE_SET_CHAR_HEADING, ScriptVoid>(ped, heading); }
+    //static void SetCharHealth(Ped ped, unsigned int health) { NativeInvoke::Invoke<NATIVE_SET_CHAR_HEALTH, ScriptVoid>(ped, health); }
     static void SetCharInvincible(Ped ped, bool enable) { NativeInvoke::Invoke<NATIVE_SET_CHAR_INVINCIBLE, ScriptVoid>(ped, enable); }
     static void SetCharIsTargetPriority(Ped ped, bool enable) { NativeInvoke::Invoke<NATIVE_SET_CHAR_IS_TARGET_PRIORITY, ScriptVoid>(ped, enable); }
     static void SetCharMaxHealth(Ped ped, unsigned int value) { NativeInvoke::Invoke<NATIVE_SET_CHAR_MAX_HEALTH, ScriptVoid>(ped, value); }
-    static void SetCharMoney(Ped ped, unsigned int amount) { NativeInvoke::Invoke<NATIVE_SET_CHAR_MONEY, ScriptVoid>(ped, amount); }
+    //static void SetCharMoney(Ped ped, unsigned int amount) { NativeInvoke::Invoke<NATIVE_SET_CHAR_MONEY, ScriptVoid>(ped, amount); }
     static void SetCharNeverLeavesGroup(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_CHAR_NEVER_LEAVES_GROUP, ScriptVoid>(ped, value); }
     static void SetCharProofs(Ped ped, bool unknown0, bool fallingDamage, bool unknown1, bool unknown2, bool unknown3) { NativeInvoke::Invoke<NATIVE_SET_CHAR_PROOFS, ScriptVoid>(ped, unknown0, fallingDamage, unknown1, unknown2, unknown3); }
     static void SetCharPropIndex(Ped ped, ePedPropType propType, unsigned int index) { NativeInvoke::Invoke<NATIVE_SET_CHAR_PROP_INDEX, ScriptVoid>(ped, propType, index); }
@@ -360,7 +360,7 @@ namespace Natives
     static void SetCharWillMoveWhenInjured(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_CHAR_WILL_MOVE_WHEN_INJURED, ScriptVoid>(ped, value); }
     static void SetCharWillUseCarsInCombat(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_CHAR_WILL_USE_CARS_IN_COMBAT, ScriptVoid>(ped, value); }
     static void SetCharWillUseCover(Ped ped, CoverPoint coverPoint) { NativeInvoke::Invoke<NATIVE_SET_CHAR_WILL_USE_COVER, ScriptVoid>(ped, coverPoint); }
-    static void SetCurrentCharWeapon(Ped ped, eWeapon w, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_SET_CURRENT_CHAR_WEAPON, ScriptVoid>(ped, w, unknownTrue); }
+    //static void SetCurrentCharWeapon(Ped ped, eWeapon w, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_SET_CURRENT_CHAR_WEAPON, ScriptVoid>(ped, w, unknownTrue); }
     static void SetGroupCharDucksWhenAimedAt(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_GROUP_CHAR_DUCKS_WHEN_AIMED_AT, ScriptVoid>(ped, value); }
     static void SetIgnoreLowPriorityShockingEvents(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_IGNORE_LOW_PRIORITY_SHOCKING_EVENTS, ScriptVoid>(ped, value); }
     static void SetPedDiesWhenInjured(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_PED_DIES_WHEN_INJURED, ScriptVoid>(ped, value); }
@@ -369,7 +369,7 @@ namespace Natives
     static void SetPedPathMayDropFromHeight(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_PED_PATH_MAY_DROP_FROM_HEIGHT, ScriptVoid>(ped, value); }
     static void SetPedPathMayUseClimbovers(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_PED_PATH_MAY_USE_CLIMBOVERS, ScriptVoid>(ped, value); }
     static void SetPedPathMayUseLadders(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_PED_PATH_MAY_USE_LADDERS, ScriptVoid>(ped, value); }
-    static void SetRoomForCharByKey(Ped ped, eInteriorRoomKey key) { NativeInvoke::Invoke<NATIVE_SET_ROOM_FOR_CHAR_BY_KEY, ScriptVoid>(ped, key); }
+    //static void SetRoomForCharByKey(Ped ped, eInteriorRoomKey key) { NativeInvoke::Invoke<NATIVE_SET_ROOM_FOR_CHAR_BY_KEY, ScriptVoid>(ped, key); }
     static void SetSenseRange(Ped ped, float value) { NativeInvoke::Invoke<NATIVE_SET_SENSE_RANGE, ScriptVoid>(ped, value); }
     static void SwitchPedToAnimated(Ped ped, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_SWITCH_PED_TO_ANIMATED, ScriptVoid>(ped, unknownTrue); }
     static ScriptAny SwitchPedToRagdoll(Ped ped, ScriptAny p1, ScriptAny p2, ScriptAny p3, ScriptAny p4, ScriptAny p5, ScriptAny p6) { return NativeInvoke::Invoke<NATIVE_SWITCH_PED_TO_RAGDOLL, ScriptAny>(ped, p1, p2, p3, p4, p5, p6); }    
@@ -385,11 +385,11 @@ namespace Natives
     // Ped Tasks
 
 
-	static void TaskJump(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_TASK_JUMP, ScriptVoid>(ped, value); }
-    static void TaskToggleDuck(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_TASK_TOGGLE_DUCK, ScriptVoid>(ped, value); }
-    static void TaskAimGunAtCoord(Ped ped, float tX, float tY, float tZ, unsigned int duration) { NativeInvoke::Invoke<NATIVE_TASK_CAR_DRIVE_TO_COORD, ScriptVoid>(ped, tX, tY, tZ, duration); }
-    static void TaskCarDriveToCoord(Ped ped, Vehicle car, float x, float y, float z, float speed, unsigned int p1f_2b, unsigned int p2, unsigned int p3, unsigned int px2, unsigned int p45000) { NativeInvoke::Invoke<NATIVE_TASK_CAR_DRIVE_TO_COORD, ScriptVoid>(ped, car, x, y, z, speed, p1f_2b, p2, p3, px2, p45000); }
-	static void TaskShootAtCoord(Ped ped, float x, float y, float z, unsigned int time_ms, unsigned int type_5) { NativeInvoke::Invoke<NATIVE_TASK_SHOOT_AT_COORD, ScriptVoid>(ped, x, y, z, time_ms, type_5); }
+	//static void TaskJump(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_TASK_JUMP, ScriptVoid>(ped, value); }
+    //static void TaskToggleDuck(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_TASK_TOGGLE_DUCK, ScriptVoid>(ped, value); }
+    //static void TaskAimGunAtCoord(Ped ped, float tX, float tY, float tZ, unsigned int duration) { NativeInvoke::Invoke<NATIVE_TASK_CAR_DRIVE_TO_COORD, ScriptVoid>(ped, tX, tY, tZ, duration); }
+    //static void TaskCarDriveToCoord(Ped ped, Vehicle car, float x, float y, float z, float speed, unsigned int p1f_2b, unsigned int p2, unsigned int p3, unsigned int px2, unsigned int p45000) { NativeInvoke::Invoke<NATIVE_TASK_CAR_DRIVE_TO_COORD, ScriptVoid>(ped, car, x, y, z, speed, p1f_2b, p2, p3, px2, p45000); }
+	//static void TaskShootAtCoord(Ped ped, float x, float y, float z, unsigned int time_ms, unsigned int type_5) { NativeInvoke::Invoke<NATIVE_TASK_SHOOT_AT_COORD, ScriptVoid>(ped, x, y, z, time_ms, type_5); }
 
     static void SetCharKeepTask(Ped ped, bool value) { NativeInvoke::Invoke<NATIVE_SET_CHAR_KEEP_TASK, ScriptVoid>(ped, value); }
     static void SetDriveTaskCruiseSpeed(Ped ped, float speed) { NativeInvoke::Invoke<NATIVE_SET_DRIVE_TASK_CRUISE_SPEED, ScriptVoid>(ped, speed); }
@@ -408,17 +408,17 @@ namespace Natives
     static void TaskCombatHatedTargetsAroundCharTimed(Ped ped, float radius, unsigned int duration) { NativeInvoke::Invoke<NATIVE_TASK_COMBAT_HATED_TARGETS_AROUND_CHAR_TIMED, ScriptVoid>(ped, radius, duration); }
     static void TaskCombatTimed(Ped ped, Char target, unsigned int duration) { NativeInvoke::Invoke<NATIVE_TASK_COMBAT_TIMED, ScriptVoid>(ped, target, duration); }
     static void TaskDie(Ped ped) { NativeInvoke::Invoke<NATIVE_TASK_DIE, ScriptVoid>(ped); }
-    static void TaskEnterCarAsDriver(Ped ped, Vehicle vehicle, unsigned int duration) { NativeInvoke::Invoke<NATIVE_TASK_ENTER_CAR_AS_DRIVER, ScriptVoid>(ped, vehicle, duration); }
-    static void TaskEnterCarAsPassenger(Ped ped, Vehicle vehicle, unsigned int duration, unsigned int seatIndex) { NativeInvoke::Invoke<NATIVE_TASK_ENTER_CAR_AS_PASSENGER, ScriptVoid>(ped, vehicle, duration, seatIndex); }
+    //static void TaskEnterCarAsDriver(Ped ped, Vehicle vehicle, unsigned int duration) { NativeInvoke::Invoke<NATIVE_TASK_ENTER_CAR_AS_DRIVER, ScriptVoid>(ped, vehicle, duration); }
+    //static void TaskEnterCarAsPassenger(Ped ped, Vehicle vehicle, unsigned int duration, unsigned int seatIndex) { NativeInvoke::Invoke<NATIVE_TASK_ENTER_CAR_AS_PASSENGER, ScriptVoid>(ped, vehicle, duration, seatIndex); }
     static void TaskEveryoneLeaveCar(Vehicle vehicle) { NativeInvoke::Invoke<NATIVE_TASK_EVERYONE_LEAVE_CAR, ScriptVoid>(vehicle); }
     static void TaskFollowNavMeshToCoord(Ped ped, float x, float y, float z, unsigned int unknown0_2, unsigned int unknown1_minus1, float unknown2_1) { NativeInvoke::Invoke<NATIVE_TASK_FOLLOW_NAV_MESH_TO_COORD, ScriptVoid>(ped, x, y, z, unknown0_2, unknown1_minus1, unknown2_1); }
     static void TaskFollowNavMeshToCoordNoStop(Ped ped, float x, float y, float z,unsigned int unknown0_2, unsigned int unknown1_minus1, float unknown2_1) { NativeInvoke::Invoke<NATIVE_TASK_FOLLOW_NAV_MESH_TO_COORD_NO_STOP, ScriptVoid>(ped, x, y, z, unknown0_2, unknown1_minus1, unknown2_1); }
-    static void TaskGoStraightToCoord(Ped ped, float x, float y, float z, unsigned int unknown2, unsigned int unknown45000) { NativeInvoke::Invoke<NATIVE_TASK_GO_STRAIGHT_TO_COORD, ScriptVoid>(ped, x, y, z, unknown2, unknown45000); }
+    //static void TaskGoStraightToCoord(Ped ped, float x, float y, float z, unsigned int unknown2, unsigned int unknown45000) { NativeInvoke::Invoke<NATIVE_TASK_GO_STRAIGHT_TO_COORD, ScriptVoid>(ped, x, y, z, unknown2, unknown45000); }
     static void TaskGotoCharOffset(Ped ped, Ped target, unsigned int duration, float offsetRight, float offsetFront) { NativeInvoke::Invoke<NATIVE_TASK_GOTO_CHAR_OFFSET, ScriptVoid>(ped, target, duration, offsetRight, offsetFront); }
     static void TaskGuardCurrentPosition(Ped ped, float unknown0_15, float unknown1_10, unsigned int unknown2_1) { NativeInvoke::Invoke<NATIVE_TASK_GUARD_CURRENT_POSITION, ScriptVoid>(ped, unknown0_15, unknown1_10, unknown2_1); }
     static void TaskHandsUp(Ped ped, unsigned int duration) { NativeInvoke::Invoke<NATIVE_TASK_HANDS_UP, ScriptVoid>(ped, duration); }
     static void TaskHeliMission(Ped ped, Vehicle heli, unsigned int uk0_0, unsigned int uk1_0, float pX, float pY, float pZ, unsigned int uk2_4, float speed, unsigned int uk3_5, float uk4_minus1, unsigned int uk5_round_z_plus_1, unsigned int uk6_40) { NativeInvoke::Invoke<NATIVE_TASK_HELI_MISSION, ScriptVoid>(ped, heli, uk0_0, uk1_0, pX, pY, pZ, uk2_4, speed, uk3_5, uk4_minus1, uk5_round_z_plus_1, uk6_40); }
-    static void TaskLeaveAnyCar(Ped ped) { NativeInvoke::Invoke<NATIVE_TASK_LEAVE_ANY_CAR, ScriptVoid>(ped); }
+    //static void TaskLeaveAnyCar(Ped ped) { NativeInvoke::Invoke<NATIVE_TASK_LEAVE_ANY_CAR, ScriptVoid>(ped); }
     static void TaskLeaveCar(Ped ped, Vehicle vehicle) { NativeInvoke::Invoke<NATIVE_TASK_LEAVE_CAR, ScriptVoid>(ped, vehicle); }
     static void TaskLeaveCarDontCloseDoor(Ped ped, Vehicle vehicle) { NativeInvoke::Invoke<NATIVE_TASK_LEAVE_CAR_DONT_CLOSE_DOOR, ScriptVoid>(ped, vehicle); }
     static void TaskLeaveCarImmediately(Ped ped, Vehicle vehicle) { NativeInvoke::Invoke<NATIVE_TASK_LEAVE_CAR_IMMEDIATELY, ScriptVoid>(ped, vehicle); }
@@ -436,7 +436,7 @@ namespace Natives
     static void TaskSmartFleeCharPreferringPavements(Ped ped, Ped fleeFromPed, float unknown0_100, unsigned int duration) { NativeInvoke::Invoke<NATIVE_TASK_SMART_FLEE_CHAR_PREFERRING_PAVEMENTS, ScriptVoid>(ped, fleeFromPed, unknown0_100, duration); }
     static void TaskSmartFleePoint(Ped ped, float x, float y, float z, float unknown0_100, unsigned int duration) { NativeInvoke::Invoke<NATIVE_TASK_SMART_FLEE_POINT, ScriptVoid>(ped, x, y, x, unknown0_100, duration); }
     static void TaskStandStill(Ped ped, int duration) { NativeInvoke::Invoke<NATIVE_TASK_STAND_STILL, ScriptVoid>(ped, duration); }
-    static void TaskSwapWeapon(Ped ped, eWeapon weapon) { NativeInvoke::Invoke<NATIVE_TASK_SWAP_WEAPON, ScriptVoid>(ped, weapon); }
+    //static void TaskSwapWeapon(Ped ped, eWeapon weapon) { NativeInvoke::Invoke<NATIVE_TASK_SWAP_WEAPON, ScriptVoid>(ped, weapon); }
     static void TaskTurnCharToFaceChar(Ped ped, Ped targetPed) { NativeInvoke::Invoke<NATIVE_TASK_TURN_CHAR_TO_FACE_CHAR, ScriptVoid>(ped, targetPed); }
     static void TaskTurnCharToFaceCoord(Ped ped, float x, float y, float z) { NativeInvoke::Invoke<NATIVE_TASK_TURN_CHAR_TO_FACE_COORD, ScriptVoid>(ped, x, y, z); }
     static void TaskUseMobilePhone(Ped ped, bool use) { NativeInvoke::Invoke<NATIVE_TASK_USE_MOBILE_PHONE, ScriptVoid>(ped, use); }
@@ -447,7 +447,7 @@ namespace Natives
 
     // Task Sequence
     static void OpenSequenceTask(TaskSequence *pTaskSequence) { NativeInvoke::Invoke<NATIVE_OPEN_SEQUENCE_TASK, ScriptVoid>(pTaskSequence); }
-    static void CloseSequenceTask(TaskSequence taskSequence) { NativeInvoke::Invoke<NATIVE_CLOSE_SEQUENCE_TASK, ScriptVoid>(taskSequence); }
+    //static void CloseSequenceTask(TaskSequence taskSequence) { NativeInvoke::Invoke<NATIVE_CLOSE_SEQUENCE_TASK, ScriptVoid>(taskSequence); }
     static void TaskPerformSequence(Ped ped, TaskSequence taskSequence) { NativeInvoke::Invoke<NATIVE_TASK_PERFORM_SEQUENCE, ScriptVoid>(ped, taskSequence); }
     static void ClearSequenceTask(TaskSequence taskSequence) { NativeInvoke::Invoke<NATIVE_CLEAR_SEQUENCE_TASK, ScriptVoid>(taskSequence); }
 
@@ -490,7 +490,7 @@ namespace Natives
     static bool AreTaxiLightsOn(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_ARE_TAXI_LIGHTS_ON, bool>(vehicle); }
     static void BreakCarDoor(Vehicle vehicle, eVehicleDoor door, bool unknownFalse) { NativeInvoke::Invoke<NATIVE_BREAK_CAR_DOOR, ScriptVoid>(vehicle, door, unknownFalse); }
     static void BurstCarTyre(Vehicle vehicle, eVehicleTyre tyre) { NativeInvoke::Invoke<NATIVE_BURST_CAR_TYRE, ScriptVoid>(vehicle, tyre); }
-    static void CreateCar(unsigned int nameHash, float x, float y, float z, Vehicle *pVehicle, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_CREATE_CAR, ScriptVoid>(nameHash, x, y, z, pVehicle, unknownTrue); }
+    //static void CreateCar(unsigned int nameHash, float x, float y, float z, Vehicle *pVehicle, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_CREATE_CAR, ScriptVoid>(nameHash, x, y, z, pVehicle, unknownTrue); }
     static void CreateCharAsPassenger(Vehicle vehicle, ePedType charType, eModel model, unsigned int passengerIndex, Ped *pPed) { NativeInvoke::Invoke<NATIVE_CREATE_CHAR_AS_PASSENGER, ScriptVoid>(vehicle, charType, model, passengerIndex, pPed); }
     static void CreateCharInsideCar(Vehicle vehicle, ePedType charType, eModel model, Ped *pPed) { NativeInvoke::Invoke<NATIVE_CREATE_CHAR_INSIDE_CAR, ScriptVoid>(vehicle, charType, model, pPed); }
     static void ChangeCarColour(Vehicle vehicle, ColourIndex colour1, ColourIndex colour2) { NativeInvoke::Invoke<NATIVE_CHANGE_CAR_COLOUR, ScriptVoid>(vehicle, colour1, colour2); }
@@ -499,13 +499,13 @@ namespace Natives
     static void ClearRoomForCar(Vehicle vehicle) { NativeInvoke::Invoke<NATIVE_CLEAR_ROOM_FOR_CAR, ScriptVoid>(vehicle); }
     static void CloseAllCarDoors(Vehicle vehicle) { NativeInvoke::Invoke<NATIVE_CLOSE_ALL_CAR_DOORS, ScriptVoid>(vehicle); }
     static void ControlCarDoor(Vehicle vehicle, eVehicleDoor door, unsigned int unknown_maybe_open, float angle) { NativeInvoke::Invoke<NATIVE_CONTROL_CAR_DOOR, ScriptVoid>(vehicle, door, unknown_maybe_open, angle); }
-    static bool CreateEmergencyServicesCar(eModel model, float x, float y, float z) { return NativeInvoke::Invoke<NATIVE_CREATE_EMERGENCY_SERVICES_CAR, bool>(model, x, y, z); }
+	//static bool CreateEmergencyServicesCar(eModel model, float x, float y, float z) { return NativeInvoke::Invoke<NATIVE_CREATE_EMERGENCY_SERVICES_CAR, bool>(model, x, y, z); }
     static void CreateRandomCharAsPassenger(Vehicle vehicle, unsigned int seat, Ped *pPed) { NativeInvoke::Invoke<NATIVE_CREATE_RANDOM_CHAR_AS_PASSENGER, ScriptVoid>(vehicle, seat, pPed); }
     static void DeleteCar(Vehicle *pVehicle) { NativeInvoke::Invoke<NATIVE_DELETE_CAR, ScriptVoid>(pVehicle); }
     static void DetachCar(Vehicle vehicle) { NativeInvoke::Invoke<NATIVE_DETACH_CAR, ScriptVoid>(vehicle); }
     static bool DoesCarHaveRoof(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_DOES_CAR_HAVE_ROOF, bool>(vehicle); }
     static bool DoesCarHaveStuckCarCheck(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_DOES_CAR_HAVE_STUCK_CAR_CHECK, bool>(vehicle); }
-    static bool DoesVehicleExist(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_DOES_VEHICLE_EXIST, bool>(vehicle); }
+    //static bool DoesVehicleExist(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_DOES_VEHICLE_EXIST, bool>(vehicle); }
     static void EnablePedHelmet(Ped ped, bool enable) { NativeInvoke::Invoke<NATIVE_ENABLE_PED_HELMET, ScriptVoid>(ped, enable); }
     static void ExplodeCar(Vehicle vehicle, bool unknownTrue, bool unknownFalse) { NativeInvoke::Invoke<NATIVE_EXPLODE_CAR, ScriptVoid>(vehicle, unknownTrue, unknownFalse); }
     static void ExtinguishCarFire(Vehicle vehicle) { NativeInvoke::Invoke<NATIVE_EXTINGUISH_CAR_FIRE, ScriptVoid>(vehicle); }
@@ -514,20 +514,20 @@ namespace Natives
     static void ForceVehicleLights(Vehicle vehicle, eVehicleLights lights) { NativeInvoke::Invoke<NATIVE_FORCE_CAR_LIGHTS, ScriptVoid>(vehicle, lights); }
     static void FreezeCarPosition(Vehicle vehicle, bool frozen) { NativeInvoke::Invoke<NATIVE_FREEZE_CAR_POSITION, ScriptVoid>(vehicle, frozen); }
     static void FreezeCarPositionAndDontLoadCollision(Vehicle vehicle, bool frozen) { NativeInvoke::Invoke<NATIVE_FREEZE_CAR_POSITION_AND_DONT_LOAD_COLLISION, ScriptVoid>(vehicle, frozen); }
-    static void GetCarCharIsUsing(Ped ped, Vehicle *pVehicle) { NativeInvoke::Invoke<NATIVE_GET_CAR_CHAR_IS_USING, ScriptVoid>(ped, pVehicle); }
+    //static void GetCarCharIsUsing(Ped ped, Vehicle *pVehicle) { NativeInvoke::Invoke<NATIVE_GET_CAR_CHAR_IS_USING, ScriptVoid>(ped, pVehicle); }
     static void GetCarColours(Vehicle vehicle, ColourIndex *pColour1, ColourIndex *pColour2) { NativeInvoke::Invoke<NATIVE_GET_CAR_COLOURS, ScriptVoid>(vehicle, pColour1, pColour2); }
-    static void GetCarCoordinates(Vehicle vehicle, float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_CAR_COORDINATES, ScriptVoid>(vehicle, pX, pY, pZ); }
+    //static void GetCarCoordinates(Vehicle vehicle, float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_CAR_COORDINATES, ScriptVoid>(vehicle, pX, pY, pZ); }
     static void GetCarDeformationAtPos(Vehicle vehicle, float x, float y, float z, Vector3 *pDeformation) { NativeInvoke::Invoke<NATIVE_GET_CAR_DEFORMATION_AT_POS, ScriptVoid>(vehicle, x, y, z, pDeformation); }
     static void GetCarDoorLockStatus(Vehicle vehicle, eVehicleDoorLock *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_DOOR_LOCK_STATUS, ScriptVoid>(vehicle, pValue); }
     static void GetCarForwardX(Vehicle vehicle, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_FORWARD_X, ScriptVoid>(vehicle, pValue); }
     static void GetCarForwardY(Vehicle vehicle, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_FORWARD_Y, ScriptVoid>(vehicle, pValue); }
-    static void GetCarHeading(Vehicle vehicle, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_HEADING, ScriptVoid>(vehicle, pValue); }
+    //static void GetCarHeading(Vehicle vehicle, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_HEADING, ScriptVoid>(vehicle, pValue); }
     static void GetCarHealth(Vehicle vehicle, unsigned int *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_HEALTH, ScriptVoid>(vehicle, pValue); }
     static void GetCarModel(Vehicle vehicle, eModel *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_MODEL, ScriptVoid>(vehicle, pValue); }
     static void GetCarPitch(Vehicle vehicle, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_PITCH, ScriptVoid>(vehicle, pValue); }
     static void GetCarRoll(Vehicle vehicle, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_ROLL, ScriptVoid>(vehicle, pValue); }
-    static void GetCarSpeed(Vehicle vehicle, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_SPEED, ScriptVoid>(vehicle, pValue); }
-    static void GetCarSpeedVector(Vehicle vehicle, Vector3 *pVector, bool unknownFalse) { NativeInvoke::Invoke<NATIVE_GET_CAR_SPEED_VECTOR, ScriptVoid>(vehicle, pVector, unknownFalse); }
+    //static void GetCarSpeed(Vehicle vehicle, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_SPEED, ScriptVoid>(vehicle, pValue); }
+    //static void GetCarSpeedVector(Vehicle vehicle, Vector3 *pVector, bool unknownFalse) { NativeInvoke::Invoke<NATIVE_GET_CAR_SPEED_VECTOR, ScriptVoid>(vehicle, pVector, unknownFalse); }
     static void GetCarUprightValue(Vehicle vehicle, float *pValue) { NativeInvoke::Invoke<NATIVE_GET_CAR_UPRIGHT_VALUE, ScriptVoid>(vehicle, pValue); }
     static void GetCharInCarPassengerSeat(Vehicle vehicle, unsigned int seatIndex, Ped *pPed) { NativeInvoke::Invoke<NATIVE_GET_CHAR_IN_CAR_PASSENGER_SEAT, ScriptVoid>(vehicle, seatIndex, pPed); }
     static Vehicle GetClosestCar(float x, float y, float z, float radius, unsigned int unknown0_0, unsigned int unknown1_70) { return NativeInvoke::Invoke<NATIVE_GET_CLOSEST_CAR, Vehicle>(x, y, z, radius, unknown0_0, unknown1_70); }
@@ -543,7 +543,7 @@ namespace Natives
     static void GetExtraCarColours(Vehicle vehicle, ColourIndex *pColour1, ColourIndex *pColour2) { NativeInvoke::Invoke<NATIVE_GET_EXTRA_CAR_COLOURS, ScriptVoid>(vehicle, pColour1, pColour2); }
     static float GetHeightOfVehicle(Vehicle vehicle, float x, float y, float z, bool unknownTrue1, bool unknownTrue2) { return NativeInvoke::Invoke<NATIVE_GET_HEIGHT_OF_VEHICLE, float>(vehicle, x, y, z, unknownTrue1, unknownTrue2); }
     static void GetKeyForCarInRoom(Vehicle vehicle, unsigned int *pKey) { NativeInvoke::Invoke<NATIVE_GET_KEY_FOR_CAR_IN_ROOM, ScriptVoid>(vehicle, pKey); }
-    static void GetMaximumNumberOfPassengers(Vehicle vehicle, unsigned int *pMax) { NativeInvoke::Invoke<NATIVE_GET_MAXIMUM_NUMBER_OF_PASSENGERS, ScriptVoid>(vehicle, pMax); }
+    //static void GetMaximumNumberOfPassengers(Vehicle vehicle, unsigned int *pMax) { NativeInvoke::Invoke<NATIVE_GET_MAXIMUM_NUMBER_OF_PASSENGERS, ScriptVoid>(vehicle, pMax); }
     static void GetNearestCableCar(float x, float y, float z, float radius, Vehicle *pVehicle) { NativeInvoke::Invoke<NATIVE_GET_NEAREST_CABLE_CAR, ScriptVoid>(x, y, z, radius, pVehicle); }
     static void GetNumCarColours(Vehicle vehicle, unsigned int *pNumColours) { NativeInvoke::Invoke<NATIVE_GET_NUM_CAR_COLOURS, ScriptVoid>(vehicle, pNumColours); }
     static void GetNumberOfPassengers(Vehicle vehicle, unsigned int *pNumPassengers) { NativeInvoke::Invoke<NATIVE_GET_NUMBER_OF_PASSENGERS, ScriptVoid>(vehicle, pNumPassengers); }
@@ -571,7 +571,7 @@ namespace Natives
     static bool IsCarOnScreen(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_ON_SCREEN, bool>(vehicle); }
     static bool IsCarPassengerSeatFree(Vehicle vehicle, unsigned int seatIndex) { return NativeInvoke::Invoke<NATIVE_IS_CAR_PASSENGER_SEAT_FREE, bool>(vehicle, seatIndex); }
     static bool IsCarSirenOn(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_SIREN_ON, bool>(vehicle); }
-    static bool IsCarStopped(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_STOPPED, bool>(vehicle); }
+    //static bool IsCarStopped(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_STOPPED, bool>(vehicle); }
     static bool IsCarStoppedAtTrafficLights(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_STOPPED_AT_TRAFFIC_LIGHTS, bool>(vehicle); }
     static bool IsCarStuckOnRoof(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_STUCK_ON_ROOF, bool>(vehicle); }
     static bool IsCarTouchingCar(Vehicle vehicle, Vehicle otherCar) { return NativeInvoke::Invoke<NATIVE_IS_CAR_TOUCHING_CAR, bool>(vehicle, otherCar); }
@@ -598,7 +598,7 @@ namespace Natives
     static void SetCarCanBeDamaged(Vehicle vehicle, bool value) { NativeInvoke::Invoke<NATIVE_SET_CAR_CAN_BE_DAMAGED, ScriptVoid>(vehicle, value); }
     static void SetCarCanBeVisiblyDamaged(Vehicle vehicle, bool value) { NativeInvoke::Invoke<NATIVE_SET_CAR_CAN_BE_VISIBLY_DAMAGED, ScriptVoid>(vehicle, value); }
     static void SetCarForwardSpeed(Vehicle vehicle, float speed) { NativeInvoke::Invoke<NATIVE_SET_CAR_FORWARD_SPEED, ScriptVoid>(vehicle, speed); }
-    static void SetCarHeading(Vehicle vehicle, float dir) { NativeInvoke::Invoke<NATIVE_SET_CAR_HEADING, ScriptVoid>(vehicle, dir); }
+    //static void SetCarHeading(Vehicle vehicle, float dir) { NativeInvoke::Invoke<NATIVE_SET_CAR_HEADING, ScriptVoid>(vehicle, dir); }
     static ScriptAny SetCarOnGroundProperly(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_SET_CAR_ON_GROUND_PROPERLY, ScriptAny>(vehicle); }
     static void SetCarProofs(Vehicle vehicle, bool bulletProof, bool fireProof, bool explosionProof, bool collisionProof, bool meleeProof) { NativeInvoke::Invoke<NATIVE_SET_CAR_PROOFS, ScriptVoid>(vehicle, bulletProof, fireProof, explosionProof, collisionProof, meleeProof); }
     static void SetCarStrong(Vehicle vehicle, bool strong) { NativeInvoke::Invoke<NATIVE_SET_CAR_STRONG, ScriptVoid>(vehicle, strong); }
@@ -652,8 +652,8 @@ namespace Natives
     static bool HasObjectBeenDamagedByChar(Object obj, Ped ped) { return NativeInvoke::Invoke<NATIVE_HAS_OBJECT_BEEN_DAMAGED_BY_CHAR, bool>(obj, ped); }
     static bool HasObjectBeenUprooted(Object obj) { return NativeInvoke::Invoke<NATIVE_HAS_OBJECT_BEEN_UPROOTED, bool>(obj); }
     static bool HasObjectCollidedWithAnything(Object obj) { return NativeInvoke::Invoke<NATIVE_HAS_OBJECT_COLLIDED_WITH_ANYTHING, bool>(obj); }
-    static bool HasPoolObjectCollidedWithCushion(Object obj) { return NativeInvoke::Invoke<NATIVE_HAS_POOL_OBJECT_COLLIDED_WITH_CUSHION, bool>(obj); }
-    static bool HasPoolObjectCollidedWithObject(Object obj, Object otherObj) { return NativeInvoke::Invoke<NATIVE_HAS_POOL_OBJECT_COLLIDED_WITH_OBJECT, bool>(obj, otherObj); }
+    //static bool HasPoolObjectCollidedWithCushion(Object obj) { return NativeInvoke::Invoke<NATIVE_HAS_POOL_OBJECT_COLLIDED_WITH_CUSHION, bool>(obj); }
+    //static bool HasPoolObjectCollidedWithObject(Object obj, Object otherObj) { return NativeInvoke::Invoke<NATIVE_HAS_POOL_OBJECT_COLLIDED_WITH_OBJECT, bool>(obj, otherObj); }
     static bool IsObjectAttached(Object obj) { return NativeInvoke::Invoke<NATIVE_IS_OBJECT_ATTACHED, bool>(obj); }
     static bool IsObjectInWater(Object obj) { return NativeInvoke::Invoke<NATIVE_IS_OBJECT_IN_WATER, bool>(obj); }
     static bool IsObjectOnFire(Object obj) { return NativeInvoke::Invoke<NATIVE_IS_OBJECT_ON_FIRE, bool>(obj); }
@@ -671,11 +671,11 @@ namespace Natives
     static ScriptAny StartObjectFire(Object obj) { return NativeInvoke::Invoke<NATIVE_START_OBJECT_FIRE, ScriptAny>(obj); }
 
     // Models
-    static bool HasModelLoaded(eModel model) { return NativeInvoke::Invoke<NATIVE_HAS_MODEL_LOADED, bool>(model); }
-    static void RequestModel(eModel model) { NativeInvoke::Invoke<NATIVE_REQUEST_MODEL, ScriptVoid>(model); }
+    //static bool HasModelLoaded(eModel model) { return NativeInvoke::Invoke<NATIVE_HAS_MODEL_LOADED, bool>(model); }
+    //static void RequestModel(eModel model) { NativeInvoke::Invoke<NATIVE_REQUEST_MODEL, ScriptVoid>(model); }
     static void GetCurrentBasicCopModel(eModel *pModel) { NativeInvoke::Invoke<NATIVE_GET_CURRENT_BASIC_COP_MODEL, ScriptVoid>(pModel); }
     static void GetCurrentBasicPoliceCarModel(eModel *pModel) { NativeInvoke::Invoke<NATIVE_GET_CURRENT_BASIC_POLICE_CAR_MODEL, ScriptVoid>(pModel); }
-    static void GetCurrentCopModel(eModel *pModel) { NativeInvoke::Invoke<NATIVE_GET_CURRENT_COP_MODEL, ScriptVoid>(pModel); }
+    //static void GetCurrentCopModel(eModel *pModel) { NativeInvoke::Invoke<NATIVE_GET_CURRENT_COP_MODEL, ScriptVoid>(pModel); }
     static void GetCurrentPoliceCarModel(eModel *pModel) { NativeInvoke::Invoke<NATIVE_GET_CURRENT_POLICE_CAR_MODEL, ScriptVoid>(pModel); }
     static void GetCurrentTaxiCarModel(eModel *pModel) { NativeInvoke::Invoke<NATIVE_GET_CURRENT_TAXI_CAR_MODEL, ScriptVoid>(pModel); }
     static const char *GetDisplayNameFromVehicleModel(eModel model) { return NativeInvoke::Invoke<NATIVE_GET_DISPLAY_NAME_FROM_VEHICLE_MODEL, const char *>(model); }
@@ -689,7 +689,7 @@ namespace Natives
     static bool IsThisModelAPlane(eModel model) { return NativeInvoke::Invoke<NATIVE_IS_THIS_MODEL_A_PLANE, bool>(model); }
     static bool IsThisModelATrain(eModel model) { return NativeInvoke::Invoke<NATIVE_IS_THIS_MODEL_A_TRAIN, bool>(model); }
     static bool IsThisModelAVehicle(eModel model) { return NativeInvoke::Invoke<NATIVE_IS_THIS_MODEL_A_VEHICLE, bool>(model); }
-    static void MarkModelAsNoLongerNeeded(eModel model) { NativeInvoke::Invoke<NATIVE_MARK_MODEL_AS_NO_LONGER_NEEDED, ScriptVoid>(model); }
+    //static void MarkModelAsNoLongerNeeded(eModel model) { NativeInvoke::Invoke<NATIVE_MARK_MODEL_AS_NO_LONGER_NEEDED, ScriptVoid>(model); }
 
     // Interiors
     static void ActivateInterior(Interior interior, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_ACTIVATE_INTERIOR, ScriptVoid>(interior, unknownTrue); }
@@ -792,26 +792,26 @@ namespace Natives
     static void RenderWeaponPickupsBigger(bool value) { NativeInvoke::Invoke<NATIVE_RENDER_WEAPON_PICKUPS_BIGGER, ScriptVoid>(value); }
 
     // Camera
-    static bool CamIsSphereVisible(Camera camera, float pX, float pY, float pZ, float radius) { return NativeInvoke::Invoke<NATIVE_CAM_IS_SPHERE_VISIBLE, bool>(camera, pX, pY, pZ, radius); }
+    //static bool CamIsSphereVisible(Camera camera, float pX, float pY, float pZ, float radius) { return NativeInvoke::Invoke<NATIVE_CAM_IS_SPHERE_VISIBLE, bool>(camera, pX, pY, pZ, radius); }
     static void CreateCam(unsigned int camtype_usually14, Camera *camera) { NativeInvoke::Invoke<NATIVE_CREATE_CAM, ScriptVoid>(camtype_usually14, camera); }
     static void DestroyCam(Camera camera) { NativeInvoke::Invoke<NATIVE_DESTROY_CAM, ScriptVoid>(camera); }
-    static bool DoesCamExist(Camera camera) { return NativeInvoke::Invoke<NATIVE_DOES_CAM_EXIST, bool>(camera); }
+    //static bool DoesCamExist(Camera camera) { return NativeInvoke::Invoke<NATIVE_DOES_CAM_EXIST, bool>(camera); }
     static void SetCamActive(Camera camera, bool value) { NativeInvoke::Invoke<NATIVE_SET_CAM_ACTIVE, ScriptVoid>(camera, value); }
     static void GetCamFov(Camera camera, float *fov) { NativeInvoke::Invoke<NATIVE_GET_CAM_FOV, ScriptVoid>(camera, fov); }
-    static void GetCamPos(Camera camera,  float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_CAM_POS, ScriptVoid>(camera, pX, pY, pZ); }
-    static void GetCamRot(Camera camera, float *angleX, float *angleY, float *angleZ) { NativeInvoke::Invoke<NATIVE_GET_CAM_ROT, ScriptVoid>(camera, angleX, angleY, angleZ); }
-    static void GetGameCam(Camera *camera) { NativeInvoke::Invoke<NATIVE_GET_GAME_CAM, ScriptVoid>(camera); }
+    //static void GetCamPos(Camera camera,  float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_CAM_POS, ScriptVoid>(camera, pX, pY, pZ); }
+    //static void GetCamRot(Camera camera, float *angleX, float *angleY, float *angleZ) { NativeInvoke::Invoke<NATIVE_GET_CAM_ROT, ScriptVoid>(camera, angleX, angleY, angleZ); }
+    //static void GetGameCam(Camera *camera) { NativeInvoke::Invoke<NATIVE_GET_GAME_CAM, ScriptVoid>(camera); }
     static void GetGameCamChild(Camera *camera) { NativeInvoke::Invoke<NATIVE_GET_GAME_CAM_CHILD, ScriptVoid>(camera); }
-    static bool IsCamActive(Camera camera) { return NativeInvoke::Invoke<NATIVE_IS_CAM_ACTIVE, bool>(camera); }
-    static bool IsCamInterpolating() { return NativeInvoke::Invoke<NATIVE_IS_CAM_INTERPOLATING, bool>(); }
-    static bool IsCamPropagating(Camera camera) { return NativeInvoke::Invoke<NATIVE_IS_CAM_PROPAGATING, bool>(camera); }
-    static void SetCamBehindPed(Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_BEHIND_PED, ScriptVoid>(ped); }
+    //static bool IsCamActive(Camera camera) { return NativeInvoke::Invoke<NATIVE_IS_CAM_ACTIVE, bool>(camera); }
+    //static bool IsCamInterpolating() { return NativeInvoke::Invoke<NATIVE_IS_CAM_INTERPOLATING, bool>(); }
+    //static bool IsCamPropagating(Camera camera) { return NativeInvoke::Invoke<NATIVE_IS_CAM_PROPAGATING, bool>(camera); }
+    //static void SetCamBehindPed(Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_BEHIND_PED, ScriptVoid>(ped); }
     static void SetCamFov(Camera camera, float fov) { NativeInvoke::Invoke<NATIVE_SET_CAM_FOV, ScriptVoid>(camera, fov); }
-    static void SetCamInFrontOfPed(Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_IN_FRONT_OF_PED, ScriptVoid>(ped); }
+    //static void SetCamInFrontOfPed(Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_IN_FRONT_OF_PED, ScriptVoid>(ped); }
     static void SetCamPos(Camera camera, float pX, float pY, float pZ) { NativeInvoke::Invoke<NATIVE_SET_CAM_POS, ScriptVoid>(camera, pX, pY, pZ); }
     static void SetCamPropagate(Camera camera, bool value) { NativeInvoke::Invoke<NATIVE_SET_CAM_PROPAGATE, ScriptVoid>(camera, value); }
     static void SetCamRot(Camera camera, float angleX, float angleY, float angleZ) { NativeInvoke::Invoke<NATIVE_SET_CAM_ROT, ScriptVoid>(camera, angleX, angleY, angleZ); }
-    static void SetCamTargetPed(Camera camera, Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_TARGET_PED, ScriptVoid>(camera, ped); }
+    //static void SetCamTargetPed(Camera camera, Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_TARGET_PED, ScriptVoid>(camera, ped); }
 
     // Network
     static bool NetworkIsGameRanked() { return NativeInvoke::Invoke<NATIVE_NETWORK_IS_GAME_RANKED, bool>(); }
@@ -821,8 +821,8 @@ namespace Natives
     static bool AreAllNavmeshRegionsLoaded() { return NativeInvoke::Invoke<NATIVE_ARE_ALL_NAVMESH_REGIONS_LOADED, bool>(); }
     static void ClearArea(float x, float y, float z, float radius, bool unknown) { NativeInvoke::Invoke<NATIVE_CLEAR_AREA, ScriptVoid>(x, y, z, radius, unknown); }
     static void ClearAreaOfCars(float x, float y, float z, float radius) { NativeInvoke::Invoke<NATIVE_CLEAR_AREA_OF_CARS, ScriptVoid>(x, y, z, radius); }
-    static void ClearAreaOfChars(float x, float y, float z, float radius) { NativeInvoke::Invoke<NATIVE_CLEAR_AREA_OF_CHARS, ScriptVoid>(x, y, z, radius); }
-    static void ClearAreaOfCops(float x, float y, float z, float radius) { NativeInvoke::Invoke<NATIVE_CLEAR_AREA_OF_COPS, ScriptVoid>(x, y, z, radius); }
+    //static void ClearAreaOfChars(float x, float y, float z, float radius) { NativeInvoke::Invoke<NATIVE_CLEAR_AREA_OF_CHARS, ScriptVoid>(x, y, z, radius); }
+    //static void ClearAreaOfCops(float x, float y, float z, float radius) { NativeInvoke::Invoke<NATIVE_CLEAR_AREA_OF_COPS, ScriptVoid>(x, y, z, radius); }
     static void ClearAreaOfObjects(float x, float y, float z, float radius) { NativeInvoke::Invoke<NATIVE_CLEAR_AREA_OF_OBJECTS, ScriptVoid>(x, y, z, radius); }
     static void ClearPedNonCreationArea() { NativeInvoke::Invoke<NATIVE_CLEAR_PED_NON_CREATION_AREA, ScriptVoid>(); }
     static void ClearPedNonRemovalArea() { NativeInvoke::Invoke<NATIVE_CLEAR_PED_NON_REMOVAL_AREA, ScriptVoid>(); }
@@ -846,16 +846,16 @@ namespace Natives
     static void LoadScene(float x, float y, float z) { NativeInvoke::Invoke<NATIVE_LOAD_SCENE, ScriptVoid>(x, y, z); }
     static void RemoveAllPickupsOfType(ePickupType type) { NativeInvoke::Invoke<NATIVE_REMOVE_ALL_PICKUPS_OF_TYPE, ScriptVoid>(type); }
     static void RequestCollisionAtPosn(float x, float y, float z) { NativeInvoke::Invoke<NATIVE_REQUEST_COLLISION_AT_POSN, ScriptVoid>(x, y, z); }
-    static void SwitchAmbientPlanes(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_AMBIENT_PLANES, ScriptVoid>(on); }  
-    static void SwitchArrowAboveBlippedPickups(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_ARROW_ABOVE_BLIPPED_PICKUPS, ScriptVoid>(on); }
-    static void SwitchRandomBoats(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_RANDOM_BOATS, ScriptVoid>(on); }
-    static void SwitchRandomTrains(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_RANDOM_TRAINS, ScriptVoid>(on); }
-    static void SwitchGarbageTrucks(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_GARBAGE_TRUCKS, ScriptVoid>(on); }
-    static void SwitchMadDrivers(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_MAD_DRIVERS, ScriptVoid>(on); }
+    //static void SwitchAmbientPlanes(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_AMBIENT_PLANES, ScriptVoid>(on); }  
+    //static void SwitchArrowAboveBlippedPickups(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_ARROW_ABOVE_BLIPPED_PICKUPS, ScriptVoid>(on); }
+    //static void SwitchRandomBoats(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_RANDOM_BOATS, ScriptVoid>(on); }
+    //static void SwitchRandomTrains(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_RANDOM_TRAINS, ScriptVoid>(on); }
+    //static void SwitchGarbageTrucks(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_GARBAGE_TRUCKS, ScriptVoid>(on); }
+    //static void SwitchMadDrivers(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_MAD_DRIVERS, ScriptVoid>(on); }
 
     // Garages
     static void CloseGarage(const char *garageName) { NativeInvoke::Invoke<NATIVE_CLOSE_GARAGE, ScriptVoid>(garageName); }
-    static bool IsCarInGarageArea(const char *garageName, Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_IN_GARAGE_AREA, bool>(garageName, vehicle); }
+    //static bool IsCarInGarageArea(const char *garageName, Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_IN_GARAGE_AREA, bool>(garageName, vehicle); }
     static ScriptAny IsGarageClosed(const char *garageName) { return NativeInvoke::Invoke<NATIVE_IS_GARAGE_CLOSED, ScriptAny>(garageName); }
     static ScriptAny IsGarageOpen(const char *garageName) { return NativeInvoke::Invoke<NATIVE_IS_GARAGE_OPEN, ScriptAny>(garageName); }
     static void OpenGarage(const char *name) { NativeInvoke::Invoke<NATIVE_OPEN_GARAGE, ScriptVoid>(name); }
@@ -871,9 +871,9 @@ namespace Natives
     static void DisplayTextWithTwoStrings(float x, float y, const char *gxtName, const char *gxtStringName1, const char *gxtStringName2) { NativeInvoke::Invoke<NATIVE_DISPLAY_TEXT_WITH_TWO_STRINGS, ScriptVoid>(x, y, gxtName, gxtStringName1, gxtStringName2); }
     static unsigned int GetLengthOfStringWithThisTextLabel(const char *gxtName) { return NativeInvoke::Invoke<NATIVE_GET_LENGTH_OF_STRING_WITH_THIS_TEXT_LABEL, unsigned int>(gxtName); }
     static const char *GetFirstNCharactersOfString(const char *gxtName, unsigned int chars) { return NativeInvoke::Invoke<NATIVE_GET_FIRST_N_CHARACTERS_OF_STRING, const char *>(gxtName, chars); }
-    static void GetMobilePhoneRenderId(unsigned int *pRenderId) { NativeInvoke::Invoke<NATIVE_GET_MOBILE_PHONE_RENDER_ID, ScriptVoid>(pRenderId); }
+    //static void GetMobilePhoneRenderId(unsigned int *pRenderId) { NativeInvoke::Invoke<NATIVE_GET_MOBILE_PHONE_RENDER_ID, ScriptVoid>(pRenderId); }
     static const char *GetNthIntegerInString(const char *gxtName, unsigned int index) { return NativeInvoke::Invoke<NATIVE_GET_NTH_INTEGER_IN_STRING, const char *>(gxtName, index); }
-    static void GetScriptRenderTargetRenderId(unsigned int *pRenderId) { NativeInvoke::Invoke<NATIVE_GET_SCRIPT_RENDERTARGET_RENDER_ID, ScriptVoid>(pRenderId); }
+    //static void GetScriptRenderTargetRenderId(unsigned int *pRenderId) { NativeInvoke::Invoke<NATIVE_GET_SCRIPT_RENDERTARGET_RENDER_ID, ScriptVoid>(pRenderId); }
     static const char *GetStringFromHashKey(unsigned int hashKey) { return NativeInvoke::Invoke<NATIVE_GET_STRING_FROM_HASH_KEY, const char *>(hashKey); }
     static ScriptAny GetStringWidth(const char *gxtName) { return NativeInvoke::Invoke<NATIVE_GET_STRING_WIDTH, ScriptAny>(gxtName); }
     static ScriptAny GetStringWidthWithNumber(const char *gxtName, int number) { return NativeInvoke::Invoke<NATIVE_GET_STRING_WIDTH_WITH_NUMBER, ScriptAny>(gxtName, number); }
@@ -897,7 +897,7 @@ namespace Natives
     static void PrintNow(const char *gxtName, unsigned int timeMS, bool enable) { NativeInvoke::Invoke<NATIVE_PRINT_NOW, ScriptVoid>(gxtName, timeMS, enable); }
     static void PrintStringInString(const char *gxtName, const char *gxtText, unsigned int timeMS, bool enable) { NativeInvoke::Invoke<NATIVE_PRINT_STRING_IN_STRING, ScriptVoid>(gxtName, gxtText, timeMS, enable); }
     static void PrintStringInStringNow(const char *gxtName, const char *gxtText, unsigned int timeMS, bool enable) { NativeInvoke::Invoke<NATIVE_PRINT_STRING_IN_STRING_NOW, ScriptVoid>(gxtName, gxtText, timeMS, enable); }
-    static void PrintStringWithLiteralStringNow(const char *gxtName, const char *text, unsigned int timeMS, bool enable) { NativeInvoke::Invoke<NATIVE_PRINT_STRING_WITH_LITERAL_STRING_NOW, ScriptVoid>(gxtName, text, timeMS, enable); }
+    //static void PrintStringWithLiteralStringNow(const char *gxtName, const char *text, unsigned int timeMS, bool enable) { NativeInvoke::Invoke<NATIVE_PRINT_STRING_WITH_LITERAL_STRING_NOW, ScriptVoid>(gxtName, text, timeMS, enable); }
     static void PrintWith2Numbers(const char *gxtName, int value1, int value2, unsigned int timeMS, bool enable) { NativeInvoke::Invoke<NATIVE_PRINT_WITH_2_NUMBERS, ScriptVoid>(gxtName, value1, value2, timeMS, enable); }
     static void PrintWith2NumbersNow(const char *gxtName, int value1, int value2, unsigned int timeMS, bool enable) { NativeInvoke::Invoke<NATIVE_PRINT_WITH_2_NUMBERS_NOW, ScriptVoid>(gxtName, value1, value2, timeMS, enable); }
     static void PrintWithNumber(const char *gxtName, int value, unsigned int timeMS, bool enable) { NativeInvoke::Invoke<NATIVE_PRINT_WITH_NUMBER, ScriptVoid>(gxtName, value, timeMS, enable); }
@@ -944,7 +944,7 @@ namespace Natives
     static void IncrementFloatStatNoMessage(eFloatStatistic stat, float value) { NativeInvoke::Invoke<NATIVE_INCREMENT_FLOAT_STAT_NO_MESSAGE, ScriptVoid>(stat, value); }
     static void IncrementIntStat(eIntStatistic stat, unsigned int value) { NativeInvoke::Invoke<NATIVE_INCREMENT_INT_STAT, ScriptVoid>(stat, value); }
     static void IncrementIntStatNoMessage(eIntStatistic stat, unsigned int value) { NativeInvoke::Invoke<NATIVE_INCREMENT_INT_STAT_NO_MESSAGE, ScriptVoid>(stat, value); }
-    static void SetIntStat(eIntStatistic stat, unsigned int value) { NativeInvoke::Invoke<NATIVE_SET_INT_STAT, ScriptVoid>(stat, value); }
+    //static void SetIntStat(eIntStatistic stat, unsigned int value) { NativeInvoke::Invoke<NATIVE_SET_INT_STAT, ScriptVoid>(stat, value); }
 
     // Pad (controls)
     static bool GetPadPitchRoll(unsigned int padIndex, float *pPitch, float *pRoll) { return NativeInvoke::Invoke<NATIVE_GET_PAD_PITCH_ROLL, bool>(padIndex, pPitch, pRoll); }
@@ -971,7 +971,7 @@ namespace Natives
     static unsigned int GetMinutesToTimeOfDay(unsigned int hour, unsigned int minute) { return NativeInvoke::Invoke<NATIVE_GET_MINUTES_TO_TIME_OF_DAY, unsigned int>(hour, minute); }
     static void GetTimeOfDay(unsigned int *hour, unsigned int *minute) { NativeInvoke::Invoke<NATIVE_GET_TIME_OF_DAY, ScriptVoid>(hour, minute); }
     static void ReleaseTimeOfDay() { NativeInvoke::Invoke<NATIVE_RELEASE_TIME_OF_DAY, ScriptVoid>(); }
-    static void SetTimeOfDay(unsigned int hour, unsigned int minute) { NativeInvoke::Invoke<NATIVE_SET_TIME_OF_DAY, ScriptVoid>(hour, minute); }
+    //static void SetTimeOfDay(unsigned int hour, unsigned int minute) { NativeInvoke::Invoke<NATIVE_SET_TIME_OF_DAY, ScriptVoid>(hour, minute); }
     static void SetTimeOneDayBack() { NativeInvoke::Invoke<NATIVE_SET_TIME_ONE_DAY_BACK, ScriptVoid>(); }
     static void SetTimeOneDayForward() { NativeInvoke::Invoke<NATIVE_SET_TIME_ONE_DAY_FORWARD, ScriptVoid>(); }
     static void SetTimeScale(float scale) { NativeInvoke::Invoke<NATIVE_SET_TIME_SCALE, ScriptVoid>(scale); }
@@ -979,7 +979,7 @@ namespace Natives
     // Fires
     static bool IsScriptFireExtinguished(FireId fire) { return NativeInvoke::Invoke<NATIVE_IS_SCRIPT_FIRE_EXTINGUISHED, bool>(fire); }
     static void RemoveScriptFire(FireId fire) { NativeInvoke::Invoke<NATIVE_REMOVE_SCRIPT_FIRE, ScriptVoid>(fire); }
-    static FireId StartCarFire(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_START_CAR_FIRE, ScriptAny>(vehicle); }
+    //static FireId StartCarFire(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_START_CAR_FIRE, ScriptAny>(vehicle); }
     static FireId StartCharFire(Ped ped) { return NativeInvoke::Invoke<NATIVE_START_CHAR_FIRE, ScriptAny>(ped); }
     static FireId StartScriptFire(float x, float y, float z, unsigned char numGenerationsAllowed = 0, unsigned int strength = 1) { return NativeInvoke::Invoke<NATIVE_START_SCRIPT_FIRE, unsigned int>(x, y, z, numGenerationsAllowed, strength); }
 
@@ -998,12 +998,12 @@ namespace Natives
     static void ActivateFrontEnd() { NativeInvoke::Invoke<NATIVE_ACTIVATE_FRONTEND, unsigned int>(); }
     static void ActivateSaveMenu() { NativeInvoke::Invoke<NATIVE_ACTIVATE_SAVE_MENU, ScriptVoid>(); }
     static void AddExplosion(float x, float y, float z, unsigned int p3, float p4, unsigned int p5, unsigned int p6, float p7) { NativeInvoke::Invoke<NATIVE_ADD_EXPLOSION, ScriptVoid>(x, y, z, p3, p4, p5, p6, p7); }
-    static void AllowEmergencyServices(bool allow) { NativeInvoke::Invoke<NATIVE_ALLOW_EMERGENCY_SERVICES, ScriptVoid>(allow); }
+    //static void AllowEmergencyServices(bool allow) { NativeInvoke::Invoke<NATIVE_ALLOW_EMERGENCY_SERVICES, ScriptVoid>(allow); }
     static void AllowGameToPauseForStreaming(bool allow) { NativeInvoke::Invoke<NATIVE_ALLOW_GAME_TO_PAUSE_FOR_STREAMING, ScriptVoid>(allow); }
     static void AllowStuntJumpsToTrigger(bool allow) { NativeInvoke::Invoke<NATIVE_ALLOW_STUNT_JUMPS_TO_TRIGGER, ScriptVoid>(allow); }
-    static bool AreWidescreenBordersActive() { return NativeInvoke::Invoke<NATIVE_ARE_WIDESCREEN_BORDERS_ACTIVE, bool>(); }
+    //static bool AreWidescreenBordersActive() { return NativeInvoke::Invoke<NATIVE_ARE_WIDESCREEN_BORDERS_ACTIVE, bool>(); }
     static ScriptAny AwardAchievement(eAchievement achievement) { return NativeInvoke::Invoke<NATIVE_AWARD_ACHIEVEMENT, ScriptAny>(achievement); }
-    static bool CanPhoneBeSeenOnScreen() { return NativeInvoke::Invoke<NATIVE_CAN_PHONE_BE_SEEN_ON_SCREEN, bool>(); }
+    //static bool CanPhoneBeSeenOnScreen() { return NativeInvoke::Invoke<NATIVE_CAN_PHONE_BE_SEEN_ON_SCREEN, bool>(); }
     static void CancelOverrideRestart() { NativeInvoke::Invoke<NATIVE_CANCEL_OVERRIDE_RESTART, ScriptVoid>(); }
     static void ClearShakePlayerPadWhenControllerDisabled() { NativeInvoke::Invoke<NATIVE_CLEAR_SHAKE_PLAYERPAD_WHEN_CONTROLLER_DISABLED, ScriptVoid>(); }
     static void ClearTimeCycleModifier() { NativeInvoke::Invoke<NATIVE_CLEAR_TIMECYCLE_MODIFIER, ScriptVoid>(); }
@@ -1019,10 +1019,10 @@ namespace Natives
     static void DisplayRadar(bool display) { NativeInvoke::Invoke<NATIVE_DISPLAY_RADAR, ScriptVoid>(display); }
     static void DisplaySniperScopeThisFrame() { NativeInvoke::Invoke<NATIVE_DISPLAY_SNIPER_SCOPE_THIS_FRAME, ScriptVoid>(); }
     static void DoAutoSave() { NativeInvoke::Invoke<NATIVE_DO_AUTO_SAVE, ScriptVoid>(); }
-    static void DoScreenFadeIn(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_IN, ScriptVoid>(timeMS); }
-    static void DoScreenFadeInUnhacked(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_IN_UNHACKED, ScriptVoid>(timeMS); }
-    static void DoScreenFadeOut(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_OUT, ScriptVoid>(timeMS); }
-    static void DoScreenFadeOutUnhacked(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_OUT_UNHACKED, ScriptVoid>(timeMS); }
+    //static void DoScreenFadeIn(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_IN, ScriptVoid>(timeMS); }
+    //static void DoScreenFadeInUnhacked(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_IN_UNHACKED, ScriptVoid>(timeMS); }
+    //static void DoScreenFadeOut(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_OUT, ScriptVoid>(timeMS); }
+    //static void DoScreenFadeOutUnhacked(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_OUT_UNHACKED, ScriptVoid>(timeMS); }
     static void DrawRect(float x1, float y1, float x2, float y2, unsigned char r, unsigned char g, unsigned char b, unsigned char a) { NativeInvoke::Invoke<NATIVE_DRAW_RECT, ScriptVoid>(x1, y1, x2, y2, r, g, b, a); }
     static void EnableMaxAmmoCap(bool enable) { NativeInvoke::Invoke<NATIVE_ENABLE_MAX_AMMO_CAP, ScriptVoid>(enable); }
     static void EnablePoliceScanner() { NativeInvoke::Invoke<NATIVE_ENABLE_POLICE_SCANNER, ScriptVoid>(); }
@@ -1030,7 +1030,7 @@ namespace Natives
     static void FakeDeathArrest() { NativeInvoke::Invoke<NATIVE_FAKE_DEATHARREST, ScriptVoid>(); }
     static void FindStreetNameAtPosition(float pX, float pY, float pZ, unsigned int *strHash0, unsigned int *strHash1) { NativeInvoke::Invoke<NATIVE_FIND_STREET_NAME_AT_POSITION, ScriptVoid>(pX, pY, pZ, strHash0, strHash1); }
     static void FireSingleBullet(float x, float y, float z, float targetX, float targetY, float targetZ, unsigned int unknown) { NativeInvoke::Invoke<NATIVE_FIRE_SINGLE_BULLET, ScriptVoid>(x, y, z, targetX, targetY, targetZ, unknown); }
-    static void FlashWeaponIcon(bool on) { NativeInvoke::Invoke<NATIVE_FLASH_WEAPON_ICON, ScriptVoid>(on); }
+    //static void FlashWeaponIcon(bool on) { NativeInvoke::Invoke<NATIVE_FLASH_WEAPON_ICON, ScriptVoid>(on); }
     static void ForceInitialPlayerStation(const char *stationName) { NativeInvoke::Invoke<NATIVE_FORCE_INITIAL_PLAYER_STATION, ScriptVoid>(stationName); }
     static void ForceLoadingScreen(bool force) { NativeInvoke::Invoke<NATIVE_FORCE_LOADING_SCREEN, ScriptVoid>(force); }
     static void GetCorrectedColour(unsigned int r, unsigned int g, unsigned int b, unsigned int *pR, unsigned int *pG, unsigned int *pB) { NativeInvoke::Invoke<NATIVE_GET_CORRECTED_COLOUR, ScriptVoid>(r, g, b, pR, pG, pB); }
@@ -1075,7 +1075,7 @@ namespace Natives
     static bool IsGameInControlOfMusic() { return NativeInvoke::Invoke<NATIVE_IS_GAME_IN_CONTROL_OF_MUSIC, bool>(); }
     static bool IsGermanVersion() { return NativeInvoke::Invoke<NATIVE_IS_GERMAN_VERSION, bool>(); }
     static bool IsHelpMessageBeingDisplayed() { return NativeInvoke::Invoke<NATIVE_IS_HELP_MESSAGE_BEING_DISPLAYED, bool>(); }
-    static bool IsHintRunning() { return NativeInvoke::Invoke<NATIVE_IS_HINT_RUNNING, bool>(); }
+    //static bool IsHintRunning() { return NativeInvoke::Invoke<NATIVE_IS_HINT_RUNNING, bool>(); }
     static bool IsHUDPreferenceSwitchedOn() { return NativeInvoke::Invoke<NATIVE_IS_HUD_PREFERENCE_SWITCHED_ON, bool>(); }
     static bool IsHUDReticuleComplex() { return NativeInvoke::Invoke<NATIVE_IS_HUD_RETICULE_COMPLEX, bool>(); }
     static bool IsInSpectatorMode() { return NativeInvoke::Invoke<NATIVE_IS_IN_SPECTATOR_MODE, bool>(); }
@@ -1090,11 +1090,11 @@ namespace Natives
     static bool IsPayNSprayActive() { return NativeInvoke::Invoke<NATIVE_IS_PAY_N_SPRAY_ACTIVE, bool>(); }
     static bool IsPlayerBeingArrested() { return NativeInvoke::Invoke<NATIVE_IS_PLAYER_BEING_ARRESTED, bool>(); }
     static bool IsPlayerOnline() { return NativeInvoke::Invoke<NATIVE_IS_PLAYER_ONLINE, bool>(); }
-    static bool IsScreenFadedIn() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADED_IN, bool>(); }
-    static bool IsScreenFadedOut() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADED_OUT, bool>(); }
-    static bool IsScreenFading() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING, bool>(); }
-    static bool IsScreenFadingIn() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING_IN, bool>(); }
-    static bool IsScreenFadingOut() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING_OUT, bool>(); }
+    //static bool IsScreenFadedIn() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADED_IN, bool>(); }
+    //static bool IsScreenFadedOut() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADED_OUT, bool>(); }
+    //static bool IsScreenFading() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING, bool>(); }
+    //static bool IsScreenFadingIn() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING_IN, bool>(); }
+    //static bool IsScreenFadingOut() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING_OUT, bool>(); }
     static bool IsSniperInverted() { return NativeInvoke::Invoke<NATIVE_IS_SNIPER_INVERTED, bool>(); }
     static bool IsSystemUIShowing() { return NativeInvoke::Invoke<NATIVE_IS_SYSTEM_UI_SHOWING, bool>(); }
     static bool IsThisAMinigameScript() { return NativeInvoke::Invoke<NATIVE_IS_THIS_A_MINIGAME_SCRIPT, bool>(); }
@@ -1111,9 +1111,9 @@ namespace Natives
     static void RemoveCoverPoint(CoverPoint coverPoint) { NativeInvoke::Invoke<NATIVE_REMOVE_COVER_POINT, ScriptVoid>(coverPoint); }
     static void RemoveIpl(const char *iplName) { NativeInvoke::Invoke<NATIVE_REMOVE_IPL, ScriptVoid>(iplName); }
     static void RequestIpl(const char *iplName) { NativeInvoke::Invoke<NATIVE_REQUEST_IPL, ScriptVoid>(iplName); }
-    static void SetCameraControlsDisabledWithPlayerControls(bool value) { NativeInvoke::Invoke<NATIVE_SET_CAMERA_CONTROLS_DISABLED_WITH_PLAYER_CONTROLS, ScriptVoid>(value); }
+	//static void SetCameraControlsDisabledWithPlayerControls(bool value) { NativeInvoke::Invoke<NATIVE_SET_CAMERA_CONTROLS_DISABLED_WITH_PLAYER_CONTROLS, ScriptVoid>(value); }
     static void SetMissionFlag(bool isMission) { NativeInvoke::Invoke<NATIVE_SET_MISSION_FLAG, ScriptVoid>(isMission); }
-    static void SetFloatStat(eFloatStatistic stat, float value) { NativeInvoke::Invoke<NATIVE_SET_FLOAT_STAT, ScriptVoid>(stat, value); }
+    //static void SetFloatStat(eFloatStatistic stat, float value) { NativeInvoke::Invoke<NATIVE_SET_FLOAT_STAT, ScriptVoid>(stat, value); }
     static void SetRadarZoom(float zoom) { NativeInvoke::Invoke<NATIVE_SET_RADAR_ZOOM, ScriptVoid>(zoom); }
     static void SetTimerA(unsigned int value) { NativeInvoke::Invoke<NATIVE_SETTIMERA, ScriptVoid>(value); }
     static void SetTimerB(unsigned int value) { NativeInvoke::Invoke<NATIVE_SETTIMERB, ScriptVoid>(value); }
@@ -1148,106 +1148,5 @@ namespace Natives
     static float Sin(float value) { return NativeInvoke::Invoke<NATIVE_SIN, float>(value); }          // Prefer using function from <math.h> instead for performance
     static float Sqrt(float value) { return NativeInvoke::Invoke<NATIVE_SQRT, float>(value); }        // Prefer using function from <math.h> instead for performance
     static float Tan(float value) { return NativeInvoke::Invoke<NATIVE_TAN, float>(value); }          // Prefer using function from <math.h> instead for performance
-	*/
+	/**/
 }
-
-/*
-#define GTA40
-#if defined GTA40
-// 1.0.4.0
-
-// unsigned int
-static unsigned int (__cdecl * GetPlayerId)() = (unsigned int (__cdecl *)())(0x9F6110 + dwLoadOffset);
-static void (__cdecl * GetPlayerPed)(unsigned int, Ped*) = (void (__cdecl *)(unsigned int, Ped*))(0x9F7ED0 + dwLoadOffset);
-static unsigned int (__cdecl * ConvertIntToPlayerIndex)(unsigned int) = (unsigned int (__cdecl *)(unsigned int))(0x9F6140 + dwLoadOffset);
-static void (__cdecl * AddScore)(unsigned int, int) = (void(__cdecl *)(unsigned int, int))(0x9F4E80 + dwLoadOffset);
-static void (__cdecl * ChangePlayerModel)(unsigned int, eModel) = (void (__cdecl *)(unsigned int, eModel))(0x9F4C00 + dwLoadOffset);
-static void (__cdecl * RegisterPlayerRespawnCoords)(int pl, float, float, float) = (void (__cdecl*)(int, float, float, float))(0x9CE6D0+dwLoadOffset);
-// char
-static bool (__cdecl * DoesCharExist)(Ped ped) = (bool(__cdecl *)(Ped))(0x9FE1A0 + dwLoadOffset);
-static void (__cdecl * CreateChar)(unsigned int,eModel,float,float,float,Ped*,bool) = (void(__cdecl *)(unsigned int,eModel,float,float,float,Ped*,bool))(0xA05CD0 + dwLoadOffset);
-static void (__cdecl * GetCharCoordinates)(Ped, float*, float*, float*) = (void(__cdecl *)(Ped, float*, float*, float*))(0x9FB910 + dwLoadOffset);
-static void (__cdecl * SetCharCoordinates)(Ped, float, float, float) = (void(__cdecl *)(Ped, float, float, float))(0x9FB970 + dwLoadOffset);
-static void (__cdecl * AddArmourToChar)(Ped, float) = (void (__cdecl *)(Ped, float))(0x9FD190 + dwLoadOffset);
-static unsigned int (__cdecl * GetCharMoney)(Ped) = (unsigned int (__cdecl *)(Ped))(0x9FD580 + dwLoadOffset);
-static void (__cdecl * RemoveWeaponFromChar)(Ped, int) = (void(__cdecl *)(Ped, int))(0x9CD2D0 + dwLoadOffset);
-static bool (__cdecl * IsCharInAnyCar)(Ped) = (bool(__cdecl *)(Ped))(0x9FBB40 + dwLoadOffset);
-static void (__cdecl * GetCharCar)(Ped, Vehicle*) = (void(__cdecl *)(Ped, Vehicle*))(0xA071A0 + dwLoadOffset);
-static void (__cdecl * RemoveAllCharWeapons)(Ped) = (void(__cdecl *)(Ped))(0x9CD320 + dwLoadOffset);
-static void (__cdecl * SetCharMoney)(Ped, int) = (void(__cdecl *)(Ped, int))(0x9FD550 + dwLoadOffset);
-static void (__cdecl * DeleteChar)(Ped*) = (void(__cdecl *)(Ped*))(0x9Fb830 + dwLoadOffset);
-static bool (__cdecl * IsCharShooting)(Ped ped) = (bool(__cdecl *)(Ped))(0x9FCF40 + dwLoadOffset);
-static bool (__cdecl * IsCharInAir)(Ped ped) = (bool(__cdecl *)(Ped))(0x9FF2D0 + dwLoadOffset);
-static bool (__cdecl * IsCharDucking)(Ped ped) = (bool(__cdecl *)(Ped))(0x9FE260 + dwLoadOffset);
-static bool (__cdecl * IsCharDead)(Ped ped) = (bool(__cdecl *)(Ped))(0x9FC280 + dwLoadOffset);
-static bool (__cdecl * IsCharSittingInAnyCar)(Ped ped) = (bool(__cdecl *)(Ped))(0x9FD910 + dwLoadOffset);
-static bool (__cdecl * IsCharOnFoot)(Ped ped) = (bool(__cdecl *)(Ped))(0x9FD970 + dwLoadOffset);
-static bool (__cdecl * IsCharGettingInToACar)(Ped ped) = (bool(__cdecl *)(Ped))(0x9FFD20 + dwLoadOffset);
-static void (__cdecl * GetCharHeading)(Ped, float*) = (void(__cdecl *)(Ped, float*))(0x9FC3C0 + dwLoadOffset);
-static void (__cdecl * SetCharHeading)(Ped, float) = (void(__cdecl *)(Ped, float))(0x9FC490 + dwLoadOffset);
-static void (__cdecl * GivePedFakeNetworkName)(Ped,char*, int r, int g, int b, int a) = (void(__cdecl *)(Ped, char*, int, int, int, int))(0xA02390 + dwLoadOffset);
-static int (__cdecl * GetCurrentCharWeapon)(Ped, int*) = (int (__cdecl*)(Ped, int*))(0x9CD060+dwLoadOffset);
-static void (__cdecl * FreezeCharPosition)(Ped, bool) = (void (__cdecl*)(Ped, bool))(0x9FDDA0+dwLoadOffset);
-static void (__cdecl * SetCharDefaultComponentVariation)(Ped) = (void (__cdecl*)(Ped))(0xA00130+dwLoadOffset);
-static void (__cdecl * SetCurrentCharWeapon)(Ped ped, eWeapon w, bool unkTrue) = (void (__cdecl*)(Ped, eWeapon, bool))(0x9CD060+dwLoadOffset);
-static void (__cdecl * GiveWeaponToChar)(Ped, eWeapon, int, bool unk0) = (void (__cdecl*)(Ped, eWeapon, int, bool))(0x9CCEF0+dwLoadOffset);
-// Car
-static bool (__cdecl * DoesVehicleExist)(Vehicle car) = (bool(__cdecl *)(Vehicle))(0x9DFDC0 + dwLoadOffset);
-static void (__cdecl * CreateCar)(unsigned int,float,float,float,Vehicle*,bool) = (void(__cdecl *)(unsigned int,float,float,float,Vehicle*,bool))(0x9E4C90 + dwLoadOffset);
-static bool (__cdecl * IsModelCar)(eModel) = (bool(__cdecl *)(eModel))(0x9DD670 + dwLoadOffset);
-static void (__cdecl * GetCarCoordinates)(Vehicle, float*, float*, float*) = (void(__cdecl *)(Vehicle, float*, float*, float*))(0x9DE420 + dwLoadOffset);
-static void (__cdecl * SetCarCoordinates)(Vehicle, float, float, float) = (void(__cdecl *)(Vehicle, float, float, float))(0x9DE4D0 + dwLoadOffset);
-static void (__cdecl * GetCarHeading)(Vehicle, float*) = (void(__cdecl *)(Vehicle, float*))(0x9DE710 + dwLoadOffset);
-static void (__cdecl * SetCarHeading)(Vehicle, float) = (void(__cdecl *)(Vehicle, float))(0x9DE790 + dwLoadOffset);
-static bool (__cdecl * IsCarStopped)(Vehicle) = (bool(__cdecl *)(Vehicle))(0x9DEA20 + dwLoadOffset);
-static void (__cdecl * GetCarSpeedVector)(Vehicle, Vector3*, bool) = (void(__cdecl *)(Vehicle, Vector3*, bool))(0x9E01E0 + dwLoadOffset);
-static void (__cdecl * GetMaximumNumberOfPassengers)(Vehicle, int*) = (void(__cdecl *)(Vehicle, int*))(0x9DEB00 + dwLoadOffset);
-static void (__cdecl * GetCarSpeed)(Vehicle, float*) = (void(__cdecl *)(Vehicle, float*))(0x9DF0E0 + dwLoadOffset);
-// Game 5B52D1DE
-static int (__cdecl * PrintStringWithLiteralStringNow)(const char*, const char*, unsigned int, unsigned int) = (int (__cdecl *)(const char*, const char*, unsigned int, unsigned int))(0xA10FE0 + dwLoadOffset);
-static void (__cdecl * RequestModel)(eModel) = (void(__cdecl *)(eModel))(0x9D1930 + dwLoadOffset);
-static int (__cdecl * HasModelLoaded)(eModel) = (int(__cdecl *)(eModel))(0x9D1970 + dwLoadOffset);
-static bool (__cdecl * MarkModelAsNoLongerNeeded)(eModel) = (bool(__cdecl *)(eModel))(0x9D1AC0 + dwLoadOffset);
-static void (__cdecl * Pause)() = (void(__cdecl *)())(0xA0D850 + dwLoadOffset);
-static void (__cdecl * Unpause)() = (void(__cdecl *)())(0xA0D870 + dwLoadOffset);
-static void (__cdecl * TerminateAllScriptsWithThisName)(char *script) = (void(__cdecl *)(char*))(0xA0CF10 + dwLoadOffset);
-static void (__cdecl * SetFloatStat)(eFloatStatistic stat, float value) = (void(__cdecl *)(eFloatStatistic stat, float value))(0x9D2AF0 + dwLoadOffset);
-static void (__cdecl * SetIntStat)(eIntStatistic stat, float value) = (void(__cdecl *)(eIntStatistic stat, float value))(0x9D2AC0 + dwLoadOffset);
-static void (__cdecl * AllowEmergencyServices)(bool) = (void(__cdecl *)(bool))(0x4B6EF0 + dwLoadOffset);
-static void (__cdecl * SetPedDensityMultiplier)(bool) = (void(__cdecl *)(bool))(0x9F8E20 + dwLoadOffset);
-static void (__cdecl * SetCarDensityMultiplier)(bool) = (void(__cdecl *)(bool))(0x9DD0F0 + dwLoadOffset);
-static void (__cdecl * DisableCarGenerators)(bool) = (void(__cdecl *)(bool))(0x9DD0A0 + dwLoadOffset);
-static void (__cdecl * DisableCarGeneratorsWithHeli)(bool) = (void(__cdecl *)(bool))(0x9DD0C0 + dwLoadOffset);
-static void (__cdecl * SwitchPoliceHelis)(bool) = (void(__cdecl *)(bool))(0x9DD780 + dwLoadOffset);
-static void (__cdecl * SetSleepModeActive)(bool) = (void(__cdecl *)(bool))(0xA0D6E0 + dwLoadOffset);
-static void (__cdecl * SetTimeOfDay)(int, int) = (void(__cdecl *)(int, int))(0x9CB170 + dwLoadOffset);
-static int (__cdecl * IsControlPressed)(int, int) = (int(__cdecl *)(int, int))(0xA0B050 + dwLoadOffset);
-*/
-
-/*
-// Camera
-static void (__cdecl * GetGameCam)(Camera *cam) = (void (__cdecl *)(Camera*))(0xA19860 + dwLoadOffset);
-static void (__cdecl * GetCamPos)(Camera cam, float *x, float *y, float *z) = (void(__cdecl *)(Camera, float*, float*, float*))(0xA19040 + dwLoadOffset);
-static void (__cdecl * GetCamRot)(Camera cam, float *x, float *y, float *z) = (void(__cdecl *)(Camera, float*, float*, float*))(0xA19090 + dwLoadOffset);
-// Task
-static void (__cdecl * ClearCharTask)(Ped ped) = (void(__cdecl *)(Ped))(0x9E9660 + dwLoadOffset);
-static void (__cdecl * TaskGoStraightToCoord)(Ped, float x, float y, float z, int ms_2_walk_4_sprint, int unk_45000) = (void(__cdecl *)(Ped, float, float, float, int, int))(0x9Eb820 + dwLoadOffset);
-static void (__cdecl * TaskToggleDuck)(Ped ped, bool duck) = (void(__cdecl *)(Ped, bool))(0x9EABA0 + dwLoadOffset);
-static void (__cdecl * TaskShootAtCoord)(Ped ped, float x, float y, float z, int Unknown0_5k, int Unknown1_5) = (void(__cdecl *)(Ped, float, float, float, int, int))(0x9ED3E0 + dwLoadOffset);
-static void (__cdecl * TaskJump)(Ped ped, bool jump) = (void(__cdecl *)(Ped, bool))(0x9EADC0 + dwLoadOffset);
-static void (__cdecl * TaskSwapWeapon)(Ped ped, eWeapon weapon) = (void(__cdecl *)(Ped, eWeapon))(0x9F0D60 + dwLoadOffset);
-static void (__cdecl * TaskLeaveAnyCar)(Ped ped) = (void(__cdecl *)(Ped))(0x9ED0C0 + dwLoadOffset);
-static void (__cdecl * TaskEnterCarAsDriver)(Ped ped, Vehicle vehicle, int duration) = (void(__cdecl *)(Ped, Vehicle, int))(0x9EB3E0 + dwLoadOffset);
-static void (__cdecl * TaskEnterCarAsPassenger)(Ped ped, Vehicle vehicle, int duration, int seatIndex) = (void(__cdecl *)(Ped, Vehicle, int, int))(0x9EB2A0 + dwLoadOffset);
-static void (__cdecl * TaskCarDriveToCoord)(Ped, Vehicle, float, float, float, float speed, int p1f_2b, int p2, int p3, int px2, int p45000) = (void(__cdecl *)(Ped, Vehicle, float, float, float, float, int, int, int, int, int))(0x9EB6D0 + dwLoadOffset);
-static void (__cdecl * TaskAimGunAtCoord)(Ped, float, float, float, int) = (void (__cdecl*)(Ped, float, float, float, int))(0x9ED330+dwLoadOffset);
-// World
-static void (__cdecl * ClearAreaOfChars)(float x, float y, float z, float radius) = (void (__cdecl*)(float, float, float, float))(0xA0CC60+dwLoadOffset);
-static void (__cdecl * ClearAreaOfCops)(float x, float y, float z, float radius) = (void (__cdecl*)(float, float, float, float))(0xA0CCD0+dwLoadOffset);
-
-
-#else#
-// 1.0.0.4
-
-#endif
-*/

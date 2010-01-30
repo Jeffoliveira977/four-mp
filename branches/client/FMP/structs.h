@@ -83,3 +83,23 @@ struct FConfig
 	int NumSkins;
 	bool SkinSelect;
 };
+
+class COLOR
+{
+public:
+	COLOR() {  }
+	COLOR(int r, int g, int b)
+	{
+		this->r = r;
+		this->g = g;
+		this->b = b;
+	}
+
+	int r, g, b;
+};
+
+struct CHATMSG 
+{
+	char msg[128];
+	COLOR color;
+};

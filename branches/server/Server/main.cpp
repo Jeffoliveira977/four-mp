@@ -39,7 +39,6 @@
 ///////////////////////////////////////////////
 //                V  A  R  S                 //
 ///////////////////////////////////////////////
-Console con;
 RakPeerInterface *net;
 HSQUIRRELVM v; 
 Player gPlayer[MAX_PLAYERS];
@@ -47,6 +46,24 @@ Vehicle gVehicle[MAX_VEHICLES];
 Server sConf;
 PlayerClass pClass[MAX_PCLASS];
 int LastCheck = 0;
+
+void SendChatMessage(char *msg, int player, int r, int g, int b)
+{
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(gPlayer[i].connected == 1)
+		{
+			RakNet::BitStream bsSend;
+			bsSend.Write(player);
+			bsSend.Write(strlen(msg));
+			bsSend.Write(msg);
+			bsSend.Write(r);
+			bsSend.Write(g);
+			bsSend.Write(b);
+			net->RPC("Chat",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[i].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
+		}
+	}
+}	
 
 void print(const char *string, ...)
 {
@@ -106,7 +123,7 @@ void LoadConfig()
 
 int main()
 {
-	con.Print("Starting...");
+	print("Starting...");
 	LoadConfig();
 
 	// Init RakNet
@@ -135,6 +152,7 @@ int main()
 	REGISTER_STATIC_RPC(net, Select_ModelChanged);
 	REGISTER_STATIC_RPC(net, SyncSkinVariation);
 
+	REGISTER_STATIC_RPC(net, Chat);
 	// Init Squerrel
 	v = sq_open(1024); 
     sqstd_seterrorhandlers(v);
@@ -160,7 +178,7 @@ int main()
 	sprintf(gamemode, "gamemodes/%s", sConf.GameMode[0]);
 	if(!SQ_SUCCEEDED(sqstd_dofile(v, _SC(gamemode), 0, 1))) 
     {
-		con.Print("Can't load gamemode");
+		print("Can't load gamemode");
 		return 1;
     }
 
@@ -168,20 +186,19 @@ int main()
 
 	// Body
 	Packet *pack;
-	con.Debug("Started");
+	debug("Started");
 	
 	while(sConf.Run == 1)
 	{
-		con.CheckUserInput();
 		pack = net->Receive();
 		if(pack)
 		{
-			con.Debug("Pack: %s[%d], %s", pack->data, pack->data[0], pack->systemAddress.ToString());
+			debug("Pack: %s[%d], %s", pack->data, pack->data[0], pack->systemAddress.ToString());
 			if((pack->data[0] == ID_DISCONNECTION_NOTIFICATION) || (pack->data[0] == ID_CONNECTION_LOST)) // Disconnect
 			{
 				int index = GetPlayerID(pack->systemAddress);
-				con.Print("Player %s[%d] disconnected", gPlayer[GetPlayerID(pack->systemAddress)].name, GetPlayerID(pack->systemAddress));
-				PlayerDisconnect(index);
+				print("Player %s[%d] disconnected", gPlayer[GetPlayerID(pack->systemAddress)].name, GetPlayerID(pack->systemAddress));
+				Man_PlayerDisconnect(index);
 				for(int i=0; i<MAX_PLAYERS;i++)
 				{
 					if(gPlayer[i].connected == 1)
@@ -194,11 +211,11 @@ int main()
 			}
 			else if(pack->data[0] == ID_NEW_INCOMING_CONNECTION)
 			{
-				con.Debug("New connection from %s:%d", pack->systemAddress.ToString(0), pack->systemAddress.port);
+				debug("New connection from %s:%d", pack->systemAddress.ToString(0), pack->systemAddress.port);
 			}
 			else if(pack->data[0] == ID_CONNECTION_REQUEST)
 			{
-				con.Debug("New connection request");
+				debug("New connection request");
 			}
 		}
 		if(GetTickCount() - LastCheck >= 30000)
@@ -215,7 +232,7 @@ int main()
 
 					RakNet::BitStream bsSend;
 					net->RPC("Check",&bsSend,HIGH_PRIORITY,RELIABLE,0,client,false, 0, UNASSIGNED_NETWORK_ID, 0);
-					con.Debug("Check %d", i);
+					debug("Check %d", i);
 				}
 			}
 		}

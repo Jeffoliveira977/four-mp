@@ -23,3 +23,5 @@ void PlayerParams(RPCParameters *rpcParameters);
 void PlayerSpawn(RPCParameters *rpcParameters);
 void Select_ModelChanged(RPCParameters *rpcParameters);
 void SyncSkinVariation(RPCParameters *rpcParameters);
+
+void Chat(RPCParameters *rpcParameters);

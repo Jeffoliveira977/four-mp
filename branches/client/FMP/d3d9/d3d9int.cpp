@@ -2,11 +2,13 @@
 
 #include <windows.h>
 #include "../main.h"
+#include "../Hook/window.h"
 #include "d3d9hook.h"
 
-extern LPD3DXFONT pFont;
-extern LPDIRECT3DTEXTURE9 g_Texture;
-extern ID3DXSprite *g_Sprite;
+extern LPD3DXFONT fFMP;
+extern LPD3DXFONT fChat;
+//extern LPDIRECT3DTEXTURE9 g_Texture;
+//extern ID3DXSprite *g_Sprite;
 
 HRESULT CreateD3DXFont( LPDIRECT3DDEVICE9 dDev, LPD3DXFONT* ppd3dxFont, TCHAR* pstrFont, DWORD dwSize, bool bold, bool Italic )
 {
@@ -72,11 +74,15 @@ HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 		hkIDirect3DDevice9 *ret = new hkIDirect3DDevice9(ppReturnedDeviceInterface, pPresentationParameters, this);
 		Debug("Hooked Direct3D9 device: 0x%x -> 0x%x\n", ret->m_pD3Ddev, ret);
 
-		if(pFont == NULL)
+		gameProc = (WNDPROC)GetWindowLong(hFocusWindow,GWL_WNDPROC);
+		SetWindowLong(hFocusWindow,GWL_WNDPROC,(LONG)DefWndProc);
+
+		if(fFMP == NULL)
 		{
-			CreateD3DXFont(ret->m_pD3Ddev, &pFont, "Arial", 14, 1, 0);
-			D3DXCreateTextureFromFile(ret->m_pD3Ddev, "mousecursorhud.png", &g_Texture);
-			D3DXCreateSprite(ret->m_pD3Ddev, &g_Sprite);
+			CreateD3DXFont(ret->m_pD3Ddev, &fFMP, "Arial", 14, 1, 0);
+			CreateD3DXFont(ret->m_pD3Ddev, &fChat, "Arial", 10, 0, 0);
+			//D3DXCreateTextureFromFile(ret->m_pD3Ddev, "mousecursorhud.png", &g_Texture);
+			//D3DXCreateSprite(ret->m_pD3Ddev, &g_Sprite);
 			/*D3DXCreateTextureFromFileEx( ret->m_pD3Ddev, "mousecursorhud.png", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2,
 				D3DX_DEFAULT, NULL, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, D3DX_DEFAULT,
 				D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),NULL, NULL, &g_Texture);*/

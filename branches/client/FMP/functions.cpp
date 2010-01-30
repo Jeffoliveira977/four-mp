@@ -7,7 +7,7 @@
 
 using namespace Natives;
 
-int FMPHook::GetCarDrive(Vehicle car)
+/*int FMPHook::GetCarDrive(Vehicle car)
 {
 	Debug("CraDrive %d", car);
 	if(!DoesVehicleExist(car)) { Debug("DOES"); return 1; }
@@ -34,7 +34,7 @@ int FMPHook::GetCarDrive(Vehicle car)
 	}
 	Debug("CarDrive x%dx", 5);
 	return 1;
-}
+}*/
 
 void GetTarget(float ax, float az, float *x, float *y, float *z, float mn = 5)
 {
@@ -54,7 +54,7 @@ void GetTarget(float ax, float az, float *x, float *y, float *z, float mn = 5)
 	*x=a; *y=b; *z=c;
 }
 
-void FMPHook::GetCamTargetedCoords(float *x, float *y, float *z)
+/*void FMPHook::GetCamTargetedCoords(float *x, float *y, float *z)
 {
 	Log("TARGET %d", 0);
 	Camera cam;
@@ -74,7 +74,7 @@ void FMPHook::GetCamTargetedCoords(float *x, float *y, float *z)
 	*y = b + cy;
 	*z = c + cz;
 	Log("TARGET %d", 4);
-}
+}*/
 
 float GetDist(float x1,float y1,float z1,float x2, float y2, float z2)
 {

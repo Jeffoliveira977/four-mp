@@ -51,6 +51,10 @@ FPlayer gPlayer[MAX_PLAYERS];
 FVehicle gCar[MAX_CARS];
 FConfig Conf;
 PlayerClass pClass[MAX_PCLASS];
+CHATMSG mChat[64];
+
+int enterChat = -1;
+char enterMsg[256];
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                           Ф У Н К Ц И И                                               */
 /* ----------------------------------------------------------------------------------------------------- */
@@ -159,6 +163,13 @@ Ped FMPHook::_GetPlayerPed()
 	return Player;
 }
 
+Player FMPHook::_GetPlayer()
+{
+	unsigned int uint = GetPlayerId();Log("### ID: %d", uint);
+	Player pl = ConvertIntToPlayerIndex(uint);Log("### PL: %d", pl);
+	return pl;
+}
+
 Vehicle FMPHook::_GetPedVehicle(Ped p)
 {
 	Vehicle car;
@@ -166,15 +177,20 @@ Vehicle FMPHook::_GetPedVehicle(Ped p)
 	return car;
 }
 
+void FMPHook::InputFreeze(bool e)
+{
+	Natives::SetPlayerControl(ConvertIntToPlayerIndex(GetPlayerId()), e);
+}
+
 void FMPHook::RunMP()
 {
 	LastUpdate = GetTickCount();
 	Log("RunMP");
-	AllowEmergencyServices(0);Log("RUN %d", 1);
+	//AllowEmergencyServices(0);Log("RUN %d", 1);
 	SetPedDensityMultiplier(0);Log("RUN %d", 2);
 	SetCarDensityMultiplier(0);Log("RUN %d", 3);
 	DisableCarGenerators(1);Log("RUN %d", 4);
-	DisableCarGeneratorsWithHeli(1);Log("RUN %d", 5);
+	//DisableCarGeneratorsWithHeli(1);Log("RUN %d", 5);
 	SetNoResprays(1);Log("RUN %d", 6);
 	SwitchAmbientPlanes(0);
 	SwitchArrowAboveBlippedPickups(0);
@@ -318,7 +334,6 @@ void FMPHook::RunMP()
 
 void FMPHook::GameThread()
 {
-	Beep(500, 500);
 	Debug("GameThread");
 
 	LoadConfig();
@@ -368,7 +383,10 @@ void FMPHook::GameThread()
 		Debug("FIBERFIBERFIBER");
 		if(mp_state == -1)
 		{
-			mp_state = 0;
+			if(GetAsyncKeyState(116) != 0 && GetAsyncKeyState(9) != 0)
+			{
+				mp_state = 0;
+			}
 		}
 		else if(mp_state == 0)
 		{
@@ -390,16 +408,17 @@ void FMPHook::GameThread()
 		}
 		else if(mp_state == 2 && Conf.SkinSelect == 1)
 		{
-			FreezeCharPosition(_GetPlayerPed(), 1);
+			SetPlayerControl(_GetPlayer(), 0);
 			if(GetAsyncKeyState(VK_SHIFT) != 0)
 			{
 				gPlayer[MyID].model = pClass[sel_cl].model;	
-				FreezeCharPosition(_GetPlayerPed(), 0);
+				SetPlayerControl(_GetPlayer(), 1);
 				mp_state = 3;
 
 				if(Conf.ComponentSelect == 0)
 				{
 					RakNet::BitStream bsSend;
+					bsSend.Write(sel_cl);
 					net->RPC("PlayerSpawn",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 					Log("Player Spawn");
 				}
@@ -418,7 +437,7 @@ void FMPHook::GameThread()
 				
 				RequestModel((eModel)gPlayer[MyID].model);
 				while(!HasModelLoaded((eModel)gPlayer[MyID].model)) wait(1);
-				ChangePlayerModel(GetPlayerId(), (eModel)gPlayer[MyID].model);
+				ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
 				SetCharDefaultComponentVariation(_GetPlayerPed());
 
 				sprintf(model_select_text, "Sellected model id %d", sel_cl);
@@ -437,7 +456,7 @@ void FMPHook::GameThread()
 				
 				RequestModel((eModel)gPlayer[MyID].model);
 				while(!HasModelLoaded((eModel)gPlayer[MyID].model)) wait(1);
-				ChangePlayerModel(GetPlayerId(), (eModel)gPlayer[MyID].model);
+				ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
 				SetCharDefaultComponentVariation(_GetPlayerPed());
 
 				sprintf(model_select_text, "Sellected model id %d", sel_cl);
@@ -445,10 +464,10 @@ void FMPHook::GameThread()
 		}
 		else if(mp_state == 3 && Conf.ComponentSelect == 1)
 		{
-			FreezeCharPosition(_GetPlayerPed(), 1);
+			SetPlayerControl(_GetPlayer(), 0);
 			if(GetAsyncKeyState(VK_SHIFT) != 0)
 			{
-				FreezeCharPosition(_GetPlayerPed(), 0);
+				SetPlayerControl(_GetPlayer(), 1);
 				mp_state = 4;
 
 				for(int i = 0; i < 11; i++)
@@ -517,13 +536,18 @@ void FMPHook::GameThread()
 			}
 			Debug("LastUpdate");
 			MoveSync();
+			Debug("MoveSync");
 			CarDoSync();
+			Debug("CarDOSync");
 			GunSync();
+			Debug("GunSync");
 			StatusSync();
+			Debug("StatusSync");
+
 			gPlayer[MyID].last_active = GetTickCount();
 		}
 		Debug("IFIFIF");
-		if(mp_state != 0)
+		if(mp_state > 0)
 		{
 			Debug("PACKIFPACK");
 			pack = net->Receive();
@@ -621,20 +645,10 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 {
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
-		if(CheckSum() == 1 && FileExists("client.asi") && !FileExists("dsound.dll"))
-		{
-			DisableThreadLibraryCalls(hModule);
-			DetourFunc((BYTE*)(0xCE32AC+dwLoadOffset),(BYTE*)hkDirect3DCreate9, 5);
+		DisableThreadLibraryCalls(hModule);
+		DetourFunc((BYTE*)(0xCE32AC+dwLoadOffset),(BYTE*)hkDirect3DCreate9, 5);
 
-			_beginthread(&MainThread, 0, NULL );
-		}
-		else
-		{
-			MessageBox(NULL, "Вы используете моды, которые могут мешать нормально синхронизировать вас с другими игроками\nПодробное описание ошибки можно прочитать в readme.txt или на сайте four-mp.com",
-				"FOUR-MP:Error", MB_OK|MB_ICONSTOP);
-			ExitProcess(1);
-		}
-		
+		_beginthread(&MainThread, 0, NULL );	
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{

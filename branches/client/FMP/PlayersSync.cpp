@@ -22,7 +22,7 @@ extern bool myEnter;
 void FMPHook::PlayerConnect(char *name, int index, int model, float x, float y, float z)
 {
 	Debug("PlayerConnect: %s", "Start");
-	Log("ConnectInfo: %s %d %d %f %f %f", name, index, model, x, y, z);
+	Log("ConnectInfo: %s %d 0x%x %f %f %f", name, index, model, x, y, z);
 	Log("STRCMP('%s', '%s') = 0 ?", name, Conf.Name);
 	if(strcmp(name, Conf.Name) == 0) // My connect
 	{
@@ -31,9 +31,9 @@ void FMPHook::PlayerConnect(char *name, int index, int model, float x, float y, 
 		Debug("PlayerConnect: %s", "RequestModel");
 		while(!HasModelLoaded((eModel)model)) wait(1);
 		Debug("PlayerConnect: %s", "ModelLoaded");
-		ChangePlayerModel(ConvertIntToPlayerIndex(GetPlayerId()), (eModel)model);
+		ChangePlayerModel(_GetPlayer(), (eModel)model);
 		Debug("PlayerConnect: %s", "ChangeModel");
-		GetPlayerChar(ConvertIntToPlayerIndex(GetPlayerId()), &gPlayer[index].PedID);
+		GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
 		SetCharDefaultComponentVariation(gPlayer[index].PedID);
 		SetCharCoordinates(gPlayer[index].PedID, x, y, z);
 		Debug("PlayerConnect: %s", "SetCoords");
@@ -128,6 +128,7 @@ void FMPHook::PlayerMove(int player, float x, float y, float z, float speed)
 	Log("Move Player Char Exist");
 	float lx,ly,lz;
 	GetCharCoordinates(gPlayer[player].PedID, &lx, &ly, &lz);
+	Log("GETCOORD");
 	float d = GetDist(lx, ly, lz, x, y, z);
 	if(gPlayer[player].car_id == -1) // Если пешком
 	{
@@ -241,39 +242,48 @@ void FMPHook::PlayerSwapGun(int player, int gun)
 
 void FMPHook::PlayerSyncSkin(int player, int skin)
 {
+	Log("Player Sync Skin START");
 	if(player == MyID)
 	{
 		RequestModel((eModel)skin);
 		while(!HasModelLoaded((eModel)skin)) wait(0);
-		ChangePlayerModel(GetPlayerId(), (eModel)skin);
+		ChangePlayerModel(_GetPlayer(), (eModel)skin);
 		
 	}
 	else
 	{
 		RequestModel((eModel)skin);
 		while(!HasModelLoaded((eModel)skin)) wait(0);
-		ChangePlayerModel(GetPlayerId(), (eModel)skin);
+		ChangePlayerModel(_GetPlayer(), (eModel)skin);
 	}
+	Log("Player Sync Skin END");
 }
 
 void FMPHook::PlayerSyncSkinVariation(int player, int sm[11], int st[11])
 {
+	Log("Player Sync Skin Variation START");
 	for(int i = 0; i < 11; i++)
-		SetCharComponentVariation(gPlayer[player].PedID, (ePedComponent)i, sm[i], st[i]);  
+		SetCharComponentVariation(gPlayer[player].PedID, (ePedComponent)i, sm[i], st[i]); 
+	Log("Player Sync Skin Variantion END");
 }
 
 void FMPHook::PlayerSpawn(int player, SpawnInfo spawn)
 {
+	Log("Player Spawn START");
 	int model;
 	GetCharModel(gPlayer[player].PedID, (eModel*)&model);
+	Log("Get Model");
 	if(spawn.model != model) PlayerSyncSkin(player, spawn.model);
+	Log("IF SPAWN MODEL");
 
 	PlayerSyncSkinVariation(player, spawn.CompD, spawn.CompT);
 
+	Log("Set UP");
 	SetCharCoordinates(gPlayer[player].PedID, spawn.x, spawn.y, spawn.z);
 	SetCharHeading(gPlayer[player].PedID, spawn.r);
 	SetCharHealth(gPlayer[player].PedID, spawn.health);
 	AddArmourToChar(gPlayer[player].PedID, -1000);
 	AddArmourToChar(gPlayer[player].PedID, spawn.armour);
 	SetRoomForCharByKey(gPlayer[player].PedID, (eInteriorRoomKey)spawn.room);
+	Log("Player SPAWN END");
 }

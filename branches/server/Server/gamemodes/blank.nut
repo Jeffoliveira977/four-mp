@@ -29,8 +29,9 @@ function OnPlayerDisconnect(playerid)
 	SendClientMessageToAll(GetPlayerName(playerid) + " [" + playerid + "]" + " disconnect from server");
 }
 
-function OnPlayerSpawn(playerid)
+function OnPlayerSpawn(playerid, classid)
 {
+	print("Player ID:"+playerid+" want spawn with class"+classid+"\n");
 	//SetPlayerHP(playerid,200);
 	//SetPlayerPos(playerid,-106.500755, 764.368164, 15.337303);
 }

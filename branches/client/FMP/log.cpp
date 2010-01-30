@@ -107,7 +107,7 @@ void Log(const char *string, ...)
 	temp = fopen("FMP_log.txt","a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);
-	fprintf(temp, "[%d:%d:%d:%d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
+	fprintf(temp, "[%02d:%02d:%02d:%03d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 	fputs(buff,temp);
 	fputs("\n",temp);
 	fclose(temp);

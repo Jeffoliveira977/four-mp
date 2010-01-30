@@ -1,0 +1,15 @@
+Reg: ClientConnect
+Reg: Check
+Reg: MovePlayer
+Reg: DuckPlayer
+Reg: JumpPlayer
+Reg: PlayerCancelEnterInVehicle
+Reg: PlayerExitFromVehicle
+Reg: PlayerEnterInVehicle
+Reg: PlayerFire
+Reg: PlayerAim
+Reg: SwapGun
+Reg: PlayerParams
+Reg: PlayerSpawn
+Reg: Select_ModelChanged
+Reg: SyncSkinVariation

@@ -8,7 +8,6 @@ Syncronizashion this player
 #include "log.h"
 #include "main.h"
 #include "Hook\classes.h"
-//#include "Hook\hook.h"
 #include "Hook\scripting.h"
 #include "functions.h"
 
@@ -25,44 +24,48 @@ extern bool myEnter;
 
 void FMPHook::MoveSync()
 {
+	Log("Move Sync START");
 	float x,y,z,a;
+	Log("PED: 0x%x", gPlayer[MyID].PedID);
 	GetCharCoordinates(gPlayer[MyID].PedID, &x, &y, &z);
+	Log("GETCOORD");
 	GetCharHeading(_GetPlayerPed(), &a);
 	if(gPlayer[MyID].x != x && gPlayer[MyID].y != y && gPlayer[MyID].z != z && myEnter == 0)
 	{
-		Debug("MOVE SEND START");
+		Log("MOVE SEND START");
 		float lx,ly,lz;
 		GetCharCoordinates(gPlayer[MyID].PedID, &lx, &ly, &lz);
+		Log("GETCOORD");
 		float d = GetDist(lx, ly, lz, gPlayer[MyID].x, gPlayer[MyID].y, gPlayer[MyID].z);
 		float t = (GetTickCount()-gPlayer[MyID].last_active);
 		float speed = (d / t)*10000;
-		Debug("MOVE MATH");
+		Log("MOVE MATH");
 
 		if(IsCharInAnyCar(_GetPlayerPed()) && gPlayer[MyID].car_id != -1) 
 		{
-			Debug("INCAR");
-			Debug("%d, %f, %d", gPlayer[MyID].car_id, speed, MyID);
+			Log("INCAR");
+			Log("%d, %f, %d", gPlayer[MyID].car_id, speed, MyID);
 			int pl_car = gPlayer[MyID].car_id;
-			Debug("lp_car %d", pl_car);
+			Log("lp_car %d", pl_car);
 			Vehicle car = gCar[pl_car].CarID;
-			Debug("car %d", car);
+			Log("car %d", car);
 
 			float cs;
 			GetCarSpeed(car, &cs);
 			if(cs > speed) speed = cs;
 
 			int dr = 1;
-			Debug("CraDrive %d", car);
+			Log("CraDrive %d", car);
 			if(!DoesVehicleExist(car)) { Debug("DOES"); }
-			Debug("CarDrive x%dx", 1);
+			Log("CarDrive x%dx", 1);
 			if(IsCarStopped(car)) { Debug("STOP"); dr = 0; }
 			Vector3 v;
-			Debug("CarDrive x%dx", 2);
+			Log("CarDrive x%dx", 2);
 			GetCarSpeedVector(car, &v, 1);
-			Debug("CarDrive x%dx", 3);
+			Log("CarDrive x%dx", 3);
 			float x = floor(v.X * 1000 + 0.5)/1000;
 			float y = floor(v.Y * 1000 + 0.5)/1000;
-			Debug("CarDrive x%dx - %fx%f", x, y);
+			Log("CarDrive x%dx - %fx%f", x, y);
 			if(abs(x) > abs(y))
 			{
 				// ось движения Х (основная)
@@ -75,11 +78,11 @@ void FMPHook::MoveSync()
 				if(y < 0)
 					dr = -1;
 			}
-			Debug("dr %d", dr);
+			Log("dr %d", dr);
 			speed = speed * dr;
 			GetCarHeading(car, &a);
 		}
-		Debug("ISCHARINCAR");
+		Log("ISCHARINCAR");
 		RakNet::BitStream bsSend;
 		bsSend.Write(x);
 		bsSend.Write(y);
@@ -92,14 +95,14 @@ void FMPHook::MoveSync()
 		gPlayer[MyID].y = y;
 		gPlayer[MyID].z = z;
 	}
-	Debug("MOVE");
+	Log("MOVE");
 	if(IsCharInAir(gPlayer[MyID].PedID))
 	{
 		RakNet::BitStream bsSend;
 		net->RPC("JumpPlayer",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 		Log("JUMP SENDed");
 	}
-	Debug("AIR");
+	Log("AIR");
 	if(IsCharDucking(gPlayer[MyID].PedID) != gPlayer[MyID].duck)
 	{
 		gPlayer[MyID].duck = IsCharDucking(gPlayer[MyID].PedID);
@@ -112,26 +115,28 @@ void FMPHook::MoveSync()
 
 void FMPHook::CarDoSync()
 {
-	if(IsCharInAnyCar(_GetPlayerPed()) && gPlayer[MyID].car_id == -1)
+	if(IsCharInAnyCar(gPlayer[MyID].PedID) && gPlayer[MyID].car_id == -1)
 	{
-		gPlayer[MyID].car_id = GetPlayerCar(_GetPedVehicle(_GetPlayerPed()));
+		gPlayer[MyID].car_id = GetPlayerCar(_GetPedVehicle(gPlayer[MyID].PedID));
 		RakNet::BitStream bsSend;
 		bsSend.Write(gPlayer[MyID].car_id);
 		bsSend.Write(100);
 		net->RPC("PlayerEnterInVehicle",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 	}
-	else if(!IsCharInAnyCar(_GetPlayerPed()) && gPlayer[MyID].car_id != -1)
+	else if(!IsCharInAnyCar(gPlayer[MyID].PedID) && gPlayer[MyID].car_id != -1)
 	{
 		gPlayer[MyID].car_id = -1;
 	}
 	Debug("INCAR");
 	if(myEnter == 0 && GetAsyncKeyState(70) != 0)
 	{
-		if(!IsCharInAnyCar(_GetPlayerPed()))
+		if(!IsCharInAnyCar(gPlayer[MyID].PedID))
 		{
 			int carid;
 			float x, y, z;
-			GetCharCoordinates(_GetPlayerPed(), &x, &y, &z);
+			Log("PED");
+			GetCharCoordinates(gPlayer[MyID].PedID, &x, &y, &z);
+			Log("GETCOORD");
 			carid = _GetClosestCar(x, y, z, 10);
 			if(carid != -1)
 			{
@@ -149,13 +154,15 @@ void FMPHook::CarDoSync()
 			net->RPC("PlayerExitFromVehicle",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 		}
 	}
-	else if(GetAsyncKeyState(71) != 0 && !IsCharInAnyCar(_GetPlayerPed()) && myEnter == 0)
+	else if(GetAsyncKeyState(71) != 0 && !IsCharInAnyCar(gPlayer[MyID].PedID) && myEnter == 0)
 	{
 		Log("GGGGG");
 		int carid, seatid = 0; 
 		unsigned int max;
 		float x, y, z;
-		GetCharCoordinates(_GetPlayerPed(), &x, &y, &z);
+		Log("CARPED");
+		GetCharCoordinates(gPlayer[MyID].PedID, &x, &y, &z);
+		Log("GETCOORD");
 		carid = _GetClosestCar(x, y, z, 10);
 		if(carid != -1)
 		{
@@ -192,7 +199,7 @@ void FMPHook::CarDoSync()
 			}
 			if(seatid >= 0)
 			{
-				TaskEnterCarAsPassenger(_GetPlayerPed(), gCar[carid].CarID, -1, seatid);
+				TaskEnterCarAsPassenger(gPlayer[MyID].PedID, gCar[carid].CarID, -1, seatid);
 				RakNet::BitStream bsSend;
 				bsSend.Write(carid);
 				bsSend.Write(seatid);
@@ -202,9 +209,9 @@ void FMPHook::CarDoSync()
 	}
 	else if(myEnter == 1)
 	{
-		int incar = IsCharInAnyCar(_GetPlayerPed());
-		incar += IsCharSittingInAnyCar(_GetPlayerPed());
-		incar = incar * IsCharOnFoot(_GetPlayerPed());
+		int incar = IsCharInAnyCar(gPlayer[MyID].PedID);
+		incar += IsCharSittingInAnyCar(gPlayer[MyID].PedID);
+		incar = incar * IsCharOnFoot(gPlayer[MyID].PedID);
 		if(incar == 0)
 			myEnter = 0;
 		else

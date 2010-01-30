@@ -8,12 +8,14 @@
 
 extern DWORD dwLoadOffset;
 
-LPD3DXFONT pFont = NULL;
+LPD3DXFONT fFMP = NULL;
+LPD3DXFONT fChat = NULL;
+
 DWORD MouseX, MouseY;
 DWORD ScreenX, ScreenY;
 
-LPDIRECT3DTEXTURE9 g_Texture;
-ID3DXSprite *g_Sprite;
+//LPDIRECT3DTEXTURE9 g_Texture;
+//ID3DXSprite *g_Sprite;
 
 HRESULT CD3DManager::Initialize()
 {
@@ -214,21 +216,26 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 	ScreenX = *(DWORD*)(0x16674A8+dwLoadOffset);
 	MouseX = *(DWORD*)(0x17DE95C+dwLoadOffset);
 
-	RECT rc = {0, 0, ScreenX, ScreenY}; 
+	RECT rc = {2, 2, ScreenX, ScreenY}; 
 	if(mp_state == -1)
-		pFont->DrawText(0, "FMP", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 0, 0));
+		fFMP->DrawText(0, "FMP [TAB+F5]", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 0, 0));
 	else if(mp_state >= 0)
-		pFont->DrawText(0, "FMP", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 0));
-
-	if(MouseY <= ScreenY && MouseX <= ScreenX && MouseY >= 0 && MouseX >= 0)
 	{
-		rc.left = MouseX;
-		rc.top = MouseY;
-
-		g_Sprite->Begin(D3DXSPRITE_ALPHABLEND);
-		g_Sprite->Draw(g_Texture, NULL, NULL, &D3DXVECTOR3(MouseX, MouseY, 0), D3DCOLOR_XRGB(255, 255, 255));
-		g_Sprite->End();
+		for(int i = 7; i >= 0; i--)
+		{
+			fChat->DrawText(0, mChat[i].msg, -1, &rc, DT_TOP|DT_LEFT, 
+				D3DCOLOR_XRGB(mChat[i].color.r, mChat[i].color.g, mChat[i].color.b));
+			rc.top += 11;
+		}
+		if(enterChat != -1)
+		{
+			rc.top += 2;
+			fChat->DrawText(0, ">", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
+			rc.left += 10;
+			fChat->DrawText(0, enterMsg, -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
+		}
 	}
+
 
 	return m_pD3Ddev->EndScene();
 }

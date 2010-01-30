@@ -8,6 +8,7 @@
 #include "Hook\types.h"
 #include "Hook\classes.h"
 #include "structs.h"
+#include "chat.h"
 
 #include "net\RakNetworkFactory.h"
 #include "net\RakPeerInterface.h"
@@ -25,7 +26,7 @@ extern FVehicle gCar[MAX_CARS];
 
 void ErrorConnect(RPCParameters *rpcParameters)
 {
-	Log("ErrorConnect\r\n");
+	Log("ErrorConnect");
 	LastUpdate = GetTickCount();
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
@@ -59,7 +60,7 @@ void ErrorConnect(RPCParameters *rpcParameters)
 
 void ConnectPlayer(RPCParameters *rpcParameters)
 {
-	Log("ConnectPlayer Start\r\n");
+	Log("ConnectPlayer Start");
 	LastUpdate = GetTickCount();
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
@@ -104,14 +105,14 @@ void ConnectPlayer(RPCParameters *rpcParameters)
 	bsData.Read(gPlayer[index].color, 4);
 
 	name[size] = '\0';
-	Log("ConnectPlayer Center %s\r\n", name);
+	Log("ConnectPlayer Center %s", name);
 	HOOK.PlayerConnect(name, index, gPlayer[index].model, gPlayer[index].x, gPlayer[index].y, gPlayer[index].z);
-	Log("ConnectPlayer End\r\n");
+	Log("ConnectPlayer End");
 }
 
 void MovePlayer(RPCParameters *rpcParameters)
 {
-	Log("MovePlayer Start\r\n");
+	Log("MovePlayer Start");
 	LastUpdate = GetTickCount();
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
@@ -140,14 +141,14 @@ void MovePlayer(RPCParameters *rpcParameters)
 	gPlayer[playerid].z = z;
 	gPlayer[playerid].angle = a;
 
-	Log("MovePlayer Center (%d,%f,%f,%f)\r\n", playerid, x, y, z);
+	Log("MovePlayer Center (%d,%f,%f,%f)", playerid, x, y, z);
 	HOOK.PlayerMove(playerid, x, y, z, s);
-	Log("MovePlayer End\r\n");
+	Log("MovePlayer End");
 }
 
 void JumpPlayer(RPCParameters *rpcParameters)
 {
-	Log("JumpPlayer Start\r\n");
+	Log("JumpPlayer Start");
 	LastUpdate = GetTickCount();
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
@@ -157,14 +158,14 @@ void JumpPlayer(RPCParameters *rpcParameters)
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
 	bsData.Read(playerid);
 
-	Log("Jumplayer Center (%d)\r\n", playerid);
+	Log("Jumplayer Center (%d)", playerid);
 	HOOK.Jump(playerid);
-	Log("JumpPlayer End\r\n");
+	Log("JumpPlayer End");
 }
 
 void DuckPlayer(RPCParameters *rpcParameters)
 {
-	Log("DuckPlayer Start\r\n");
+	Log("DuckPlayer Start");
 	LastUpdate = GetTickCount();
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
@@ -175,26 +176,26 @@ void DuckPlayer(RPCParameters *rpcParameters)
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
 	bsData.Read(playerid);
 	bsData.Read(duck);
-	Log("DuckPlayer Center (%d,%d)\r\n", playerid, duck);
+	Log("DuckPlayer Center (%d,%d)", playerid, duck);
 	HOOK.Duck(playerid, duck);
-	Log("DuckPlayer End\r\n");
+	Log("DuckPlayer End");
 }
 
 void Check(RPCParameters *rpcParameters)
 {
-	Log("Check Start\r\n");
+	Log("Check Start");
 	LastUpdate = GetTickCount();
 	
 	RakNet::BitStream bsSend;
 	bsSend.Write(MyID);
 	net->RPC("Check",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 		
-	Log("Check End\r\n");
+	Log("Check End");
 }
 
 void Disconnect(RPCParameters *rpcParameters)
 {
-	Log("Disconnect Start\r\n");
+	Log("Disconnect Start");
 	LastUpdate = GetTickCount();
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
@@ -204,7 +205,7 @@ void Disconnect(RPCParameters *rpcParameters)
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
 	bsData.Read(id);
 	HOOK.PlayerDisconnect(id);
-	Log("MovePlayer End\r\n");
+	Log("MovePlayer End");
 }
 
 
@@ -440,4 +441,30 @@ void PlayerSpawn(RPCParameters *rpcParameters)
 	Log("PlayerSpawn Center\r\n");
 	HOOK.PlayerSpawn(pid, spawn);
 	Log("PlayerSpawn End\r\n");
+}
+
+void Chat(RPCParameters *rpcParameters)
+{
+	Log("Chat Start\r\n");
+	LastUpdate = GetTickCount();
+	unsigned char* Data = rpcParameters->input; 
+	int iBitLength = rpcParameters->numberOfBitsOfData;
+
+	int player, len;
+	int r, g, b;
+	char msg[128];
+
+	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
+	bsData.Read(player);
+	bsData.Read(len);
+	bsData.Read(msg);
+	bsData.Read(r);
+	bsData.Read(g);
+	bsData.Read(b);
+
+	msg[len] = 0;
+
+	Log("Chat Center\r\n");
+	AddChatMessage(msg, COLOR(r, g, b), player);
+	Log("Chat End\r\n");
 }

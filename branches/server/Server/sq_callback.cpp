@@ -53,6 +53,21 @@ void sc_OnPlayerDisconnect(HSQUIRRELVM v, int playerid)
 	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
 		sq_pushroottable(v); 
 		sq_pushinteger(v,playerid); 
+		sq_call(v,2,0,0); 
+	}
+	sq_settop(v,top); 
+}
+
+void sc_OnPlayerSpawn(HSQUIRRELVM v, int playerid, int cl)
+{
+	int result;
+	int top = sq_gettop(v); 
+	sq_pushroottable(v);
+	sq_pushstring(v,_SC("OnPlayerSpawn"),-1);
+	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
+		sq_pushroottable(v); 
+		sq_pushinteger(v,playerid); 
+		sq_pushinteger(v,cl); 
 		sq_call(v,3,0,0); 
 	}
 	sq_settop(v,top); 

@@ -30,3 +30,5 @@ void ClassSync(RPCParameters *rpcParameters);
 void SyncSkin(RPCParameters *rpcParameters);
 void SyncSkinVariation(RPCParameters *rpcParameters);
 void PlayerSpawn(RPCParameters *rpcParameters);
+
+void Chat(RPCParameters *rpcParameters);

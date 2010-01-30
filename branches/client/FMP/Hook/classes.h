@@ -151,6 +151,7 @@ public:
 	// -- Help func
 	Ped _GetPlayerPed();
 	Vehicle _GetPedVehicle(Ped p);
+	Player _GetPlayer();
 	int GetCarDrive(Vehicle car);
 	void GetCamTargetedCoords(float *x, float *y, float *z);
 
@@ -178,6 +179,8 @@ public:
 	void PlayerSyncSkinVariation(int, int*, int*);
 
 	void PlayerSpawn(int, SpawnInfo);
+
+	void InputFreeze(bool);
 
 	// -- My sync
 	void CarDoSync();

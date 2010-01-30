@@ -40,7 +40,7 @@ void sq_CreateCar(HSQUIRRELVM v)
 		}
 	}
 
-	con.Debug("%d = CreateCar(%d, %f, %f, %f, %f);", car_id, model, x, y, z, rot);
+	debug("%d = CreateCar(%d, %f, %f, %f, %f);", car_id, model, x, y, z, rot);
 
 	gVehicle[car_id].model = model;
 	gVehicle[car_id].x = x;
@@ -113,7 +113,7 @@ void sq_addPlayerClass(HSQUIRRELVM v)
 	int id = sConf.NumSkins;
 	if(id == MAX_PCLASS) 
 	{
-		con.Print("Not free player class (MAX CLASSES = %d)", MAX_PCLASS);
+		print("Not free player class (MAX CLASSES = %d)", MAX_PCLASS);
 		sq_pushinteger(v, -1);
 	}
 

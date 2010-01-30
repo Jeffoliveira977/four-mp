@@ -16,5 +16,9 @@ extern FPlayer gPlayer[MAX_PLAYERS];
 extern FVehicle gCar[MAX_CARS];
 extern FConfig Conf;
 extern PlayerClass pClass[MAX_PCLASS];
+extern CHATMSG mChat[64];
+
+extern int enterChat;
+extern char enterMsg[256];
 
 #endif

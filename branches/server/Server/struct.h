@@ -33,6 +33,7 @@ struct Player
 	int Room;
 	bool car_enter;
 	char color[4];
+	int CompT[11], CompD[11];
 
 	void Clean()
 	{
@@ -117,6 +118,15 @@ struct Server
 
 	bool ComponentSelect;
 	int NumSkins;
+};
+
+struct SpawnInfo
+{
+	int model;
+	float x, y, z, r;
+	int room;
+	int CompT[11], CompD[11];
+	int health, armour;
 };
 
 #define STRUCTS

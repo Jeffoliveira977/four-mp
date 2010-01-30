@@ -7,6 +7,7 @@
 
 #include "main.h"
 #include "sq.h"
+#include "manager.h"
 
 extern HSQUIRRELVM v;
 
@@ -32,11 +33,11 @@ int GetPlayerID(SystemAddress ad)
 	return -1;
 }
 
-int PlayerConnect(char *name, int index)
+int Man_PlayerConnect(char *name, int index)
 {
 	gPlayer[index].Clean();
 	
-	con.Debug("### I'm set PLAYER MODEL");
+	debug("### I'm set PLAYER MODEL");
 	if(sc_OnPlayerConnect(v, index, name) == 0)
 	{
 		return 3;
@@ -44,7 +45,7 @@ int PlayerConnect(char *name, int index)
 	return 0;
 }
 
-void PlayerDisconnect(int index)
+void Man_PlayerDisconnect(int index)
 {
 	if(index == -1)
 		return;
@@ -54,3 +55,20 @@ void PlayerDisconnect(int index)
 	sc_OnPlayerDisconnect(v, index);
 }
 
+void Man_PlayerSpawn(int pl, int cl, SpawnInfo *sp)
+{
+	sp->armour = 0;
+	sp->health = 200;
+	sp->model = pClass[cl].model;
+	sp->r = pClass[cl].angle;
+	sp->room = 0;
+	sp->x = pClass[cl].x;
+	sp->y = pClass[cl].y;
+	sp->z = pClass[cl].z;
+	for(int i=0; i<11; i++)
+	{
+		sp->CompD[i] = gPlayer[i].CompD[i];
+		sp->CompT[i] = gPlayer[i].CompT[i];
+	}
+	sc_OnPlayerSpawn(v, pl, cl);
+}

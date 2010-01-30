@@ -16,6 +16,7 @@ void sc_OnGameModeInit(HSQUIRRELVM v);
 void sc_OnGameModeExit(HSQUIRRELVM v);
 int sc_OnPlayerConnect(HSQUIRRELVM v, int playerid, char name[32]);
 void sc_OnPlayerDisconnect(HSQUIRRELVM v, int playerid);
+void sc_OnPlayerSpawn(HSQUIRRELVM v, int playerid, int);
 // SQ Script Functions
 void sq_CreateCar(HSQUIRRELVM v);
 void sq_GiveWeapon(HSQUIRRELVM v);

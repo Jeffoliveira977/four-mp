@@ -32,7 +32,7 @@ net->RPC("FUNC",&bsSend,HIGH_PRIORITY,RELIABLE,0,sender,false, 0, UNASSIGNED_NET
 
 void ClientConnect(RPCParameters *rpcParameters)
 {
-	con.Debug("ClientConnect Start");
+	debug("ClientConnect Start");
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 	SystemAddress sender = rpcParameters->sender;
@@ -44,7 +44,7 @@ void ClientConnect(RPCParameters *rpcParameters)
 	bsData.Read(size);
 	bsData.Read(name, size);
 	name[size] = '\0';
-	con.Debug("ClientConnect FOR 1 %s[%d]", name, size);
+	debug("ClientConnect FOR 1 %s[%d]", name, size);
 	for(int i=0; i < MAX_PLAYERS; i++)
 	{
 		if(gPlayer[i].connected == 1 && strcmp(gPlayer[i].name, name) == 0)
@@ -55,14 +55,14 @@ void ClientConnect(RPCParameters *rpcParameters)
 			return;
 		}
 	}
-	con.Debug("ClientConnect FOR 2");
+	debug("ClientConnect FOR 2");
 	for(int index=0; index < MAX_PLAYERS; index++)
 	{
 		if(gPlayer[index].connected != 1)
 		{
-			con.Print("New player %s[%d] connected", name, index);
+			print("New player %s[%d] connected", name, index);
 
-			int r = PlayerConnect(name, index);
+			int r = Man_PlayerConnect(name, index);
 			if(r != 0)
 			{
 				RakNet::BitStream bsSend;
@@ -113,16 +113,16 @@ void ClientConnect(RPCParameters *rpcParameters)
 
 			bsSend.Write(gPlayer[index].color);
 
-			con.Debug("ClientConnect ME SEND TO %s:%d  - %d", gPlayer[index].ip, gPlayer[index].port, gPlayer[index].model);
+			debug("ClientConnect ME SEND TO %s:%d  - %d", gPlayer[index].ip, gPlayer[index].port, gPlayer[index].model);
 			bool rs = net->RPC("ConnectPlayer",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
 			printf("%d", rs);
-			con.Debug("ClientConnect ME END");
+			debug("ClientConnect ME END");
 
 			for(int i = 0; i < MAX_PLAYERS; i++)
 			{
 				if(gPlayer[i].connected == 1 && i != index)
 				{
-					con.Debug("+++ %d != %d | %d", i, index, gPlayer[i].connected);
+					debug("+++ %d != %d | %d", i, index, gPlayer[i].connected);
 
 					bsSend.Reset();
 					bsSend.Write(strlen(gPlayer[index].name));
@@ -160,9 +160,9 @@ void ClientConnect(RPCParameters *rpcParameters)
 
 					bsSend.Write(gPlayer[index].color);
 
-					con.Debug("ClientConnect SEND TO %s:%d  - %d", gPlayer[i].ip, gPlayer[i].port, gPlayer[index].model);
+					debug("ClientConnect SEND TO %s:%d  - %d", gPlayer[i].ip, gPlayer[i].port, gPlayer[index].model);
 					net->RPC("ConnectPlayer",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[i].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
-					con.Debug("ClientConnect END");
+					debug("ClientConnect END");
 
 					bsSend.Reset();
 					bsSend.Write(strlen(gPlayer[i].name));
@@ -199,12 +199,12 @@ void ClientConnect(RPCParameters *rpcParameters)
 					bsSend.Write(gPlayer[i].gAmmo[7]);
 
 					bsSend.Write(gPlayer[i].color);
-					con.Debug("+++ ClientConnect SEND TO %s - %d", gPlayer[i].name, gPlayer[i].model);
+					debug("+++ ClientConnect SEND TO %s - %d", gPlayer[i].name, gPlayer[i].model);
 					net->RPC("ConnectPlayer",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
-					con.Debug("+++ ClientConnect END");
+					debug("+++ ClientConnect END");
 				}
 			}
-			con.Debug("+++--------------------+++");
+			debug("+++--------------------+++");
 			for(int i = 0; i < MAX_VEHICLES; i++)
 			{
 				if(gVehicle[i].exist == 1)
@@ -229,7 +229,7 @@ void ClientConnect(RPCParameters *rpcParameters)
 				bSend.Write(pClass[j]);
 
 			net->RPC("ClassSync",&bSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[index].sa ,false, 0, UNASSIGNED_NETWORK_ID, 0);
-			con.Debug("------------------");
+			debug("------------------");
 			return;
 		}
 	}
@@ -281,7 +281,7 @@ void MovePlayer(RPCParameters *rpcParameters)
 	gPlayer[index].z = z;
 	gPlayer[index].angle = a;
 
-	con.Debug("PlayerMove %d to (%f,%f,%f)", index, x, y, z);
+	debug("PlayerMove %d to (%f,%f,%f)", index, x, y, z);
 
 	if(gPlayer[index].car_enter == 1) return;
 
@@ -309,7 +309,7 @@ void JumpPlayer(RPCParameters *rpcParameters)
 	
 	int index = GetPlayerID(sender);
 
-	con.Debug("JUMP %d", index);
+	debug("JUMP %d", index);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -337,7 +337,7 @@ void DuckPlayer(RPCParameters *rpcParameters)
 
 	gPlayer[index].duck = duck;
 
-	con.Debug("DUCK %d to %d", index, duck);
+	debug("DUCK %d to %d", index, duck);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -370,7 +370,7 @@ void PlayerEnterInVehicle(RPCParameters *rpcParameters)
 		gPlayer[index].car_enter = 1;
 		gPlayer[index].seat_id = seat;
 
-		con.Debug("ENTER To CAR %d to %d as %d", index, car, seat);
+		debug("ENTER To CAR %d to %d as %d", index, car, seat);
 
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -400,7 +400,7 @@ void PlayerCancelEnterInVehicle(RPCParameters *rpcParameters)
 	gPlayer[index].car_id = -1;
 	gPlayer[index].car_enter = 0;
 
-	con.Debug("PlayerCancelEnterInVehicle %d", index);
+	debug("PlayerCancelEnterInVehicle %d", index);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -423,7 +423,7 @@ void PlayerExitFromVehicle(RPCParameters *rpcParameters)
 	gPlayer[index].car_id = -1;
 	gPlayer[index].car_enter = 0;
 
-	con.Debug("PlayerExitFromVehicle %d", index);
+	debug("PlayerExitFromVehicle %d", index);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -464,7 +464,7 @@ void PlayerFire(RPCParameters *rpcParameters)
 		gPlayer[dam.pid].armour = dam.armour;
 	}
 
-	con.Debug("FIRE %d to %d", index, gun);
+	debug("FIRE %d to %d", index, gun);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -502,7 +502,7 @@ void PlayerAim(RPCParameters *rpcParameters)
 
 	gPlayer[index].gun = gun;
 
-	con.Debug("AIM %d to %d", index, gun);
+	debug("AIM %d to %d", index, gun);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -535,7 +535,7 @@ void SwapGun(RPCParameters *rpcParameters)
 
 	gPlayer[index].gun = gun;
 
-	con.Debug("SWAP %d to %d", index, gun);
+	debug("SWAP %d to %d", index, gun);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -566,7 +566,7 @@ void PlayerParams(RPCParameters *rpcParameters)
 	gPlayer[index].health = hp;
 	gPlayer[index].armour = arm;
 
-	con.Debug("PlayerParams %d to %d", index, hp);
+	debug("PlayerParams %d to %d", index, hp);
 
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -583,13 +583,120 @@ void PlayerParams(RPCParameters *rpcParameters)
 
 void PlayerSpawn(RPCParameters *rpcParameters)
 {
-	con.Debug("PlayerSpawn");
+	debug("PlayerSpawn");
+	unsigned char* Data = rpcParameters->input; 
+	int iBitLength = rpcParameters->numberOfBitsOfData;
+	SystemAddress sender = rpcParameters->sender;
+
+	int cla;
+
+	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
+	bsData.Read(cla);
+
+	int index = GetPlayerID(sender);
+
+	SpawnInfo spawn;
+	Man_PlayerSpawn(index, cla, &spawn);
+	debug("MODEL %d", index);
+
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(gPlayer[i].connected == 1)
+		{
+			RakNet::BitStream bsSend;
+			bsSend.Write(index);
+			bsSend.Write(spawn);
+			net->RPC("PlayerSpawn",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[i].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
+		}
+	}
+	debug("PlayerSpawn OVER");
 }
 void Select_ModelChanged(RPCParameters *rpcParameters)
 {
-	con.Debug("ModelChanged [select]");
+	debug("ModelChanged [select]");
+	unsigned char* Data = rpcParameters->input; 
+	int iBitLength = rpcParameters->numberOfBitsOfData;
+	SystemAddress sender = rpcParameters->sender;
+
+	int model;
+
+	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
+	bsData.Read(model);
+
+	int index = GetPlayerID(sender);
+
+	gPlayer[index].model = model;
+
+	debug("MODEL %d to 0x%x", index, model);
+
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(i != index && gPlayer[i].connected == 1)
+		{
+			RakNet::BitStream bsSend;
+			bsSend.Write(index);
+			bsSend.Write(model);
+			net->RPC("SyncSkin",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[i].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
+		}
+	}
+	debug("ModelChanged [select] OVER");
 }
 void SyncSkinVariation(RPCParameters *rpcParameters)
 {
-	con.Debug("SyncSkinVariation");
+	debug("SyncSkinVariation");
+	unsigned char* Data = rpcParameters->input; 
+	int iBitLength = rpcParameters->numberOfBitsOfData;
+	SystemAddress sender = rpcParameters->sender;
+
+	int sm[11], st[11];
+
+	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
+	bsData.Read(sm);
+	bsData.Read(st);
+
+	int index = GetPlayerID(sender);
+
+	for(int i=0; i<11; i++)
+	{
+		gPlayer[index].CompD[i] = sm[i];
+		gPlayer[index].CompT[i] = st[i];
+	}
+
+	debug("VARIATIONS %d", index);
+
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(i != index && gPlayer[i].connected == 1)
+		{
+			RakNet::BitStream bsSend;
+			bsSend.Write(index);
+			bsSend.Write(sm);
+			bsSend.Write(st);
+			net->RPC("SyncSkinVariation",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[i].sa,false, 0, UNASSIGNED_NETWORK_ID, 0);
+		}
+	}
+	debug("SyncSkinVariantion OVER");
+}
+
+void Chat(RPCParameters *rpcParameters)
+{
+	debug("Chat getting");
+	unsigned char* Data = rpcParameters->input; 
+	int iBitLength = rpcParameters->numberOfBitsOfData;
+	SystemAddress sender = rpcParameters->sender;
+
+	int len;
+	char msg[128];
+
+	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
+	bsData.Read(len);
+	bsData.Read(msg);
+	if(len != 128)
+		msg[len] = 0;
+
+	int index = GetPlayerID(sender);
+	
+	debug("Chat resending");
+	SendChatMessage(msg, index, gPlayer[index].color[1], gPlayer[index].color[2], gPlayer[index].color[3]);
+	debug("Chat end");
 }
