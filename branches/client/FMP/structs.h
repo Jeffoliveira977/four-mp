@@ -6,10 +6,19 @@
 
 #pragma once
 #include "Hook/types.h"
+#include "Hook/scripting.h"
 
 struct FPlayer
 {
-	Ped PedID;
+	bool LocalPlayer;
+	Ped PedID() 
+	{ 
+		if(this->LocalPlayer)
+			Natives::GetPlayerChar(Natives::ConvertIntToPlayerIndex(Natives::GetPlayerId()), &this->iPedID);
+		return this->iPedID;
+	}
+
+	Ped iPedID;
 	bool connected;
 	char ip[32];
 	int port;

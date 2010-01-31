@@ -26,22 +26,22 @@ void FMPHook::MoveSync()
 {
 	Log("Move Sync START");
 	float x,y,z,a;
-	Log("PED: 0x%x", gPlayer[MyID].PedID);
-	GetCharCoordinates(gPlayer[MyID].PedID, &x, &y, &z);
+	Log("PED: 0x%x = %d", gPlayer[MyID].PedID(), DoesCharExist(gPlayer[MyID].PedID()));
+	GetCharCoordinates(gPlayer[MyID].PedID(), &x, &y, &z);
 	Log("GETCOORD");
 	GetCharHeading(_GetPlayerPed(), &a);
 	if(gPlayer[MyID].x != x && gPlayer[MyID].y != y && gPlayer[MyID].z != z && myEnter == 0)
 	{
 		Log("MOVE SEND START");
 		float lx,ly,lz;
-		GetCharCoordinates(gPlayer[MyID].PedID, &lx, &ly, &lz);
+		GetCharCoordinates(gPlayer[MyID].PedID(), &lx, &ly, &lz);
 		Log("GETCOORD");
 		float d = GetDist(lx, ly, lz, gPlayer[MyID].x, gPlayer[MyID].y, gPlayer[MyID].z);
 		float t = (GetTickCount()-gPlayer[MyID].last_active);
 		float speed = (d / t)*10000;
 		Log("MOVE MATH");
 
-		if(IsCharInAnyCar(_GetPlayerPed()) && gPlayer[MyID].car_id != -1) 
+		if(IsCharInAnyCar(gPlayer[MyID].PedID()) && gPlayer[MyID].car_id != -1) 
 		{
 			Log("INCAR");
 			Log("%d, %f, %d", gPlayer[MyID].car_id, speed, MyID);
@@ -96,16 +96,16 @@ void FMPHook::MoveSync()
 		gPlayer[MyID].z = z;
 	}
 	Log("MOVE");
-	if(IsCharInAir(gPlayer[MyID].PedID))
+	if(IsCharInAir(gPlayer[MyID].PedID()))
 	{
 		RakNet::BitStream bsSend;
 		net->RPC("JumpPlayer",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 		Log("JUMP SENDed");
 	}
 	Log("AIR");
-	if(IsCharDucking(gPlayer[MyID].PedID) != gPlayer[MyID].duck)
+	if(IsCharDucking(gPlayer[MyID].PedID()) != gPlayer[MyID].duck)
 	{
-		gPlayer[MyID].duck = IsCharDucking(gPlayer[MyID].PedID);
+		gPlayer[MyID].duck = IsCharDucking(gPlayer[MyID].PedID());
 		RakNet::BitStream bsSend;
 		bsSend.Write(gPlayer[MyID].duck);
 		net->RPC("DuckPlayer",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
@@ -115,27 +115,27 @@ void FMPHook::MoveSync()
 
 void FMPHook::CarDoSync()
 {
-	if(IsCharInAnyCar(gPlayer[MyID].PedID) && gPlayer[MyID].car_id == -1)
+	if(IsCharInAnyCar(gPlayer[MyID].PedID()) && gPlayer[MyID].car_id == -1)
 	{
-		gPlayer[MyID].car_id = GetPlayerCar(_GetPedVehicle(gPlayer[MyID].PedID));
+		gPlayer[MyID].car_id = GetPlayerCar(_GetPedVehicle(gPlayer[MyID].PedID()));
 		RakNet::BitStream bsSend;
 		bsSend.Write(gPlayer[MyID].car_id);
 		bsSend.Write(100);
 		net->RPC("PlayerEnterInVehicle",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 	}
-	else if(!IsCharInAnyCar(gPlayer[MyID].PedID) && gPlayer[MyID].car_id != -1)
+	else if(!IsCharInAnyCar(gPlayer[MyID].PedID()) && gPlayer[MyID].car_id != -1)
 	{
 		gPlayer[MyID].car_id = -1;
 	}
 	Debug("INCAR");
 	if(myEnter == 0 && GetAsyncKeyState(70) != 0)
 	{
-		if(!IsCharInAnyCar(gPlayer[MyID].PedID))
+		if(!IsCharInAnyCar(gPlayer[MyID].PedID()))
 		{
 			int carid;
 			float x, y, z;
 			Log("PED");
-			GetCharCoordinates(gPlayer[MyID].PedID, &x, &y, &z);
+			GetCharCoordinates(gPlayer[MyID].PedID(), &x, &y, &z);
 			Log("GETCOORD");
 			carid = _GetClosestCar(x, y, z, 10);
 			if(carid != -1)
@@ -154,14 +154,14 @@ void FMPHook::CarDoSync()
 			net->RPC("PlayerExitFromVehicle",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 		}
 	}
-	else if(GetAsyncKeyState(71) != 0 && !IsCharInAnyCar(gPlayer[MyID].PedID) && myEnter == 0)
+	else if(GetAsyncKeyState(71) != 0 && !IsCharInAnyCar(gPlayer[MyID].PedID()) && myEnter == 0)
 	{
 		Log("GGGGG");
 		int carid, seatid = 0; 
 		unsigned int max;
 		float x, y, z;
 		Log("CARPED");
-		GetCharCoordinates(gPlayer[MyID].PedID, &x, &y, &z);
+		GetCharCoordinates(gPlayer[MyID].PedID(), &x, &y, &z);
 		Log("GETCOORD");
 		carid = _GetClosestCar(x, y, z, 10);
 		if(carid != -1)
@@ -199,7 +199,7 @@ void FMPHook::CarDoSync()
 			}
 			if(seatid >= 0)
 			{
-				TaskEnterCarAsPassenger(gPlayer[MyID].PedID, gCar[carid].CarID, -1, seatid);
+				TaskEnterCarAsPassenger(gPlayer[MyID].PedID(), gCar[carid].CarID, -1, seatid);
 				RakNet::BitStream bsSend;
 				bsSend.Write(carid);
 				bsSend.Write(seatid);
@@ -209,9 +209,9 @@ void FMPHook::CarDoSync()
 	}
 	else if(myEnter == 1)
 	{
-		int incar = IsCharInAnyCar(gPlayer[MyID].PedID);
-		incar += IsCharSittingInAnyCar(gPlayer[MyID].PedID);
-		incar = incar * IsCharOnFoot(gPlayer[MyID].PedID);
+		int incar = IsCharInAnyCar(gPlayer[MyID].PedID());
+		incar += IsCharSittingInAnyCar(gPlayer[MyID].PedID());
+		incar = incar * IsCharOnFoot(gPlayer[MyID].PedID());
 		if(incar == 0)
 			myEnter = 0;
 		else
@@ -237,7 +237,7 @@ void FMPHook::GunSync()
 {
 	Log("Start");
 	int gun;
-	GetCurrentCharWeapon(gPlayer[MyID].PedID, (eWeapon*)&gun);
+	GetCurrentCharWeapon(gPlayer[MyID].PedID(), (eWeapon*)&gun);
 	Log("GetGUN");
 	if(gun != gPlayer[MyID].gun)
 	{
@@ -249,7 +249,7 @@ void FMPHook::GunSync()
 	Log("AIM FIRE");
 	if(IsControlPressed(0, 137)!=0) // Fire
 	{
-		FreezeCharPosition(gPlayer[MyID].PedID, 1);
+		FreezeCharPosition(gPlayer[MyID].PedID(), 1);
 		gPlayer[MyID].Aim = 1;
 
 		int time;
@@ -282,8 +282,8 @@ void FMPHook::GunSync()
 		{
 			if(gPlayer[i].connected == 1)
 			{
-				GetCharHealth(gPlayer[i].PedID, &hp);
-				GetCharArmour(gPlayer[i].PedID, &ar);
+				GetCharHealth(gPlayer[i].PedID(), &hp);
+				GetCharArmour(gPlayer[i].PedID(), &ar);
 				if(ar != gPlayer[i].armour || hp != gPlayer[i].health)
 				{
 					dam.pid = i;
@@ -306,7 +306,7 @@ void FMPHook::GunSync()
 	else if(IsControlPressed(0, 138)!=0) // Aim
 	{
 		Log("Freeze");
-		FreezeCharPosition(gPlayer[MyID].PedID, 1);
+		FreezeCharPosition(gPlayer[MyID].PedID(), 1);
 		gPlayer[MyID].Aim = 1;
 		Log("Find");
 		int time;
@@ -344,7 +344,7 @@ void FMPHook::GunSync()
 	else if(gPlayer[MyID].Aim == 1)
 	{
 		if(gPlayer[MyID].edFreeze == 0)
-			FreezeCharPosition(gPlayer[MyID].PedID, 0);
+			FreezeCharPosition(gPlayer[MyID].PedID(), 0);
 		gPlayer[MyID].Aim = 0;
 	}
 	Log("End");
@@ -353,8 +353,8 @@ void FMPHook::GunSync()
 void FMPHook::StatusSync()
 {
 	unsigned int hp, arm;
-	GetCharHealth(_GetPlayerPed(), &hp);
-	GetCharArmour(_GetPlayerPed(), &arm);
+	GetCharHealth(gPlayer[MyID].PedID(), &hp);
+	GetCharArmour(gPlayer[MyID].PedID(), &arm);
 	if(hp != gPlayer[MyID].health || arm != gPlayer[MyID].armour)
 	{
 		gPlayer[MyID].health = hp;
