@@ -326,9 +326,10 @@ void FMPHook::RunMP()
 	GetPlayerChar(ConvertIntToPlayerIndex(GetPlayerId()), &Player);Log("RUN 1%d", 1);
 	RemoveAllCharWeapons(Player);Log("RUN 1%d", 2);
 	AddArmourToChar(Player, -1000);Log("RUN 1%d", 3);
-	SetCharMoney(Player,0);Log("RUN 1%d", 4);
+	SetCharMoney(Player, 0);Log("RUN 1%d", 4);
 	SetTimeOfDay(12,0);
 	SetMaxWantedLevel(0);
+
 	Log("RunMP End");
 }
 

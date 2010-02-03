@@ -39,7 +39,7 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			enterChat--;
 			enterMsg[enterChat] = 0;
 		}
-		else
+		else if(enterChat != -1)
 		{
 			if(enterChat != 255)
 			{
