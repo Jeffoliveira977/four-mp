@@ -55,8 +55,11 @@ CHATMSG mChat[64];
 
 int enterChat = -1;
 char enterMsg[256];
+
+void patchCode();
+extern DWORD dwGameVersion;
 /* ----------------------------------------------------------------------------------------------------- */
-/*                                           Ф У Н К Ц И И                                               */
+/*                                           F U N C T I O N S                                           */
 /* ----------------------------------------------------------------------------------------------------- */
 
 using namespace Natives;
@@ -615,11 +618,7 @@ void GameStart()
 
 void MainThread(void* dummy)
 {
-	/* Удаляем инфо файлы */
-	debug_clear();
-	log_clear();
-
-	DWORD d,c;
+	//DWORD d,c;
 	/*VirtualProtect((PVOID)(0xDEA1C0+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
 	strcpy((PCHAR)0xDEA1C0+dwLoadOffset,"GTA IV:Four-MultiPlayer");
 	VirtualProtect((PVOID)(0xDEA1C0+dwLoadOffset),2,d,&c);
@@ -648,14 +647,24 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 {
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
-		DisableThreadLibraryCalls(hModule);
-		DetourFunc((BYTE*)(0xCE32AC+dwLoadOffset),(BYTE*)hkDirect3DCreate9, 5);
+		debug_clear();
+		log_clear();
 
-		_beginthread(&MainThread, 0, NULL );	
+		patchCode();
+
+		if(dwGameVersion == 0x00010005)
+		{
+			DisableThreadLibraryCalls(hModule);
+			DetourFunc((BYTE*)(0xCE32AC+dwLoadOffset),(BYTE*)hkDirect3DCreate9, 5);
+
+			_beginthread(&MainThread, 0, NULL );	
+		}
+		else
+			Log("This version not supported");
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{
-		Debug("EXIT FMP");
+		Log("EXIT FMP");
 	}
 	return TRUE;
 }
