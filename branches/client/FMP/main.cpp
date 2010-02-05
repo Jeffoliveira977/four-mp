@@ -373,6 +373,8 @@ void FMPHook::GameThread()
 	REGISTER_STATIC_RPC(net, ::SyncSkinVariation);
 	REGISTER_STATIC_RPC(net, ::PlayerSpawn);
 
+	REGISTER_STATIC_RPC(net, ::Chat);
+
 	mp_state = -1;
 	//-------------------
 	Log("GameThread");
