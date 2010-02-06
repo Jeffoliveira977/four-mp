@@ -3,7 +3,6 @@
 #include <conio.h>
 #include <string.h>
 #include <stdarg.h>
-#include <windows.h>
 
 #include "Console.h"
 
@@ -12,6 +11,9 @@ Console::Console(void)
 	maxoutputbuffersize = 1024;
 	maxinputbuffersize = 255;
 	pagesize = 26;
+#ifdef WIN32
+	outputhandle = GetStdHandle(STD_OUTPUT_HANDLE);
+#endif
 	outputbuffer = (char **)calloc(1, sizeof(char *));
 	outputbuffersize = 0;
 	inputbuffer = (char **)calloc(1, sizeof(char *));
@@ -200,7 +202,8 @@ void Console::Print(const char *string, ...)
 	vsprintf(tempstring, string, arglist);
 	va_end(arglist);
 	this->WriteToOutputBuffer(tempstring);
-	this->UpdateScreen();
+	this->PrintOutputPage();
+	this->PrintInputLine();
 	//FMP specific
 	FILE *f = fopen("server.log", "a");
 	SYSTEMTIME time;
@@ -220,7 +223,8 @@ void Console::Debug(const char *string, ...)
 	vsprintf(tempstring, string, arglist);
 	va_end(arglist);
 	this->WriteToOutputBuffer(tempstring);
-	this->UpdateScreen();
+	this->PrintOutputPage();
+	this->PrintInputLine();
 	//FMP specific
 	FILE *f = fopen("server.log", "a");
 	SYSTEMTIME time;
@@ -233,37 +237,80 @@ void Console::Debug(const char *string, ...)
 
 void Console::ClearScreen(void)
 {
+#ifdef WIN32
 	system("cls");
+#endif
+}
+
+void Console::ClearInputLine(void)
+{
+	unsigned int length = strlen(inputbuffer[inputbufferposition[0]]);
+	this->SetCursorPosition(2, this->GetInputLineScreenPosition());
+	for (int i = 0; i < length; i++)
+	{
+		printf(" ");
+	}
+}
+
+void Console::SetCursorPosition(unsigned char x, unsigned char y)
+{
+#ifdef WIN32
+	COORD coords = {x, y};
+	SetConsoleCursorPosition(outputhandle, coords);
+#endif
+}
+
+unsigned char Console::GetInputLineScreenPosition(void)
+{
+	if (outputbuffersize < pagesize)
+	{
+		return outputbuffersize + 1;
+	}
+	else
+	{
+		return pagesize + 1;
+	}
 }
 
 void Console::PrintCaption(void)
 {
+	this->SetCursorPosition(0, 0);
+#ifdef WIN32
+	WriteConsole(outputhandle, L"Test", 5, NULL, NULL);
+	COORD coords = {0, 0};
+	FillConsoleOutputAttribute(outputhandle, FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY, 80, coords, NULL);
+#else
 	printf("Test\n");
+#endif
 }
 
 void Console::PrintOutputPage(void)
 {
+	this->SetCursorPosition(0, 1);
+	unsigned char length;
 	for (char i = 0; ((i < pagesize) && (i < outputbuffersize)); i++)
 	{
-		if (strlen(outputbuffer[screenposition+i]) < 80)
+		printf("%s", outputbuffer[screenposition+i]);
+		length = strlen(outputbuffer[screenposition+i]);
+		if (length < 80)
 		{
-			printf("%s\n", outputbuffer[screenposition+i]);
-		}
-		else
-		{
-			printf("%s", outputbuffer[screenposition+i]);
+			do
+			{
+				printf(" ");
+				length++;
+			} while (length != 80);
 		}
 	}
 }
 
 void Console::PrintInputLine()
 {
+	this->SetCursorPosition(0, this->GetInputLineScreenPosition());
 	printf("> %s", inputbuffer[inputbuffersize-1]);
 }
 
 void Console::UpdateScreen(void)
 {
-	this->ClearScreen();
 	this->PrintCaption();
 	this->PrintOutputPage();
 	this->PrintInputLine();
@@ -271,7 +318,11 @@ void Console::UpdateScreen(void)
 
 void Console::GoOnePageUp(void)
 {
-	if ((screenposition - pagesize) < 0)
+	if (screenposition == 0)
+	{
+		return;
+	}
+	else if (screenposition < pagesize)
 	{
 		screenposition = 0;
 	}
@@ -279,12 +330,16 @@ void Console::GoOnePageUp(void)
 	{
 		screenposition = screenposition - pagesize;
 	}
-	this->UpdateScreen();
+	this->PrintOutputPage();
 }
 
 void Console::GoOnePageDown(void)
 {
-	if ((screenposition + pagesize) > (outputbuffersize - pagesize))
+	if (screenposition == (outputbuffersize - pagesize))
+	{
+		return;
+	}
+	else if ((screenposition + pagesize) > (outputbuffersize - pagesize))
 	{
 		screenposition = outputbuffersize - pagesize;
 	}
@@ -292,11 +347,12 @@ void Console::GoOnePageDown(void)
 	{
 		screenposition = screenposition + pagesize;
 	}
-	this->UpdateScreen();
+	this->PrintOutputPage();
 }
 
 void Console::InputHistoryBack(void)
 {
+	this->ClearInputLine();
 	if (inputbufferposition[0] != 0)
 	{
 		inputbufferposition[0]--;
@@ -306,11 +362,12 @@ void Console::InputHistoryBack(void)
 		inputbufferposition[0] = inputbuffersize - 2;
 	}
 	this->FillInputBufferFromHistory();
-	this->UpdateScreen();
+	this->PrintInputLine();
 }
 
 void Console::InputHistoryForward(void)
 {
+	this->ClearInputLine();
 	if (inputbufferposition[0] < (inputbuffersize - 2))
 	{
 		inputbufferposition[0]++;
@@ -320,7 +377,7 @@ void Console::InputHistoryForward(void)
 		inputbufferposition[0] = 0;
 	}
 	this->FillInputBufferFromHistory();
-	this->UpdateScreen();
+	this->PrintInputLine();
 }
 
 void Console::WriteToOutputBuffer(const char *string)
@@ -384,9 +441,12 @@ void Console::AddCharToInputBuffer(const int ch)
 	strncpy(tempstring, inputbuffer[inputbuffersize-1] + inputbufferposition[1], buffersize - inputbufferposition[1] + 1);
 	inputbuffer[inputbuffersize-1][inputbufferposition[1]] = ch;
 	strncpy(inputbuffer[inputbuffersize-1] + inputbufferposition[1] + 1, tempstring, buffersize - inputbufferposition[1] + 1);
+	unsigned char y = this->GetInputLineScreenPosition();
+	this->SetCursorPosition(inputbufferposition[1] + 2, y);
 	inputbufferposition[1]++;
+	printf("%c%s", ch, tempstring);
 	free(tempstring);
-	this->UpdateScreen();
+	this->SetCursorPosition(inputbufferposition[1] + 2, y);
 }
 
 void Console::BackspaceCharInInputBuffer(void)
@@ -402,8 +462,11 @@ void Console::BackspaceCharInInputBuffer(void)
 	this->ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize);
 	strncpy(inputbuffer[inputbuffersize-1] + inputbufferposition[1] - 1, tempstring, buffersize - inputbufferposition[1] + 1);
 	inputbufferposition[1]--;
+	unsigned char y = this->GetInputLineScreenPosition();
+	this->SetCursorPosition(inputbufferposition[1] + 2, y);
+	printf("%s ", tempstring);
 	free(tempstring);
-	this->UpdateScreen();
+	this->SetCursorPosition(inputbufferposition[1] + 2, y);
 }
 
 void Console::MoveCursorLeft(void)
@@ -412,12 +475,16 @@ void Console::MoveCursorLeft(void)
 	{
 		return;
 	}
+	inputbufferposition[1]--;
+#ifdef WIN32
+	this->SetCursorPosition(inputbufferposition[1] + 2, this->GetInputLineScreenPosition());
+#else
 	unsigned int buffersize = strlen(inputbuffer[inputbuffersize-1]);
 	this->ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize + 2);
 	inputbuffer[inputbuffersize-1][buffersize] = 8;
 	inputbuffer[inputbuffersize-1][buffersize+1] = '\0';
-	inputbufferposition[1]--;
-	this->UpdateScreen();
+	this->PrintInputLine();
+#endif
 }
 
 void Console::MoveCursorRight(void)
@@ -427,16 +494,20 @@ void Console::MoveCursorRight(void)
 	{
 		return;
 	}
+	inputbufferposition[1]++;
+#ifdef WIN32
+	this->SetCursorPosition(inputbufferposition[1] + 2, this->GetInputLineScreenPosition());
+#else
 	this->ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize);
 	inputbuffer[inputbuffersize-1][buffersize-1] = '\0';
-	inputbufferposition[1]++;
-	this->UpdateScreen();
+	this->PrintInputLine();
+#endif
 }
 
 void Console::DeleteCharInInputBuffer(void)
 {
 	unsigned int buffersize = strlen(inputbuffer[inputbuffersize-1]);
-	if (inputbufferposition[1] == (buffersize + 1))
+	if (inputbufferposition[1] == buffersize)
 	{
 		return;
 	}
@@ -445,8 +516,11 @@ void Console::DeleteCharInInputBuffer(void)
 	strncpy(tempstring, inputbuffer[inputbuffersize-1] + inputbufferposition[1] + 1, buffersize - inputbufferposition[1]);
 	this->ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize);
 	strncpy(inputbuffer[inputbuffersize-1] + inputbufferposition[1], tempstring, buffersize - inputbufferposition[1]);
+	unsigned char y = this->GetInputLineScreenPosition();
+	this->SetCursorPosition(inputbufferposition[1] + 2, y);
+	printf("%s ", tempstring);
 	free(tempstring);
-	this->UpdateScreen();
+	this->SetCursorPosition(inputbufferposition[1] + 2, y);
 }
 
 void Console::AcceptUserInput(void)
@@ -458,7 +532,7 @@ void Console::AcceptUserInput(void)
 	sprintf(tempstring, "> %s", inputbuffer[inputbuffersize-2]);
 	this->WriteToOutputBuffer(tempstring);
 	this->InterpretLine(inputbuffer[inputbuffersize-2]);
-	this->UpdateScreen();
+	this->PrintInputLine();
 }
 
 void Console::WriteToInputBuffer(void)

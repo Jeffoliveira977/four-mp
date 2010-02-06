@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 class Console
 {
 public:
@@ -11,14 +15,20 @@ public:
 private:
 	char **outputbuffer;
 	char **inputbuffer;
+#ifdef WIN32
+	HANDLE outputhandle;
+#endif
 	unsigned short outputbuffersize; //Holds current size of the output buffer (in lines)
 	unsigned short maxoutputbuffersize; // Holds maximum size of the output buffer (in lines)
 	unsigned char inputbuffersize; //Holds curent size of the input buffer (in lines)
 	unsigned char maxinputbuffersize; // Holds maximum size of the input buffer (in lines)
-	unsigned char inputbufferposition[2]; //Holds current cursor position in the input buffer
+	unsigned char inputbufferposition[2]; //Holds current cursor position in the input buffer ([0] - Line index, [1] - Character index)
 	unsigned char pagesize; //How many lines will be shown on one page (excluding caption and input line)
-	unsigned short screenposition; //Holds first line in the output buffer that will be shown on current page
+	unsigned short screenposition; //Holds index of the first line in the output buffer that will be shown on the current page
 	void ClearScreen(void); //Clears the screen
+	void ClearInputLine(void); //Clears input line
+	void SetCursorPosition(unsigned char x, unsigned char y); //Sets cursor position on the console screen
+	unsigned char GetInputLineScreenPosition(void); //Gets y coordinate of the input line on the console screen
 	void PrintCaption(void); //Prints caption
 	void PrintOutputPage(void); //Prints output page
 	void PrintInputLine(void); //Prints input line
