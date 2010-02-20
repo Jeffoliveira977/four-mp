@@ -1,5 +1,6 @@
-#include "common.h"
 #include <stdlib.h>
+
+#include "common.h"
 
 bool ResizeStringBuffer(char *&buffer, const unsigned int size)
 {

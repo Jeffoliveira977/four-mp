@@ -469,9 +469,9 @@ void Console::PrintCaption(void)
 	this->SetCursorPosition(0, 0);
 #ifdef WIN32
 #ifdef _UNICODE
-	WriteConsole(outputhandle, L"FOUR-MP", 5, NULL, NULL);
+	WriteConsole(outputhandle, L"FOUR-MP", sizeof("FOUR-MP"), NULL, NULL);
 #else
-	WriteConsole(outputhandle, "FOUR-MP", 5, NULL, NULL);
+	WriteConsole(outputhandle, "FOUR-MP", sizeof("FOUR-MP"), NULL, NULL);
 #endif
 	COORD coords = {0, 0};
 	FillConsoleOutputAttribute(outputhandle, FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY, 80, coords, NULL);
@@ -726,7 +726,7 @@ void Console::MoveCursorLeft(void)
 	this->SetCursorPosition(inputbufferposition[1] + 2, this->GetInputLineScreenPosition());
 #else
 	unsigned int buffersize = strlen(inputbuffer[inputbuffersize-1]);
-	this->ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize + 2))
+	this->ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize + 2);
 	inputbuffer[inputbuffersize-1][buffersize] = 8;
 	inputbuffer[inputbuffersize-1][buffersize+1] = '\0';
 	this->PrintInputLine();
@@ -744,7 +744,7 @@ void Console::MoveCursorRight(void)
 #ifdef WIN32
 	this->SetCursorPosition(inputbufferposition[1] + 2, this->GetInputLineScreenPosition());
 #else
-	this->ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize))
+	this->ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize);
 	inputbuffer[inputbuffersize-1][buffersize-1] = '\0';
 	this->PrintInputLine();
 #endif
