@@ -10,13 +10,15 @@
 #include "sq\squirrel.h"
 #include "sq\sqstdsystem.h"
 #include "main.h"
+#include "Console.h"
 
+extern Console con;
 extern HSQUIRRELVM v;
 
 #ifdef SQUNICODE 
-#define scvprintf vwprintf 
+#define scvprintf _vscwprintf 
 #else 
-#define scvprintf vprintf 
+#define scvprintf _vscprintf 
 #endif 
 
 // функция регистрации функций
@@ -34,9 +36,11 @@ SQInteger register_global_func(HSQUIRRELVM v,SQFUNCTION f,const char *fname)
 void printfunc(HSQUIRRELVM v, const SQChar *s, ...) 
 { 
 	va_list arglist; 
-    va_start(arglist, s); 
-    scvprintf(s, arglist); 
-
+    va_start(arglist, s);
+	char *tempstring = (char *)calloc(scvprintf(s, arglist) + 1, sizeof(char));
+	vsprintf(tempstring, s, arglist); 
+	con.Print(tempstring);
+	free(tempstring);
 	FILE *f = fopen("server.log", "a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);
@@ -54,7 +58,7 @@ void sq_printr(HSQUIRRELVM v)
 	const char *str = new char[1024];
 	sq_getstring(v, 2, &str);
 	CharToOem(str, txt);
-	printf(txt);
+	con.Print(txt);
 	FILE *f = fopen("server.log", "a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);

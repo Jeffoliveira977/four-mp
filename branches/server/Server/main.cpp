@@ -9,6 +9,7 @@
 
 #pragma comment (lib ,"squirrel.lib")
 #pragma comment (lib ,"sqstdlib.lib")
+
 ///////////////////////////////////////////////
 //             I N C L U D E S               //
 ///////////////////////////////////////////////
@@ -24,6 +25,8 @@
 #include "sq\sqstdmath.h"
 #include "sq\sqstdstring.h"
 #include "sq\sqstdsystem.h"
+// Pawn
+//#include "pawn.h"
 // RakNet
 #include "net\RakNetworkFactory.h"
 #include "net\RakPeerInterface.h"
@@ -31,6 +34,8 @@
 #include "net\BitStream.h"
 // Other
 #include "main.h"
+#include "Console.h"
+#include "concommands.h"
 #include "rpc.h"
 #include "sq.h"
 #include "manager.h"
@@ -39,8 +44,10 @@
 ///////////////////////////////////////////////
 //                V  A  R  S                 //
 ///////////////////////////////////////////////
+Console con;
 RakPeerInterface *net;
-HSQUIRRELVM v; 
+HSQUIRRELVM v;
+//AMX amx;
 Player gPlayer[MAX_PLAYERS];
 Vehicle gVehicle[MAX_VEHICLES];
 Server sConf;
@@ -68,9 +75,11 @@ void SendChatMessage(char *msg, int player, int r, int g, int b)
 void print(const char *string, ...)
 {
 	va_list arglist; 
-    va_start(arglist, string); 
-	vprintf(string, arglist); 
-	printf("\n");
+    va_start(arglist, string);
+	char *tempstring = (char *)calloc(_vscprintf(string, arglist) + 1, sizeof(char));
+	vsprintf(tempstring, string, arglist); 
+	con.Print(tempstring);
+	free(tempstring);
 	#ifdef LOG
 		FILE *f = fopen("server.log", "a");
 		SYSTEMTIME time;
@@ -88,8 +97,10 @@ void debug(const char *string, ...)
 	va_list arglist; 
     va_start(arglist, string); 
 	#ifdef DEBUG
-		vprintf(string, arglist); 
-		printf("\n");
+		char *tempstring = (char *)calloc(_vscprintf(string, arglist) + 1, sizeof(char));
+		vsprintf(tempstring, string, arglist); 
+		con.Print(tempstring);
+		free(tempstring);
 		FILE *f = fopen("server.log", "a");
 		SYSTEMTIME time;
 		GetSystemTime(&time);
@@ -123,6 +134,10 @@ void LoadConfig()
 
 int main()
 {
+	new ConCmd("cvarlist", ConCmdCvarlist, "Show the list of convars/concommands.", 0);
+	new ConVar("developer", 0, "Show developer messages.", 0, true, 0, true, 2);
+	new ConCmd("find", ConCmdFind, "Find concommands with the specified string in their name/help text.", 0);
+	new ConCmd("help", ConCmdHelp, "Find help about a convar/concommand.");
 	print("Starting...");
 	LoadConfig();
 
@@ -157,7 +172,7 @@ int main()
 	v = sq_open(1024); 
     sqstd_seterrorhandlers(v);
     sq_setprintfunc(v, printfunc);
-
+	
 	// Register Script Funcions
 	register_global_func(v, (SQFUNCTION)sq_printr, "printr");
 	register_global_func(v, (SQFUNCTION)sq_CreateCar, "CreateCar");
@@ -182,7 +197,21 @@ int main()
 		return 1;
     }
 
+	//Init Pawn
+	//int err = aux_LoadProgram(&amx, "text.amx", NULL);
+	//if (err != AMX_ERR_NONE)
+	//{
+	//	//ErrorExit(&amx, err);
+	//}
+	//pawn_Init(amx);
+	//if (err)
+	//{
+	//	ErrorExit(&amx, err);
+	//}
+	//err = amx_Exec(&amx, &ret, AMX_EXEC_MAIN);
+	
 	sc_OnGameModeInit(v); // Call OnGameModeInit
+	/*pawn_OnGameModeInit(amx);*/
 
 	// Body
 	Packet *pack;
@@ -190,6 +219,7 @@ int main()
 	
 	while(sConf.Run == 1)
 	{
+		con.CheckUserInput();
 		pack = net->Receive();
 		if(pack)
 		{

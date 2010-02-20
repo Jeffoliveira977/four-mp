@@ -177,7 +177,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\common.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ConCmd.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\concommands.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Console.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ConSymbolBase.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ConVar.cpp"
 				>
 			</File>
 			<File
@@ -215,7 +235,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ConCmd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\concommands.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Console.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ConSymbolBase.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ConVar.h"
 				>
 			</File>
 			<File
