@@ -232,6 +232,10 @@
 					RelativePath=".\d3d9\d3d9tex.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\d3d9\gui.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Hook"
@@ -336,6 +340,10 @@
 				</File>
 				<File
 					RelativePath=".\d3d9\d3d9tex.h"
+					>
+				</File>
+				<File
+					RelativePath=".\d3d9\gui.h"
 					>
 				</File>
 			</Filter>
