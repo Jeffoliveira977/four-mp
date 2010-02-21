@@ -11,8 +11,11 @@
 #include "sq\sqstdsystem.h"
 #include "main.h"
 #include "Console.h"
+#include "concommands.h"
+#include "ScriptCommandHandler.h"
 
 extern Console con;
+extern ScriptCommandHandler cmdhandler;
 extern HSQUIRRELVM v;
 
 #ifdef SQUNICODE 
@@ -30,6 +33,20 @@ SQInteger register_global_func(HSQUIRRELVM v,SQFUNCTION f,const char *fname)
     sq_createslot(v,-3); 
     sq_pop(v,1);   
 	return 1;
+}
+
+void sq_RegServerCmd(HSQUIRRELVM v)
+{
+	const char *cmdname;
+	const char *cmdcallback;
+	const char *cmddesc;
+	int cmdflags;
+	sq_getstring(v, 2, &cmdname);
+	sq_getstring(v, 3, &cmdcallback);
+	sq_getstring(v, 4, &cmddesc);
+	sq_getinteger(v, 5, &cmdflags);
+	new ConCmd(cmdname, ConCmdSquirrel, cmddesc, cmdflags);
+	cmdhandler.AddScriptCommand(cmdname, cmdcallback);
 }
 
 // функция печати - print(string)

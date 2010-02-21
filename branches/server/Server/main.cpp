@@ -35,6 +35,7 @@
 // Other
 #include "main.h"
 #include "Console.h"
+#include "ScriptCommandHandler.h"
 #include "concommands.h"
 #include "rpc.h"
 #include "sq.h"
@@ -45,6 +46,7 @@
 //                V  A  R  S                 //
 ///////////////////////////////////////////////
 Console con;
+ScriptCommandHandler cmdhandler;
 RakPeerInterface *net;
 HSQUIRRELVM v;
 //AMX amx;
@@ -174,8 +176,12 @@ int main()
     sq_setprintfunc(v, printfunc);
 	
 	// Register Script Funcions
+	// Conosle functions
 	register_global_func(v, (SQFUNCTION)sq_printr, "printr");
+	register_global_func(v, (SQFUNCTION)sq_RegServerCmd, "RegServerCmd");
+	// Car functions
 	register_global_func(v, (SQFUNCTION)sq_CreateCar, "CreateCar");
+	// Player functions
 	register_global_func(v, (SQFUNCTION)sq_GiveWeapon, "GiveWeapon");
 	register_global_func(v, (SQFUNCTION)sq_addPlayerClass, "addPlayerClass");
 	register_global_func(v, (SQFUNCTION)sq_enableComponentSelect, "enableComponentSelect");

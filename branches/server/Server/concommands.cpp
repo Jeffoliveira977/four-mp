@@ -3,8 +3,10 @@
 #include "common.h"
 #include "concommands.h"
 #include "Console.h"
+#include "ScriptCommandHandler.h"
 
 extern Console con;
+extern ScriptCommandHandler cmdhandler;
 
 void ConCmdCvarlist(unsigned char numargs)
 {
@@ -119,6 +121,21 @@ void ConCmdHelp(unsigned char numargs)
 	con.Print(con.GetConsoleSymbolHelpString(cvarname));
 	free(cvarname);
 }
+
+void ConCmdSquirrel(unsigned char numargs)
+{
+	char *cmdname;
+	if (!con.GetCmdArg(0, cmdname))
+	{
+		return;
+	}
+	if (!cmdhandler.Execute(cmdname, numargs))
+	{
+		con.Print("Unknown command \"%s\"", cmdname);
+	}
+	free(cmdname);
+}
+
 void ConCmdTest(unsigned char numargs)
 {
 	con.Print("0	1	2	3	4	5	6	7	8	9	0\n");
