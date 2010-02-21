@@ -9,6 +9,7 @@ extern LPD3DXFONT fFMP;
 extern LPD3DXFONT fChat;
 //extern LPDIRECT3DTEXTURE9 g_Texture;
 //extern ID3DXSprite *g_Sprite;
+IDirect3DDevice9 * g_pDevice;
 
 HRESULT CreateD3DXFont( LPDIRECT3DDEVICE9 dDev, LPD3DXFONT* ppd3dxFont, TCHAR* pstrFont, DWORD dwSize, bool bold, bool Italic )
 {
@@ -76,6 +77,7 @@ HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 
 		gameProc = (WNDPROC)GetWindowLong(hFocusWindow,GWL_WNDPROC);
 		SetWindowLong(hFocusWindow,GWL_WNDPROC,(LONG)DefWndProc);
+		g_pDevice = ret->m_pD3Ddev;
 
 		if(fFMP == NULL)
 		{

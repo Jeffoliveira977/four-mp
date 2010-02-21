@@ -2,9 +2,16 @@
 #include "hook.h"
 #include "../log.h"
 
-FMPHook::FMPHook()
+
+FMPHook::FMPHook(): FMPThread()
 {
 	debug("FMPHook::FMPHook called");
+
+	m_pPrimaryFiber = NULL;
+	m_pScriptFiber = NULL;
+	m_bKillRequested = false;
+	m_nWaitTick = 0;
+
 	debug("FMPHook::FMPHook complete");
 }
 
@@ -14,11 +21,21 @@ FMPHook::~FMPHook()
 	debug("FMPHook::~FMPHook complete");
 }
 
-ThreadStates FMPHook::reset(unsigned int hash,int v2,int i3)
+ThreadStates FMPHook::Reset(unsigned int hash,int v2,int i3)
 {
 	debug("FMPHook::reset called");
+	if (m_pScriptFiber)
+		DeleteFiber(m_pScriptFiber);
+
+	m_pScriptFiber = CreateFiber(0, &FiberStart, this);
+
+	if (!m_pScriptFiber)
+	{
+		Kill();
+		return m_context.eThreadState;
+	}
 	debug("FMPHook::reset complete");
-	return FMPThread::reset(hash,v2,i3);
+	return FMPThread::Reset(hash,v2,i3);
 }
 
 void FMPHook::FiberStart(void* parameter)
@@ -33,7 +50,7 @@ void FMPHook::FiberStart(void* parameter)
 	debug("FMPHook::FiberStart complete");
 }
 
-ThreadStates FMPHook::run(int i1)
+ThreadStates FMPHook::Run(int i1)
 {
 	debug("FMPHook::run called");
 
@@ -50,12 +67,21 @@ ThreadStates FMPHook::run(int i1)
 		}
 
 		m_pScriptFiber = CreateFiber(0,&FiberStart,this);
+
+		if (!m_pScriptFiber)
+		{
+			Kill();
+			return m_context.eThreadState;
+		}
 	}
 
 	scrThread* old = GetActiveThread();
 	SetActiveThread(this);
 
-	if(GetTickCount() > m_nWaitTick) SwitchToFiber(m_pScriptFiber);
+	if(m_context.eThreadState != ThreadStateKilled)
+		if(GetTickCount() > m_nWaitTick) SwitchToFiber(m_pScriptFiber);
+
+	if(m_bKillRequested) Kill();
 
 	SetActiveThread(old);
 	debug("FMPHook::run complete");
@@ -70,9 +96,35 @@ void FMPHook::wait(unsigned int timeMS)
 	debug("FMPHook::wait complete");
 }
 
+void FMPHook::Kill()
+{
+	debug("FMPHook::Kill called");
+	if (GetCurrentFiber() != m_pPrimaryFiber) return;
+
+	DeleteFiber(m_pScriptFiber);
+
+	m_pPrimaryFiber = NULL;
+	m_pScriptFiber = NULL;
+	m_bKillRequested = false;
+
+	FMPThread::Kill();
+	debug("FMPHook::Kill complete");
+}
+
 bool FMPHook::IsThreadAlive()
 {
 	return m_context.eThreadState != ThreadStateKilled;
+}
+
+void FMPHook::TerminateThisScript()
+{
+	debug("FMPHook::TerminateThisScript called");
+	if (GetCurrentFiber() != m_pScriptFiber)
+		return;
+
+	m_bKillRequested = true;	
+	SwitchToFiber(m_pPrimaryFiber);
+	debug("FMPHook::TerminateThisScript complete");
 }
 
 //-----------------------------------------------------------

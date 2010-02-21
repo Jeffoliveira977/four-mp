@@ -3,6 +3,7 @@
 #include <windows.h>
 #include "../main.h"
 #include "d3d9hook.h"
+#include "gui.h"
 
 #define D3DHOOK_TEXTURES //comment this to disable texture hooking
 
@@ -218,7 +219,9 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 
 	RECT rc = {2, 2, ScreenX, ScreenY}; 
 	if(mp_state == -1)
+	{
 		fFMP->DrawText(0, "FMP [TAB+F5]", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 0, 0));
+	}
 	else if(mp_state >= 0)
 	{
 		for(int i = 7; i >= 0; i--)
@@ -234,8 +237,10 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 			rc.left += 10;
 			fChat->DrawText(0, enterMsg, -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
 		}
-	}
 
+		GuiMoveMouse(MouseX, MouseY);
+		GuiDraw();
+	}
 
 	return m_pD3Ddev->EndScene();
 }

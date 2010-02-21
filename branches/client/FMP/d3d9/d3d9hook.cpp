@@ -1,5 +1,6 @@
 #include "d3d9hook.h"
 
+
 void DetourFunc(BYTE *src, const BYTE *dst, const int len)
 {
 	BYTE *jmp = (BYTE*)malloc(len+5);

@@ -23,7 +23,7 @@ void SetActiveThread(scrThread* thread)
 	*reinterpret_cast< scrThread** >(ADDRESS_ACTIVE_THREAD) = thread;
 }
 
-void FMPThread::AttachGtaThread()
+void FMPThread::AttachGtaThread(char *s_name)
 {
 	debug("FMPThread::AttachGtaThread called");
 
@@ -35,13 +35,15 @@ void FMPThread::AttachGtaThread()
 
 	for(i = 0;i < nowThreads->wCount;i++)
 	{
-		/* Проверяем не занят ли слот потока */
+		// Проверяем не занят ли слот потока
 		if(nowThreads->pData[i]->RetContext()->nThreadId == 0) break;
 	}
 	if(i == nowThreads->wCount) 
 	{
 		return;
 	}
+
+	strcpy(ThreadName, s_name);
 
 	m_pOriginalThread = nowThreads->pData[i];
 	m_nThreadIndex = i;
@@ -53,18 +55,16 @@ void FMPThread::AttachGtaThread()
 	// получаем хеш названия GtaThread
 
 	unsigned int hash;
-	char* string_asm = "FMP";
 	ptr call_this = ptr_cast(ADDRESS_HASH_GET);
 	_asm
 	{
-		mov eax, string_asm;
+		mov eax, s_name;
 		call call_this;
 		mov hash, eax;
 	}
 
 	// Ставим чистую инфу в GtaThread
-
-	reset(hash,NULL,0);
+	Reset(hash,NULL,0);
 
 	// Забираем ид потока..
 	unsigned int value;
@@ -72,7 +72,6 @@ void FMPThread::AttachGtaThread()
 	*(PDWORD)ADDRESS_THREAD_ID = value + 1;
 
 	// Говорим игре что у нас есть ещё 1 скрипт 
-
 
 	DWORD ScriptsCount;
 	ScriptsCount = *(PDWORD)ADDRESS_SCRIPTS_COUNT;
@@ -83,7 +82,7 @@ void FMPThread::AttachGtaThread()
 	debug("FMPThread::AttachGtaThread complete");
 }
 
-ThreadStates FMPThread::reset(unsigned int hash,int v2,int i3)
+ThreadStates FMPThread::Reset(unsigned int hash,int v2,int i3)
 {
 	debug("FMPThread::reset called");
 	m_context.dwOpcodeOff = 0;
@@ -100,11 +99,12 @@ ThreadStates FMPThread::reset(unsigned int hash,int v2,int i3)
 	m_context.dwScriptHash = hash;
 	m_pszExitMessage = "Normal exit";
 	m_bCanBePaused = true;
+
 	debug("FMPThread::reset complete");
 	return m_context.eThreadState;
 }
 
-ThreadStates FMPThread::run(int i1)
+ThreadStates FMPThread::Run(int i1)
 {
 	debug("FMPThread::run called");
 
@@ -113,7 +113,7 @@ ThreadStates FMPThread::run(int i1)
 
 	if(m_context.eThreadState != ThreadStateKilled) 
 	{
-
+		
 	}
 
 	SetActiveThread(oldThread);
@@ -121,7 +121,7 @@ ThreadStates FMPThread::run(int i1)
 	return m_context.eThreadState;
 }
 
-ThreadStates FMPThread::tick(unsigned int msec)
+ThreadStates FMPThread::Tick(unsigned int msec)
 {
 	debug("FMPThread::tick called");
 
@@ -142,11 +142,32 @@ ThreadStates FMPThread::tick(unsigned int msec)
 FMPThread::FMPThread()
 {
 	debug("FMPThread::FMPThread called");
+
+	strcpy(ThreadName, "FMP");
+
+	m_pOriginalThread = NULL;
+	m_nThreadIndex = -1;
+
 	debug("FMPThread::FMPThread complete");
 }
 
 FMPThread::~FMPThread()
 {
 	debug("FMPThread::~FMPThread called");
+	if(m_pOriginalThread != NULL) Kill();
 	debug("FMPThread::~FMPThread complete");
+}
+
+void FMPThread::Kill()
+{
+	debug("FMPThread::Kill called");
+	sysArray<GtaThread>* nowThreads = GetThreadsArray();
+	nowThreads->pData[m_nThreadIndex] = m_pOriginalThread;
+
+	m_context.eThreadState = ThreadStateKilled;
+	m_context.nThreadId = 0;
+
+	m_pOriginalThread = NULL;
+	m_nThreadIndex = -1;
+	debug("FMPThread::Kill complete");
 }

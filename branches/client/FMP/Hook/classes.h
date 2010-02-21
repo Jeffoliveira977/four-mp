@@ -63,9 +63,9 @@ protected:
 	char* m_pszExitMessage;
 public:
 	virtual ~scrThread() {}
-	virtual ThreadStates reset(unsigned int hash,int v2,int i3) = 0;
-	virtual ThreadStates run(int i1) = 0;
-	virtual ThreadStates tick(unsigned int msec) = 0;
+	virtual ThreadStates Reset(unsigned int hash,int v2,int i3) = 0;
+	virtual ThreadStates Run(int i1) = 0;
+	virtual ThreadStates Tick(unsigned int msec) = 0;
 	
 	scrThreadContext *RetContext() { return &m_context; }
 };
@@ -110,17 +110,16 @@ protected:
 	char ThreadName[24];
 
 
-	ThreadStates reset(unsigned int hash,int v2,int i3);
-	ThreadStates run(int i1);
-	ThreadStates tick(unsigned int msec);
-
-	virtual void RunTick() = 0;
+	ThreadStates Reset(unsigned int hash,int v2,int i3);
+	ThreadStates Run(int i1);
+	ThreadStates Tick(unsigned int msec);
 
 public:
 	FMPThread();
 	~FMPThread();
+	void Kill();
 
-	void AttachGtaThread();
+	void AttachGtaThread(char*);
 };
 
 class FMPHook: 
@@ -134,18 +133,19 @@ private:
 
 	static void _stdcall FiberStart(void* parameter);
 
-	virtual void RunTick() {}	
 protected:
-	ThreadStates reset(unsigned int hash,int v2,int i3);
-	ThreadStates run(int i1);
+	ThreadStates Reset(unsigned int hash,int v2,int i3);
+	ThreadStates Run(int i1);
 
 	void wait(unsigned int timeMS);
 	
 	bool IsThreadAlive();
+	void TerminateThisScript();
 
 public:
 	FMPHook();
 	~FMPHook();
+	void Kill();
 	void GameThread();
 
 	// -- Help func

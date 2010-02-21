@@ -31,10 +31,13 @@
 
 #include "Check\check.h"
 #include "d3d9\d3d9hook.h"
+#include "d3d9\gui.h"
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                     Потоки для работы с игрой                                         */
 /* ----------------------------------------------------------------------------------------------------- */
 FMPHook HOOK;
+HANDLE ThreadHandle;
+
 RakPeerInterface *net;
 SystemAddress servAddr;
 
@@ -391,6 +394,7 @@ void FMPHook::GameThread()
 		{
 			if(GetAsyncKeyState(116) != 0 && GetAsyncKeyState(9) != 0)
 			{
+				GuiLoad();
 				mp_state = 0;
 			}
 		}
@@ -638,9 +642,11 @@ void MainThread(void* dummy)
 	Debug("START (0x%x)", dwLoadOffset);
 
 	/* Зацепляем наш GtaThread к игре */
-	HOOK.AttachGtaThread();
-
+	HOOK.AttachGtaThread("FMP");
 	Log("MainThread End");
+
+	CloseHandle(ThreadHandle);
+	ThreadHandle = NULL;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) 
@@ -657,13 +663,19 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 			DisableThreadLibraryCalls(hModule);
 			DetourFunc((BYTE*)(0xCE32AC+dwLoadOffset),(BYTE*)hkDirect3DCreate9, 5);
 
-			_beginthread(&MainThread, 0, NULL );	
+			DWORD threadId = 0; 
+			ThreadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&MainThread, 0, 0, (LPDWORD)&threadId);
 		}
 		else
 			Log("This version not supported");
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{
+		if(ThreadHandle != NULL)
+		{
+			TerminateThread(ThreadHandle, 1);
+			CloseHandle(ThreadHandle);
+		}
 		Log("EXIT FMP");
 	}
 	return TRUE;

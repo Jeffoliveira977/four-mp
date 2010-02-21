@@ -3,6 +3,7 @@
 #include "window.h"
 #include "../chat.h"
 #include "../Hook/classes.h"
+#include "../d3d9/Gui.h"
 
 extern FMPHook HOOK;
 WNDPROC gameProc;
@@ -11,6 +12,8 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	if(mp_state < 2) 
 		return CallWindowProc(gameProc, hWnd, Msg, wParam, lParam);
+
+	GuiHandleMessage(Msg, wParam, lParam);
 
 	if(Msg == WM_KEYDOWN)
 	{
