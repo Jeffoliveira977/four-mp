@@ -198,7 +198,12 @@ void CGUI::BringToTop( CWindow * pWindow )
 	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
 		if( m_vWindows[i] == pWindow )
 			m_vWindows.erase( m_vWindows.begin() + i );
+
+	if(m_wFocus)
+		m_wFocus->LostFocus();
+
 	m_vWindows.insert(  m_vWindows.end(), pWindow );
+	m_wFocus = pWindow;
 }
 
 void CGUI::Draw()

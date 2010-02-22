@@ -1,9 +1,10 @@
 #include "CListBox.h"
 
-CListBox::CListBox( int X, int Y, int Width, int Height, const char * String, const char * String2, const char * Callback )
+CListBox::CListBox( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
 	SetElement( X, Y, Width, Height, String, String2, Callback );
 	m_iMouseOverIndex = -1;
+	m_iMouseSelect = -1;
 
 	pSlider = new CHelperSlider( CPos( GetWidth() - HELPERSLIDER_WIDTH + 2, 0 ), GetHeight() );
 
@@ -31,6 +32,12 @@ void CListBox::Draw()
 				pColor = pMouseOverString;
 			else
 				pColor = pString;
+
+			if(m_iMouseSelect == i)	
+			{
+				gpGui->DrawOutlinedBox( Pos.GetX() + 2, Pos.GetY() + iHeight, GetWidth() - HELPERSLIDER_WIDTH, iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
+				pColor = pInner;
+			}
 
 			gpGui->GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pColor, m_vRows[ i ].c_str(), GetWidth() - HELPERSLIDER_WIDTH );
 			iHeight += iAddHeight;
@@ -70,6 +77,7 @@ void CListBox::KeyEvent( SKey sKey )
 	{
 		if( GetMouseOver() )
 		{
+			if(m_iMouseSelect > -2) m_iMouseSelect = m_iMouseOverIndex;
 			if( m_iMouseOverIndex >= 0 && GetAction() && gpGui->GetMouse()->GetLeftButton() )
 				GetAction()( reinterpret_cast<char*>( m_iMouseOverIndex ), this );
 		}
@@ -89,7 +97,7 @@ int CListBox::GetSize()
 
 void CListBox::PutStr( std::string sString, int Index )
 {
-	if(Index >= m_vRows.size() || Index == -1)
+	if(Index >= static_cast<int>( m_vRows.size() ) || Index == -1)
 	{
 		pSlider->SetMaxValue( m_vRows.size() );
 		m_vRows.push_back(sString);
@@ -125,4 +133,14 @@ void CListBox::UpdateTheme( int iIndex )
 void CListBox::ShowSlider( bool bShow )
 {
 	pSlider->Show = bShow;
+}
+
+int CListBox::GetSelected()
+{
+	return m_iMouseSelect;
+}
+
+void CListBox::SetSelect(int Item)
+{
+	m_iMouseSelect = Item;
 }

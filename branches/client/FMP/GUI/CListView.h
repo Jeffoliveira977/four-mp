@@ -18,7 +18,7 @@ class CListView : public CElement
 
 	CColor * pInner, * pBorder, * pString, * pMouseOverString;
 public:
-	CListView( int X, int Y, int *Width, int Height, int Columns, const char * String = NULL, const char *String2 = NULL, const char * Callback = NULL );
+	CListView( int X, int Y, int *Width, int Height, int Columns, const char * String = NULL, const char *String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 	void PreDraw();
@@ -37,4 +37,5 @@ public:
 	void ShowSlider( bool bShow );
 
 	int GetSelected();
+	void SetSelect(int Item = -1);
 };

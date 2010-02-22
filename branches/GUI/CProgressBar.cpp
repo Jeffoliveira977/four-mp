@@ -1,6 +1,6 @@
 #include "CGUI.h"
 
-CProgressBar::CProgressBar( int X, int Y, int Width, int Height, int value, const char * String, const char * String2, const char * Callback )
+CProgressBar::CProgressBar( int X, int Y, int Width, int Height, int value, const char * String, const char * String2, tAction Callback )
 {
 	SetElement( X, Y, Width, Height, String, String2, Callback );
 	SetProgress( value );

@@ -1,6 +1,6 @@
 #include "CGUI.h"
 
-CEditBox::CEditBox( int X, int Y, int Width, int Height, const char * String, const char * String2, const char * Callback )
+CEditBox::CEditBox( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
 	SetElement( X, Y, Width, Height, String, String2, Callback );
 	SetHeight( BUTTON_HEIGHT );
@@ -11,12 +11,13 @@ CEditBox::CEditBox( int X, int Y, int Width, int Height, const char * String, co
 	SetAction( 0 );
 	if( Callback )
 	{
-		CVar * pCvar = gpGui->Cvars[ Callback ];
+		/*CVar * pCvar = gpGui->Cvars[ Callback ];
 	
 		if( pCvar )
 			SetAction( pCvar->GetAction() );
 		else
-			MessageBoxA( 0, "Cvar invalid", GetString().c_str(), 0 );
+			MessageBoxA( 0, "Cvar invalid", GetString().c_str(), 0 );*/
+		SetAction( Callback );
 	}
 	SetThemeElement( gpGui->GetThemeElement( "EditBox" ) );
 	if( !GetThemeElement() )
@@ -261,7 +262,7 @@ void CEditBox::SetAction( tAction pCallback )
 	m_pCallback = pCallback;
 }
 
-CEditBox::tAction CEditBox::GetAction()
+tAction CEditBox::GetAction()
 {
 	return m_pCallback;
 }

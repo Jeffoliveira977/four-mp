@@ -23,7 +23,7 @@ class CDropDown : public CElement
 	CTexture * pButton;
 
 public:
-	CDropDown( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, const char * Callback = NULL );
+	CDropDown( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 	void MouseMove( CMouse * pMouse );

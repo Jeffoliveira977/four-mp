@@ -9,13 +9,12 @@ class CEditBox : public CElement
 	CTimer m_tCursorTimer;
 	bool m_bCursorState;
 
-	typedef std::string ( __cdecl * tAction )( const char * pszArgs, CElement * pElement );
 	tAction m_pCallback;
 
 	CColor * pInner, * pBorder, * pString, * pCursor;
 
 public:
-	CEditBox( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, const char * Callback = NULL );
+	CEditBox( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 

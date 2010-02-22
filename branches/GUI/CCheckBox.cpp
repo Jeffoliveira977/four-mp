@@ -1,6 +1,6 @@
 #include "CGUI.h"
 
-CCheckBox::CCheckBox( int X, int Y, int Width, int Height, bool Checked, const char * String, const char * String2, const char * Callback )
+CCheckBox::CCheckBox( int X, int Y, int Width, int Height, bool Checked, const char * String, const char * String2, tAction Callback )
 {
 	SetElement( X, Y, Width, Height, String, String2, Callback );
 	SetChecked( Checked );

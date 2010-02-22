@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CPos.h"
+typedef void ( __cdecl * tAction )( const char * pszArgs, CElement * pElement );
 
 class CElement
 {
@@ -12,7 +13,6 @@ class CElement
 	CPos m_relPos, m_absPos;
 	CWindow * m_pParent;
 
-	typedef std::string ( __cdecl * tAction )( const char * pszArgs, CElement * pElement );
 	tAction m_pAction;
 
 	SElement * m_pThemeElement[ 3 ];
@@ -20,7 +20,7 @@ class CElement
 
 public:
 
-	void SetElement( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, const char * Callback = NULL, bool abs = 0 );
+	void SetElement( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL, bool abs = 0 );
 
 	void SetParent( CWindow * pParent );
 	CWindow * GetParent();

@@ -11,11 +11,12 @@ class CWindow : public CElement
 
 	bool m_bCloseButtonEnabled;
 	CTimer m_tCloseButtonPressed;
+	bool m_bTitleVisible;
 
 	CColor * pTitle, * pBodyInner, * pBodyBorder;
 	CTexture * pTitlebar, * pButton;
 public:
-	CWindow( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, const char * Callback = NULL );
+	CWindow( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 	~CWindow();
 
 	void AddElement( CElement * pElement );
@@ -46,4 +47,9 @@ public:
 	void BringToTop( CElement * pElement );
 
 	void UpdateTheme( int iIndex );
+
+	void SetTitleVisible( bool v );
+	bool GetTitleVisible();
+
+	void LostFocus();
 };

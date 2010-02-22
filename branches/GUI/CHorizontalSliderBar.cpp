@@ -7,7 +7,7 @@ CHorizontalSliderBar::CHorizontalSliderBar()
 	m_iMinValue = 0, m_iMaxValue = 0, m_iValue = 0;
 }
 
-CHorizontalSliderBar::CHorizontalSliderBar( int X, int Y, int Width, int Height, int minValue, int maxValue, int step, int value, const char * String, const char * String2, const char * Callback )
+CHorizontalSliderBar::CHorizontalSliderBar( int X, int Y, int Width, int Height, int minValue, int maxValue, int step, int value, const char * String, const char * String2, tAction Callback )
 {
 	SetDragged( false );
 	SetAction( 0 );
@@ -23,7 +23,7 @@ CHorizontalSliderBar::CHorizontalSliderBar( int X, int Y, int Width, int Height,
 		SetElementState( "Norm" );
 }
 
-void CHorizontalSliderBar::SetSliderElement( int X, int Y, int Width, int Height, int minValue, int maxValue, int step, int value, const char * String, const char * String2, const char * Callback )
+void CHorizontalSliderBar::SetSliderElement( int X, int Y, int Width, int Height, int minValue, int maxValue, int step, int value, const char * String, const char * String2, tAction Callback )
 {
 	SetElement( X, Y, Width, Height, String, String2, Callback );
 

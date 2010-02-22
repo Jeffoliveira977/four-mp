@@ -5,6 +5,7 @@
 class CListBox : public CElement
 {
 	int m_iMouseOverIndex;
+	int m_iMouseSelect;
 
 	CHelperSlider * pSlider;
 
@@ -12,14 +13,14 @@ class CListBox : public CElement
 
 	CColor * pInner, * pBorder, * pString, * pMouseOverString;
 public:
-	CListBox( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, const char * Callback = NULL );
+	CListBox( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 	void PreDraw();
 	void MouseMove( CMouse * pMouse );
 	void KeyEvent( SKey sKey );
 
-	void PutStr( std::string sString, int Index );
+	void PutStr( std::string sString, int Index = -1 );
 	std::string GetRow( int iIndex );
 
 	void Clear();
@@ -27,4 +28,7 @@ public:
 
 	void UpdateTheme( int iIndex );
 	void ShowSlider( bool bShow );
+
+	int GetSelected();
+	void SetSelect(int Item = -1);
 };

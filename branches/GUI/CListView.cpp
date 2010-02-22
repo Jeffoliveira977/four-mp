@@ -1,6 +1,6 @@
 #include "CListView.h"
 
-CListView::CListView( int X, int Y, int *Width, int Height, int Columns, const char *String, const char *String2, const char * Callback )
+CListView::CListView( int X, int Y, int *Width, int Height, int Columns, const char *String, const char *String2, tAction Callback )
 {
 	Count = Columns;
 	Poss = new int[Count];
@@ -44,7 +44,7 @@ void CListView::Draw()
 				
 	for( int j = 0; j < Count; j++)
 	{
-		if(mTitles.size() > j)
+		if( static_cast<int>( mTitles.size() ) > j)
 			gpGui->GetFont()->DrawString( Pos.GetX() + 3 + Poss[j], Pos.GetY(), 0, pString, mTitles[j], Widths[j] );
 		
 		int iHeight = iAddHeight + 5;
@@ -109,7 +109,7 @@ void CListView::KeyEvent( SKey sKey )
 		{
 			if( m_iMouseOverIndex >= 0 && gpGui->GetMouse()->GetLeftButton() )
 			{
-				m_iMouseSelect = m_iMouseOverIndex;
+				if(m_iMouseSelect > -2) m_iMouseSelect = m_iMouseOverIndex;
 				if( GetAction() )
 					GetAction()( reinterpret_cast<char*>( m_iMouseOverIndex ), this );
 			}
@@ -132,7 +132,7 @@ int CListView::GetSize(int Index)
 void CListView::PutStr( std::string sString, int Column, int Row )
 {
 	if(Column < 0 || Column >= Count) return;
-	if(Row >= m_vRows[Column].size() || Row == -1)
+	if(Row >= static_cast<int>( m_vRows[Column].size() ) || Row == -1)
 	{
 		pSlider->SetMaxValue( m_vRows[Column].size() );
 		m_vRows[Column].push_back(sString);
@@ -188,4 +188,9 @@ void CListView::ShowSlider( bool bShow )
 int CListView::GetSelected()
 {
 	return m_iMouseSelect;
+}
+
+void CListView::SetSelect(int Item)
+{
+	m_iMouseSelect = Item;
 }

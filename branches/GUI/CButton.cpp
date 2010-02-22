@@ -1,6 +1,6 @@
 #include "CGUI.h"
 
-CButton::CButton( int X, int Y, int Width, int Height, const char * String, const char * String2, const char * Callback )
+CButton::CButton( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
 	SetElement( X, Y, Width, Height, String, String2, Callback );
 	SetHeight( BUTTON_HEIGHT );
@@ -43,7 +43,9 @@ void CButton::KeyEvent( SKey sKey )
 			SetElementState( "Pressed" );
 
 			if( GetAction() )
+			{
 				GetAction()( 0, this );
+			}
 
 			m_tPressed.Start( 0.1f );
 		}

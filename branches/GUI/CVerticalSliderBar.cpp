@@ -1,6 +1,6 @@
 #include "CGUI.h"
 
-CVerticalSliderBar::CVerticalSliderBar( int X, int Y, int Width, int Height, int minValue, int maxValue, int step, int value, const char * String, const char * String2, const char * Callback )
+CVerticalSliderBar::CVerticalSliderBar( int X, int Y, int Width, int Height, int minValue, int maxValue, int step, int value, const char * String, const char * String2, tAction Callback )
 {
 	SetDragged( false );
 	SetAction( 0 );

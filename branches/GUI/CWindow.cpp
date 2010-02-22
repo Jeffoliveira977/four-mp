@@ -1,8 +1,9 @@
 #include "CGUI.h"
 
-CWindow::CWindow( int X, int Y, int Width, int Height, const char * String, const char * String2, const char * Callback )
+CWindow::CWindow( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
 	SetMaximized( true );
+	SetTitleVisible( true );
 	SetFocussedElement( 0 );
 	posDif = CPos();
 	m_bDragging = false;
@@ -10,21 +11,6 @@ CWindow::CWindow( int X, int Y, int Width, int Height, const char * String, cons
 	SetElement( X, Y, Width, Height, String, String2, Callback, 1 );
 
 	SetVisible( true );
-
-	/*#define LOAD_ELEMENTS( Class, String ) \
-	for( TiXmlElement * pElementElement = pElement->FirstChildElement( String ); pElementElement; pElementElement = pElementElement->NextSiblingElement( String ) ) \
-		AddElement( new Class( pElementElement ) );
-
-	LOAD_ELEMENTS( CButton, "Button" )
-	LOAD_ELEMENTS( CText, "Text" )
-	LOAD_ELEMENTS( CProgressBar, "ProgressBar" )
-	LOAD_ELEMENTS( CCheckBox, "CheckBox" )
-	LOAD_ELEMENTS( CEditBox, "EditBox" )
-	LOAD_ELEMENTS( CHorizontalSliderBar, "HorizontalSliderBar" )
-	LOAD_ELEMENTS( CVerticalSliderBar, "VerticalSliderBar" )
-	LOAD_ELEMENTS( CTextBox, "TextBox" )
-	LOAD_ELEMENTS( CListBox, "ListBox" )
-	LOAD_ELEMENTS( CDropDown, "DropDown" )*/
 
 	SetThemeElement( gpGui->GetThemeElement( "Window" ) );
 
@@ -55,7 +41,8 @@ CWindow::~CWindow()
 
 void CWindow::AddElement( CElement * pElement )
 {
-	pElement->SetRelPos( *pElement->GetRelPos() + CPos( 0, TITLEBAR_HEIGHT ) );
+	if(m_bTitleVisible)
+		pElement->SetRelPos( *pElement->GetRelPos() + CPos( 0, TITLEBAR_HEIGHT ) );
 	pElement->SetParent( this );
 
 	m_vElements.push_back( pElement );
@@ -63,13 +50,17 @@ void CWindow::AddElement( CElement * pElement )
 
 void CWindow::Draw()
 {	
-	pTitlebar->Draw( *GetAbsPos(), GetWidth(), TITLEBAR_HEIGHT );
-	gpGui->GetFont()->DrawString( GetAbsPos()->GetX() + 5, GetAbsPos()->GetY() + 5, 0, pTitle, GetFormatted() );
-	pButton->Draw( CPos( GetAbsPos()->GetX() + GetWidth() - BUTTON_HEIGHT - 2, GetAbsPos()->GetY() + 2 ), BUTTON_HEIGHT, BUTTON_HEIGHT );
+	if(m_bTitleVisible)
+	{
+		pTitlebar->Draw( *GetAbsPos(), GetWidth(), TITLEBAR_HEIGHT );
+		gpGui->GetFont()->DrawString( GetAbsPos()->GetX() + 5, GetAbsPos()->GetY() + 5, 0, pTitle, GetFormatted() );
+		pButton->Draw( CPos( GetAbsPos()->GetX() + GetWidth() - BUTTON_HEIGHT - 2, GetAbsPos()->GetY() + 2 ), BUTTON_HEIGHT, BUTTON_HEIGHT );
+	}
 
 	if( GetMaximized() )
 	{
-		gpGui->DrawOutlinedBox( GetAbsPos()->GetX(), GetAbsPos()->GetY() + TITLEBAR_HEIGHT, GetWidth(), GetHeight() - TITLEBAR_HEIGHT + 1,  pBodyInner->GetD3DCOLOR(), pBodyBorder->GetD3DCOLOR() );
+		if(m_bTitleVisible)
+			gpGui->DrawOutlinedBox( GetAbsPos()->GetX(), GetAbsPos()->GetY() + TITLEBAR_HEIGHT, GetWidth(), GetHeight() - TITLEBAR_HEIGHT + 1,  pBodyInner->GetD3DCOLOR(), pBodyBorder->GetD3DCOLOR() );
 
 		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
 			m_vElements[iIndex]->Draw();
@@ -104,7 +95,7 @@ void CWindow::MouseMove( CMouse * pMouse )
 		}
 	}
 
-	if( GetCloseButton() )
+	if( GetCloseButton() && m_bTitleVisible )
 		SetElementState( SetMouseOver( pMouse->InArea( GetAbsPos()->GetX() + GetWidth() - BUTTON_HEIGHT - 2, GetAbsPos()->GetY() + 2, BUTTON_HEIGHT, BUTTON_HEIGHT ) )?"MouseOver":"Norm", 1 );
 
 	if( GetMaximized() )
@@ -120,9 +111,9 @@ void CWindow::KeyEvent( SKey sKey )
 	{
 		SetFocussedElement( 0 );
 
-		if( GetMouseOver() && m_bCloseButtonEnabled )
+		if( GetMouseOver() && m_bCloseButtonEnabled && m_bTitleVisible )
 			this->SetVisible( false );
-		else if( pMouse->InArea( GetAbsPos()->GetX(), GetAbsPos()->GetY(), GetWidth(), TITLEBAR_HEIGHT ) )
+		else if( pMouse->InArea( GetAbsPos()->GetX(), GetAbsPos()->GetY(), GetWidth(), TITLEBAR_HEIGHT ) && m_bTitleVisible )
 		{
 			if( !pMouse->GetDragging() )
 			{
@@ -256,4 +247,20 @@ void CWindow::UpdateTheme( int iIndex )
 	}
 	else
 		pButton = pState->GetTexture( "Button" );
+}
+
+void CWindow::SetTitleVisible( bool v )
+{
+	m_bTitleVisible = v;
+}
+
+bool CWindow::GetTitleVisible()
+{
+	return m_bTitleVisible;
+}
+
+void CWindow::LostFocus()
+{
+	if(GetAction())
+		GetAction()("LF", this);
 }

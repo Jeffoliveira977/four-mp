@@ -9,7 +9,6 @@ class CHorizontalSliderBar : public CElement
 	int m_iMinValue, m_iMaxValue, m_iValue, m_iStep;
 	bool m_bDragged, m_bShowString;
 
-	typedef std::string ( __cdecl * tAction )( const char * pszArgs, CElement * pElement );
 	tAction m_pUpdater;
 
 	CColor * pLines, * pString;
@@ -17,9 +16,9 @@ class CHorizontalSliderBar : public CElement
 
 public:
 	CHorizontalSliderBar();
-	CHorizontalSliderBar( int X, int Y, int Width, int Height, int minValue = 0, int maxValue = 0, int step = 1, int value = 0, const char * String = NULL, const char * String2 = NULL, const char * Callback = NULL );
+	CHorizontalSliderBar( int X, int Y, int Width, int Height, int minValue = 0, int maxValue = 0, int step = 1, int value = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
-	void SetSliderElement( int X, int Y, int Width, int Height, int minValue = 0, int maxValue = 0, int step = 1, int value = 0, const char * String = NULL, const char * String2 = NULL, const char * Callback = NULL );
+	void SetSliderElement( int X, int Y, int Width, int Height, int minValue = 0, int maxValue = 0, int step = 1, int value = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 	void PreDraw();

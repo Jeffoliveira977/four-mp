@@ -1,6 +1,6 @@
 #include "CGUI.h"
 
-void CElement::SetElement( int X, int Y, int Width, int Height, const char * String, const char * String2, const char * Callback, bool abs)
+void CElement::SetElement( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback, bool abs)
 {
 	if(!abs)
 		SetRelPos( CPos( X, Y ) );
@@ -21,7 +21,7 @@ void CElement::SetElement( int X, int Y, int Width, int Height, const char * Str
 
 	if( Callback )
 	{
-		CVar * pCvar = gpGui->Cvars[ Callback ];
+		/*CVar * pCvar = gpGui->Cvars[ Callback ];
 	
 		if( pCvar )
 			SetAction( pCvar->GetAction() );
@@ -29,7 +29,8 @@ void CElement::SetElement( int X, int Y, int Width, int Height, const char * Str
 		{
 			SetAction( 0 );
 			MessageBoxA( 0, "Cvar invalid", Callback, 0 );
-		}
+		}*/
+		SetAction( Callback );
 	}
 	else
 		SetAction( 0 );
@@ -52,7 +53,7 @@ void CElement::SetAction( tAction pAction )
 	m_pAction = pAction;
 }
 
-CElement::tAction CElement::GetAction()
+tAction CElement::GetAction()
 {
 	return m_pAction;
 }

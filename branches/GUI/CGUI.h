@@ -84,6 +84,7 @@ class CGUI
 	CTimer m_tPreDrawTimer;
 
 	std::vector<CWindow*> m_vWindows;
+	CWindow * m_wFocus;
 
 	std::string m_sCurTheme;
 
