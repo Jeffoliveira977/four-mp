@@ -177,30 +177,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\common.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ConCmd.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\concommands.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Console.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ConSymbolBase.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ConVar.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -210,10 +186,6 @@
 			</File>
 			<File
 				RelativePath=".\rpc.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ScriptCommandHandler.cpp"
 				>
 			</File>
 			<File
@@ -228,6 +200,38 @@
 				RelativePath=".\sq_scriptfunc.cpp"
 				>
 			</File>
+			<Filter
+				Name="Console"
+				>
+				<File
+					RelativePath=".\console\common.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\console\ConCmd.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\console\concommands.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\console\Console.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\console\ConSymbolBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\console\ConVar.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\console\ScriptCommandHandler.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -236,30 +240,6 @@
 			>
 			<File
 				RelativePath=".\cfg.h"
-				>
-			</File>
-			<File
-				RelativePath=".\common.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ConCmd.h"
-				>
-			</File>
-			<File
-				RelativePath=".\concommands.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Console.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ConSymbolBase.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ConVar.h"
 				>
 			</File>
 			<File
@@ -275,10 +255,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ScriptCommandHandler.h"
-				>
-			</File>
-			<File
 				RelativePath=".\sq.h"
 				>
 			</File>
@@ -286,6 +262,38 @@
 				RelativePath=".\struct.h"
 				>
 			</File>
+			<Filter
+				Name="Console"
+				>
+				<File
+					RelativePath=".\console\common.h"
+					>
+				</File>
+				<File
+					RelativePath=".\console\ConCmd.h"
+					>
+				</File>
+				<File
+					RelativePath=".\console\concommands.h"
+					>
+				</File>
+				<File
+					RelativePath=".\console\Console.h"
+					>
+				</File>
+				<File
+					RelativePath=".\console\ConSymbolBase.h"
+					>
+				</File>
+				<File
+					RelativePath=".\console\ConVar.h"
+					>
+				</File>
+				<File
+					RelativePath=".\console\ScriptCommandHandler.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
