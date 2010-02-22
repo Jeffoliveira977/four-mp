@@ -10,9 +10,9 @@
 #include "sq\squirrel.h"
 #include "sq\sqstdsystem.h"
 #include "main.h"
-#include "Console.h"
-#include "concommands.h"
-#include "ScriptCommandHandler.h"
+#include "console\Console.h"
+#include "console\concommands.h"
+#include "console\ScriptCommandHandler.h"
 
 extern Console con;
 extern ScriptCommandHandler cmdhandler;

@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sq\squirrel.h"
-#include "sq\sqstdsystem.h"
+#include "..\sq\squirrel.h"
+#include "..\sq\sqstdsystem.h"
 #include "ScriptCommandHandler.h"
 
 extern HSQUIRRELVM v;

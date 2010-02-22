@@ -34,9 +34,9 @@
 #include "net\BitStream.h"
 // Other
 #include "main.h"
-#include "Console.h"
-#include "ScriptCommandHandler.h"
-#include "concommands.h"
+#include "console\Console.h"
+#include "console\ScriptCommandHandler.h"
+#include "console\concommands.h"
 #include "rpc.h"
 #include "sq.h"
 #include "manager.h"
