@@ -129,6 +129,10 @@ void ConCmdSquirrel(unsigned char numargs)
 	{
 		return;
 	}
+	if (!cmdhandler.IsScriptCommandExist(cmdname))
+	{
+		con.Print("Unknown command \"%s\"", cmdname);
+	}
 	if (!cmdhandler.Execute(cmdname, numargs))
 	{
 		con.Print("Unknown command \"%s\"", cmdname);

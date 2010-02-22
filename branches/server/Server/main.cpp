@@ -177,6 +177,12 @@ int main()
 	
 	// Register Script Funcions
 	// Conosle functions
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgs, "GetCmdArgs");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgsAsString, "GetCmdArgsAsString");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgType, "GetCmdArgType");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgString, "GetCmdArgString");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgInt, "GetCmdArgInt");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgFloat, "GetCmdArgFloat");
 	register_global_func(v, (SQFUNCTION)sq_printr, "printr");
 	register_global_func(v, (SQFUNCTION)sq_RegServerCmd, "RegServerCmd");
 	// Car functions

@@ -35,6 +35,91 @@ SQInteger register_global_func(HSQUIRRELVM v,SQFUNCTION f,const char *fname)
 	return 1;
 }
 
+void sq_GetCmdArgs(HSQUIRRELVM v)
+{
+	sq_pushinteger(v, con.GetCmdArgs());
+}
+
+void sq_GetCmdArgsAsString(HSQUIRRELVM v)
+{
+	char *arg;
+	if (!con.GetCmdArgString(arg))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushstring(v, arg, -1);
+}
+
+void sq_GetCmdArgType(HSQUIRRELVM v)
+{
+	int argnum;
+	ConVarType type;
+	sq_getinteger(v, 2, &argnum);
+	if (!con.GetCmdArgType(argnum, type))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	switch (type)
+	{
+	case ConVarTypeFloat:
+		{
+			sq_pushinteger(v, 0);
+			break;
+		}
+	case ConVarTypeInt:
+		{
+			sq_pushinteger(v, 1);
+			break;
+		}
+	case ConVarTypeString:
+		{
+			sq_pushinteger(v, 2);
+			break;
+		}
+	}
+}
+
+void sq_GetCmdArgString(HSQUIRRELVM v)
+{
+	int argnum;
+	char *arg;
+	sq_getinteger(v, 2, &argnum);
+	if (!con.GetCmdArg(argnum, arg))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushstring(v, arg, -1);
+}
+
+void sq_GetCmdArgInt(HSQUIRRELVM v)
+{
+	int argnum;
+	int arg;
+	sq_getinteger(v, 2, &argnum);
+	if (!con.GetCmdArg(argnum, arg))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushinteger(v, arg);
+}
+
+void sq_GetCmdArgFloat(HSQUIRRELVM v)
+{
+	int argnum;
+	float arg;
+	sq_getinteger(v, 2, &argnum);
+	if (!con.GetCmdArg(argnum, arg))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushfloat(v, arg);
+}
+
 void sq_RegServerCmd(HSQUIRRELVM v)
 {
 	const char *cmdname;

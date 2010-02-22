@@ -40,7 +40,7 @@ int sc_OnPlayerConnect(HSQUIRRELVM v, int playerid, char name[32])
 		sq_call(v,3,1,0); 
 		sq_getinteger(v, sq_gettop(v), &result);
 	}
-	sq_settop(v,top); 
+	sq_settop(v,top);
 	return result;
 }
 

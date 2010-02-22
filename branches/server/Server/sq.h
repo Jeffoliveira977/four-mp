@@ -9,6 +9,12 @@
 
 // SQ Functions
 SQInteger register_global_func(HSQUIRRELVM v,SQFUNCTION f,const char *fname);
+void sq_GetCmdArgs(HSQUIRRELVM v);
+void sq_GetCmdArgsAsString(HSQUIRRELVM v);
+void sq_GetCmdArgType(HSQUIRRELVM v);
+void sq_GetCmdArgString(HSQUIRRELVM v);
+void sq_GetCmdArgInt(HSQUIRRELVM v);
+void sq_GetCmdArgFloat(HSQUIRRELVM v);
 void sq_RegServerCmd(HSQUIRRELVM v);
 void printfunc(HSQUIRRELVM v, const SQChar *s, ...);
 void sq_printr(HSQUIRRELVM v);

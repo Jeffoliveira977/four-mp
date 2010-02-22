@@ -7,5 +7,24 @@ function OnGameModeInit()
 
 function Command_sqtest(args)
 {
-	print("Squirrel test command succeded");
+	print("Squirrel test command");
+	print("Args = "+args+"");
+	for (local i = 1; i <= args; i++)
+	{
+		switch (GetCmdArgType(i))
+		{
+			case 0:
+			{
+			print("Arg "+i+" - type = float, value = "+GetCmdArgFloat(i)+"");
+			}
+			case 1:
+			{
+			print("Arg "+i+" - type = int, value = "+GetCmdArgInt(i)+"");
+			}
+			case 2:
+			{
+			print("Arg "+i+" - type = string, value = "+GetCmdArgString(i)+"");
+			}
+		}
+	}
 }
