@@ -10,11 +10,13 @@
 #include "sq\squirrel.h"
 #include "sq\sqstdsystem.h"
 #include "main.h"
-#include "console\Console.h"
-#include "console\concommands.h"
+#include "console\ConsoleCore.h"
+#include "console\ConsoleScreen.h"
+#include "console\fmpconcommands.h"
 #include "console\ScriptCommandHandler.h"
 
-extern Console con;
+extern ConsoleCore concore;
+extern ConsoleScreen conscreen;
 extern ScriptCommandHandler cmdhandler;
 extern HSQUIRRELVM v;
 
@@ -37,13 +39,13 @@ SQInteger register_global_func(HSQUIRRELVM v,SQFUNCTION f,const char *fname)
 
 void sq_GetCmdArgs(HSQUIRRELVM v)
 {
-	sq_pushinteger(v, con.GetCmdArgs());
+	sq_pushinteger(v, concore.GetCmdArgs());
 }
 
 void sq_GetCmdArgsAsString(HSQUIRRELVM v)
 {
 	char *arg;
-	if (!con.GetCmdArgString(arg))
+	if (!concore.GetCmdArgString(arg))
 	{
 		sq_pushnull(v);
 		return;
@@ -56,7 +58,7 @@ void sq_GetCmdArgType(HSQUIRRELVM v)
 	int argnum;
 	ConVarType type;
 	sq_getinteger(v, 2, &argnum);
-	if (!con.GetCmdArgType(argnum, type))
+	if (!concore.GetCmdArgType(argnum, type))
 	{
 		sq_pushnull(v);
 		return;
@@ -86,7 +88,7 @@ void sq_GetCmdArgString(HSQUIRRELVM v)
 	int argnum;
 	char *arg;
 	sq_getinteger(v, 2, &argnum);
-	if (!con.GetCmdArg(argnum, arg))
+	if (!concore.GetCmdArg(argnum, arg))
 	{
 		sq_pushnull(v);
 		return;
@@ -99,7 +101,7 @@ void sq_GetCmdArgInt(HSQUIRRELVM v)
 	int argnum;
 	int arg;
 	sq_getinteger(v, 2, &argnum);
-	if (!con.GetCmdArg(argnum, arg))
+	if (!concore.GetCmdArg(argnum, arg))
 	{
 		sq_pushnull(v);
 		return;
@@ -112,7 +114,7 @@ void sq_GetCmdArgFloat(HSQUIRRELVM v)
 	int argnum;
 	float arg;
 	sq_getinteger(v, 2, &argnum);
-	if (!con.GetCmdArg(argnum, arg))
+	if (!concore.GetCmdArg(argnum, arg))
 	{
 		sq_pushnull(v);
 		return;
@@ -138,7 +140,7 @@ void sq_ServerCommand(HSQUIRRELVM v)
 {
 	const char *cmdstring;
 	sq_getstring(v, 2, &cmdstring);
-	con.InterpretLine(cmdstring);
+	concore.InterpretLine(cmdstring);
 }
 
 // функция печати - print(string)
@@ -148,7 +150,7 @@ void printfunc(HSQUIRRELVM v, const SQChar *s, ...)
     va_start(arglist, s);
 	char *tempstring = (char *)calloc(scvprintf(s, arglist) + 1, sizeof(char));
 	vsprintf(tempstring, s, arglist); 
-	con.Print(tempstring);
+	conscreen.Print(tempstring);
 	free(tempstring);
 	FILE *f = fopen("server.log", "a");
 	SYSTEMTIME time;
@@ -167,7 +169,7 @@ void sq_printr(HSQUIRRELVM v)
 	const char *str = new char[1024];
 	sq_getstring(v, 2, &str);
 	CharToOem(str, txt);
-	con.Print(txt);
+	conscreen.Print(txt);
 	FILE *f = fopen("server.log", "a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);

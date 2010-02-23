@@ -212,11 +212,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\console\concommands.cpp"
+					RelativePath=".\console\ConsoleCore.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\console\Console.cpp"
+					RelativePath=".\console\ConsoleScreen.cpp"
 					>
 				</File>
 				<File
@@ -225,6 +225,14 @@
 				</File>
 				<File
 					RelativePath=".\console\ConVar.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\console\coreconcommands.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\console\fmpconcommands.cpp"
 					>
 				</File>
 				<File
@@ -274,11 +282,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\console\concommands.h"
+					RelativePath=".\console\ConsoleCore.h"
 					>
 				</File>
 				<File
-					RelativePath=".\console\Console.h"
+					RelativePath=".\console\ConsoleScreen.h"
 					>
 				</File>
 				<File
@@ -287,6 +295,14 @@
 				</File>
 				<File
 					RelativePath=".\console\ConVar.h"
+					>
+				</File>
+				<File
+					RelativePath=".\console\coreconcommands.h"
+					>
+				</File>
+				<File
+					RelativePath=".\console\fmpconcommands.h"
 					>
 				</File>
 				<File

@@ -8,6 +8,7 @@
 #include "struct.h"
 
 // LIMITS
+#define MAX_FILTERSCRIPTS 16
 #define MAX_PLAYERS 32
 #define MAX_VEHICLES 64
 #define MAX_PCLASS 64

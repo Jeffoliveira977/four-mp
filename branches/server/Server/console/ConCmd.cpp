@@ -1,7 +1,10 @@
-#include "ConCmd.h"
-#include "Console.h"
+#include <stdlib.h>
+#include <string.h>
 
-extern Console con;
+#include "ConCmd.h"
+#include "ConsoleCore.h"
+
+extern ConsoleCore concore;
 
 ConCmd::ConCmd(const char *cmdname, void *callback, const char *desc, const int cmdflags)
 {
@@ -12,7 +15,7 @@ ConCmd::ConCmd(const char *cmdname, void *callback, const char *desc, const int 
 	strcpy(tempsymbol->name, cmdname);
 	tempsymbol->type = ConsoleSymbolTypeConCmd;
 	tempsymbol->ptr.concmd = this;
-	con.AddConsoleSymbol(tempsymbol);
+	concore.AddConsoleSymbol(tempsymbol);
 }
 
 ConCmd::~ConCmd(void)
@@ -22,6 +25,6 @@ ConCmd::~ConCmd(void)
 
 void ConCmd::Execute(void)
 {
-	unsigned char numargs = con.GetCmdArgs();
+	unsigned char numargs = concore.GetCmdArgs();
 	((void (*) (const unsigned char))handler)(numargs);
 }

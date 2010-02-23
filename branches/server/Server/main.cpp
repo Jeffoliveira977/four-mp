@@ -17,7 +17,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <math.h>
-// BeLKa
+// Squirrel
 #include "sq\squirrel.h"
 #include "sq\sqstdaux.h"
 #include "sq\sqstdblob.h"
@@ -34,9 +34,11 @@
 #include "net\BitStream.h"
 // Other
 #include "main.h"
-#include "console\Console.h"
+#include "console\ConsoleCore.h"
+#include "console\ConsoleScreen.h"
 #include "console\ScriptCommandHandler.h"
-#include "console\concommands.h"
+#include "console\coreconcommands.h"
+#include "console\fmpconcommands.h"
 #include "rpc.h"
 #include "sq.h"
 #include "manager.h"
@@ -45,7 +47,8 @@
 ///////////////////////////////////////////////
 //                V  A  R  S                 //
 ///////////////////////////////////////////////
-Console con;
+ConsoleCore concore;
+ConsoleScreen conscreen;
 ScriptCommandHandler cmdhandler;
 RakPeerInterface *net;
 HSQUIRRELVM v;
@@ -80,7 +83,7 @@ void print(const char *string, ...)
     va_start(arglist, string);
 	char *tempstring = (char *)calloc(_vscprintf(string, arglist) + 1, sizeof(char));
 	vsprintf(tempstring, string, arglist); 
-	con.Print(tempstring);
+	conscreen.Print(tempstring);
 	free(tempstring);
 	#ifdef LOG
 		FILE *f = fopen("server.log", "a");
@@ -101,7 +104,7 @@ void debug(const char *string, ...)
 	#ifdef DEBUG
 		char *tempstring = (char *)calloc(_vscprintf(string, arglist) + 1, sizeof(char));
 		vsprintf(tempstring, string, arglist); 
-		con.Print(tempstring);
+		conscreen.Print(tempstring);
 		free(tempstring);
 		FILE *f = fopen("server.log", "a");
 		SYSTEMTIME time;
@@ -136,6 +139,8 @@ void LoadConfig()
 
 int main()
 {
+	concore.SetOutputFunction(print);
+	conscreen.SetCaption("FOUR-MP");
 	new ConCmd("cvarlist", ConCmdCvarlist, "Show the list of convars/concommands.", 0);
 	new ConVar("developer", 0, "Show developer messages.", 0, true, 0, true, 2);
 	new ConCmd("find", ConCmdFind, "Find concommands with the specified string in their name/help text.", 0);
@@ -232,7 +237,7 @@ int main()
 	
 	while(sConf.Run == 1)
 	{
-		con.CheckUserInput();
+		conscreen.CheckUserInput();
 		pack = net->Receive();
 		if(pack)
 		{

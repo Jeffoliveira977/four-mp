@@ -1,10 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
 #include "ConVar.h"
-#include "Console.h"
+#include "ConsoleCore.h"
 
-extern Console con;
+extern ConsoleCore concore;
 
 ConVar::ConVar(const char *cvarname, const float defvalue, const char *desc, const int cvarflags, const bool hasMin, const float min, const bool hasMax, const float max)
 {
@@ -318,5 +320,5 @@ void ConVar::RegisterConVar(const char *cvarname)
 	strcpy(tempsymbol->name, cvarname);
 	tempsymbol->type = ConsoleSymbolTypeConVar;
 	tempsymbol->ptr.convar = this;
-	con.AddConsoleSymbol(tempsymbol);
+	concore.AddConsoleSymbol(tempsymbol);
 }

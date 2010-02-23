@@ -1,12 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "common.h"
-#include "concommands.h"
-#include "Console.h"
-#include "ScriptCommandHandler.h"
+#include "coreconcommands.h"
+#include "ConsoleCore.h"
 
-extern Console con;
-extern ScriptCommandHandler cmdhandler;
+extern ConsoleCore concore;
 
 void ConCmdCvarlist(unsigned char numargs)
 {
@@ -14,13 +14,13 @@ void ConCmdCvarlist(unsigned char numargs)
 	char *searchstring;
 	if (numargs > 0)
 	{
-		if (con.GetCmdArg(1, searchstring))
+		if (concore.GetCmdArg(1, searchstring))
 		{
 			search = true;
 		}
 	}
-	con.Print("cvar list\n--------------");
-	unsigned short numsymbols = con.GetNumberOfConsoleSymbols();
+	concore.Output("cvar list\n--------------");
+	unsigned short numsymbols = concore.GetNumberOfConsoleSymbols();
 	unsigned short numfound = 0;
 	ConsoleSymbol *symbol;
 	char *symbolstring;
@@ -28,7 +28,7 @@ void ConCmdCvarlist(unsigned char numargs)
 	for (unsigned short i = 0; i < numsymbols; i++)
 	{
 		//TODO: Sort alphabetically
-		symbol = con.GetConsoleSymbolByIndex(i);
+		symbol = concore.GetConsoleSymbolByIndex(i);
 		symbolstring = (char *)calloc(strlen(symbol->name) + 3, sizeof(char));
 		sprintf(symbolstring, "%s	:", symbol->name);
 		switch (symbol->type)
@@ -65,34 +65,34 @@ void ConCmdCvarlist(unsigned char numargs)
 				break;
 			}
 		}
-		con.Print(symbolstring);
+		concore.Output(symbolstring);
 		free(symbolstring);
 	}
-	con.Print("--------------\n%d total convars/concommands", numsymbols);
+	concore.Output("--------------\n%d total convars/concommands", numsymbols);
 }
 
 void ConCmdFind(unsigned char numargs)
 {
 	if (numargs != 1)
 	{
-		con.Print("Usage: find <string>");
+		concore.Output("Usage: find <string>");
 		return;
 	}
 	char *searchstring;
-	if (!con.GetCmdArgString(searchstring))
+	if (!concore.GetCmdArgString(searchstring))
 	{
-		con.Print("Usage: find <string>");
+		concore.Output("Usage: find <string>");
 		return;
 	}
-	unsigned short numsymbols = con.GetNumberOfConsoleSymbols();
+	unsigned short numsymbols = concore.GetNumberOfConsoleSymbols();
 	char *tempstring;
 	for (unsigned short i = 0; i < numsymbols; i++)
 	{
 		//TODO: Sort alphabetically
-		tempstring = con.GetConsoleSymbolHelpStringByIndex(i);
+		tempstring = concore.GetConsoleSymbolHelpStringByIndex(i);
 		if (strstr(tempstring, searchstring) != NULL)
 		{
-			con.Print(tempstring);
+			concore.Output(tempstring);
 		}
 		free(tempstring);
 	}
@@ -102,46 +102,22 @@ void ConCmdHelp(unsigned char numargs)
 {
 	if (numargs != 1)
 	{
-		con.Print("Usage: help <cvarname>");
+		concore.Output("Usage: help <cvarname>");
 		return;
 	}
 	char *cvarname;
-	if (!con.GetCmdArg(1, cvarname))
+	if (!concore.GetCmdArg(1, cvarname))
 	{
-		con.Print("Usage: help <cvarname>");
+		concore.Output("Usage: help <cvarname>");
 		free(cvarname);
 		return;
 	}
-	if (!con.IsConsoleSymbolExist(cvarname))
+	if (!concore.IsConsoleSymbolExist(cvarname))
 	{
-		con.Print("help: no cvar or command named %s", cvarname);
+		concore.Output("help: no cvar or command named %s", cvarname);
 		free(cvarname);
 		return;
 	}
-	con.Print(con.GetConsoleSymbolHelpString(cvarname));
+	concore.Output(concore.GetConsoleSymbolHelpString(cvarname));
 	free(cvarname);
-}
-
-void ConCmdSquirrel(unsigned char numargs)
-{
-	char *cmdname;
-	if (!con.GetCmdArg(0, cmdname))
-	{
-		return;
-	}
-	if (!cmdhandler.IsScriptCommandExist(cmdname))
-	{
-		con.Print("Unknown command \"%s\"", cmdname);
-	}
-	if (!cmdhandler.Execute(cmdname, numargs))
-	{
-		con.Print("Unknown command \"%s\"", cmdname);
-	}
-	free(cmdname);
-}
-
-void ConCmdTest(unsigned char numargs)
-{
-	con.Print("0	1	2	3	4	5	6	7	8	9	0\n");
-	//con.Print("	2	3	4	5");
 }
