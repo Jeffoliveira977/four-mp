@@ -16,14 +16,17 @@ function Command_sqtest(args)
 			case 0:
 			{
 			print("Arg "+i+" - type = float, value = "+GetCmdArgFloat(i)+"");
+			break;
 			}
 			case 1:
 			{
 			print("Arg "+i+" - type = int, value = "+GetCmdArgInt(i)+"");
+			break;
 			}
 			case 2:
 			{
 			print("Arg "+i+" - type = string, value = "+GetCmdArgString(i)+"");
+			break;
 			}
 		}
 	}

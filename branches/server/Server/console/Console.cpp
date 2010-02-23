@@ -234,12 +234,14 @@ unsigned short Console::GetNumberOfConsoleSymbols(void)
 
 bool Console::IsConsoleSymbolExist(const char *name)
 {
-	unsigned short index;
-	if (!(this->GetConsoleSymbolIndex(name, index)))
+	for (unsigned short i = 0; i < symbolbuffersize; i++)
 	{
-		return false;
+		if ((strcmp(symbolbuffer[i].name, name)) == 0)
+		{
+			return true;
+		}
 	}
-	return true;
+	return false;
 }
 
 ConsoleSymbol *Console::GetConsoleSymbolByIndex(unsigned short index)
@@ -259,7 +261,7 @@ bool Console::AddConsoleSymbol(ConsoleSymbol *symbol)
 	{
 		return false;
 	}
-	if (this->GetConsoleSymbol(symbol->name))
+	if (this->IsConsoleSymbolExist(symbol->name))
 	{
 		return false;
 	}
@@ -356,7 +358,7 @@ bool Console::GetCmdArgType(const unsigned char argnum, ConVarType &type)
 	bool floatflag = false;
 	while (i < length)
 	{
-		if (!((commandargs[argnum][i] != '.') || ((commandargs[argnum][i] >= 48) && (commandargs[argnum][i] <= 57))))
+		if (!((commandargs[argnum][i] == '.') || ((commandargs[argnum][i] >= 48) && (commandargs[argnum][i] <= 57))))
 		{
 			type = ConVarTypeString;
 			return true;
@@ -419,7 +421,7 @@ bool Console::GetCmdArg(const unsigned char argnum, float &arg)
 		return false;
 	}
 	ConVarType type;
-	if ((this->GetCmdArgType(argnum, type)) && (type != ConVarTypeString))
+	if ((this->GetCmdArgType(argnum, type)) && (type != ConVarTypeFloat))
 	{
 		return false;
 	}
