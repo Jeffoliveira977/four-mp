@@ -134,6 +134,13 @@ void sq_RegServerCmd(HSQUIRRELVM v)
 	cmdhandler.AddScriptCommand(cmdname, cmdcallback);
 }
 
+void sq_ServerCommand(HSQUIRRELVM v)
+{
+	const char *cmdstring;
+	sq_getstring(v, 2, &cmdstring);
+	con.InterpretLine(cmdstring);
+}
+
 // функция печати - print(string)
 void printfunc(HSQUIRRELVM v, const SQChar *s, ...) 
 { 

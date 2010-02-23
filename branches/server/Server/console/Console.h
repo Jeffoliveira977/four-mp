@@ -46,6 +46,7 @@ public:
 	bool GetCmdArg(const unsigned char argnum, char *&arg); //Retrieves a command argument given its index, from the current console command
 	bool GetCmdArg(const unsigned char argnum, int &arg);	//Retrieves a command argument given its index, from the current console command
 	bool GetCmdArg(const unsigned char argnum, float &arg); //Retrieves a command argument given its index, from the current console command
+	void InterpretLine(const char *string); //Interprets line
 private:
 	char **outputbuffer;
 	char **inputbuffer;
@@ -94,7 +95,6 @@ private:
 	ConsoleSymbol *GetConsoleSymbol(const char *name);
 	bool GetConsoleSymbolIndex(const char *name, unsigned short &index);
 	char *GetHelpString(const ConsoleSymbol *symbol);
-	void InterpretLine(const char *string); //Interprets line
 	char *GetCommand(const char *string, const unsigned int startindex); //Gets command string from multicommand string starting from startindex
 	void InterpretCommand(void); //Interpret prepared command
 };

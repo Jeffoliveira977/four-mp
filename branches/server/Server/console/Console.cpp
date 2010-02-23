@@ -429,6 +429,20 @@ bool Console::GetCmdArg(const unsigned char argnum, float &arg)
 	return true;
 }
 
+void Console::InterpretLine(const char *string)
+{
+	unsigned int length = strlen(string);
+	unsigned int i = 0;
+	while (i < length)
+	{
+	commandbuffer = this->GetCommand(string, i);
+	this->InterpretCommand();
+	i = i + strlen(commandbuffer) + 1;
+	free(commandbuffer);
+	commandbuffer = NULL;
+	}
+}
+
 void Console::ClearScreen(void)
 {
 #ifdef WIN32
@@ -987,20 +1001,6 @@ char *Console::GetHelpString(const ConsoleSymbol *symbol)
 	return helpstring;
 }
 
-void Console::InterpretLine(const char *string)
-{
-	unsigned int length = strlen(string);
-	unsigned int i = 0;
-	while (i < length)
-	{
-	commandbuffer = this->GetCommand(string, i);
-	this->InterpretCommand();
-	i = i + strlen(commandbuffer) + 1;
-	free(commandbuffer);
-	commandbuffer = NULL;
-	}
-}
-
 char *Console::GetCommand(const char *string, const unsigned int startindex)
 {
 	unsigned int length = strlen(string);
@@ -1074,6 +1074,7 @@ void Console::InterpretCommand(void)
 				i++;
 			}
 			templength = i - startindex;
+			i++;
 			this->ResizeArrayBuffer(commandargs, j + 1);
 			commandargs[j] = (char *)calloc(templength + 1, sizeof(char));
 			strncpy(commandargs[j], commandbuffer + startindex, templength);

@@ -185,6 +185,7 @@ int main()
 	register_global_func(v, (SQFUNCTION)sq_GetCmdArgFloat, "GetCmdArgFloat");
 	register_global_func(v, (SQFUNCTION)sq_printr, "printr");
 	register_global_func(v, (SQFUNCTION)sq_RegServerCmd, "RegServerCmd");
+	register_global_func(v, (SQFUNCTION)sq_ServerCommand, "ServerCommand");
 	// Car functions
 	register_global_func(v, (SQFUNCTION)sq_CreateCar, "CreateCar");
 	// Player functions

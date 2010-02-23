@@ -16,6 +16,7 @@ void sq_GetCmdArgString(HSQUIRRELVM v);
 void sq_GetCmdArgInt(HSQUIRRELVM v);
 void sq_GetCmdArgFloat(HSQUIRRELVM v);
 void sq_RegServerCmd(HSQUIRRELVM v);
+void sq_ServerCommand(HSQUIRRELVM v);
 void printfunc(HSQUIRRELVM v, const SQChar *s, ...);
 void sq_printr(HSQUIRRELVM v);
 // SQ Callbacks
