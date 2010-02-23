@@ -30,6 +30,6 @@ IDirect3D9 *APIENTRY hkDirect3DCreate9(UINT SDKVersion)
 	}
 	else
 		Debug("Direct3DCreate9(%i) failed...", SDKVersion);
-
+	
 	return d3dint;
 }

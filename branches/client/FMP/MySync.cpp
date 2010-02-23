@@ -26,46 +26,32 @@ void FMPHook::MoveSync()
 {
 	Log("Move Sync START");
 	float x,y,z,a;
-	Log("PED: 0x%x = %d", gPlayer[MyID].PedID(), DoesCharExist(gPlayer[MyID].PedID()));
 	GetCharCoordinates(gPlayer[MyID].PedID(), &x, &y, &z);
-	Log("GETCOORD");
 	GetCharHeading(_GetPlayerPed(), &a);
 	if(gPlayer[MyID].x != x && gPlayer[MyID].y != y && gPlayer[MyID].z != z && myEnter == 0)
 	{
-		Log("MOVE SEND START");
 		float lx,ly,lz;
 		GetCharCoordinates(gPlayer[MyID].PedID(), &lx, &ly, &lz);
-		Log("GETCOORD");
 		float d = GetDist(lx, ly, lz, gPlayer[MyID].x, gPlayer[MyID].y, gPlayer[MyID].z);
 		float t = (GetTickCount()-gPlayer[MyID].last_active);
 		float speed = (d / t)*10000;
-		Log("MOVE MATH");
 
 		if(IsCharInAnyCar(gPlayer[MyID].PedID()) && gPlayer[MyID].car_id != -1) 
 		{
-			Log("INCAR");
-			Log("%d, %f, %d", gPlayer[MyID].car_id, speed, MyID);
 			int pl_car = gPlayer[MyID].car_id;
-			Log("lp_car %d", pl_car);
 			Vehicle car = gCar[pl_car].CarID;
-			Log("car %d", car);
 
 			float cs;
 			GetCarSpeed(car, &cs);
 			if(cs > speed) speed = cs;
 
 			int dr = 1;
-			Log("CraDrive %d", car);
 			if(!DoesVehicleExist(car)) { Debug("DOES"); }
-			Log("CarDrive x%dx", 1);
 			if(IsCarStopped(car)) { Debug("STOP"); dr = 0; }
 			Vector3 v;
-			Log("CarDrive x%dx", 2);
 			GetCarSpeedVector(car, &v, 1);
-			Log("CarDrive x%dx", 3);
 			float x = floor(v.X * 1000 + 0.5)/1000;
 			float y = floor(v.Y * 1000 + 0.5)/1000;
-			Log("CarDrive x%dx - %fx%f", x, y);
 			if(abs(x) > abs(y))
 			{
 				// ось движения Х (основная)
@@ -78,11 +64,9 @@ void FMPHook::MoveSync()
 				if(y < 0)
 					dr = -1;
 			}
-			Log("dr %d", dr);
 			speed = speed * dr;
 			GetCarHeading(car, &a);
 		}
-		Log("ISCHARINCAR");
 		RakNet::BitStream bsSend;
 		bsSend.Write(x);
 		bsSend.Write(y);

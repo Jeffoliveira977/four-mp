@@ -10,7 +10,7 @@
 #ifndef main_cpp
 
 extern int MyID;
-extern int mp_state;
+extern MP_STATE fmp;
 
 extern FPlayer gPlayer[MAX_PLAYERS];
 extern FVehicle gCar[MAX_CARS];
@@ -20,5 +20,8 @@ extern CHATMSG mChat[64];
 
 extern int enterChat;
 extern char enterMsg[256];
+
+extern RakPeerInterface *net;
+extern bool myEnter;
 
 #endif

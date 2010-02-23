@@ -4,12 +4,12 @@
 #include "../main.h"
 #include "../Hook/window.h"
 #include "d3d9hook.h"
+#include "gui.h"
 
 extern LPD3DXFONT fFMP;
 extern LPD3DXFONT fChat;
 //extern LPDIRECT3DTEXTURE9 g_Texture;
 //extern ID3DXSprite *g_Sprite;
-IDirect3DDevice9 * g_pDevice;
 
 HRESULT CreateD3DXFont( LPDIRECT3DDEVICE9 dDev, LPD3DXFONT* ppd3dxFont, TCHAR* pstrFont, DWORD dwSize, bool bold, bool Italic )
 {
@@ -73,11 +73,12 @@ HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 	if( SUCCEEDED(hRet) )
 	{
 		hkIDirect3DDevice9 *ret = new hkIDirect3DDevice9(ppReturnedDeviceInterface, pPresentationParameters, this);
-		Debug("Hooked Direct3D9 device: 0x%x -> 0x%x\n", ret->m_pD3Ddev, ret);
+		Debug("Hooked Direct3D9 device: 0x%x -> 0x%x", ret->m_pD3Ddev, ret);
 
 		gameProc = (WNDPROC)GetWindowLong(hFocusWindow,GWL_WNDPROC);
 		SetWindowLong(hFocusWindow,GWL_WNDPROC,(LONG)DefWndProc);
-		g_pDevice = ret->m_pD3Ddev;
+		Gui.Load(ret->m_pD3Ddev);
+		Debug("Save Device");
 
 		if(fFMP == NULL)
 		{
@@ -91,6 +92,7 @@ HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 		}
 	}
 
+	fmp.gui = 1;
 	return hRet;
 }
 

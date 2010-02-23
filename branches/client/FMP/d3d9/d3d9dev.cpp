@@ -13,7 +13,6 @@ LPD3DXFONT fFMP = NULL;
 LPD3DXFONT fChat = NULL;
 
 DWORD MouseX, MouseY;
-DWORD ScreenX, ScreenY;
 
 //LPDIRECT3DTEXTURE9 g_Texture;
 //ID3DXSprite *g_Sprite;
@@ -213,16 +212,10 @@ HRESULT APIENTRY hkIDirect3DDevice9::DrawTriPatch(UINT Handle, CONST float *pNum
 HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 {
 	MouseY = *(DWORD*)(0x17DE968+dwLoadOffset); 
-	ScreenY = *(DWORD*)(0x1667494+dwLoadOffset);
-	ScreenX = *(DWORD*)(0x16674A8+dwLoadOffset);
 	MouseX = *(DWORD*)(0x17DE95C+dwLoadOffset);
 
-	RECT rc = {2, 2, ScreenX, ScreenY}; 
-	if(mp_state == -1)
-	{
-		fFMP->DrawText(0, "FMP [TAB+F5]", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 0, 0));
-	}
-	else if(mp_state >= 0)
+	RECT rc = {2, 2, 800, 600}; 
+	if(fmp.chat && !fmp.gui && fmp.connect)
 	{
 		for(int i = 7; i >= 0; i--)
 		{
@@ -230,6 +223,7 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 				D3DCOLOR_XRGB(mChat[i].color.r, mChat[i].color.g, mChat[i].color.b));
 			rc.top += 11;
 		}
+
 		if(enterChat != -1)
 		{
 			rc.top += 2;
@@ -237,9 +231,15 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 			rc.left += 10;
 			fChat->DrawText(0, enterMsg, -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
 		}
+	}
 
-		GuiMoveMouse(MouseX, MouseY);
-		GuiDraw();
+	if(1) // Показ меню
+		Gui.GetStartMenu()->SetVisible( true );
+
+	if(fmp.gui)
+	{
+		Gui.MoveMouse(MouseX, MouseY);
+		Gui.Draw();
 	}
 
 	return m_pD3Ddev->EndScene();

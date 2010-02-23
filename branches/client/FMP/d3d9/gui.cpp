@@ -1,10 +1,25 @@
 #include <windows.h>
 #include "gui.h"
+#include "../log.h"
 
-extern IDirect3DDevice9 * g_pDevice;
-bool g_Mouse[3] = {0, 0, 0};
+FMPGUI Gui;
+CButton * sm_bStart;
+CButton * sm_bExit;
 
-void GuiLoad()
+void StartMenuButtons(const char * Args, CElement *pElement)
+{
+	if(pElement == sm_bExit)
+		exit(0);
+}
+
+FMPGUI::FMPGUI()
+{
+	 g_Mouse[0] = 0;
+	 g_Mouse[1] = 0;
+	 g_Mouse[2] = 0;
+}
+
+void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 {
 	gpGui = new CGUI( g_pDevice );
 	gpGui->LoadInterfaceFromFile( "ColorThemes.xml" );
@@ -24,33 +39,41 @@ void GuiLoad()
 	gpGui->SetVarInt("Titlebar height", 24);
 	gpGui->SetVarInt("Button height", 20);
 
-	CWindow * cWin = new CWindow(10, 200, 340, 220, "FOUR-MP TEAM", "WINDOW_TEST");
+	CText * tInfo = new CText(10, 10, 300, 100, "WAIT OR CREATE INTERFACE");
 
-	int widths[] = {100, 200};
-	CListView * cLW = new CListView(10, 10, widths, 180, 2);
+	// Create Start Menu
+	StartMenu = new CWindow(100, 100, 600, 400, "FOUR-MP START MENU");
+	sm_bStart = new CButton(50, 50, 500, 0, "START", NULL, StartMenuButtons);
+	sm_bExit = new CButton(50, 100, 500, 0, "EXIT", NULL, StartMenuButtons);
 
-	cLW->SetTitle("ID");
-	cLW->SetTitle("NAME");
+	StartMenu->AddElement(sm_bStart);
+	StartMenu->AddElement(sm_bExit);
+	StartMenu->SetVisible( 0 );
 
-	cLW->PutStr("1", 0);
-	cLW->PutStr("WNeZRoS", 1);
-	cLW->PutStr("2", 0);
-	cLW->PutStr("VoLT", 1);
-	cLW->PutStr("3", 0);
-	cLW->PutStr("009", 1);
-	cLW->PutStr("4", 0);
-	cLW->PutStr("FaTony", 1);
-	cLW->PutStr("5", 0);
-	cLW->PutStr("XAOC", 1);
+	// Create Servers List
+	ServerList = new CWindow(100, 100, 600, 400, "FOUR-MP SERVERS LIST");
+	ServerList->AddElement(tInfo);
+	ServerList->SetVisible( 0 );
 
-	cWin->AddElement(cLW);
-	gpGui->AddWindow(cWin);
+	// Create Chat
+	Chat = new CWindow(10, 10, 200, 300, "FOUR-MP CHAT");
+	Chat->AddElement(tInfo);
+	Chat->SetVisible( 0 );
+
+	// Create Option
+	ServerList = new CWindow(100, 100, 600, 400, "FOUR-MP OPTIONS");
+	ServerList->AddElement(tInfo);
+	ServerList->SetVisible( 0 );
+
+	gpGui->AddWindow( StartMenu );
+	gpGui->AddWindow( ServerList );
+	gpGui->AddWindow( Chat );
+	gpGui->AddWindow( Option );
 
 	gpGui->SetVisible( true );
-	gpGui->GetMouse()->SetPos(100, 100);
 }
 
-void GuiHandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam)
+void FMPGUI::HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	if( gpGui->IsVisible() )
 	{
@@ -59,7 +82,7 @@ void GuiHandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam)
 	}
 }
 
-void GuiMoveMouse(int x, int y)
+void FMPGUI::MoveMouse(int x, int y)
 {
 	if( gpGui->IsVisible() )
 	{
@@ -91,7 +114,24 @@ void GuiMoveMouse(int x, int y)
 	}
 }
 
-void GuiDraw()
+void FMPGUI::Draw()
 {
 	gpGui->Draw();
+}
+
+CWindow * FMPGUI::GetStartMenu()
+{
+	return StartMenu;
+}
+CWindow * FMPGUI::GetServerList()
+{
+	return ServerList;
+}
+CWindow * FMPGUI::GetChat()
+{
+	return Chat;
+}
+CWindow * FMPGUI::GetOption()
+{
+	return Option;
 }

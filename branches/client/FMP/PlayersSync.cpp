@@ -14,11 +14,6 @@
 
 using namespace Natives;
 
-extern RakPeerInterface *net;
-extern int mp_state;
-extern bool myEnter;
-
-
 void FMPHook::PlayerConnect(char *name, int index, int model, float x, float y, float z)
 {
 	Debug("PlayerConnect: %s", "Start");
@@ -38,7 +33,7 @@ void FMPHook::PlayerConnect(char *name, int index, int model, float x, float y, 
 		SetCharDefaultComponentVariation(gPlayer[index].PedID());
 		SetCharCoordinates(gPlayer[index].PedID(), x, y, z);
 		Debug("PlayerConnect: %s", "SetCoords");
-		mp_state++;
+		
 	}
 	else // Other player connect
 	{

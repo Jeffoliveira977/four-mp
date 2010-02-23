@@ -112,3 +112,15 @@ struct CHATMSG
 	char msg[128];
 	COLOR color;
 };
+
+struct MP_STATE
+{
+	bool run;
+	bool wait;
+	bool connect;
+	bool chat;
+	bool gui;
+	bool skin;
+	bool component;
+	bool hook;
+};

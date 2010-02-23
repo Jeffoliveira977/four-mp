@@ -41,7 +41,7 @@ HANDLE ThreadHandle;
 RakPeerInterface *net;
 SystemAddress servAddr;
 
-int mp_state = -2;
+MP_STATE fmp;
 int MyID = 0;
 int LastUpdate = 0;
 bool myEnter = 0;
@@ -381,28 +381,18 @@ void FMPHook::GameThread()
 
 	REGISTER_STATIC_RPC(net, ::Chat);
 
-	mp_state = -1;
+	fmp.hook = 1;
 	//-------------------
 	Log("GameThread");
 	
-	while(IsThreadAlive())
+	while(IsThreadAlive() && fmp.run && fmp.hook)
 	{
 		//player_dump();
 		//car_dump();
 		Debug("FIBERFIBERFIBER");
-		if(mp_state == -1)
-		{
-			if(GetAsyncKeyState(116) != 0 && GetAsyncKeyState(9) != 0)
-			{
-				GuiLoad();
-				mp_state = 0;
-			}
-		}
-		else if(mp_state == 0)
+		if(!fmp.connect)
 		{
 			RunMP();
-			mp_state++;
-			Log("mp_state++");
 			LastUpdate = GetTickCount();
 
 			// Коннект
@@ -410,20 +400,23 @@ void FMPHook::GameThread()
 			net->Connect(Conf.server, Conf.port, 0, 0, 0);
 			servAddr.SetBinaryAddress(Conf.server);
 			servAddr.port = Conf.port;
+
+			fmp.wait = 1;
 		}
-		else if(mp_state == 1 && GetTickCount() - LastUpdate > 15*1000)
+		else if(fmp.wait && !fmp.connect && GetTickCount() - LastUpdate > 15*1000)
 		{
 			net->Connect(Conf.server, Conf.port, 0, 0, 0);
 			LastUpdate = GetTickCount();
 		}
-		else if(mp_state == 2 && Conf.SkinSelect == 1)
+		else if(fmp.skin)
 		{
 			SetPlayerControl(_GetPlayer(), 0);
 			if(GetAsyncKeyState(VK_SHIFT) != 0)
 			{
 				gPlayer[MyID].model = pClass[sel_cl].model;	
 				SetPlayerControl(_GetPlayer(), 1);
-				mp_state = 3;
+				fmp.skin = 0;
+				if(Conf.ComponentSelect == 1) fmp.component = 1;
 
 				if(Conf.ComponentSelect == 0)
 				{
@@ -472,13 +465,13 @@ void FMPHook::GameThread()
 				sprintf(model_select_text, "Sellected model id %d", sel_cl);
 			}
 		}
-		else if(mp_state == 3 && Conf.ComponentSelect == 1)
+		else if(fmp.component)
 		{
 			SetPlayerControl(_GetPlayer(), 0);
 			if(GetAsyncKeyState(VK_SHIFT) != 0)
 			{
 				SetPlayerControl(_GetPlayer(), 1);
-				mp_state = 4;
+				fmp.component = 0;
 
 				for(int i = 0; i < 11; i++)
 				{
@@ -530,34 +523,23 @@ void FMPHook::GameThread()
 				sprintf(model_select_text, "Selected model id %d", sel_cl);
 			}
 		}
-		else if(mp_state >= 2)
+		else if(fmp.connect)
 		{
 			Debug("MPSTATE");
-			if(GetAsyncKeyState(192) != 0)
-			{
-				//Chat
-			
-			}
-			Debug("CHAT");
 			if(GetTickCount() - LastUpdate > 60*1000)
 			{
 				// Disconnect: Not info from server
 				PrintStringWithLiteralStringNow("STRING", "SERVER NOT SEND INFO TO YOU", 5000, 1);
 			}
-			Debug("LastUpdate");
 			MoveSync();
-			Debug("MoveSync");
 			CarDoSync();
-			Debug("CarDOSync");
 			GunSync();
-			Debug("GunSync");
 			StatusSync();
-			Debug("StatusSync");
 
 			gPlayer[MyID].last_active = GetTickCount();
 		}
-		Debug("IFIFIF");
-		if(mp_state > 0)
+
+		if(fmp.connect)
 		{
 			Debug("PACKIFPACK");
 			pack = net->Receive();
@@ -622,28 +604,10 @@ void GameStart()
 
 void MainThread(void* dummy)
 {
-	//DWORD d,c;
-	/*VirtualProtect((PVOID)(0xDEA1C0+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
-	strcpy((PCHAR)0xDEA1C0+dwLoadOffset,"GTA IV:Four-MultiPlayer");
-	VirtualProtect((PVOID)(0xDEA1C0+dwLoadOffset),2,d,&c);
-
-	VirtualProtect((PVOID)(0xDE2D00+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
-	strcpy((PCHAR)0xDE2D00+dwLoadOffset,"platform:/textures/loadingscreensx");
-	VirtualProtect((PVOID)(0xDE2D50+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
-	strcpy((PCHAR)0xDE2D50+dwLoadOffset,"platform:/textures/loadingscreensx");
-	VirtualProtect((PVOID)(0x175B793+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);*/
-
-
-	Sleep(1000);
-	
-	/*while(!*(BYTE*)(0xfc3fff+dwLoadOffset)) { Sleep(100); }
-	GameStart();*/
-
 	Debug("START (0x%x)", dwLoadOffset);
 
-	/* Зацепляем наш GtaThread к игре */
+	fmp.run = 1;
 	HOOK.AttachGtaThread("FMP");
-	Log("MainThread End");
 
 	CloseHandle(ThreadHandle);
 	ThreadHandle = NULL;

@@ -4,7 +4,25 @@
 #include <d3dx9.h>
 #include "../GUI/CGUI.h"
 
-void GuiLoad();
-void GuiHandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
-void GuiMoveMouse(int x, int y);
-void GuiDraw();
+class FMPGUI
+{
+	bool g_Mouse[3];
+	CWindow * StartMenu;
+	CWindow * ServerList;
+	CWindow * Chat;
+	CWindow * Option;
+public:
+	FMPGUI();
+
+	void Load(IDirect3DDevice9 * g_pDevice);
+	void HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
+	void MoveMouse(int x, int y);
+	void Draw();
+
+	CWindow * GetStartMenu();
+	CWindow * GetServerList();
+	CWindow * GetChat();
+	CWindow * GetOption();
+};
+
+extern FMPGUI Gui;

@@ -19,7 +19,7 @@ CGUI::CGUI( IDirect3DDevice9 * pDevice )
 	m_pRender->Initialize( pDevice );
 #endif
 
-	m_pMouse = new CMouse( pDevice );
+	m_pMouse = new CMouse( pDevice, m_pSprite );
 	m_pKeyboard = new CKeyboard();
 	m_pFont = 0;
 

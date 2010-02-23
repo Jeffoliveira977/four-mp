@@ -6,15 +6,17 @@ class CMouse
 {
 	IDirect3DDevice9 * m_pDevice;
 	CPos m_pos, m_bpos;
+	int size;
 
 	CColor * m_pInnerColor, * m_pBorderColor;
+	CTexture * pCursor;
 
 	CElement * m_pDraggingElement;
 
 	int m_iLeftButton, m_iRightButton, m_iMiddleButton, m_iWheel;
 	CTimer m_tLeftButton, m_tRightButton, m_tMiddleButton;
 public:
-	CMouse( IDirect3DDevice9 * pDevice );
+	CMouse( IDirect3DDevice9 * pDevice, ID3DXSprite * pSprite );
 	~CMouse();
 
 	bool HandleMessage( unsigned int uMsg, WPARAM wParam, LPARAM lParam );
@@ -44,4 +46,7 @@ public:
 	void SavePos();
 	void LoadPos();
 	CPos GetSavedPos();
+
+	void SetSize(int);
+	int GetSize();
 };
