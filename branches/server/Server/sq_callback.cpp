@@ -8,8 +8,6 @@
 #include "sq\sqstdsystem.h"
 #include "main.h"
 
-extern HSQUIRRELVM v;
-
 void sc_OnGameModeInit(HSQUIRRELVM v)
 {
 	int top = sq_gettop(v); 

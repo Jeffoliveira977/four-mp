@@ -18,7 +18,6 @@
 extern ConsoleCore concore;
 extern ConsoleScreen conscreen;
 extern ScriptCommandHandler cmdhandler;
-extern HSQUIRRELVM v;
 
 #ifdef SQUNICODE 
 #define scvprintf _vscwprintf 

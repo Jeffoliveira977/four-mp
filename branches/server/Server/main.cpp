@@ -17,14 +17,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <math.h>
-// Squirrel
-#include "sq\squirrel.h"
-#include "sq\sqstdaux.h"
-#include "sq\sqstdblob.h"
-#include "sq\sqstdio.h"
-#include "sq\sqstdmath.h"
-#include "sq\sqstdstring.h"
-#include "sq\sqstdsystem.h"
 // Pawn
 //#include "pawn.h"
 // RakNet
@@ -39,6 +31,7 @@
 #include "console\ScriptCommandHandler.h"
 #include "console\coreconcommands.h"
 #include "console\fmpconcommands.h"
+#include "VirtualMachineManager.h"
 #include "rpc.h"
 #include "sq.h"
 #include "manager.h"
@@ -51,7 +44,7 @@ ConsoleCore concore;
 ConsoleScreen conscreen;
 ScriptCommandHandler cmdhandler;
 RakPeerInterface *net;
-HSQUIRRELVM v;
+VirtualMachineManager vmm;
 //AMX amx;
 Player gPlayer[MAX_PLAYERS];
 Vehicle gVehicle[MAX_VEHICLES];
@@ -175,45 +168,13 @@ int main()
 	REGISTER_STATIC_RPC(net, SyncSkinVariation);
 
 	REGISTER_STATIC_RPC(net, Chat);
-	// Init Squerrel
-	v = sq_open(1024); 
-    sqstd_seterrorhandlers(v);
-    sq_setprintfunc(v, printfunc);
 	
-	// Register Script Funcions
-	// Conosle functions
-	register_global_func(v, (SQFUNCTION)sq_GetCmdArgs, "GetCmdArgs");
-	register_global_func(v, (SQFUNCTION)sq_GetCmdArgsAsString, "GetCmdArgsAsString");
-	register_global_func(v, (SQFUNCTION)sq_GetCmdArgType, "GetCmdArgType");
-	register_global_func(v, (SQFUNCTION)sq_GetCmdArgString, "GetCmdArgString");
-	register_global_func(v, (SQFUNCTION)sq_GetCmdArgInt, "GetCmdArgInt");
-	register_global_func(v, (SQFUNCTION)sq_GetCmdArgFloat, "GetCmdArgFloat");
-	register_global_func(v, (SQFUNCTION)sq_printr, "printr");
-	register_global_func(v, (SQFUNCTION)sq_RegServerCmd, "RegServerCmd");
-	register_global_func(v, (SQFUNCTION)sq_ServerCommand, "ServerCommand");
-	// Car functions
-	register_global_func(v, (SQFUNCTION)sq_CreateCar, "CreateCar");
-	// Player functions
-	register_global_func(v, (SQFUNCTION)sq_GiveWeapon, "GiveWeapon");
-	register_global_func(v, (SQFUNCTION)sq_addPlayerClass, "addPlayerClass");
-	register_global_func(v, (SQFUNCTION)sq_enableComponentSelect, "enableComponentSelect");
-
-    sq_pushroottable(v); 
-
-	// Register Standart Script Functions
-	sqstd_register_stringlib(v);
-    sqstd_register_mathlib(v); 
-    sqstd_register_systemlib(v); 
-    sqstd_seterrorhandlers(v);
-
 	// Load Game Mode
-	char gamemode[256];
-	sprintf(gamemode, "gamemodes/%s", sConf.GameMode[0]);
-	if(!SQ_SUCCEEDED(sqstd_dofile(v, _SC(gamemode), 0, 1))) 
-    {
+	if (!vmm.LoadGameMode(sConf.GameMode[0]))
+	{
 		print("Can't load gamemode");
 		return 1;
-    }
+	}
 
 	//Init Pawn
 	//int err = aux_LoadProgram(&amx, "text.amx", NULL);
@@ -228,7 +189,7 @@ int main()
 	//}
 	//err = amx_Exec(&amx, &ret, AMX_EXEC_MAIN);
 	
-	sc_OnGameModeInit(v); // Call OnGameModeInit
+	vmm.OnGameModeInit(); // Call OnGameModeInit
 	/*pawn_OnGameModeInit(amx);*/
 
 	// Body
@@ -288,6 +249,6 @@ int main()
 		Sleep(100);
 	}
 
-	sc_OnGameModeExit(v); // Call OnGameModeExit
+	vmm.OnGameModeExit(); // Call OnGameModeExit
 	return 0;
 }

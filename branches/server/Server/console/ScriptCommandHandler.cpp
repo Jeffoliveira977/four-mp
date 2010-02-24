@@ -5,7 +5,7 @@
 #include "..\sq\sqstdsystem.h"
 #include "ScriptCommandHandler.h"
 
-extern HSQUIRRELVM v;
+//extern HSQUIRRELVM v;
 
 ScriptCommandHandler::ScriptCommandHandler(void)
 {
@@ -81,15 +81,15 @@ bool ScriptCommandHandler::Execute(const char *name, const unsigned char numargs
 		return false;
 	}
 	int result;
-	int top = sq_gettop(v); 
-	sq_pushroottable(v);
-	sq_pushstring(v,_SC(callback),-1);
-	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
-		sq_pushroottable(v); 
-		sq_pushinteger(v,numargs); 
-		sq_call(v,2,0,0);
-	}
-	sq_settop(v,top);
+	//int top = sq_gettop(v); 
+	//sq_pushroottable(v);
+	//sq_pushstring(v,_SC(callback),-1);
+	//if(SQ_SUCCEEDED(sq_get(v,-2))) { 
+	//	sq_pushroottable(v); 
+	//	sq_pushinteger(v,numargs); 
+	//	sq_call(v,2,0,0);
+	//}
+	//sq_settop(v,top);
 	free(callback);
 	return true;
 }

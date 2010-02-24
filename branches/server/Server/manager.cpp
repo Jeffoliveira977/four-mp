@@ -6,10 +6,11 @@
 #include <windows.h>
 
 #include "main.h"
+#include "VirtualMachineManager.h"
 #include "sq.h"
 #include "manager.h"
 
-extern HSQUIRRELVM v;
+extern VirtualMachineManager vmm;
 
 int GetPlayerID(const char *ip, int port)
 {
@@ -38,10 +39,14 @@ int Man_PlayerConnect(char *name, int index)
 	gPlayer[index].Clean();
 	
 	debug("### I'm set PLAYER MODEL");
-	if(sc_OnPlayerConnect(v, index, name) == 0)
+	if (vmm.OnPlayerConnect(index, name) == 0)
 	{
 		return 3;
 	}
+	//if(sc_OnPlayerConnect(v, index, name) == 0)
+	//{
+	//	return 3;
+	//}
 	return 0;
 }
 
@@ -52,7 +57,8 @@ void Man_PlayerDisconnect(int index)
 
 	gPlayer[index].connected = 0;
 
-	sc_OnPlayerDisconnect(v, index);
+	vmm.OnPlayerDisconnect(index);
+	//sc_OnPlayerDisconnect(v, index);
 }
 
 void Man_PlayerSpawn(int pl, int cl, SpawnInfo *sp)
@@ -70,5 +76,6 @@ void Man_PlayerSpawn(int pl, int cl, SpawnInfo *sp)
 		sp->CompD[i] = gPlayer[i].CompD[i];
 		sp->CompT[i] = gPlayer[i].CompT[i];
 	}
-	sc_OnPlayerSpawn(v, pl, cl);
+	vmm.OnPlayerSpawn(pl, cl);
+	//sc_OnPlayerSpawn(v, pl, cl);
 }
