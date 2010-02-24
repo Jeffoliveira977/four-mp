@@ -22,6 +22,7 @@ void sq_printr(HSQUIRRELVM v);
 // SQ Callbacks
 void sc_OnGameModeInit(HSQUIRRELVM v);
 void sc_OnGameModeExit(HSQUIRRELVM v);
+void sc_OnFilterScriptInit(HSQUIRRELVM v);
 int sc_OnPlayerConnect(HSQUIRRELVM v, int playerid, char name[32]);
 void sc_OnPlayerDisconnect(HSQUIRRELVM v, int playerid);
 void sc_OnPlayerSpawn(HSQUIRRELVM v, int playerid, int);

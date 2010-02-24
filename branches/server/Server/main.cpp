@@ -175,7 +175,7 @@ int main()
 		print("Can't load gamemode");
 		return 1;
 	}
-
+	vmm.LoadFilterScripts();
 	//Init Pawn
 	//int err = aux_LoadProgram(&amx, "text.amx", NULL);
 	//if (err != AMX_ERR_NONE)
@@ -189,7 +189,6 @@ int main()
 	//}
 	//err = amx_Exec(&amx, &ret, AMX_EXEC_MAIN);
 	
-	vmm.OnGameModeInit(); // Call OnGameModeInit
 	/*pawn_OnGameModeInit(amx);*/
 
 	// Body
@@ -248,7 +247,7 @@ int main()
 		net->DeallocatePacket(pack);
 		Sleep(100);
 	}
-
-	vmm.OnGameModeExit(); // Call OnGameModeExit
+	vmm.UnloadFilterScripts();
+	vmm.UnloadGameMode();
 	return 0;
 }

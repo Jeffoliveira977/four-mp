@@ -1,0 +1,4 @@
+function OnFilterScriptInit()
+{
+	print("FILTERSCRIPT");
+}

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <io.h>
 
 #include "VirtualMachineManager.h"
 #include "sq\sqstdaux.h"
@@ -20,69 +21,75 @@ VirtualMachineManager::~VirtualMachineManager(void)
 {
 }
 
+bool VirtualMachineManager::IsGameModeLoaded(void)
+{
+	if (!vmbuffer[0].loaded)
+	{
+		return false;
+	}
+	return true;
+}
+
 bool VirtualMachineManager::LoadGameMode(const char *string)
 {
-	if (vmbuffer[0].loaded)
-	{
-		return false;
-	}
-	VirtualMachineLanguage lang;
-	if (strcmp(strrchr(string, '.') + 1, "nut") == 0)
-	{
-		lang = VMLanguageSquirrel;
-	}
-	else
-	{
-		return false;
-	}
-	if(!this->InitVirtualMachine(0, lang))
+	if (this->IsGameModeLoaded())
 	{
 		return false;
 	}
 	char *gamemode = (char *)calloc(strlen(string) + 11, sizeof(char));
 	sprintf(gamemode, "gamemodes/%s", string);
-	if(!SQ_SUCCEEDED(sqstd_dofile(*vmbuffer[0].ptr.squirrel, _SC(gamemode), 0, 1))) 
-    {
+	if (!this->LoadFilterScript(0, gamemode))
+	{
 		return false;
-    }
-	vmbuffer[0].loaded = true;
+	}
+	this->OnGameModeInit();
 	return true;
 }
 
-void VirtualMachineManager::OnGameModeInit(void)
+bool VirtualMachineManager::UnloadGameMode(void)
 {
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	if (!this->IsGameModeLoaded())
 	{
-		if (vmbuffer[i].loaded)
-		{
-			switch (vmbuffer[i].lang)
-			{
-			case VMLanguageSquirrel:
-				{
-					sc_OnGameModeInit(*vmbuffer[i].ptr.squirrel);
-					break;
-				}
-			}
-		}
+		return false;
 	}
+	this->OnGameModeExit();
+	if (!this->UnloadFilterScript(0))
+	{
+		return false;
+	}
+	return true;
 }
 
-void VirtualMachineManager::OnGameModeExit(void)
+void VirtualMachineManager::LoadFilterScripts(void)
 {
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	intptr_t ptr;
+	_finddata64i32_t data;
+	ptr = _findfirst("filterscripts\\*.*", &data);
+	if (ptr == -1)
 	{
-		if (vmbuffer[i].loaded)
-		{
-			switch (vmbuffer[i].lang)
-			{
-			case VMLanguageSquirrel:
-				{
-					sc_OnGameModeExit(*vmbuffer[i].ptr.squirrel);
-					break;
-				}
-			}
-		}
+		return;
 	}
+	_findnext(ptr, &data);
+	int continuesearch = _findnext(ptr, &data);
+	char * filename;
+	unsigned char i = 1;
+	while ((continuesearch == 0) && (i <= MAX_FILTERSCRIPTS))
+	{
+		filename = (char *)calloc(strlen(data.name) + 15, sizeof(char));
+		sprintf(filename, "filterscripts/%s", data.name);
+		if (this->LoadFilterScript(i, filename))
+		{
+			this->OnFilterScriptInit(i);
+			i++;
+		}
+		continuesearch = _findnext(ptr, &data);
+	}
+	_findclose(ptr);
+}
+
+void VirtualMachineManager::UnloadFilterScripts(void)
+{
+
 }
 
 int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
@@ -140,7 +147,7 @@ void VirtualMachineManager::OnPlayerSpawn(int playerid, int cl)
 	}
 }
 
-bool VirtualMachineManager::InitVirtualMachine(const unsigned char index, const VirtualMachineLanguage lang)
+bool VirtualMachineManager::LoadFilterScript(const unsigned char index, const char *string)
 {
 	if (index > MAX_FILTERSCRIPTS)
 	{
@@ -150,7 +157,15 @@ bool VirtualMachineManager::InitVirtualMachine(const unsigned char index, const 
 	{
 		return false;
 	}
-	vmbuffer[index].lang = lang;
+	VirtualMachineLanguage lang;
+	if (strcmp(strrchr(string, '.') + 1, "nut") == 0)
+	{
+		lang = VMLanguageSquirrel;
+	}
+	else
+	{
+		return false;
+	}
 	switch (lang)
 	{
 	case VMLanguageSquirrel:
@@ -183,8 +198,87 @@ bool VirtualMachineManager::InitVirtualMachine(const unsigned char index, const 
 			sqstd_register_mathlib(*vmbuffer[index].ptr.squirrel);
 			sqstd_register_systemlib(*vmbuffer[index].ptr.squirrel);
 			sqstd_seterrorhandlers(*vmbuffer[index].ptr.squirrel);
+			if(!SQ_SUCCEEDED(sqstd_dofile(*vmbuffer[index].ptr.squirrel, _SC(string), 0, 1))) 
+			{
+				sq_close(*vmbuffer[index].ptr.squirrel);
+				delete vmbuffer[index].ptr.squirrel;
+				return false;
+			}
+			vmbuffer[index].lang = VMLanguageSquirrel;
 			break;
 		}
 	}
+	vmbuffer[index].loaded = true;
 	return true;
+}
+
+bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
+{
+	if (!vmbuffer[index].loaded)
+	{
+		return false;
+	}
+	switch (vmbuffer[index].lang)
+	{
+	case VMLanguageSquirrel:
+		{
+			sq_close(*vmbuffer[index].ptr.squirrel);
+			delete vmbuffer[index].ptr.squirrel;
+			break;
+		}
+	}
+	vmbuffer[index].loaded = false;
+	return true;
+}
+
+void VirtualMachineManager::OnGameModeInit(void)
+{
+	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	{
+		if (vmbuffer[i].loaded)
+		{
+			switch (vmbuffer[i].lang)
+			{
+			case VMLanguageSquirrel:
+				{
+					sc_OnGameModeInit(*vmbuffer[i].ptr.squirrel);
+					break;
+				}
+			}
+		}
+	}
+}
+
+void VirtualMachineManager::OnGameModeExit(void)
+{
+	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	{
+		if (vmbuffer[i].loaded)
+		{
+			switch (vmbuffer[i].lang)
+			{
+			case VMLanguageSquirrel:
+				{
+					sc_OnGameModeExit(*vmbuffer[i].ptr.squirrel);
+					break;
+				}
+			}
+		}
+	}
+}
+
+void VirtualMachineManager::OnFilterScriptInit(const unsigned char index)
+{
+	if (!vmbuffer[index].loaded)
+	{
+		return;
+	}
+	switch (vmbuffer[index].lang)
+	{
+	case VMLanguageSquirrel:
+		{
+			sc_OnFilterScriptInit(*vmbuffer[index].ptr.squirrel);
+			break;
+		}
+	}
 }
