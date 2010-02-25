@@ -47,10 +47,13 @@ private:
 		VirtualMachinePtr ptr;
 	};
 	VirtualMachine vmbuffer[MAX_FILTERSCRIPTS+1]; //Virtual machine buffer. 0 - is game mode, 1...16 - filterscripts
-	bool LoadFilterScript(const unsigned char index, const char *string);
+	bool LoadFilterScriptInternal(const unsigned char index, const char *string);
+	bool UnloadFilterScriptInternal(const unsigned char index);
+	unsigned char GetNumberOfFreeFilterscriptSlots(void);
 	bool GetFilterScriptFreeSlot(unsigned char &index);
 	bool FindFilterScript(HSQUIRRELVM *v, unsigned char &index);
 	void OnGameModeInit(void);
 	void OnGameModeExit(void);
 	void OnFilterScriptInit(const unsigned char index);
+	void OnFilterScriptExit(const unsigned char index);
 };

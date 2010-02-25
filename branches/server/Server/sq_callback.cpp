@@ -22,7 +22,14 @@ void sc_OnGameModeInit(HSQUIRRELVM v)
 
 void sc_OnGameModeExit(HSQUIRRELVM v)
 {
-
+	int top = sq_gettop(v); 
+	sq_pushroottable(v);
+	sq_pushstring(v,_SC("OnGameModeExit"),-1);
+	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
+		sq_pushroottable(v); 
+		sq_call(v,1,0,0); 
+	}
+	sq_settop(v,top); 
 }
 
 void sc_OnFilterScriptInit(HSQUIRRELVM v)
@@ -30,6 +37,18 @@ void sc_OnFilterScriptInit(HSQUIRRELVM v)
 	int top = sq_gettop(v); 
 	sq_pushroottable(v);
 	sq_pushstring(v,_SC("OnFilterScriptInit"),-1);
+	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
+		sq_pushroottable(v); 
+		sq_call(v,1,0,0); 
+	}
+	sq_settop(v,top); 
+}
+
+void sc_OnFilterScriptExit(HSQUIRRELVM v)
+{
+	int top = sq_gettop(v); 
+	sq_pushroottable(v);
+	sq_pushstring(v,_SC("OnFilterScriptExit"),-1);
 	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
 		sq_pushroottable(v); 
 		sq_call(v,1,0,0); 

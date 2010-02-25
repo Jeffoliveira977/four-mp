@@ -5,3 +5,8 @@ function OnFilterScriptInit()
 	SetScriptAuthor("FaTony");
 	print("FILTERSCRIPT");
 }
+
+function OnFilterScriptExit()
+{
+	print("EXIT");
+}

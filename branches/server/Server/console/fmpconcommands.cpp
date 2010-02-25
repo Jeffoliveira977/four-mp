@@ -58,6 +58,11 @@ void ConCmdFsUnload(unsigned char numargs)
 		conscreen.Print("Usage: fs_unload <index>");
 		return;
 	}
+	if (index == 0)
+	{
+		conscreen.Print("Can't unload gamemode");
+		return;
+	}
 	if (!vmm.UnloadFilterScript(index))
 	{
 

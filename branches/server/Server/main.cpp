@@ -17,8 +17,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <math.h>
-// Pawn
-//#include "pawn.h"
 // RakNet
 #include "net\RakNetworkFactory.h"
 #include "net\RakPeerInterface.h"
@@ -44,7 +42,6 @@ ConsoleScreen conscreen;
 ScriptCommandHandler cmdhandler;
 RakPeerInterface *net;
 VirtualMachineManager vmm;
-//AMX amx;
 Player gPlayer[MAX_PLAYERS];
 Vehicle gVehicle[MAX_VEHICLES];
 Server sConf;
@@ -181,21 +178,6 @@ int main()
 		return 1;
 	}
 	vmm.LoadFilterScripts();
-	//Init Pawn
-	//int err = aux_LoadProgram(&amx, "text.amx", NULL);
-	//if (err != AMX_ERR_NONE)
-	//{
-	//	//ErrorExit(&amx, err);
-	//}
-	//pawn_Init(amx);
-	//if (err)
-	//{
-	//	ErrorExit(&amx, err);
-	//}
-	//err = amx_Exec(&amx, &ret, AMX_EXEC_MAIN);
-	
-	/*pawn_OnGameModeInit(amx);*/
-
 	// Body
 	Packet *pack;
 	debug("Started");
@@ -252,7 +234,5 @@ int main()
 		net->DeallocatePacket(pack);
 		Sleep(100);
 	}
-	vmm.UnloadFilterScripts();
-	vmm.UnloadGameMode();
 	return 0;
 }
