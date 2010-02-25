@@ -111,7 +111,7 @@ void CListView::KeyEvent( SKey sKey )
 			{
 				if(m_iMouseSelect > -2) m_iMouseSelect = m_iMouseOverIndex;
 				if( GetAction() )
-					GetAction()( reinterpret_cast<char*>( m_iMouseOverIndex ), this );
+					GetAction()( this, SELECT, m_iMouseOverIndex );
 			}
 		}
 	}

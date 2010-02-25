@@ -59,7 +59,7 @@ void CCheckBox::KeyEvent( SKey sKey )
 			m_bChecked = !m_bChecked;
 			
 			if( GetAction() )
-				GetAction()( (const char*)m_bChecked, this );
+				GetAction()( this, SELECT, m_bChecked );
 		}
 	}
 }

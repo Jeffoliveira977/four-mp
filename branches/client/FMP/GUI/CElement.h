@@ -1,7 +1,21 @@
 #pragma once
 
 #include "CPos.h"
-typedef void ( __cdecl * tAction )( const char * pszArgs, CElement * pElement );
+
+enum CMSG
+{
+	KEY_DOWN,
+	CLICK,
+	GOT_FOCUS,
+	LOST_FOCUS,
+	CHANGE,
+	SELECT,
+	MOUSE_OVER,
+	MOUSE_OUT,
+	END,
+};
+
+typedef void ( __cdecl * tAction )( CElement *, CMSG, int );
 
 class CElement
 {
@@ -54,6 +68,10 @@ public:
 
 	void SetElementState( std::string sState, int iIndex = 0 );
 	SElementState * GetElementState( int iIndex = 0 );
+
+	void LostFocus();
+	void GotFocus();
+	void SendMsg(CMSG, int);
 
 	virtual void UpdateTheme( int iIndex );
 

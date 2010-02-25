@@ -58,7 +58,7 @@ void CVerticalSliderBar::MouseMove( CMouse * pMouse )
 			}
 
 			if( GetAction() )
-				GetAction()( reinterpret_cast<const char*>( GetValue() ), this );
+				GetAction()( this, CHANGE, GetValue() );
 	}
 	else
 		SetElementState( SetMouseOver( gpGui->GetMouse()->InArea( Pos.GetX(), Pos.GetY(), TITLEBAR_HEIGHT, GetHeight() ) )?"MouseOver":"Norm" );

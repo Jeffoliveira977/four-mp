@@ -201,6 +201,8 @@ void CGUI::BringToTop( CWindow * pWindow )
 
 	if(m_wFocus)
 		m_wFocus->LostFocus();
+	if(pWindow)
+		pWindow->GotFocus();
 
 	m_vWindows.insert(  m_vWindows.end(), pWindow );
 	m_wFocus = pWindow;

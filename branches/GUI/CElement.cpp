@@ -160,6 +160,9 @@ bool CElement::GetMouseOver()
 
 bool CElement::SetMouseOver( bool bMouseOver )
 {
+	if(GetAction())
+		if(bMouseOver) GetAction()(this, MOUSE_OVER, 0);
+		else GetAction()(this, MOUSE_OUT, 0);
 	return m_bMouseOver = bMouseOver;
 }
 
@@ -186,6 +189,24 @@ void CElement::SetElementState( std::string sState, int iIndex )
 SElementState * CElement::GetElementState( int iIndex )
 {
 	return m_pElementState[ iIndex ];
+}
+
+void CElement::LostFocus()
+{
+	if(GetAction())
+		GetAction()(this, LOST_FOCUS, 0);
+}
+
+void CElement::GotFocus()
+{
+	if(GetAction())
+		GetAction()(this, GOT_FOCUS, 0);
+}
+
+void CElement::SendMsg(CMSG msg, int Param)
+{
+	if(GetAction())
+		GetAction()(this, msg, Param);
 }
 
 void CElement::UpdateTheme( int )

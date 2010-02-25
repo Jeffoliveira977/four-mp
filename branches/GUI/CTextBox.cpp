@@ -48,6 +48,8 @@ void CTextBox::MouseMove( CMouse * pMouse )
 void CTextBox::KeyEvent( SKey sKey )
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
+	if(GetMouseOver() && gpGui->GetMouse()->GetLeftButton())
+		SendMsg(CLICK, 0);
 
 	if( GetMouseOver() || ( !sKey.m_bDown && !gpGui->GetMouse()->GetWheel() )  )
 		pSlider->KeyEvent( Pos, sKey );

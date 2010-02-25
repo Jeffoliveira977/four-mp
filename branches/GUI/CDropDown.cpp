@@ -89,7 +89,7 @@ void CDropDown::KeyEvent( SKey sKey )
 				{	
 					m_iSelected = m_iMouseOverIndex;
 					if( GetAction() )
-						GetAction()( m_vEntrys[ m_iSelected ].m_sValue.c_str(), this );
+						GetAction()( this, SELECT, m_iSelected );
 
 					m_bDropped = false;
 					SetElementState( "Norm" );

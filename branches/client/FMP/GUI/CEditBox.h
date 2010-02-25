@@ -9,8 +9,6 @@ class CEditBox : public CElement
 	CTimer m_tCursorTimer;
 	bool m_bCursorState;
 
-	tAction m_pCallback;
-
 	CColor * pInner, * pBorder, * pString, * pCursor;
 
 public:
@@ -27,9 +25,6 @@ public:
 
 	int GetStart();
 	void SetStart( int iStart );
-
-	void SetAction( tAction pCallback );
-	tAction GetAction();
 
 	void UpdateTheme( int iIndex );
 };

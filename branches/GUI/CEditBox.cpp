@@ -11,12 +11,6 @@ CEditBox::CEditBox( int X, int Y, int Width, int Height, const char * String, co
 	SetAction( 0 );
 	if( Callback )
 	{
-		/*CVar * pCvar = gpGui->Cvars[ Callback ];
-	
-		if( pCvar )
-			SetAction( pCvar->GetAction() );
-		else
-			MessageBoxA( 0, "Cvar invalid", GetString().c_str(), 0 );*/
 		SetAction( Callback );
 	}
 	SetThemeElement( gpGui->GetThemeElement( "EditBox" ) );
@@ -65,6 +59,8 @@ void CEditBox::KeyEvent( SKey sKey )
 		{
 			if( GetMouseOver() )
 			{
+				SendMsg(CLICK, 0);
+
 				int iX = gpGui->GetMouse()->GetPos().GetX();
 				int iAbsX = ( *GetParent()->GetAbsPos() + *GetRelPos() ).GetX();
 
@@ -172,10 +168,7 @@ void CEditBox::KeyEvent( SKey sKey )
 			{
 				GetParent()->SetFocussedElement( 0 );
 
-				tAction pAction = GetAction();
-
-				if( pAction )
-					pAction( GetString().c_str(), this );
+				SendMsg(END, 0);
 
 				break;
 			}
@@ -190,6 +183,7 @@ void CEditBox::KeyEvent( SKey sKey )
 
 				WORD wKey = 0;
 				ToAscii( sKey.m_vKey, HIWORD( sKey.m_lParam )&0xFF, bKeys, &wKey, 0 );
+				SendMsg(CHANGE, wKey);
 
 				char szKey[2] = { static_cast<char>( wKey ), 0 };
 				if( GetStart() + m_iIndex >= 0 && GetStart() + m_iIndex <= static_cast<int>( sString.length() ) )
@@ -255,16 +249,6 @@ int CEditBox::GetStart()
 void CEditBox::SetStart( int iStart )
 {
 	m_iStart = iStart;
-}
-
-void CEditBox::SetAction( tAction pCallback )
-{
-	m_pCallback = pCallback;
-}
-
-tAction CEditBox::GetAction()
-{
-	return m_pCallback;
 }
 
 void CEditBox::UpdateTheme( int iIndex )

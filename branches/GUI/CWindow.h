@@ -50,6 +50,4 @@ public:
 
 	void SetTitleVisible( bool v );
 	bool GetTitleVisible();
-
-	void LostFocus();
 };

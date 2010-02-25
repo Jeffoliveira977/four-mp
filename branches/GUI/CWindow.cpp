@@ -2,14 +2,16 @@
 
 CWindow::CWindow( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
+	m_pFocussedElement = 0;
 	SetMaximized( true );
 	SetTitleVisible( true );
 	SetFocussedElement( 0 );
 	posDif = CPos();
 	m_bDragging = false;
-	SetMouseOver( false );
+
 	SetElement( X, Y, Width, Height, String, String2, Callback, 1 );
 
+	SetMouseOver( false );
 	SetVisible( true );
 
 	SetThemeElement( gpGui->GetThemeElement( "Window" ) );
@@ -109,10 +111,14 @@ void CWindow::KeyEvent( SKey sKey )
 
 	if( pMouse->GetLeftButton() )
 	{
+		SendMsg(CLICK, 0);
 		SetFocussedElement( 0 );
 
 		if( GetMouseOver() && m_bCloseButtonEnabled && m_bTitleVisible )
+		{
+			SendMsg(END, 0);
 			this->SetVisible( false );
+		}
 		else if( pMouse->InArea( GetAbsPos()->GetX(), GetAbsPos()->GetY(), GetWidth(), TITLEBAR_HEIGHT ) && m_bTitleVisible )
 		{
 			if( !pMouse->GetDragging() )
@@ -199,6 +205,12 @@ bool CWindow::GetCloseButton()
 
 void CWindow::SetFocussedElement( CElement * pElement )
 {
+	if(m_pFocussedElement)
+		m_pFocussedElement->LostFocus();
+
+	if(pElement != 0)
+		pElement->GotFocus();
+
 	m_pFocussedElement = pElement;
 
 	if( pElement )
@@ -257,10 +269,4 @@ void CWindow::SetTitleVisible( bool v )
 bool CWindow::GetTitleVisible()
 {
 	return m_bTitleVisible;
-}
-
-void CWindow::LostFocus()
-{
-	if(GetAction())
-		GetAction()("LF", this);
 }

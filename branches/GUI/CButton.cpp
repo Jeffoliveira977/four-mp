@@ -5,6 +5,8 @@ CButton::CButton( int X, int Y, int Width, int Height, const char * String, cons
 	SetElement( X, Y, Width, Height, String, String2, Callback );
 	SetHeight( BUTTON_HEIGHT );
 
+	m_bVisibleBack = 1;
+
 	SetThemeElement( gpGui->GetThemeElement( "Button" ) );
 
 	if( !GetThemeElement() )
@@ -17,7 +19,7 @@ void CButton::Draw()
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	pButton->Draw( Pos, GetWidth(), GetHeight() );
+	if(m_bVisibleBack) pButton->Draw( Pos, GetWidth(), GetHeight() );
 	gpGui->GetFont()->DrawString( Pos.GetX() + GetWidth() / 2, Pos.GetY() + GetHeight() / 2, FT_CENTER|FT_VCENTER, pString, GetString().c_str() );
 }
 
@@ -44,12 +46,22 @@ void CButton::KeyEvent( SKey sKey )
 
 			if( GetAction() )
 			{
-				GetAction()( 0, this );
+				GetAction()( this, CLICK, 0 );
 			}
 
 			m_tPressed.Start( 0.1f );
 		}
 	}
+}
+
+void CButton::SetBackVisible(bool v)
+{
+	m_bVisibleBack = v;
+}
+
+bool CButton::GetBackVisible()
+{
+	return m_bVisibleBack;
 }
 
 void CButton::UpdateTheme( int iIndex )

@@ -79,7 +79,7 @@ void CListBox::KeyEvent( SKey sKey )
 		{
 			if(m_iMouseSelect > -2) m_iMouseSelect = m_iMouseOverIndex;
 			if( m_iMouseOverIndex >= 0 && GetAction() && gpGui->GetMouse()->GetLeftButton() )
-				GetAction()( reinterpret_cast<char*>( m_iMouseOverIndex ), this );
+				GetAction()( this, SELECT, m_iMouseOverIndex );
 		}
 	}
 

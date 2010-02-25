@@ -83,7 +83,7 @@ void CHorizontalSliderBar::PreDraw()
 		GetString( !GetShowString() );
 
 	if( m_pUpdater )
-		m_pUpdater( reinterpret_cast<const char*>( GetValue() ), this );
+		m_pUpdater( this, CHANGE, GetValue() );
 }
 
 void CHorizontalSliderBar::MouseMove( CMouse * pMouse )
@@ -112,7 +112,7 @@ void CHorizontalSliderBar::MouseMove( CMouse * pMouse )
 			}
 
 			if( GetAction() )
-				GetAction()( reinterpret_cast<const char*>( GetValue() ), this );
+				GetAction()( this, CHANGE, GetValue() );
 	}
 	else
 		SetElementState( SetMouseOver( gpGui->GetMouse()->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), TITLEBAR_HEIGHT ) )?"MouseOver":"Norm" );

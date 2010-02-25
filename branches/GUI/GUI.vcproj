@@ -73,6 +73,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalOptions="/NODEFAULTLIB:LIBCMT"
 				OutputFile="$(SolutionDir)\Gui.lib"
 			/>
 			<Tool
