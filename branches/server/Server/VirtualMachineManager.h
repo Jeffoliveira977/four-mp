@@ -21,6 +21,12 @@ public:
 	bool UnloadGameMode(void);
 	void LoadFilterScripts(void);
 	void UnloadFilterScripts(void);
+	bool LoadFilterScript(const char *string);
+	bool UnloadFilterScript(const unsigned char index);
+	bool GetFilterScriptInfoString(const unsigned char index, char *&string);
+	void SetFilterScriptName(HSQUIRRELVM *v, const char *string);
+	void SetFilterScriptVersion(HSQUIRRELVM *v, const char *string);
+	void SetFilterScriptAuthor(HSQUIRRELVM *v, const char *string);
 	int OnPlayerConnect(int playerid, char name[32]);
 	void OnPlayerDisconnect(int playerid);
 	void OnPlayerSpawn(int playerid, int cl);
@@ -34,12 +40,16 @@ private:
 	struct VirtualMachine
 	{
 		bool loaded;
+		char *name;
+		char *version;
+		char *author;
 		VirtualMachineLanguage lang;
 		VirtualMachinePtr ptr;
 	};
 	VirtualMachine vmbuffer[MAX_FILTERSCRIPTS+1]; //Virtual machine buffer. 0 - is game mode, 1...16 - filterscripts
 	bool LoadFilterScript(const unsigned char index, const char *string);
-	bool UnloadFilterScript(const unsigned char index);
+	bool GetFilterScriptFreeSlot(unsigned char &index);
+	bool FindFilterScript(HSQUIRRELVM *v, unsigned char &index);
 	void OnGameModeInit(void);
 	void OnGameModeExit(void);
 	void OnFilterScriptInit(const unsigned char index);

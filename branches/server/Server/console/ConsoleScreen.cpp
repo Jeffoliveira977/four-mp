@@ -335,7 +335,7 @@ void ConsoleScreen::GoOnePageUp(void)
 
 void ConsoleScreen::GoOnePageDown(void)
 {
-	if (screenposition == (outputbuffersize - pagesize))
+	if (screenposition >= (outputbuffersize - pagesize))
 	{
 		return;
 	}
@@ -583,6 +583,7 @@ void ConsoleScreen::DeleteCharInInputBuffer(void)
 
 void ConsoleScreen::AcceptUserInput(void)
 {
+	this->ClearInputLine();
 	this->WriteToInputBuffer();
 	inputbufferposition[0] = inputbuffersize - 1;
 	inputbufferposition[1] = 0;

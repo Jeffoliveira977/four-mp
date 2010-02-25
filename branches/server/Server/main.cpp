@@ -33,7 +33,6 @@
 #include "console\fmpconcommands.h"
 #include "VirtualMachineManager.h"
 #include "rpc.h"
-#include "sq.h"
 #include "manager.h"
 #include "cfg.h"
 
@@ -134,11 +133,17 @@ int main()
 {
 	concore.SetOutputFunction(print);
 	conscreen.SetCaption("FOUR-MP");
+	//Core console functions
 	new ConCmd("cvarlist", ConCmdCvarlist, "Show the list of convars/concommands.", 0);
 	new ConVar("developer", 0, "Show developer messages.", 0, true, 0, true, 2);
 	new ConCmd("find", ConCmdFind, "Find concommands with the specified string in their name/help text.", 0);
-	new ConCmd("help", ConCmdHelp, "Find help about a convar/concommand.");
-	print("Starting...");
+	new ConCmd("help", ConCmdHelp, "Find help about a convar/concommand.", 0);
+	// FMP console functions
+	new ConCmd("fs_list", ConCmdFsList, "Prints details about loaded gamemode/filterscripts.", 0);
+	new ConCmd("fs_load", ConCmdFsLoad, "fs_load <filename> : loads a filterscript", 0);
+	new ConCmd("fs_unload", ConCmdFsUnload, "fs_unload <index> : unloads a filterscript", 0);
+	print("FOUR-MP. Copyright 2009-2010 Four-mp team.");
+	print("Developer build. Loading...");
 	LoadConfig();
 
 	// Init RakNet

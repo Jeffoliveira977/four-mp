@@ -14,10 +14,12 @@
 #include "console\ConsoleScreen.h"
 #include "console\fmpconcommands.h"
 #include "console\ScriptCommandHandler.h"
+#include "VirtualMachineManager.h"
 
 extern ConsoleCore concore;
 extern ConsoleScreen conscreen;
 extern ScriptCommandHandler cmdhandler;
+extern VirtualMachineManager vmm;
 
 #ifdef SQUNICODE 
 #define scvprintf _vscwprintf 
@@ -34,6 +36,27 @@ SQInteger register_global_func(HSQUIRRELVM v,SQFUNCTION f,const char *fname)
     sq_createslot(v,-3); 
     sq_pop(v,1);   
 	return 1;
+}
+
+void sq_SetScriptName(HSQUIRRELVM v)
+{
+	const char *string;
+	sq_getstring(v, 2, &string);
+	vmm.SetFilterScriptName(&v, string);
+}
+
+void sq_SetScriptVersion(HSQUIRRELVM v)
+{
+	const char *string;
+	sq_getstring(v, 2, &string);
+	vmm.SetFilterScriptVersion(&v, string);
+}
+
+void sq_SetScriptAuthor(HSQUIRRELVM v)
+{
+	const char *string;
+	sq_getstring(v, 2, &string);
+	vmm.SetFilterScriptAuthor(&v, string);
 }
 
 void sq_GetCmdArgs(HSQUIRRELVM v)

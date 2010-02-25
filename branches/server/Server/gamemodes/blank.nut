@@ -2,10 +2,12 @@ strtokstart <- 0
 
 function OnGameModeInit()
 {
+	SetScriptName("Building mode");
+	SetScriptVersion("0.0.0.1");
+	SetScriptAuthor("009");
 	printr("—троительный мод от 009 загружен. \n");
 	print("русский = ");
 	printr("русский\n");
-	//SetGameModeName("TestMode");
 	CreateCar(418536135,-44.4, -18.53, 14.83, 0.0, 0, 0);
 	CreateCar(1348744438,-42.4, -18.53, 14.83, 0.0, 0, 0);
 	CreateCar(2948279460,-46.4, -18.53, 14.83, 0.0, 0, 0);
@@ -29,9 +31,8 @@ function OnPlayerDisconnect(playerid)
 	SendClientMessageToAll(GetPlayerName(playerid) + " [" + playerid + "]" + " disconnect from server");
 }
 
-function OnPlayerSpawn(playerid, classid)
+function OnPlayerSpawn(playerid)
 {
-	print("Player ID:"+playerid+" want spawn with class"+classid+"\n");
 	//SetPlayerHP(playerid,200);
 	//SetPlayerPos(playerid,-106.500755, 764.368164, 15.337303);
 }

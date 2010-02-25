@@ -11,6 +11,7 @@
 #include "sq\sqstdstring.h"
 #include "sq\sqstdsystem.h"
 
+#include "console\common.h"
 #include "sq.h"
 
 VirtualMachineManager::VirtualMachineManager(void)
@@ -90,6 +91,89 @@ void VirtualMachineManager::LoadFilterScripts(void)
 void VirtualMachineManager::UnloadFilterScripts(void)
 {
 
+}
+
+bool VirtualMachineManager::LoadFilterScript(const char *string)
+{
+	unsigned char index;
+	if (!this->GetFilterScriptFreeSlot(index))
+	{
+		return false;
+	}
+	char *filterscript = (char *)calloc(strlen(string) + 15, sizeof(char));
+	sprintf(filterscript, "filterscripts/%s", string);
+	if (!this->LoadFilterScript(index, filterscript))
+	{
+		return false;
+	}
+	this->OnFilterScriptInit(index);
+	return true;
+}
+
+bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
+{
+	if (!vmbuffer[index].loaded)
+	{
+		return false;
+	}
+	switch (vmbuffer[index].lang)
+	{
+	case VMLanguageSquirrel:
+		{
+			sq_close(*vmbuffer[index].ptr.squirrel);
+			delete vmbuffer[index].ptr.squirrel;
+			break;
+		}
+	}
+	free(vmbuffer[index].name);
+	free(vmbuffer[index].version);
+	free(vmbuffer[index].author);
+	vmbuffer[index].loaded = false;
+	return true;
+}
+
+bool VirtualMachineManager::GetFilterScriptInfoString(const unsigned char index, char *&string)
+{
+	if (!vmbuffer[index].loaded)
+	{
+		return false;
+	}
+	string = (char *)calloc(_scprintf("%d \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author) + 1, sizeof(char));
+	sprintf(string, "%d \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author);
+	return true;
+}
+
+void VirtualMachineManager::SetFilterScriptName(HSQUIRRELVM *v, const char *string)
+{
+	unsigned char index;
+	if (!this->FindFilterScript(v, index))
+	{
+		return;
+	}
+	ResizeStringBuffer(vmbuffer[index].name, strlen(string) + 1);
+	strcpy(vmbuffer[index].name, string);
+}
+
+void VirtualMachineManager::SetFilterScriptVersion(HSQUIRRELVM *v, const char *string)
+{
+	unsigned char index;
+	if (!this->FindFilterScript(v, index))
+	{
+		return;
+	}
+	ResizeStringBuffer(vmbuffer[index].version, strlen(string) + 1);
+	strcpy(vmbuffer[index].version, string);
+}
+
+void VirtualMachineManager::SetFilterScriptAuthor(HSQUIRRELVM *v, const char *string)
+{
+	unsigned char index;
+	if (!this->FindFilterScript(v, index))
+	{
+		return;
+	}
+	ResizeStringBuffer(vmbuffer[index].author, strlen(string) + 1);
+	strcpy(vmbuffer[index].author, string);
 }
 
 int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
@@ -176,6 +260,10 @@ bool VirtualMachineManager::LoadFilterScript(const unsigned char index, const ch
 			sqstd_seterrorhandlers(*vmbuffer[index].ptr.squirrel);
 			sq_setprintfunc(*vmbuffer[index].ptr.squirrel, printfunc);
 			// Register Script Funcions
+			// Script identity functions
+			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_SetScriptName, "SetScriptName");
+			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_SetScriptVersion, "SetScriptVersion");
+			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_SetScriptAuthor, "SetScriptAuthor");
 			// Console functions
 			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_GetCmdArgs, "GetCmdArgs");
 			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_GetCmdArgsAsString, "GetCmdArgsAsString");
@@ -208,27 +296,38 @@ bool VirtualMachineManager::LoadFilterScript(const unsigned char index, const ch
 			break;
 		}
 	}
+	vmbuffer[index].name = (char *)calloc(16, sizeof(char));
+	strcpy(vmbuffer[index].name, "Untitled script");
+	vmbuffer[index].version = (char *)calloc(8, sizeof(char));
+	strcpy(vmbuffer[index].version, "0.0.0.0");
+	vmbuffer[index].author = (char *)calloc(15, sizeof(char));
+	strcpy(vmbuffer[index].author, "Unnamed author");
 	vmbuffer[index].loaded = true;
 	return true;
 }
 
-bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
+bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 {
-	if (!vmbuffer[index].loaded)
+	for (index = 1; index <= MAX_FILTERSCRIPTS; index++)
 	{
-		return false;
-	}
-	switch (vmbuffer[index].lang)
-	{
-	case VMLanguageSquirrel:
+		if (!vmbuffer[index].loaded)
 		{
-			sq_close(*vmbuffer[index].ptr.squirrel);
-			delete vmbuffer[index].ptr.squirrel;
-			break;
+			return true;
 		}
 	}
-	vmbuffer[index].loaded = false;
-	return true;
+	return false;
+}
+
+bool VirtualMachineManager::FindFilterScript(HSQUIRRELVM *v, unsigned char &index)
+{
+	for (index = 0; index <= MAX_FILTERSCRIPTS; index++)
+	{
+		if ((vmbuffer[index].loaded) && (vmbuffer[index].lang == VMLanguageSquirrel) && (*vmbuffer[index].ptr.squirrel == *v))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void VirtualMachineManager::OnGameModeInit(void)
