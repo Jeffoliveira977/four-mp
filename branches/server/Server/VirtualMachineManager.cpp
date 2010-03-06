@@ -398,6 +398,10 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 	}
 	if (index > maxfilterscriptindex)
 	{
+		if (maxfilterscriptindex == maxfilterscripts)
+		{
+			return false;
+		}
 		if (!this->ResizeVirtualMachineBuffer(vmbuffer, index + 1))
 		{
 			return false;
