@@ -17,7 +17,7 @@
 VirtualMachineManager::VirtualMachineManager(void)
 {
 	maxfilterscripts = 16;
-	vmbuffer = (VirtualMachine **)calloc(maxfilterscripts + 1, sizeof(VirtualMachine *));
+	vmbuffer = (VirtualMachine **)calloc(1, sizeof(VirtualMachine *));
 	maxfilterscriptindex = 0;
 }
 
@@ -384,10 +384,6 @@ bool VirtualMachineManager::LoadFilterScriptInternal(const unsigned char index, 
 	{
 		return false;
 	}
-	if (index > maxfilterscriptindex)
-	{
-		maxfilterscriptindex = index;
-	}
 	vmbuffer[index]->filename = (char *)calloc(length + 1, sizeof(char));
 	strcpy(vmbuffer[index]->filename, string);
 	this->OnFilterScriptInit(index);
@@ -399,6 +395,15 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 	if (index > maxfilterscripts)
 	{
 		return false;
+	}
+	if (index > maxfilterscriptindex)
+	{
+		if (!this->ResizeVirtualMachineBuffer(vmbuffer, index + 1))
+		{
+			return false;
+		}
+		vmbuffer[index] = NULL;
+		maxfilterscriptindex = index;
 	}
 	if (vmbuffer[index] != NULL)
 	{
@@ -528,14 +533,18 @@ unsigned char VirtualMachineManager::GetNumberOfFreeFilterScriptSlots(void)
 
 bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 {
-	for (index = 1; index <= maxfilterscripts; index++)
+	for (index = 1; index <= maxfilterscriptindex; index++)
 	{
 		if (vmbuffer[index] == NULL)
 		{
 			return true;
 		}
 	}
-	return false;
+	if (maxfilterscriptindex == maxfilterscripts)
+	{
+		return false;
+	}
+	return true;
 }
 
 bool VirtualMachineManager::FindVirtualMachine(HSQUIRRELVM *v, unsigned char &index)
@@ -548,6 +557,17 @@ bool VirtualMachineManager::FindVirtualMachine(HSQUIRRELVM *v, unsigned char &in
 		}
 	}
 	return false;
+}
+
+bool VirtualMachineManager::ResizeVirtualMachineBuffer(VirtualMachine **&buffer, const unsigned char size)
+{
+	VirtualMachine **tempbuffer = (VirtualMachine **)realloc(*&buffer, size * sizeof(VirtualMachine *));
+	if ((tempbuffer == NULL) && (size != 0))
+	{
+		return false;
+	}
+	buffer = tempbuffer;
+	return true;
 }
 
 void VirtualMachineManager::OnGameModeInit(void)

@@ -63,6 +63,7 @@ private:
 	unsigned char GetNumberOfFreeFilterScriptSlots(void);
 	bool GetFilterScriptFreeSlot(unsigned char &index);
 	bool FindVirtualMachine(HSQUIRRELVM *v, unsigned char &index);
+	bool ResizeVirtualMachineBuffer(VirtualMachine **&buffer, const unsigned char size);
 	void OnGameModeInit(void);
 	void OnGameModeExit(void);
 	void OnFilterScriptInit(const unsigned char index);
