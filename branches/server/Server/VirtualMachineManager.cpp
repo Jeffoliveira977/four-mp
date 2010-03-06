@@ -39,12 +39,15 @@ bool VirtualMachineManager::LoadGameMode(const char *string)
 	{
 		return false;
 	}
-	char *gamemode = (char *)calloc(strlen(string) + 11, sizeof(char));
+	int length = strlen(string);
+	char *gamemode = (char *)calloc(length + 11, sizeof(char));
 	sprintf(gamemode, "gamemodes/%s", string);
-	if (!this->LoadFilterScriptInternal(0, gamemode))
+	if (!this->LoadVirtualMachine(0, gamemode))
 	{
 		return false;
 	}
+	vmbuffer[0].filename = (char *)calloc(length + 1, sizeof(char));
+	strcpy(vmbuffer[0].filename, string);
 	this->OnGameModeInit();
 	return true;
 }
@@ -56,10 +59,11 @@ bool VirtualMachineManager::UnloadGameMode(void)
 		return false;
 	}
 	this->OnGameModeExit();
-	if (!this->UnloadFilterScriptInternal(0))
+	if (!this->UnloadVirtualMachine(0))
 	{
 		return false;
 	}
+	free(vmbuffer[0].filename);
 	return true;
 }
 
@@ -74,13 +78,16 @@ void VirtualMachineManager::LoadFilterScripts(void)
 	}
 	_findnext(ptr, &data);
 	int continuesearch = _findnext(ptr, &data);
-	unsigned char slots = this->GetNumberOfFreeFilterscriptSlots();
+	unsigned char slots = this->GetNumberOfFreeFilterScriptSlots();
 	unsigned char i = 0;
 	while ((continuesearch == 0) && (i < slots))
 	{
-		if (this->LoadFilterScript(data.name))
+		if (!this->IsFilterScriptLoaded(data.name))
 		{
-			i++;
+			if (this->LoadFilterScript(data.name))
+			{
+				i++;
+			}
 		}
 		continuesearch = _findnext(ptr, &data);
 	}
@@ -98,6 +105,51 @@ void VirtualMachineManager::UnloadFilterScripts(void)
 	}
 }
 
+void VirtualMachineManager::ReloadFilterScripts(void)
+{
+	for (unsigned char i = 1; i <= MAX_FILTERSCRIPTS; i++)
+	{
+		if (vmbuffer[i].loaded)
+		{
+			this->ReloadFilterScript(i);
+		}
+	}
+}
+
+void VirtualMachineManager::PauseVirtualMachines(void)
+{
+	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	{
+		if (vmbuffer[i].loaded)
+		{
+			this->PauseVirtualMachine(i);
+		}
+	}
+}
+
+void VirtualMachineManager::UnpauseVirtualMachines(void)
+{
+	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	{
+		if (vmbuffer[i].loaded)
+		{
+			this->UnpauseVirtualMachine(i);
+		}
+	}
+}
+
+bool VirtualMachineManager::IsFilterScriptLoaded(const char *string)
+{
+	for (unsigned char i = 1; i <= MAX_FILTERSCRIPTS; i++)
+	{
+		if ((vmbuffer[i].loaded) && (strcmp(vmbuffer[i].filename, string) == 0))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool VirtualMachineManager::LoadFilterScript(const char *string)
 {
 	unsigned char index;
@@ -105,13 +157,10 @@ bool VirtualMachineManager::LoadFilterScript(const char *string)
 	{
 		return false;
 	}
-	char *filterscript = (char *)calloc(strlen(string) + 15, sizeof(char));
-	sprintf(filterscript, "filterscripts/%s", string);
-	if (!this->LoadFilterScriptInternal(index, filterscript))
+	if (!this->LoadFilterScriptInternal(index, string))
 	{
 		return false;
 	}
-	this->OnFilterScriptInit(index);
 	return true;
 }
 
@@ -130,14 +179,15 @@ bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
 		return false;
 	}
 	this->OnFilterScriptExit(index);
-	if (!this->UnloadFilterScriptInternal(index))
+	if (!this->UnloadVirtualMachine(index))
 	{
 		return false;
 	}
+	free(vmbuffer[index].filename);
 	return true;
 }
 
-bool VirtualMachineManager::GetFilterScriptInfoString(const unsigned char index, char *&string)
+bool VirtualMachineManager::ReloadFilterScript(const unsigned char index)
 {
 	if (index > MAX_FILTERSCRIPTS)
 	{
@@ -147,15 +197,82 @@ bool VirtualMachineManager::GetFilterScriptInfoString(const unsigned char index,
 	{
 		return false;
 	}
-	string = (char *)calloc(_scprintf("%d \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author) + 1, sizeof(char));
-	sprintf(string, "%d \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author);
+	char *filename = (char *)calloc(strlen(vmbuffer[index].filename) + 1, sizeof(char));
+	strcpy(filename, vmbuffer[index].filename);
+	if (!this->UnloadFilterScript(index))
+	{
+		return false;
+	}
+	if (!this->LoadFilterScriptInternal(index, filename))
+	{
+		return false;
+	}
 	return true;
 }
 
-void VirtualMachineManager::SetFilterScriptName(HSQUIRRELVM *v, const char *string)
+bool VirtualMachineManager::PauseVirtualMachine(const unsigned char index)
+{
+	if (index > MAX_FILTERSCRIPTS)
+	{
+		return false;
+	}
+	if (!vmbuffer[index].loaded)
+	{
+		return false;
+	}
+	if (vmbuffer[index].paused)
+	{
+		return false;
+	}
+	vmbuffer[index].paused = true;
+	return true;
+}
+
+bool VirtualMachineManager::UnpauseVirtualMachine(const unsigned char index)
+{
+	if (index > MAX_FILTERSCRIPTS)
+	{
+		return false;
+	}
+	if (!vmbuffer[index].loaded)
+	{
+		return false;
+	}
+	if (!vmbuffer[index].paused)
+	{
+		return false;
+	}
+	vmbuffer[index].paused = false;
+	return true;
+}
+
+bool VirtualMachineManager::GetVirtualMachineInfoString(const unsigned char index, char *&string)
+{
+	if (index > MAX_FILTERSCRIPTS)
+	{
+		return false;
+	}
+	if (!vmbuffer[index].loaded)
+	{
+		return false;
+	}
+	if (!vmbuffer[index].paused)
+	{
+		string = (char *)calloc(_scprintf("%d \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author) + 1, sizeof(char));
+		sprintf(string, "%d \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author);
+	}
+	else
+	{
+		string = (char *)calloc(_scprintf("%d (Paused) \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author) + 1, sizeof(char));
+		sprintf(string, "%d (Paused) \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author);
+	}
+	return true;
+}
+
+void VirtualMachineManager::SetVirtualMachineName(HSQUIRRELVM *v, const char *string)
 {
 	unsigned char index;
-	if (!this->FindFilterScript(v, index))
+	if (!this->FindVirtualMachine(v, index))
 	{
 		return;
 	}
@@ -163,10 +280,10 @@ void VirtualMachineManager::SetFilterScriptName(HSQUIRRELVM *v, const char *stri
 	strcpy(vmbuffer[index].name, string);
 }
 
-void VirtualMachineManager::SetFilterScriptVersion(HSQUIRRELVM *v, const char *string)
+void VirtualMachineManager::SetVirtualMachineVersion(HSQUIRRELVM *v, const char *string)
 {
 	unsigned char index;
-	if (!this->FindFilterScript(v, index))
+	if (!this->FindVirtualMachine(v, index))
 	{
 		return;
 	}
@@ -174,10 +291,10 @@ void VirtualMachineManager::SetFilterScriptVersion(HSQUIRRELVM *v, const char *s
 	strcpy(vmbuffer[index].version, string);
 }
 
-void VirtualMachineManager::SetFilterScriptAuthor(HSQUIRRELVM *v, const char *string)
+void VirtualMachineManager::SetVirtualMachineAuthor(HSQUIRRELVM *v, const char *string)
 {
 	unsigned char index;
-	if (!this->FindFilterScript(v, index))
+	if (!this->FindVirtualMachine(v, index))
 	{
 		return;
 	}
@@ -189,7 +306,7 @@ int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
 {
 	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
 	{
-		if (vmbuffer[i].loaded)
+		if ((vmbuffer[i].loaded) && (!vmbuffer[i].paused))
 		{
 			switch (vmbuffer[i].lang)
 			{
@@ -208,7 +325,7 @@ void VirtualMachineManager::OnPlayerDisconnect(int playerid)
 {
 	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
 	{
-		if (vmbuffer[i].loaded)
+		if ((vmbuffer[i].loaded) && (!vmbuffer[i].paused))
 		{
 			switch (vmbuffer[i].lang)
 			{
@@ -226,7 +343,7 @@ void VirtualMachineManager::OnPlayerSpawn(int playerid, int cl)
 {
 	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
 	{
-		if (vmbuffer[i].loaded)
+		if ((vmbuffer[i].loaded) && (!vmbuffer[i].paused))
 		{
 			switch (vmbuffer[i].lang)
 			{
@@ -241,6 +358,21 @@ void VirtualMachineManager::OnPlayerSpawn(int playerid, int cl)
 }
 
 bool VirtualMachineManager::LoadFilterScriptInternal(const unsigned char index, const char *string)
+{
+	int length = strlen(string);
+	char *filterscript = (char *)calloc(length + 15, sizeof(char));
+	sprintf(filterscript, "filterscripts/%s", string);
+	if (!this->LoadVirtualMachine(index, filterscript))
+	{
+		return false;
+	}
+	vmbuffer[index].filename = (char *)calloc(length + 1, sizeof(char));
+	strcpy(vmbuffer[index].filename, string);
+	this->OnFilterScriptInit(index);
+	return true;
+}
+
+bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const char *string)
 {
 	if (index > MAX_FILTERSCRIPTS)
 	{
@@ -321,6 +453,7 @@ bool VirtualMachineManager::LoadFilterScriptInternal(const unsigned char index, 
 	//		break;
 	//	}
 	}
+	vmbuffer[index].paused = false;
 	vmbuffer[index].name = (char *)calloc(16, sizeof(char));
 	strcpy(vmbuffer[index].name, "Untitled script");
 	vmbuffer[index].version = (char *)calloc(8, sizeof(char));
@@ -331,7 +464,7 @@ bool VirtualMachineManager::LoadFilterScriptInternal(const unsigned char index, 
 	return true;
 }
 
-bool VirtualMachineManager::UnloadFilterScriptInternal(const unsigned char index)
+bool VirtualMachineManager::UnloadVirtualMachine(const unsigned char index)
 {
 	if (index > MAX_FILTERSCRIPTS)
 	{
@@ -350,6 +483,7 @@ bool VirtualMachineManager::UnloadFilterScriptInternal(const unsigned char index
 			break;
 		}
 	}
+	vmbuffer[index].paused = false;
 	free(vmbuffer[index].name);
 	free(vmbuffer[index].version);
 	free(vmbuffer[index].author);
@@ -357,7 +491,7 @@ bool VirtualMachineManager::UnloadFilterScriptInternal(const unsigned char index
 	return true;
 }
 
-unsigned char VirtualMachineManager::GetNumberOfFreeFilterscriptSlots(void)
+unsigned char VirtualMachineManager::GetNumberOfFreeFilterScriptSlots(void)
 {
 	unsigned char slots = 0;
 	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
@@ -382,7 +516,7 @@ bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 	return false;
 }
 
-bool VirtualMachineManager::FindFilterScript(HSQUIRRELVM *v, unsigned char &index)
+bool VirtualMachineManager::FindVirtualMachine(HSQUIRRELVM *v, unsigned char &index)
 {
 	for (index = 0; index <= MAX_FILTERSCRIPTS; index++)
 	{

@@ -21,12 +21,19 @@ public:
 	bool UnloadGameMode(void);
 	void LoadFilterScripts(void);
 	void UnloadFilterScripts(void);
+	void ReloadFilterScripts(void);
+	void PauseVirtualMachines(void);
+	void UnpauseVirtualMachines(void);
+	bool IsFilterScriptLoaded(const char *string);
 	bool LoadFilterScript(const char *string);
 	bool UnloadFilterScript(const unsigned char index);
-	bool GetFilterScriptInfoString(const unsigned char index, char *&string);
-	void SetFilterScriptName(HSQUIRRELVM *v, const char *string);
-	void SetFilterScriptVersion(HSQUIRRELVM *v, const char *string);
-	void SetFilterScriptAuthor(HSQUIRRELVM *v, const char *string);
+	bool ReloadFilterScript(const unsigned char index);
+	bool PauseVirtualMachine(const unsigned char index);
+	bool UnpauseVirtualMachine(const unsigned char index);
+	bool GetVirtualMachineInfoString(const unsigned char index, char *&string);
+	void SetVirtualMachineName(HSQUIRRELVM *v, const char *string);
+	void SetVirtualMachineVersion(HSQUIRRELVM *v, const char *string);
+	void SetVirtualMachineAuthor(HSQUIRRELVM *v, const char *string);
 	int OnPlayerConnect(int playerid, char name[32]);
 	void OnPlayerDisconnect(int playerid);
 	void OnPlayerSpawn(int playerid, int cl);
@@ -40,18 +47,21 @@ private:
 	struct VirtualMachine
 	{
 		bool loaded;
+		bool paused;
 		char *name;
 		char *version;
 		char *author;
 		VirtualMachineLanguage lang;
 		VirtualMachinePtr ptr;
+		char *filename;
 	};
 	VirtualMachine vmbuffer[MAX_FILTERSCRIPTS+1]; //Virtual machine buffer. 0 - is game mode, 1...16 - filterscripts
 	bool LoadFilterScriptInternal(const unsigned char index, const char *string);
-	bool UnloadFilterScriptInternal(const unsigned char index);
-	unsigned char GetNumberOfFreeFilterscriptSlots(void);
+	bool LoadVirtualMachine(const unsigned char index, const char *string);
+	bool UnloadVirtualMachine(const unsigned char index);
+	unsigned char GetNumberOfFreeFilterScriptSlots(void);
 	bool GetFilterScriptFreeSlot(unsigned char &index);
-	bool FindFilterScript(HSQUIRRELVM *v, unsigned char &index);
+	bool FindVirtualMachine(HSQUIRRELVM *v, unsigned char &index);
 	void OnGameModeInit(void);
 	void OnGameModeExit(void);
 	void OnFilterScriptInit(const unsigned char index);

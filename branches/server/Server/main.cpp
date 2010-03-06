@@ -138,7 +138,15 @@ int main()
 	// FMP console functions
 	new ConCmd("fs_list", ConCmdFsList, "Prints details about loaded gamemode/filterscripts.", 0);
 	new ConCmd("fs_load", ConCmdFsLoad, "fs_load <filename> : loads a filterscript", 0);
+	new ConCmd("fs_load_all", ConCmdFsLoadAll, "Loads all filterscripts", 0);
+	new ConCmd("fs_pause", ConCmdFsPause, "fs_pause <index> : pauses a loaded filterscript", 0);
+	new ConCmd("fs_pause_all", ConCmdFsPauseAll, "Pauses all loaded filterscripts", 0);
+	new ConCmd("fs_reload", ConCmdFsReload, "fs_reload <index> : reloads a filterscript", 0);
+	new ConCmd("fs_reload_all", ConCmdFsReloadAll, "Reloads all filterscripts", 0);
 	new ConCmd("fs_unload", ConCmdFsUnload, "fs_unload <index> : unloads a filterscript", 0);
+	new ConCmd("fs_unload_all", ConCmdFsUnloadAll, "Unloads all filterscripts", 0);
+	new ConCmd("fs_unpause", ConCmdFsUnpause, "fs_unpause <index> : unpauses a loaded filterscript", 0);
+	new ConCmd("fs_unpause_all", ConCmdFsUnpauseAll, "Unpauses all disabled filterscripts", 0);
 	print("FOUR-MP. Copyright 2009-2010 Four-mp team.");
 	print("Developer build. Loading...");
 	LoadConfig();
@@ -171,13 +179,12 @@ int main()
 
 	REGISTER_STATIC_RPC(net, Chat);
 	
-	// Load Game Mode
+	vmm.LoadFilterScripts();
 	if (!vmm.LoadGameMode(sConf.GameMode[0]))
 	{
 		print("Can't load gamemode");
 		return 1;
 	}
-	vmm.LoadFilterScripts();
 	// Body
 	Packet *pack;
 	debug("Started");

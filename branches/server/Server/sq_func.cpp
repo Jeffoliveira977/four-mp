@@ -42,21 +42,21 @@ void sq_SetScriptName(HSQUIRRELVM v)
 {
 	const char *string;
 	sq_getstring(v, 2, &string);
-	vmm.SetFilterScriptName(&v, string);
+	vmm.SetVirtualMachineName(&v, string);
 }
 
 void sq_SetScriptVersion(HSQUIRRELVM v)
 {
 	const char *string;
 	sq_getstring(v, 2, &string);
-	vmm.SetFilterScriptVersion(&v, string);
+	vmm.SetVirtualMachineVersion(&v, string);
 }
 
 void sq_SetScriptAuthor(HSQUIRRELVM v)
 {
 	const char *string;
 	sq_getstring(v, 2, &string);
-	vmm.SetFilterScriptAuthor(&v, string);
+	vmm.SetVirtualMachineAuthor(&v, string);
 }
 
 void sq_GetCmdArgs(HSQUIRRELVM v)

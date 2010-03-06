@@ -15,7 +15,7 @@ void ConCmdFsList(unsigned char numargs)
 	char *string;
 	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
 	{
-		if (vmm.GetFilterScriptInfoString(i, string))
+		if (vmm.GetVirtualMachineInfoString(i, string))
 		{
 			conscreen.Print(string);
 		}
@@ -45,6 +45,73 @@ void ConCmdFsLoad(unsigned char numargs)
 	free(name);
 }
 
+void ConCmdFsLoadAll(unsigned char numargs)
+{
+	vmm.LoadFilterScripts();
+	conscreen.Print("Loaded all filterscripts");
+}
+
+void ConCmdFsPause(unsigned char numargs)
+{
+	if (numargs == 0)
+	{
+		conscreen.Print("Usage: fs_pause <index>");
+		return;
+	}
+	int index;
+	if (!concore.GetCmdArg(1, index))
+	{
+		conscreen.Print("Usage: fs_pause <index>");
+		return;
+	}
+	if (!vmm.PauseVirtualMachine(index))
+	{
+
+		conscreen.Print("Unable to pause filterscript \"%d\"", index);
+		return;
+	}
+	conscreen.Print("Filterscript \"%d\" disabled", index);
+}
+
+void ConCmdFsPauseAll(unsigned char numargs)
+{
+	vmm.PauseVirtualMachines();
+	conscreen.Print("Filterscripts disabled");
+}
+
+void ConCmdFsReload(unsigned char numargs)
+{
+	if (numargs == 0)
+	{
+		conscreen.Print("Usage: fs_reload <index>");
+		return;
+	}
+	int index;
+	if (!concore.GetCmdArg(1, index))
+	{
+		conscreen.Print("Usage: fs_reload <index>");
+		return;
+	}
+	if (index == 0)
+	{
+		conscreen.Print("Can't reload gamemode");
+		return;
+	}
+	if (!vmm.ReloadFilterScript(index))
+	{
+
+		conscreen.Print("Unable to reload filterscript \"%d\"", index);
+		return;
+	}
+	conscreen.Print("Filterscript \"%d\" has been reloaded successfully", index);
+}
+
+void ConCmdFsReloadAll(unsigned char numargs)
+{
+	vmm.ReloadFilterScripts();
+	conscreen.Print("Reloaded all filterscripts");
+}
+
 void ConCmdFsUnload(unsigned char numargs)
 {
 	if (numargs == 0)
@@ -70,6 +137,40 @@ void ConCmdFsUnload(unsigned char numargs)
 		return;
 	}
 	conscreen.Print("Filterscript \"%d\" has been unloaded successfully", index);
+}
+
+void ConCmdFsUnloadAll(unsigned char numargs)
+{
+	vmm.UnloadFilterScripts();
+	conscreen.Print("Unloaded all filterscripts");
+}
+
+void ConCmdFsUnpause(unsigned char numargs)
+{
+	if (numargs == 0)
+	{
+		conscreen.Print("Usage: fs_unpause <index>");
+		return;
+	}
+	int index;
+	if (!concore.GetCmdArg(1, index))
+	{
+		conscreen.Print("Usage: fs_unpause <index>");
+		return;
+	}
+	if (!vmm.UnpauseVirtualMachine(index))
+	{
+
+		conscreen.Print("Unable to unpause filterscript \"%d\"", index);
+		return;
+	}
+	conscreen.Print("Filterscript \"%d\" enabled", index);
+}
+
+void ConCmdFsUnpauseAll(unsigned char numargs)
+{
+	vmm.UnpauseVirtualMachines();
+	conscreen.Print("Filterscripts enabled");
 }
 
 void ConCmdSquirrel(unsigned char numargs)
