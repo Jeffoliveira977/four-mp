@@ -18,6 +18,7 @@ public:
 	bool LoadGameMode(const char *string);
 	bool UnloadGameMode(void);
 	unsigned char GetMaxFilterScripts(void);
+	unsigned char GetMaxFilterScriptIndex(void);
 	void LoadFilterScripts(void);
 	void UnloadFilterScripts(void);
 	void ReloadFilterScripts(void);
@@ -54,6 +55,7 @@ private:
 		char *filename;
 	};
 	unsigned char maxfilterscripts;
+	unsigned char maxfilterscriptindex;
 	VirtualMachine **vmbuffer; //Virtual machine buffer. 0 - is game mode, 1...maxfilterscripts - filterscripts
 	bool LoadFilterScriptInternal(const unsigned char index, const char *string);
 	bool LoadVirtualMachine(const unsigned char index, const char *string);

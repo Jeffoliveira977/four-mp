@@ -18,6 +18,7 @@ VirtualMachineManager::VirtualMachineManager(void)
 {
 	maxfilterscripts = 16;
 	vmbuffer = (VirtualMachine **)calloc(maxfilterscripts + 1, sizeof(VirtualMachine *));
+	maxfilterscriptindex = 0;
 }
 
 VirtualMachineManager::~VirtualMachineManager(void)
@@ -77,6 +78,11 @@ unsigned char VirtualMachineManager::GetMaxFilterScripts(void)
 	return maxfilterscripts;
 }
 
+unsigned char VirtualMachineManager::GetMaxFilterScriptIndex(void)
+{
+	return maxfilterscriptindex;
+}
+
 void VirtualMachineManager::LoadFilterScripts(void)
 {
 	intptr_t ptr;
@@ -106,7 +112,7 @@ void VirtualMachineManager::LoadFilterScripts(void)
 
 void VirtualMachineManager::UnloadFilterScripts(void)
 {
-	for (unsigned char i = 1; i <= maxfilterscripts; i++)
+	for (unsigned char i = 1; i <= maxfilterscriptindex; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -117,7 +123,7 @@ void VirtualMachineManager::UnloadFilterScripts(void)
 
 void VirtualMachineManager::ReloadFilterScripts(void)
 {
-	for (unsigned char i = 1; i <= maxfilterscripts; i++)
+	for (unsigned char i = 1; i <= maxfilterscriptindex; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -128,7 +134,7 @@ void VirtualMachineManager::ReloadFilterScripts(void)
 
 void VirtualMachineManager::PauseVirtualMachines(void)
 {
-	for (unsigned char i = 0; i <= maxfilterscripts; i++)
+	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -139,7 +145,7 @@ void VirtualMachineManager::PauseVirtualMachines(void)
 
 void VirtualMachineManager::UnpauseVirtualMachines(void)
 {
-	for (unsigned char i = 0; i <= maxfilterscripts; i++)
+	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -150,7 +156,7 @@ void VirtualMachineManager::UnpauseVirtualMachines(void)
 
 bool VirtualMachineManager::IsFilterScriptLoaded(const char *string)
 {
-	for (unsigned char i = 1; i <= maxfilterscripts; i++)
+	for (unsigned char i = 1; i <= maxfilterscriptindex; i++)
 	{
 		if ((vmbuffer[i] != NULL) && (strcmp(vmbuffer[i]->filename, string) == 0))
 		{
@@ -176,7 +182,7 @@ bool VirtualMachineManager::LoadFilterScript(const char *string)
 
 bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
 {
-	if (index > maxfilterscripts)
+	if (index > maxfilterscriptindex)
 	{
 		return false;
 	}
@@ -201,7 +207,7 @@ bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
 
 bool VirtualMachineManager::ReloadFilterScript(const unsigned char index)
 {
-	if (index > maxfilterscripts)
+	if (index > maxfilterscriptindex)
 	{
 		return false;
 	}
@@ -224,7 +230,7 @@ bool VirtualMachineManager::ReloadFilterScript(const unsigned char index)
 
 bool VirtualMachineManager::PauseVirtualMachine(const unsigned char index)
 {
-	if (index > maxfilterscripts)
+	if (index > maxfilterscriptindex)
 	{
 		return false;
 	}
@@ -242,7 +248,7 @@ bool VirtualMachineManager::PauseVirtualMachine(const unsigned char index)
 
 bool VirtualMachineManager::UnpauseVirtualMachine(const unsigned char index)
 {
-	if (index > maxfilterscripts)
+	if (index > maxfilterscriptindex)
 	{
 		return false;
 	}
@@ -260,7 +266,7 @@ bool VirtualMachineManager::UnpauseVirtualMachine(const unsigned char index)
 
 bool VirtualMachineManager::GetVirtualMachineInfoString(const unsigned char index, char *&string)
 {
-	if (index > maxfilterscripts)
+	if (index > maxfilterscriptindex)
 	{
 		return false;
 	}
@@ -316,7 +322,7 @@ void VirtualMachineManager::SetVirtualMachineAuthor(HSQUIRRELVM *v, const char *
 
 int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
 {
-	for (unsigned char i = 0; i <= maxfilterscripts; i++)
+	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
 	{
 		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
 		{
@@ -335,7 +341,7 @@ int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
 
 void VirtualMachineManager::OnPlayerDisconnect(int playerid)
 {
-	for (unsigned char i = 0; i <= maxfilterscripts; i++)
+	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
 	{
 		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
 		{
@@ -353,7 +359,7 @@ void VirtualMachineManager::OnPlayerDisconnect(int playerid)
 
 void VirtualMachineManager::OnPlayerSpawn(int playerid, int cl)
 {
-	for (unsigned char i = 0; i <= maxfilterscripts; i++)
+	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
 	{
 		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
 		{
@@ -377,6 +383,10 @@ bool VirtualMachineManager::LoadFilterScriptInternal(const unsigned char index, 
 	if (!this->LoadVirtualMachine(index, filterscript))
 	{
 		return false;
+	}
+	if (index > maxfilterscriptindex)
+	{
+		maxfilterscriptindex = index;
 	}
 	vmbuffer[index]->filename = (char *)calloc(length + 1, sizeof(char));
 	strcpy(vmbuffer[index]->filename, string);
@@ -478,7 +488,7 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 
 bool VirtualMachineManager::UnloadVirtualMachine(const unsigned char index)
 {
-	if (index > maxfilterscripts)
+	if (index > maxfilterscriptindex)
 	{
 		return false;
 	}
@@ -505,13 +515,14 @@ bool VirtualMachineManager::UnloadVirtualMachine(const unsigned char index)
 unsigned char VirtualMachineManager::GetNumberOfFreeFilterScriptSlots(void)
 {
 	unsigned char slots = 0;
-	for (unsigned char i = 0; i <= maxfilterscripts; i++)
+	for (unsigned char i = 1; i <= maxfilterscriptindex; i++)
 	{
 		if (vmbuffer[i] == NULL)
 		{
 			slots++;
 		}
 	}
+	slots = maxfilterscripts - maxfilterscriptindex + slots;
 	return slots;
 }
 
@@ -529,7 +540,7 @@ bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 
 bool VirtualMachineManager::FindVirtualMachine(HSQUIRRELVM *v, unsigned char &index)
 {
-	for (index = 0; index <= maxfilterscripts; index++)
+	for (index = 0; index <= maxfilterscriptindex; index++)
 	{
 		if ((vmbuffer[index] != NULL) && (vmbuffer[index]->lang == VMLanguageSquirrel) && (*vmbuffer[index]->ptr.squirrel == *v))
 		{
@@ -541,7 +552,7 @@ bool VirtualMachineManager::FindVirtualMachine(HSQUIRRELVM *v, unsigned char &in
 
 void VirtualMachineManager::OnGameModeInit(void)
 {
-	for (unsigned char i = 0; i <= maxfilterscripts; i++)
+	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -559,7 +570,7 @@ void VirtualMachineManager::OnGameModeInit(void)
 
 void VirtualMachineManager::OnGameModeExit(void)
 {
-	for (unsigned char i = 0; i <= maxfilterscripts; i++)
+	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -577,7 +588,7 @@ void VirtualMachineManager::OnGameModeExit(void)
 
 void VirtualMachineManager::OnFilterScriptInit(const unsigned char index)
 {
-	if (index > maxfilterscripts)
+	if (index > maxfilterscriptindex)
 	{
 		return;
 	}
@@ -597,7 +608,7 @@ void VirtualMachineManager::OnFilterScriptInit(const unsigned char index)
 
 void VirtualMachineManager::OnFilterScriptExit(const unsigned char index)
 {
-	if (index > maxfilterscripts)
+	if (index > maxfilterscriptindex)
 	{
 		return;
 	}
