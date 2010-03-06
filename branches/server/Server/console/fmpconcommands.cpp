@@ -13,7 +13,8 @@ void ConCmdFsList(unsigned char numargs)
 {
 	conscreen.Print("Loaded filterscripts:\n---------------------");
 	char *string;
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	unsigned char max = vmm.GetMaxFilterScripts();
+	for (unsigned char i = 0; i <= max; i++)
 	{
 		if (vmm.GetVirtualMachineInfoString(i, string))
 		{

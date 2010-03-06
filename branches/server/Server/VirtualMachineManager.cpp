@@ -16,17 +16,20 @@
 
 VirtualMachineManager::VirtualMachineManager(void)
 {
+	maxfilterscripts = 16;
+	vmbuffer = (VirtualMachine **)calloc(maxfilterscripts + 1, sizeof(VirtualMachine *));
 }
 
 VirtualMachineManager::~VirtualMachineManager(void)
 {
 	this->UnloadGameMode();
 	this->UnloadFilterScripts();
+	free(vmbuffer);
 }
 
 bool VirtualMachineManager::IsGameModeLoaded(void)
 {
-	if (!vmbuffer[0].loaded)
+	if (vmbuffer[0] == NULL)
 	{
 		return false;
 	}
@@ -35,7 +38,7 @@ bool VirtualMachineManager::IsGameModeLoaded(void)
 
 bool VirtualMachineManager::LoadGameMode(const char *string)
 {
-	if (vmbuffer[0].loaded)
+	if (vmbuffer[0] != NULL)
 	{
 		return false;
 	}
@@ -46,8 +49,8 @@ bool VirtualMachineManager::LoadGameMode(const char *string)
 	{
 		return false;
 	}
-	vmbuffer[0].filename = (char *)calloc(length + 1, sizeof(char));
-	strcpy(vmbuffer[0].filename, string);
+	vmbuffer[0]->filename = (char *)calloc(length + 1, sizeof(char));
+	strcpy(vmbuffer[0]->filename, string);
 	this->OnGameModeInit();
 	return true;
 }
@@ -63,8 +66,15 @@ bool VirtualMachineManager::UnloadGameMode(void)
 	{
 		return false;
 	}
-	free(vmbuffer[0].filename);
+	free(vmbuffer[0]->filename);
+	delete vmbuffer[0];
+	vmbuffer[0] = NULL;
 	return true;
+}
+
+unsigned char VirtualMachineManager::GetMaxFilterScripts(void)
+{
+	return maxfilterscripts;
 }
 
 void VirtualMachineManager::LoadFilterScripts(void)
@@ -96,9 +106,9 @@ void VirtualMachineManager::LoadFilterScripts(void)
 
 void VirtualMachineManager::UnloadFilterScripts(void)
 {
-	for (unsigned char i = 1; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 1; i <= maxfilterscripts; i++)
 	{
-		if (vmbuffer[i].loaded)
+		if (vmbuffer[i] != NULL)
 		{
 			this->UnloadFilterScript(i);
 		}
@@ -107,9 +117,9 @@ void VirtualMachineManager::UnloadFilterScripts(void)
 
 void VirtualMachineManager::ReloadFilterScripts(void)
 {
-	for (unsigned char i = 1; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 1; i <= maxfilterscripts; i++)
 	{
-		if (vmbuffer[i].loaded)
+		if (vmbuffer[i] != NULL)
 		{
 			this->ReloadFilterScript(i);
 		}
@@ -118,9 +128,9 @@ void VirtualMachineManager::ReloadFilterScripts(void)
 
 void VirtualMachineManager::PauseVirtualMachines(void)
 {
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 0; i <= maxfilterscripts; i++)
 	{
-		if (vmbuffer[i].loaded)
+		if (vmbuffer[i] != NULL)
 		{
 			this->PauseVirtualMachine(i);
 		}
@@ -129,9 +139,9 @@ void VirtualMachineManager::PauseVirtualMachines(void)
 
 void VirtualMachineManager::UnpauseVirtualMachines(void)
 {
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 0; i <= maxfilterscripts; i++)
 	{
-		if (vmbuffer[i].loaded)
+		if (vmbuffer[i] != NULL)
 		{
 			this->UnpauseVirtualMachine(i);
 		}
@@ -140,9 +150,9 @@ void VirtualMachineManager::UnpauseVirtualMachines(void)
 
 bool VirtualMachineManager::IsFilterScriptLoaded(const char *string)
 {
-	for (unsigned char i = 1; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 1; i <= maxfilterscripts; i++)
 	{
-		if ((vmbuffer[i].loaded) && (strcmp(vmbuffer[i].filename, string) == 0))
+		if ((vmbuffer[i] != NULL) && (strcmp(vmbuffer[i]->filename, string) == 0))
 		{
 			return true;
 		}
@@ -166,7 +176,7 @@ bool VirtualMachineManager::LoadFilterScript(const char *string)
 
 bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
 {
-	if (index > MAX_FILTERSCRIPTS)
+	if (index > maxfilterscripts)
 	{
 		return false;
 	}
@@ -174,7 +184,7 @@ bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
 	{
 		return false;
 	}
-	if (!vmbuffer[index].loaded)
+	if (vmbuffer[index] == NULL)
 	{
 		return false;
 	}
@@ -183,22 +193,24 @@ bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
 	{
 		return false;
 	}
-	free(vmbuffer[index].filename);
+	free(vmbuffer[index]->filename);
+	delete vmbuffer[index];
+	vmbuffer[index] = NULL;
 	return true;
 }
 
 bool VirtualMachineManager::ReloadFilterScript(const unsigned char index)
 {
-	if (index > MAX_FILTERSCRIPTS)
+	if (index > maxfilterscripts)
 	{
 		return false;
 	}
-	if (!vmbuffer[index].loaded)
+	if (vmbuffer[index] == NULL)
 	{
 		return false;
 	}
-	char *filename = (char *)calloc(strlen(vmbuffer[index].filename) + 1, sizeof(char));
-	strcpy(filename, vmbuffer[index].filename);
+	char *filename = (char *)calloc(strlen(vmbuffer[index]->filename) + 1, sizeof(char));
+	strcpy(filename, vmbuffer[index]->filename);
 	if (!this->UnloadFilterScript(index))
 	{
 		return false;
@@ -212,59 +224,59 @@ bool VirtualMachineManager::ReloadFilterScript(const unsigned char index)
 
 bool VirtualMachineManager::PauseVirtualMachine(const unsigned char index)
 {
-	if (index > MAX_FILTERSCRIPTS)
+	if (index > maxfilterscripts)
 	{
 		return false;
 	}
-	if (!vmbuffer[index].loaded)
+	if (vmbuffer[index] == NULL)
 	{
 		return false;
 	}
-	if (vmbuffer[index].paused)
+	if (vmbuffer[index]->paused)
 	{
 		return false;
 	}
-	vmbuffer[index].paused = true;
+	vmbuffer[index]->paused = true;
 	return true;
 }
 
 bool VirtualMachineManager::UnpauseVirtualMachine(const unsigned char index)
 {
-	if (index > MAX_FILTERSCRIPTS)
+	if (index > maxfilterscripts)
 	{
 		return false;
 	}
-	if (!vmbuffer[index].loaded)
+	if (vmbuffer[index] == NULL)
 	{
 		return false;
 	}
-	if (!vmbuffer[index].paused)
+	if (!vmbuffer[index]->paused)
 	{
 		return false;
 	}
-	vmbuffer[index].paused = false;
+	vmbuffer[index]->paused = false;
 	return true;
 }
 
 bool VirtualMachineManager::GetVirtualMachineInfoString(const unsigned char index, char *&string)
 {
-	if (index > MAX_FILTERSCRIPTS)
+	if (index > maxfilterscripts)
 	{
 		return false;
 	}
-	if (!vmbuffer[index].loaded)
+	if (vmbuffer[index] == NULL)
 	{
 		return false;
 	}
-	if (!vmbuffer[index].paused)
+	if (!vmbuffer[index]->paused)
 	{
-		string = (char *)calloc(_scprintf("%d \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author) + 1, sizeof(char));
-		sprintf(string, "%d \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author);
+		string = (char *)calloc(_scprintf("%d \"%s\" (%s) by %s", index, vmbuffer[index]->name, vmbuffer[index]->version, vmbuffer[index]->author) + 1, sizeof(char));
+		sprintf(string, "%d \"%s\" (%s) by %s", index, vmbuffer[index]->name, vmbuffer[index]->version, vmbuffer[index]->author);
 	}
 	else
 	{
-		string = (char *)calloc(_scprintf("%d (Paused) \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author) + 1, sizeof(char));
-		sprintf(string, "%d (Paused) \"%s\" (%s) by %s", index, vmbuffer[index].name, vmbuffer[index].version, vmbuffer[index].author);
+		string = (char *)calloc(_scprintf("%d (Paused) \"%s\" (%s) by %s", index, vmbuffer[index]->name, vmbuffer[index]->version, vmbuffer[index]->author) + 1, sizeof(char));
+		sprintf(string, "%d (Paused) \"%s\" (%s) by %s", index, vmbuffer[index]->name, vmbuffer[index]->version, vmbuffer[index]->author);
 	}
 	return true;
 }
@@ -276,8 +288,8 @@ void VirtualMachineManager::SetVirtualMachineName(HSQUIRRELVM *v, const char *st
 	{
 		return;
 	}
-	ResizeStringBuffer(vmbuffer[index].name, strlen(string) + 1);
-	strcpy(vmbuffer[index].name, string);
+	ResizeStringBuffer(vmbuffer[index]->name, strlen(string) + 1);
+	strcpy(vmbuffer[index]->name, string);
 }
 
 void VirtualMachineManager::SetVirtualMachineVersion(HSQUIRRELVM *v, const char *string)
@@ -287,8 +299,8 @@ void VirtualMachineManager::SetVirtualMachineVersion(HSQUIRRELVM *v, const char 
 	{
 		return;
 	}
-	ResizeStringBuffer(vmbuffer[index].version, strlen(string) + 1);
-	strcpy(vmbuffer[index].version, string);
+	ResizeStringBuffer(vmbuffer[index]->version, strlen(string) + 1);
+	strcpy(vmbuffer[index]->version, string);
 }
 
 void VirtualMachineManager::SetVirtualMachineAuthor(HSQUIRRELVM *v, const char *string)
@@ -298,21 +310,21 @@ void VirtualMachineManager::SetVirtualMachineAuthor(HSQUIRRELVM *v, const char *
 	{
 		return;
 	}
-	ResizeStringBuffer(vmbuffer[index].author, strlen(string) + 1);
-	strcpy(vmbuffer[index].author, string);
+	ResizeStringBuffer(vmbuffer[index]->author, strlen(string) + 1);
+	strcpy(vmbuffer[index]->author, string);
 }
 
 int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
 {
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 0; i <= maxfilterscripts; i++)
 	{
-		if ((vmbuffer[i].loaded) && (!vmbuffer[i].paused))
+		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
 		{
-			switch (vmbuffer[i].lang)
+			switch (vmbuffer[i]->lang)
 			{
 			case VMLanguageSquirrel:
 				{
-					sc_OnPlayerConnect(*vmbuffer[i].ptr.squirrel, playerid, name);
+					sc_OnPlayerConnect(*vmbuffer[i]->ptr.squirrel, playerid, name);
 					break;
 				}
 			}
@@ -323,15 +335,15 @@ int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
 
 void VirtualMachineManager::OnPlayerDisconnect(int playerid)
 {
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 0; i <= maxfilterscripts; i++)
 	{
-		if ((vmbuffer[i].loaded) && (!vmbuffer[i].paused))
+		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
 		{
-			switch (vmbuffer[i].lang)
+			switch (vmbuffer[i]->lang)
 			{
 			case VMLanguageSquirrel:
 				{
-					sc_OnPlayerDisconnect(*vmbuffer[i].ptr.squirrel, playerid);
+					sc_OnPlayerDisconnect(*vmbuffer[i]->ptr.squirrel, playerid);
 					break;
 				}
 			}
@@ -341,15 +353,15 @@ void VirtualMachineManager::OnPlayerDisconnect(int playerid)
 
 void VirtualMachineManager::OnPlayerSpawn(int playerid, int cl)
 {
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 0; i <= maxfilterscripts; i++)
 	{
-		if ((vmbuffer[i].loaded) && (!vmbuffer[i].paused))
+		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
 		{
-			switch (vmbuffer[i].lang)
+			switch (vmbuffer[i]->lang)
 			{
 			case VMLanguageSquirrel:
 				{
-					sc_OnPlayerSpawn(*vmbuffer[i].ptr.squirrel, playerid, cl);
+					sc_OnPlayerSpawn(*vmbuffer[i]->ptr.squirrel, playerid, cl);
 					break;
 				}
 			}
@@ -366,19 +378,19 @@ bool VirtualMachineManager::LoadFilterScriptInternal(const unsigned char index, 
 	{
 		return false;
 	}
-	vmbuffer[index].filename = (char *)calloc(length + 1, sizeof(char));
-	strcpy(vmbuffer[index].filename, string);
+	vmbuffer[index]->filename = (char *)calloc(length + 1, sizeof(char));
+	strcpy(vmbuffer[index]->filename, string);
 	this->OnFilterScriptInit(index);
 	return true;
 }
 
 bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const char *string)
 {
-	if (index > MAX_FILTERSCRIPTS)
+	if (index > maxfilterscripts)
 	{
 		return false;
 	}
-	if (vmbuffer[index].loaded)
+	if (vmbuffer[index] != NULL)
 	{
 		return false;
 	}
@@ -391,49 +403,50 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 	{
 		return false;
 	}
+	vmbuffer[index] = new VirtualMachine;
 	switch (lang)
 	{
 	case VMLanguageSquirrel:
 		{
-			vmbuffer[index].ptr.squirrel = new HSQUIRRELVM;
+			vmbuffer[index]->ptr.squirrel = new HSQUIRRELVM;
 			// Init Squirrel
-			*vmbuffer[index].ptr.squirrel = sq_open(1024);
-			sqstd_seterrorhandlers(*vmbuffer[index].ptr.squirrel);
-			sq_setprintfunc(*vmbuffer[index].ptr.squirrel, printfunc);
+			*vmbuffer[index]->ptr.squirrel = sq_open(1024);
+			sqstd_seterrorhandlers(*vmbuffer[index]->ptr.squirrel);
+			sq_setprintfunc(*vmbuffer[index]->ptr.squirrel, printfunc);
 			// Register Script Funcions
 			// Script identity functions
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_SetScriptName, "SetScriptName");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_SetScriptVersion, "SetScriptVersion");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_SetScriptAuthor, "SetScriptAuthor");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptName, "SetScriptName");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptVersion, "SetScriptVersion");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptAuthor, "SetScriptAuthor");
 			// Console functions
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_GetCmdArgs, "GetCmdArgs");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_GetCmdArgsAsString, "GetCmdArgsAsString");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_GetCmdArgType, "GetCmdArgType");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_GetCmdArgString, "GetCmdArgString");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_GetCmdArgInt, "GetCmdArgInt");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_GetCmdArgFloat, "GetCmdArgFloat");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_printr, "printr");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_RegServerCmd, "RegServerCmd");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_ServerCommand, "ServerCommand");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgs, "GetCmdArgs");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgsAsString, "GetCmdArgsAsString");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgType, "GetCmdArgType");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgString, "GetCmdArgString");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgInt, "GetCmdArgInt");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgFloat, "GetCmdArgFloat");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_printr, "printr");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_RegServerCmd, "RegServerCmd");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ServerCommand, "ServerCommand");
 			// Car functions
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_CreateCar, "CreateCar");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateCar, "CreateCar");
 			// Player functions
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_GiveWeapon, "GiveWeapon");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_addPlayerClass, "addPlayerClass");
-			register_global_func(*vmbuffer[index].ptr.squirrel, (SQFUNCTION)sq_enableComponentSelect, "enableComponentSelect");
-			sq_pushroottable(*vmbuffer[index].ptr.squirrel);
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GiveWeapon, "GiveWeapon");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_addPlayerClass, "addPlayerClass");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_enableComponentSelect, "enableComponentSelect");
+			sq_pushroottable(*vmbuffer[index]->ptr.squirrel);
 			// Register Standart Script Functions
-			sqstd_register_stringlib(*vmbuffer[index].ptr.squirrel);
-			sqstd_register_mathlib(*vmbuffer[index].ptr.squirrel);
-			sqstd_register_systemlib(*vmbuffer[index].ptr.squirrel);
-			sqstd_seterrorhandlers(*vmbuffer[index].ptr.squirrel);
-			if(!SQ_SUCCEEDED(sqstd_dofile(*vmbuffer[index].ptr.squirrel, _SC(string), 0, 1))) 
+			sqstd_register_stringlib(*vmbuffer[index]->ptr.squirrel);
+			sqstd_register_mathlib(*vmbuffer[index]->ptr.squirrel);
+			sqstd_register_systemlib(*vmbuffer[index]->ptr.squirrel);
+			sqstd_seterrorhandlers(*vmbuffer[index]->ptr.squirrel);
+			if(!SQ_SUCCEEDED(sqstd_dofile(*vmbuffer[index]->ptr.squirrel, _SC(string), 0, 1))) 
 			{
-				sq_close(*vmbuffer[index].ptr.squirrel);
-				delete vmbuffer[index].ptr.squirrel;
+				sq_close(*vmbuffer[index]->ptr.squirrel);
+				delete vmbuffer[index]->ptr.squirrel;
 				return false;
 			}
-			vmbuffer[index].lang = VMLanguageSquirrel;
+			vmbuffer[index]->lang = VMLanguageSquirrel;
 			break;
 		}
 	//case VMLanguagePawn:
@@ -453,50 +466,48 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 	//		break;
 	//	}
 	}
-	vmbuffer[index].paused = false;
-	vmbuffer[index].name = (char *)calloc(16, sizeof(char));
-	strcpy(vmbuffer[index].name, "Untitled script");
-	vmbuffer[index].version = (char *)calloc(8, sizeof(char));
-	strcpy(vmbuffer[index].version, "0.0.0.0");
-	vmbuffer[index].author = (char *)calloc(15, sizeof(char));
-	strcpy(vmbuffer[index].author, "Unnamed author");
-	vmbuffer[index].loaded = true;
+	vmbuffer[index]->paused = false;
+	vmbuffer[index]->name = (char *)calloc(16, sizeof(char));
+	strcpy(vmbuffer[index]->name, "Untitled script");
+	vmbuffer[index]->version = (char *)calloc(8, sizeof(char));
+	strcpy(vmbuffer[index]->version, "0.0.0.0");
+	vmbuffer[index]->author = (char *)calloc(15, sizeof(char));
+	strcpy(vmbuffer[index]->author, "Unnamed author");
 	return true;
 }
 
 bool VirtualMachineManager::UnloadVirtualMachine(const unsigned char index)
 {
-	if (index > MAX_FILTERSCRIPTS)
+	if (index > maxfilterscripts)
 	{
 		return false;
 	}
-	if (!vmbuffer[index].loaded)
+	if (vmbuffer[index] == NULL)
 	{
 		return false;
 	}
-	switch (vmbuffer[index].lang)
+	switch (vmbuffer[index]->lang)
 	{
 	case VMLanguageSquirrel:
 		{
-			sq_close(*vmbuffer[index].ptr.squirrel);
-			delete vmbuffer[index].ptr.squirrel;
+			sq_close(*vmbuffer[index]->ptr.squirrel);
+			delete vmbuffer[index]->ptr.squirrel;
 			break;
 		}
 	}
-	vmbuffer[index].paused = false;
-	free(vmbuffer[index].name);
-	free(vmbuffer[index].version);
-	free(vmbuffer[index].author);
-	vmbuffer[index].loaded = false;
+	vmbuffer[index]->paused = false;
+	free(vmbuffer[index]->name);
+	free(vmbuffer[index]->version);
+	free(vmbuffer[index]->author);
 	return true;
 }
 
 unsigned char VirtualMachineManager::GetNumberOfFreeFilterScriptSlots(void)
 {
 	unsigned char slots = 0;
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 0; i <= maxfilterscripts; i++)
 	{
-		if (!vmbuffer[i].loaded)
+		if (vmbuffer[i] == NULL)
 		{
 			slots++;
 		}
@@ -506,9 +517,9 @@ unsigned char VirtualMachineManager::GetNumberOfFreeFilterScriptSlots(void)
 
 bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 {
-	for (index = 1; index <= MAX_FILTERSCRIPTS; index++)
+	for (index = 1; index <= maxfilterscripts; index++)
 	{
-		if (!vmbuffer[index].loaded)
+		if (vmbuffer[index] == NULL)
 		{
 			return true;
 		}
@@ -518,9 +529,9 @@ bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 
 bool VirtualMachineManager::FindVirtualMachine(HSQUIRRELVM *v, unsigned char &index)
 {
-	for (index = 0; index <= MAX_FILTERSCRIPTS; index++)
+	for (index = 0; index <= maxfilterscripts; index++)
 	{
-		if ((vmbuffer[index].loaded) && (vmbuffer[index].lang == VMLanguageSquirrel) && (*vmbuffer[index].ptr.squirrel == *v))
+		if ((vmbuffer[index] != NULL) && (vmbuffer[index]->lang == VMLanguageSquirrel) && (*vmbuffer[index]->ptr.squirrel == *v))
 		{
 			return true;
 		}
@@ -530,15 +541,15 @@ bool VirtualMachineManager::FindVirtualMachine(HSQUIRRELVM *v, unsigned char &in
 
 void VirtualMachineManager::OnGameModeInit(void)
 {
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 0; i <= maxfilterscripts; i++)
 	{
-		if (vmbuffer[i].loaded)
+		if (vmbuffer[i] != NULL)
 		{
-			switch (vmbuffer[i].lang)
+			switch (vmbuffer[i]->lang)
 			{
 			case VMLanguageSquirrel:
 				{
-					sc_OnGameModeInit(*vmbuffer[i].ptr.squirrel);
+					sc_OnGameModeInit(*vmbuffer[i]->ptr.squirrel);
 					break;
 				}
 			}
@@ -548,15 +559,15 @@ void VirtualMachineManager::OnGameModeInit(void)
 
 void VirtualMachineManager::OnGameModeExit(void)
 {
-	for (unsigned char i = 0; i <= MAX_FILTERSCRIPTS; i++)
+	for (unsigned char i = 0; i <= maxfilterscripts; i++)
 	{
-		if (vmbuffer[i].loaded)
+		if (vmbuffer[i] != NULL)
 		{
-			switch (vmbuffer[i].lang)
+			switch (vmbuffer[i]->lang)
 			{
 			case VMLanguageSquirrel:
 				{
-					sc_OnGameModeExit(*vmbuffer[i].ptr.squirrel);
+					sc_OnGameModeExit(*vmbuffer[i]->ptr.squirrel);
 					break;
 				}
 			}
@@ -566,19 +577,19 @@ void VirtualMachineManager::OnGameModeExit(void)
 
 void VirtualMachineManager::OnFilterScriptInit(const unsigned char index)
 {
-	if (index > MAX_FILTERSCRIPTS)
+	if (index > maxfilterscripts)
 	{
 		return;
 	}
-	if (!vmbuffer[index].loaded)
+	if (vmbuffer[index] == NULL)
 	{
 		return;
 	}
-	switch (vmbuffer[index].lang)
+	switch (vmbuffer[index]->lang)
 	{
 	case VMLanguageSquirrel:
 		{
-			sc_OnFilterScriptInit(*vmbuffer[index].ptr.squirrel);
+			sc_OnFilterScriptInit(*vmbuffer[index]->ptr.squirrel);
 			break;
 		}
 	}
@@ -586,19 +597,19 @@ void VirtualMachineManager::OnFilterScriptInit(const unsigned char index)
 
 void VirtualMachineManager::OnFilterScriptExit(const unsigned char index)
 {
-	if (index > MAX_FILTERSCRIPTS)
+	if (index > maxfilterscripts)
 	{
 		return;
 	}
-	if (!vmbuffer[index].loaded)
+	if (vmbuffer[index] == NULL)
 	{
 		return;
 	}
-	switch (vmbuffer[index].lang)
+	switch (vmbuffer[index]->lang)
 	{
 	case VMLanguageSquirrel:
 		{
-			sc_OnFilterScriptExit(*vmbuffer[index].ptr.squirrel);
+			sc_OnFilterScriptExit(*vmbuffer[index]->ptr.squirrel);
 			break;
 		}
 	}

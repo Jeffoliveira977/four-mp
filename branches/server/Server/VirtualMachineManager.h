@@ -2,8 +2,6 @@
 
 #include "sq\squirrel.h"
 
-#define MAX_FILTERSCRIPTS 16
-
 enum VirtualMachineLanguage
 	{
 		VMLanguageSquirrel
@@ -19,6 +17,7 @@ public:
 	bool IsGameModeLoaded(void);
 	bool LoadGameMode(const char *string);
 	bool UnloadGameMode(void);
+	unsigned char GetMaxFilterScripts(void);
 	void LoadFilterScripts(void);
 	void UnloadFilterScripts(void);
 	void ReloadFilterScripts(void);
@@ -46,7 +45,6 @@ private:
 	};
 	struct VirtualMachine
 	{
-		bool loaded;
 		bool paused;
 		char *name;
 		char *version;
@@ -55,7 +53,8 @@ private:
 		VirtualMachinePtr ptr;
 		char *filename;
 	};
-	VirtualMachine vmbuffer[MAX_FILTERSCRIPTS+1]; //Virtual machine buffer. 0 - is game mode, 1...16 - filterscripts
+	unsigned char maxfilterscripts;
+	VirtualMachine **vmbuffer; //Virtual machine buffer. 0 - is game mode, 1...maxfilterscripts - filterscripts
 	bool LoadFilterScriptInternal(const unsigned char index, const char *string);
 	bool LoadVirtualMachine(const unsigned char index, const char *string);
 	bool UnloadVirtualMachine(const unsigned char index);
