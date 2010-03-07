@@ -280,33 +280,28 @@ void ConCmdPluginLoad(unsigned char numargs)
 //	conscreen.Print("Reloaded all filterscripts");
 //}
 //
-//void ConCmdFsUnload(unsigned char numargs)
-//{
-//	if (numargs == 0)
-//	{
-//		conscreen.Print("Usage: fs_unload <index>");
-//		return;
-//	}
-//	int index;
-//	if (!concore.GetCmdArg(1, index))
-//	{
-//		conscreen.Print("Usage: fs_unload <index>");
-//		return;
-//	}
-//	if (index == 0)
-//	{
-//		conscreen.Print("Can't unload gamemode");
-//		return;
-//	}
-//	if (!vmm.UnloadFilterScript(index))
-//	{
-//
-//		conscreen.Print("Unable to unload filterscript \"%d\", not found", index);
-//		return;
-//	}
-//	conscreen.Print("Filterscript \"%d\" has been unloaded successfully", index);
-//}
-//
+void ConCmdPluginUnload(unsigned char numargs)
+{
+	if (numargs == 0)
+	{
+		conscreen.Print("Usage: plugin_unload <index>");
+		return;
+	}
+	int index;
+	if (!concore.GetCmdArg(1, index))
+	{
+		conscreen.Print("Usage: plugin_unload <index>");
+		return;
+	}
+	if (!pm.UnloadPlugin(index))
+	{
+
+		conscreen.Print("Unable to unload plugin \"%d\", not found", index);
+		return;
+	}
+	conscreen.Print("Plugin \"%d\" has been unloaded successfully", index);
+}
+
 //void ConCmdFsUnloadAll(unsigned char numargs)
 //{
 //	vmm.UnloadFilterScripts();

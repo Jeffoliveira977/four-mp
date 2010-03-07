@@ -18,7 +18,7 @@ void ConCmdPluginLoad(unsigned char numargs);
 //void ConCmdPluginPauseAll(unsigned char numargs);
 //void ConCmdPluginReload(unsigned char numargs);
 //void ConCmdPluginReloadAll(unsigned char numargs);
-//void ConCmdPluginUnload(unsigned char numargs);
+void ConCmdPluginUnload(unsigned char numargs);
 //void ConCmdPluginUnloadAll(unsigned char numargs);
 //void ConCmdPluginUnpause(unsigned char numargs);
 //void ConCmdPluginUnpauseAll(unsigned char numargs);

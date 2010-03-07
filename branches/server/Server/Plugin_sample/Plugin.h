@@ -9,4 +9,5 @@ public:
 	Plugin(void);
 	~Plugin(void);
 	virtual void OnPluginLoad(void);
+	virtual void OnPluginUnload(void);
 };

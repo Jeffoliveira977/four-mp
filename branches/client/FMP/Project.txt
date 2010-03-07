@@ -10,6 +10,7 @@ Developers:
 					WNeZRoS
 					009 & VoLT
 					XAOC
+					FaTony
 Testers:
 					Robot
 					DEM@N

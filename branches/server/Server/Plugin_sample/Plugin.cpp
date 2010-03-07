@@ -19,3 +19,7 @@ Plugin::~Plugin(void)
 void Plugin::OnPluginLoad(void)
 {
 }
+
+void Plugin::OnPluginUnload(void)
+{
+}

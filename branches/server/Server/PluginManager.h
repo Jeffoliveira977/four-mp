@@ -13,6 +13,7 @@ public:
 	~PluginManager(void);
 	unsigned char GetPluginBufferSize(void);
 	bool LoadPlugin(const char *string);
+	bool UnloadPlugin(const unsigned char index);
 private:
 	struct Plugin
 	{
@@ -27,7 +28,9 @@ private:
 	unsigned char pluginbuffersize;
 	Plugin **pluginbuffer;
 	bool LoadPluginInternal(const unsigned char index, const char *string);
+	bool UnloadPluginInternal(const unsigned char index);
 	bool GetPluginFreeSlot(unsigned char &index);
 	bool ResizePluginBuffer(Plugin **&buffer, const unsigned char size);
 	void OnPluginLoad(const unsigned char index);
+	void OnPluginUnload(const unsigned char index);
 };

@@ -121,7 +121,6 @@ void LoadConfig()
 	strcpy(sConf.GameMode[1], config->GetVara("GameMode1"));
 	strcpy(sConf.GameMode[2], config->GetVara("GameMode2"));
 	strcpy(sConf.GameMode[3], config->GetVara("GameMode3"));
-	strcpy(sConf.FilterScripts, config->GetVara("FilterScript")); 
 	strcpy(sConf.Lang, config->GetVara("Lang")); 
 	strcpy(sConf.Password, config->GetVara("Password")); 
 	strcpy(sConf.RconPassword, config->GetVara("RconPassword")); 
@@ -156,7 +155,7 @@ int main()
 	//new ConCmd("plugin_pause_all", ConCmdPluginPauseAll, "Pauses all loaded plugins", 0);
 	//new ConCmd("plugin_reload", ConCmdPluginReload, "fs_reload <index> : reloads a plugin", 0);
 	//new ConCmd("plugin_reload_all", ConCmdPluginReloadAll, "Reloads all plugins", 0);
-	//new ConCmd("plugin_unload", ConCmdPluginUnload, "fs_unload <index> : unloads a plugin", 0);
+	new ConCmd("plugin_unload", ConCmdPluginUnload, "fs_unload <index> : unloads a plugin", 0);
 	//new ConCmd("plugin_unload_all", ConCmdPluginUnloadAll, "Unloads all plugins", 0);
 	//new ConCmd("plugin_unpause", ConCmdPluginUnpause, "fs_unpause <index> : unpauses a loaded plugin", 0);
 	//new ConCmd("plugin_unpause_all", ConCmdPluginUnpauseAll, "Unpauses all disabled plugins", 0);

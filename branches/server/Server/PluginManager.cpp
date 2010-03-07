@@ -37,6 +37,27 @@ bool PluginManager::LoadPlugin(const char *string)
 	return true;
 }
 
+bool PluginManager::UnloadPlugin(const unsigned char index)
+{
+	if (index >= pluginbuffersize)
+	{
+		return false;
+	}
+	if (pluginbuffer[index] == NULL)
+	{
+		return false;
+	}
+	this->OnPluginUnload(index);
+	if (!this->UnloadPluginInternal(index))
+	{
+		return false;
+	}
+	free(pluginbuffer[index]->filename);
+	delete pluginbuffer[index];
+	pluginbuffer[index] = NULL;
+	return true;
+}
+
 bool PluginManager::LoadPluginInternal(const unsigned char index, const char *string)
 {
 	if (index >= maxpluginbuffersize)
@@ -83,6 +104,21 @@ bool PluginManager::LoadPluginInternal(const unsigned char index, const char *st
 	return true;
 }
 
+bool PluginManager::UnloadPluginInternal(const unsigned char index)
+{
+	if (index >= pluginbuffersize)
+	{
+		return false;
+	}
+	if (pluginbuffer[index] == NULL)
+	{
+		return false;
+	}
+	pluginbuffer[index]->paused = false;
+	FreeLibrary(pluginbuffer[index]->module);
+	return true;
+}
+
 bool PluginManager::GetPluginFreeSlot(unsigned char &index)
 {
 	for (index = 0; index < pluginbuffersize; index++)
@@ -121,4 +157,17 @@ void PluginManager::OnPluginLoad(const unsigned char index)
 		return;
 	}
 	pluginbuffer[index]->ptr->OnPluginLoad();
+}
+
+void PluginManager::OnPluginUnload(const unsigned char index)
+{
+	if (index >= pluginbuffersize)
+	{
+		return;
+	}
+	if (pluginbuffer[index] == NULL)
+	{
+		return;
+	}
+	pluginbuffer[index]->ptr->OnPluginUnload();
 }
