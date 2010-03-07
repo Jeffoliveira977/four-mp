@@ -463,6 +463,8 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			{
 				sq_close(*vmbuffer[index]->ptr.squirrel);
 				delete vmbuffer[index]->ptr.squirrel;
+				delete vmbuffer[index];
+				vmbuffer[index] = NULL;
 				return false;
 			}
 			vmbuffer[index]->lang = VMLanguageSquirrel;

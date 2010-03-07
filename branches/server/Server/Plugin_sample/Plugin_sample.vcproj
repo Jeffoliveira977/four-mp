@@ -2,10 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="Server"
-	ProjectGUID="{10160BC2-2973-4F7D-9643-778C7D3168F3}"
-	RootNamespace="Server"
-	Keyword="Win32Proj"
+	Name="Plugin_sample"
+	ProjectGUID="{E81D190E-B8BF-4C3C-941A-075203948BF2}"
+	RootNamespace="Plugin_sample"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -20,7 +19,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
+			ConfigurationType="2"
 			CharacterSet="2"
 			>
 			<Tool
@@ -41,12 +40,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				UsePrecompiledHeader="0"
-				WarningLevel="1"
+				RuntimeLibrary="3"
+				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
 			<Tool
@@ -60,10 +57,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="RakNetDebug.lib ws2_32.lib"
-				LinkIncremental="2"
 				GenerateDebugInformation="true"
-				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -115,11 +109,9 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="1"
+				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
 			<Tool
@@ -133,10 +125,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="RakNet.lib ws2_32.lib"
-				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -173,81 +162,9 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\cfg.cpp"
+				RelativePath=".\Plugin.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\main.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\manager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PluginManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\rpc.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_callback.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_func.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_scriptfunc.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\VirtualMachineManager.cpp"
-				>
-			</File>
-			<Filter
-				Name="Console"
-				>
-				<File
-					RelativePath=".\console\common.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConCmd.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConsoleCore.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConsoleScreen.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConSymbolBase.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConVar.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\coreconcommands.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\fmpconcommands.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ScriptCommandHandler.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -255,91 +172,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\cfg.h"
+				RelativePath=".\Plugin.h"
 				>
 			</File>
-			<File
-				RelativePath=".\IPluginInterface.h"
-				>
-			</File>
-			<File
-				RelativePath=".\main.h"
-				>
-			</File>
-			<File
-				RelativePath=".\manager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PluginManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\rpc.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sq.h"
-				>
-			</File>
-			<File
-				RelativePath=".\struct.h"
-				>
-			</File>
-			<File
-				RelativePath=".\VirtualMachineManager.h"
-				>
-			</File>
-			<Filter
-				Name="Console"
-				>
-				<File
-					RelativePath=".\console\common.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConCmd.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConsoleCore.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConsoleScreen.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConSymbolBase.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConVar.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\coreconcommands.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\fmpconcommands.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ScriptCommandHandler.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath=".\scriptfunc.txt"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>

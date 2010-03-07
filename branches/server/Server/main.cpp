@@ -29,6 +29,7 @@
 #include "console\ScriptCommandHandler.h"
 #include "console\coreconcommands.h"
 #include "console\fmpconcommands.h"
+#include "PluginManager.h"
 #include "VirtualMachineManager.h"
 #include "rpc.h"
 #include "manager.h"
@@ -41,6 +42,7 @@ ConsoleCore concore;
 ConsoleScreen conscreen;
 ScriptCommandHandler cmdhandler;
 RakPeerInterface *net;
+PluginManager pm;
 VirtualMachineManager vmm;
 Player gPlayer[MAX_PLAYERS];
 Vehicle gVehicle[MAX_VEHICLES];
@@ -147,6 +149,17 @@ int main()
 	new ConCmd("fs_unload_all", ConCmdFsUnloadAll, "Unloads all filterscripts", 0);
 	new ConCmd("fs_unpause", ConCmdFsUnpause, "fs_unpause <index> : unpauses a loaded filterscript", 0);
 	new ConCmd("fs_unpause_all", ConCmdFsUnpauseAll, "Unpauses all disabled filterscripts", 0);
+	//new ConCmd("plugin_list", ConCmdPluginList, "Prints details about loaded plugins.", 0);
+	new ConCmd("plugin_load", ConCmdPluginLoad, "plugin_load <filename> : loads a plugin", 0);
+	//new ConCmd("plugin_load_all", ConCmdPluginLoadAll, "Loads all plugins", 0);
+	//new ConCmd("plugin_pause", ConCmdPluginPause, "plugin_pause <index> : pauses a loaded plugin", 0);
+	//new ConCmd("plugin_pause_all", ConCmdPluginPauseAll, "Pauses all loaded plugins", 0);
+	//new ConCmd("plugin_reload", ConCmdPluginReload, "fs_reload <index> : reloads a plugin", 0);
+	//new ConCmd("plugin_reload_all", ConCmdPluginReloadAll, "Reloads all plugins", 0);
+	//new ConCmd("plugin_unload", ConCmdPluginUnload, "fs_unload <index> : unloads a plugin", 0);
+	//new ConCmd("plugin_unload_all", ConCmdPluginUnloadAll, "Unloads all plugins", 0);
+	//new ConCmd("plugin_unpause", ConCmdPluginUnpause, "fs_unpause <index> : unpauses a loaded plugin", 0);
+	//new ConCmd("plugin_unpause_all", ConCmdPluginUnpauseAll, "Unpauses all disabled plugins", 0);
 	print("FOUR-MP. Copyright 2009-2010 Four-mp team.");
 	print("Developer build. Loading...");
 	LoadConfig();
