@@ -10,4 +10,7 @@ public:
 	~Plugin(void);
 	virtual void OnPluginLoad(void);
 	virtual void OnPluginUnload(void);
+	virtual char *GetName(void);
+	virtual char *GetVersion(void);
+	virtual char *GetAuthor(void);
 };

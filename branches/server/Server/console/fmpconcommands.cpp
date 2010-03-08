@@ -176,20 +176,20 @@ void ConCmdFsUnpauseAll(unsigned char numargs)
 	conscreen.Print("Filterscripts enabled");
 }
 
-//void ConCmdPluginList(unsigned char numargs)
-//{
-//	conscreen.Print("Loaded plugins:\n---------------------");
-//	char *string;
-//	unsigned char max = pm.GetPluginBufferSize();
-//	for (unsigned char i = 0; i < max; i++)
-//	{
-//		if (pm.GetPluginInfoString(i, string))
-//		{
-//			conscreen.Print(string);
-//		}
-//	}
-//	conscreen.Print("---------------------");
-//}
+void ConCmdPluginList(unsigned char numargs)
+{
+	conscreen.Print("Loaded plugins:\n---------------------");
+	char *string;
+	unsigned char max = pm.GetPluginBufferSize();
+	for (unsigned char i = 0; i < max; i++)
+	{
+		if (pm.GetPluginInfoString(i, string))
+		{
+			conscreen.Print(string);
+		}
+	}
+	conscreen.Print("---------------------");
+}
 
 void ConCmdPluginLoad(unsigned char numargs)
 {
@@ -213,73 +213,68 @@ void ConCmdPluginLoad(unsigned char numargs)
 	free(name);
 }
 
-//void ConCmdFsLoadAll(unsigned char numargs)
-//{
-//	vmm.LoadFilterScripts();
-//	conscreen.Print("Loaded all filterscripts");
-//}
-//
-//void ConCmdFsPause(unsigned char numargs)
-//{
-//	if (numargs == 0)
-//	{
-//		conscreen.Print("Usage: fs_pause <index>");
-//		return;
-//	}
-//	int index;
-//	if (!concore.GetCmdArg(1, index))
-//	{
-//		conscreen.Print("Usage: fs_pause <index>");
-//		return;
-//	}
-//	if (!vmm.PauseVirtualMachine(index))
-//	{
-//
-//		conscreen.Print("Unable to pause filterscript \"%d\"", index);
-//		return;
-//	}
-//	conscreen.Print("Filterscript \"%d\" disabled", index);
-//}
-//
-//void ConCmdFsPauseAll(unsigned char numargs)
-//{
-//	vmm.PauseVirtualMachines();
-//	conscreen.Print("Filterscripts disabled");
-//}
-//
-//void ConCmdFsReload(unsigned char numargs)
-//{
-//	if (numargs == 0)
-//	{
-//		conscreen.Print("Usage: fs_reload <index>");
-//		return;
-//	}
-//	int index;
-//	if (!concore.GetCmdArg(1, index))
-//	{
-//		conscreen.Print("Usage: fs_reload <index>");
-//		return;
-//	}
-//	if (index == 0)
-//	{
-//		conscreen.Print("Can't reload gamemode");
-//		return;
-//	}
-//	if (!vmm.ReloadFilterScript(index))
-//	{
-//
-//		conscreen.Print("Unable to reload filterscript \"%d\"", index);
-//		return;
-//	}
-//	conscreen.Print("Filterscript \"%d\" has been reloaded successfully", index);
-//}
-//
-//void ConCmdFsReloadAll(unsigned char numargs)
-//{
-//	vmm.ReloadFilterScripts();
-//	conscreen.Print("Reloaded all filterscripts");
-//}
-//
+void ConCmdPluginLoadAll(unsigned char numargs)
+{
+	pm.LoadPlugins();
+	conscreen.Print("Loaded all plugins");
+}
+
+void ConCmdPluginPause(unsigned char numargs)
+{
+	if (numargs == 0)
+	{
+		conscreen.Print("Usage: plugin_pause <index>");
+		return;
+	}
+	int index;
+	if (!concore.GetCmdArg(1, index))
+	{
+		conscreen.Print("Usage: plugin_pause <index>");
+		return;
+	}
+	if (!pm.PausePlugin(index))
+	{
+
+		conscreen.Print("Unable to pause plugin \"%d\"", index);
+		return;
+	}
+	conscreen.Print("Plugin \"%d\" disabled", index);
+}
+
+void ConCmdPluginPauseAll(unsigned char numargs)
+{
+	pm.PausePlugins();
+	conscreen.Print("Plugins disabled");
+}
+
+void ConCmdPluginReload(unsigned char numargs)
+{
+	if (numargs == 0)
+	{
+		conscreen.Print("Usage: plugin_reload <index>");
+		return;
+	}
+	int index;
+	if (!concore.GetCmdArg(1, index))
+	{
+		conscreen.Print("Usage: plugin_reload <index>");
+		return;
+	}
+	if (!pm.ReloadPlugin(index))
+	{
+
+		conscreen.Print("Unable to reload plugin \"%d\"", index);
+		return;
+	}
+	conscreen.Print("Plugin \"%d\" has been reloaded successfully", index);
+}
+
+void ConCmdPluginReloadAll(unsigned char numargs)
+{
+	pm.ReloadPlugins();
+	conscreen.Print("Reloaded all plugins");
+}
+
 void ConCmdPluginUnload(unsigned char numargs)
 {
 	if (numargs == 0)
@@ -302,40 +297,40 @@ void ConCmdPluginUnload(unsigned char numargs)
 	conscreen.Print("Plugin \"%d\" has been unloaded successfully", index);
 }
 
-//void ConCmdFsUnloadAll(unsigned char numargs)
-//{
-//	vmm.UnloadFilterScripts();
-//	conscreen.Print("Unloaded all filterscripts");
-//}
-//
-//void ConCmdFsUnpause(unsigned char numargs)
-//{
-//	if (numargs == 0)
-//	{
-//		conscreen.Print("Usage: fs_unpause <index>");
-//		return;
-//	}
-//	int index;
-//	if (!concore.GetCmdArg(1, index))
-//	{
-//		conscreen.Print("Usage: fs_unpause <index>");
-//		return;
-//	}
-//	if (!vmm.UnpauseVirtualMachine(index))
-//	{
-//
-//		conscreen.Print("Unable to unpause filterscript \"%d\"", index);
-//		return;
-//	}
-//	conscreen.Print("Filterscript \"%d\" enabled", index);
-//}
-//
-//void ConCmdFsUnpauseAll(unsigned char numargs)
-//{
-//	vmm.UnpauseVirtualMachines();
-//	conscreen.Print("Filterscripts enabled");
-//}
-//
+void ConCmdPluginUnloadAll(unsigned char numargs)
+{
+	pm.UnloadPlugins();
+	conscreen.Print("Unloaded all plugins");
+}
+
+void ConCmdPluginUnpause(unsigned char numargs)
+{
+	if (numargs == 0)
+	{
+		conscreen.Print("Usage: plugin_unpause <index>");
+		return;
+	}
+	int index;
+	if (!concore.GetCmdArg(1, index))
+	{
+		conscreen.Print("Usage: plugin_unpause <index>");
+		return;
+	}
+	if (!pm.UnpausePlugin(index))
+	{
+
+		conscreen.Print("Unable to unpause plugin \"%d\"", index);
+		return;
+	}
+	conscreen.Print("Plugin \"%d\" enabled", index);
+}
+
+void ConCmdPluginUnpauseAll(unsigned char numargs)
+{
+	pm.UnpausePlugins();
+	conscreen.Print("Plugins enabled");
+}
+
 void ConCmdSquirrel(unsigned char numargs)
 {
 	char *cmdname;

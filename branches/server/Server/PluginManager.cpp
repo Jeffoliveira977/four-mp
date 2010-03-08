@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <io.h>
 
 #include "PluginManager.h"
 
@@ -17,6 +18,88 @@ unsigned char PluginManager::GetPluginBufferSize(void)
 {
 	return pluginbuffersize;
 }
+
+void PluginManager::LoadPlugins(void)
+{
+	intptr_t ptr;
+	_finddata64i32_t data;
+	ptr = _findfirst("plugins\\*.dll", &data);
+	if (ptr == -1)
+	{
+		return;
+	}
+	int continuesearch = 0;
+	unsigned char slots = this->GetNumberOfFreePluginSlots();
+	unsigned char i = 0;
+	while ((continuesearch == 0) && (i < slots))
+	{
+		if ((!this->IsPluginLoaded(data.name)) && (this->LoadPlugin(data.name)))
+		{
+			i++;
+		}
+		continuesearch = _findnext(ptr, &data);
+	}
+	_findclose(ptr);
+}
+
+void PluginManager::UnloadPlugins(void)
+{
+	for (unsigned char i = 0; i < pluginbuffersize; i++)
+	{
+		if (pluginbuffer[i] != NULL)
+		{
+			this->UnloadPlugin(i);
+		}
+	}
+}
+
+void PluginManager::ReloadPlugins(void)
+{
+	for (unsigned char i = 0; i < pluginbuffersize; i++)
+	{
+		if (pluginbuffer[i] != NULL)
+		{
+			this->ReloadPlugin(i);
+		}
+	}
+}
+
+void PluginManager::PausePlugins(void)
+{
+	for (unsigned char i = 0; i < pluginbuffersize; i++)
+	{
+		if (pluginbuffer[i] != NULL)
+		{
+			this->PausePlugin(i);
+		}
+	}
+}
+
+void PluginManager::UnpausePlugins(void)
+{
+	for (unsigned char i = 0; i < pluginbuffersize; i++)
+	{
+		if (pluginbuffer[i] != NULL)
+		{
+			this->UnpausePlugin(i);
+		}
+	}
+}
+
+bool PluginManager::IsPluginLoaded(const char *string)
+{
+	char *plugin = (char *)calloc(strlen(string) + 8, sizeof(char));
+	sprintf(plugin, "plugins/%s", string);
+	for (unsigned char i = 0; i < pluginbuffersize; i++)
+	{
+		if ((pluginbuffer[i] != NULL) && (strcmp(pluginbuffer[i]->filename, plugin) == 0))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 bool PluginManager::LoadPlugin(const char *string)
 {
 	unsigned char index;
@@ -24,16 +107,12 @@ bool PluginManager::LoadPlugin(const char *string)
 	{
 		return false;
 	}
-	int length = strlen(string) + 8;
-	char *plugin = (char *)calloc(length, sizeof(char));
+	char *plugin = (char *)calloc(strlen(string) + 8, sizeof(char));
 	sprintf(plugin, "plugins/%s", string);
 	if (!this->LoadPluginInternal(index, plugin))
 	{
 		return false;
 	}
-	pluginbuffer[index]->filename = (char *)calloc(length, sizeof(char));
-	strcpy(pluginbuffer[index]->filename, string);
-	this->OnPluginLoad(index);
 	return true;
 }
 
@@ -48,13 +127,96 @@ bool PluginManager::UnloadPlugin(const unsigned char index)
 		return false;
 	}
 	this->OnPluginUnload(index);
-	if (!this->UnloadPluginInternal(index))
-	{
-		return false;
-	}
+	pluginbuffer[index]->paused = false;
+	FreeLibrary(pluginbuffer[index]->module);
 	free(pluginbuffer[index]->filename);
 	delete pluginbuffer[index];
 	pluginbuffer[index] = NULL;
+	return true;
+}
+
+bool PluginManager::ReloadPlugin(const unsigned char index)
+{
+	if (index >= pluginbuffersize)
+	{
+		return false;
+	}
+	if (pluginbuffer[index] == NULL)
+	{
+		return false;
+	}
+	char *filename = (char *)calloc(strlen(pluginbuffer[index]->filename) + 1, sizeof(char));
+	strcpy(filename, pluginbuffer[index]->filename);
+	if (!this->UnloadPlugin(index))
+	{
+		return false;
+	}
+	if (!this->LoadPluginInternal(index, filename))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool PluginManager::PausePlugin(const unsigned char index)
+{
+	if (index >= pluginbuffersize)
+	{
+		return false;
+	}
+	if (pluginbuffer[index] == NULL)
+	{
+		return false;
+	}
+	if (pluginbuffer[index]->paused)
+	{
+		return false;
+	}
+	pluginbuffer[index]->paused = true;
+	return true;
+}
+
+bool PluginManager::UnpausePlugin(const unsigned char index)
+{
+	if (index >= pluginbuffersize)
+	{
+		return false;
+	}
+	if (pluginbuffer[index] == NULL)
+	{
+		return false;
+	}
+	if (!pluginbuffer[index]->paused)
+	{
+		return false;
+	}
+	pluginbuffer[index]->paused = false;
+	return true;
+}
+
+bool PluginManager::GetPluginInfoString(const unsigned char index, char *&string)
+{
+	if (index >= pluginbuffersize)
+	{
+		return false;
+	}
+	if (pluginbuffer[index] == NULL)
+	{
+		return false;
+	}
+	char *name = pluginbuffer[index]->ptr->GetName();
+	char *version = pluginbuffer[index]->ptr->GetVersion();
+	char *author = pluginbuffer[index]->ptr->GetAuthor();
+	if (!pluginbuffer[index]->paused)
+	{
+		string = (char *)calloc(_scprintf("%d \"%s\" (%s) by %s", index, name, version, author) + 1, sizeof(char));
+		sprintf(string, "%d \"%s\" (%s) by %s", index, name, version, author);
+	}
+	else
+	{
+		string = (char *)calloc(_scprintf("%d (Paused) \"%s\" (%s) by %s", index, name, version, author) + 1, sizeof(char));
+		sprintf(string, "%d (Paused) \"%s\" (%s) by %s", index, name, version, author);
+	}
 	return true;
 }
 
@@ -101,22 +263,24 @@ bool PluginManager::LoadPluginInternal(const unsigned char index, const char *st
 	}
 	pluginbuffer[index]->ptr = GetPluginFunction();
 	pluginbuffer[index]->paused = false;
+	pluginbuffer[index]->filename = (char *)calloc(strlen(string) + 1, sizeof(char));
+	strcpy(pluginbuffer[index]->filename, string);
+	this->OnPluginLoad(index);
 	return true;
 }
 
-bool PluginManager::UnloadPluginInternal(const unsigned char index)
+unsigned char PluginManager::GetNumberOfFreePluginSlots(void)
 {
-	if (index >= pluginbuffersize)
+	unsigned char slots = 0;
+	for (unsigned char i = 0; i < pluginbuffersize; i++)
 	{
-		return false;
+		if (pluginbuffer[i] == NULL)
+		{
+			slots++;
+		}
 	}
-	if (pluginbuffer[index] == NULL)
-	{
-		return false;
-	}
-	pluginbuffer[index]->paused = false;
-	FreeLibrary(pluginbuffer[index]->module);
-	return true;
+	slots = maxpluginbuffersize - pluginbuffersize + slots;
+	return slots;
 }
 
 bool PluginManager::GetPluginFreeSlot(unsigned char &index)

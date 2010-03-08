@@ -98,12 +98,9 @@ void VirtualMachineManager::LoadFilterScripts(void)
 	unsigned char i = 0;
 	while ((continuesearch == 0) && (i < slots))
 	{
-		if (!this->IsFilterScriptLoaded(data.name))
+		if ((!this->IsFilterScriptLoaded(data.name)) && (this->LoadFilterScript(data.name)))
 		{
-			if (this->LoadFilterScript(data.name))
-			{
-				i++;
-			}
+			i++;
 		}
 		continuesearch = _findnext(ptr, &data);
 	}
