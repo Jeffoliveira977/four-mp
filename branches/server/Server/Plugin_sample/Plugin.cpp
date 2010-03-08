@@ -1,5 +1,9 @@
 #include "Plugin.h"
 
+#ifdef WIN32
+#include "windows.h"
+#endif
+
 Plugin plugin;
 IPluginInterface *pluginptr = &plugin;
 
@@ -18,6 +22,15 @@ Plugin::~Plugin(void)
 
 void Plugin::OnPluginLoad(void)
 {
+	typedef IPluginHandlerInterface *(*GetPluginHandlerFunctionType)();
+	GetPluginHandlerFunctionType GetPluginHandlerFunction = NULL;
+	GetPluginHandlerFunction = (GetPluginHandlerFunctionType)GetProcAddress(GetModuleHandle(NULL), "GetPluginHandler");
+	if (GetPluginHandlerFunction == NULL)
+	{
+		return;
+	}
+	ph = GetPluginHandlerFunction();
+	ph->PrintToServer("HELLO WORLD!");
 }
 
 void Plugin::OnPluginUnload(void)

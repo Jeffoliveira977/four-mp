@@ -177,6 +177,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HandleManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -256,6 +260,14 @@
 			>
 			<File
 				RelativePath=".\cfg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HandleManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\IPluginHandlerInterface.h"
 				>
 			</File>
 			<File

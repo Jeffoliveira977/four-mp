@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IPluginInterface.h"
+#include "IPluginHandlerInterface.h"
 
 #ifdef WIN32
 #include <windows.h>
@@ -24,6 +24,7 @@ public:
 	bool PausePlugin(const unsigned char index);
 	bool UnpausePlugin(const unsigned char index);
 	bool GetPluginInfoString(const unsigned char index, char *&string);
+	IPluginHandlerInterface *GetPluginHandler(void);
 private:
 	struct Plugin
 	{
@@ -37,6 +38,14 @@ private:
 	unsigned char maxpluginbuffersize;
 	unsigned char pluginbuffersize;
 	Plugin **pluginbuffer;
+	class PluginHandler : public IPluginHandlerInterface
+	{
+	public:
+		PluginHandler(void);
+		~PluginHandler(void);
+		virtual void PrintToServer(const char *string);
+	};
+	IPluginHandlerInterface *ph;
 	bool LoadPluginInternal(const unsigned char index, const char *string);
 	unsigned char GetNumberOfFreePluginSlots(void);
 	bool GetPluginFreeSlot(unsigned char &index);

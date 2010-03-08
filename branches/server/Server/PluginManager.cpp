@@ -3,15 +3,23 @@
 #include <io.h>
 
 #include "PluginManager.h"
+#include "console\ConsoleScreen.h"
+
+extern ConsoleScreen conscreen;
+extern PluginManager pm;
 
 PluginManager::PluginManager(void)
 {
 	maxpluginbuffersize = 8;
 	pluginbuffersize = 0;
+	ph = new PluginHandler;
 }
 
 PluginManager::~PluginManager(void)
 {
+	this->UnloadPlugins();
+	free(pluginbuffer);
+	delete ph;
 }
 
 unsigned char PluginManager::GetPluginBufferSize(void)
@@ -220,6 +228,11 @@ bool PluginManager::GetPluginInfoString(const unsigned char index, char *&string
 	return true;
 }
 
+IPluginHandlerInterface *PluginManager::GetPluginHandler(void)
+{
+	return ph;
+}
+
 bool PluginManager::LoadPluginInternal(const unsigned char index, const char *string)
 {
 	if (index >= maxpluginbuffersize)
@@ -334,4 +347,22 @@ void PluginManager::OnPluginUnload(const unsigned char index)
 		return;
 	}
 	pluginbuffer[index]->ptr->OnPluginUnload();
+}
+
+extern "C" __declspec(dllexport) IPluginHandlerInterface *GetPluginHandler(void)
+{
+	return pm.GetPluginHandler();
+}
+
+PluginManager::PluginHandler::PluginHandler(void)
+{
+}
+
+PluginManager::PluginHandler::~PluginHandler(void)
+{
+}
+
+void PluginManager::PluginHandler::PrintToServer(const char *string)
+{
+	conscreen.Print(string);
 }

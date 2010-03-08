@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\IPluginInterface.h"
+#include "..\IPluginHandlerInterface.h"
 
 class Plugin :
 	public IPluginInterface
@@ -13,4 +13,6 @@ public:
 	virtual char *GetName(void);
 	virtual char *GetVersion(void);
 	virtual char *GetAuthor(void);
+private:
+	IPluginHandlerInterface *ph;
 };
