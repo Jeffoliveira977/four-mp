@@ -284,7 +284,7 @@ bool VirtualMachineManager::GetVirtualMachineInfoString(const unsigned char inde
 	return true;
 }
 
-void VirtualMachineManager::SetVirtualMachineName(HSQUIRRELVM *v, const char *string)
+void VirtualMachineManager::SetVirtualMachineName(const HSQUIRRELVM *v, const char *string)
 {
 	unsigned char index;
 	if (!this->FindVirtualMachine(v, index))
@@ -295,7 +295,7 @@ void VirtualMachineManager::SetVirtualMachineName(HSQUIRRELVM *v, const char *st
 	strcpy(vmbuffer[index]->name, string);
 }
 
-void VirtualMachineManager::SetVirtualMachineVersion(HSQUIRRELVM *v, const char *string)
+void VirtualMachineManager::SetVirtualMachineVersion(const HSQUIRRELVM *v, const char *string)
 {
 	unsigned char index;
 	if (!this->FindVirtualMachine(v, index))
@@ -306,7 +306,7 @@ void VirtualMachineManager::SetVirtualMachineVersion(HSQUIRRELVM *v, const char 
 	strcpy(vmbuffer[index]->version, string);
 }
 
-void VirtualMachineManager::SetVirtualMachineAuthor(HSQUIRRELVM *v, const char *string)
+void VirtualMachineManager::SetVirtualMachineAuthor(const HSQUIRRELVM *v, const char *string)
 {
 	unsigned char index;
 	if (!this->FindVirtualMachine(v, index))
@@ -550,7 +550,7 @@ bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 	return true;
 }
 
-bool VirtualMachineManager::FindVirtualMachine(HSQUIRRELVM *v, unsigned char &index)
+bool VirtualMachineManager::FindVirtualMachine(const HSQUIRRELVM *v, unsigned char &index)
 {
 	for (index = 0; index <= maxfilterscriptindex; index++)
 	{

@@ -31,6 +31,11 @@ void Plugin::OnPluginLoad(void)
 	}
 	ph = GetPluginHandlerFunction();
 	ph->PrintToServer("HELLO WORLD!");
+	unsigned short handletypeindex = 0;
+	if (ph->RequestNewHandleType(this, handletypeindex))
+	{
+		ph->PrintToServer("New handle type: %d", handletypeindex);
+	}
 }
 
 void Plugin::OnPluginUnload(void)

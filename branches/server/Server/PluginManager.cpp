@@ -2,10 +2,11 @@
 #include <string.h>
 #include <io.h>
 
+#include "main.h"
 #include "PluginManager.h"
-#include "console\ConsoleScreen.h"
+#include "HandleManager.h"
 
-extern ConsoleScreen conscreen;
+extern HandleManager hm;
 extern PluginManager pm;
 
 PluginManager::PluginManager(void)
@@ -20,6 +21,11 @@ PluginManager::~PluginManager(void)
 	this->UnloadPlugins();
 	free(pluginbuffer);
 	delete ph;
+}
+
+unsigned char PluginManager::GetMaxPluginBufferSize(void)
+{
+	return maxpluginbuffersize;
 }
 
 unsigned char PluginManager::GetPluginBufferSize(void)
@@ -135,6 +141,7 @@ bool PluginManager::UnloadPlugin(const unsigned char index)
 		return false;
 	}
 	this->OnPluginUnload(index);
+	hm.ReleaseAllHandleTypes(index);
 	pluginbuffer[index]->paused = false;
 	FreeLibrary(pluginbuffer[index]->module);
 	free(pluginbuffer[index]->filename);
@@ -312,7 +319,19 @@ bool PluginManager::GetPluginFreeSlot(unsigned char &index)
 	return true;
 }
 
-bool PluginManager::ResizePluginBuffer(PluginManager::Plugin **&buffer, const unsigned char size)
+bool PluginManager::FindPlugin(const IPluginInterface *plugin, unsigned char &index)
+{
+	for (index = 0; index < pluginbuffersize; index++)
+	{
+		if ((pluginbuffer[index] != NULL) && (pluginbuffer[index]->ptr == plugin))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool PluginManager::ResizePluginBuffer(Plugin **&buffer, const unsigned char size)
 {
 	Plugin **tempbuffer = (Plugin **)realloc(*&buffer, size * sizeof(Plugin *));
 	if ((tempbuffer == NULL) && (size != 0))
@@ -362,7 +381,51 @@ PluginManager::PluginHandler::~PluginHandler(void)
 {
 }
 
-void PluginManager::PluginHandler::PrintToServer(const char *string)
+void PluginManager::PluginHandler::ReleaseAllHandleTypes(const IPluginInterface *plugin)
 {
-	conscreen.Print(string);
+	unsigned char index;
+	if (!pm.FindPlugin(plugin, index))
+	{
+		return;
+	}
+	hm.ReleaseAllHandleTypes(index);
+}
+
+bool PluginManager::PluginHandler::RequestNewHandleType(const IPluginInterface *plugin, unsigned short &index)
+{
+	unsigned char pluginindex;
+	if (!pm.FindPlugin(plugin, pluginindex))
+	{
+		return false;
+	}
+	if (!hm.RequestNewHandleType(pluginindex, index))
+	{
+		return false;
+	}
+	return true;
+}
+
+bool PluginManager::PluginHandler::ReleaseHandleType(const IPluginInterface *plugin, const unsigned short &index)
+{
+	unsigned char pluginindex;
+	if (!pm.FindPlugin(plugin, pluginindex))
+	{
+		return false;
+	}
+	if (!hm.ReleaseHandleType(pluginindex, index))
+	{
+		return false;
+	}
+	return true;
+}
+
+void PluginManager::PluginHandler::PrintToServer(const char *string, ...)
+{
+	va_list arglist; 
+    va_start(arglist, string);
+	char *tempstring = (char *)calloc(_vscprintf(string, arglist) + 1, sizeof(char));
+	vsprintf(tempstring, string, arglist);
+	print(tempstring);
+	free(tempstring);
+	va_end(arglist);
 }

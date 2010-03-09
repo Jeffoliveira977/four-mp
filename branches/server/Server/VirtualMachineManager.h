@@ -31,9 +31,9 @@ public:
 	bool PauseVirtualMachine(const unsigned char index);
 	bool UnpauseVirtualMachine(const unsigned char index);
 	bool GetVirtualMachineInfoString(const unsigned char index, char *&string);
-	void SetVirtualMachineName(HSQUIRRELVM *v, const char *string);
-	void SetVirtualMachineVersion(HSQUIRRELVM *v, const char *string);
-	void SetVirtualMachineAuthor(HSQUIRRELVM *v, const char *string);
+	void SetVirtualMachineName(const HSQUIRRELVM *v, const char *string);
+	void SetVirtualMachineVersion(const HSQUIRRELVM *v, const char *string);
+	void SetVirtualMachineAuthor(const HSQUIRRELVM *v, const char *string);
 	int OnPlayerConnect(int playerid, char name[32]);
 	void OnPlayerDisconnect(int playerid);
 	void OnPlayerSpawn(int playerid, int cl);
@@ -62,7 +62,7 @@ private:
 	bool UnloadVirtualMachine(const unsigned char index);
 	unsigned char GetNumberOfFreeFilterScriptSlots(void);
 	bool GetFilterScriptFreeSlot(unsigned char &index);
-	bool FindVirtualMachine(HSQUIRRELVM *v, unsigned char &index);
+	bool FindVirtualMachine(const HSQUIRRELVM *v, unsigned char &index);
 	bool ResizeVirtualMachineBuffer(VirtualMachine **&buffer, const unsigned char size);
 	void OnGameModeInit(void);
 	void OnGameModeExit(void);
