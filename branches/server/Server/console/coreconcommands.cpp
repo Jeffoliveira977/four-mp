@@ -22,7 +22,7 @@ void ConCmdCvarlist(unsigned char numargs)
 	concore.Output("cvar list\n--------------");
 	unsigned short numsymbols = concore.GetNumberOfConsoleSymbols();
 	unsigned short numfound = 0;
-	ConsoleSymbol *symbol;
+	ConsoleCore::ConsoleSymbol *symbol;
 	char *symbolstring;
 	char *tempstring;
 	for (unsigned short i = 0; i < numsymbols; i++)
@@ -33,7 +33,7 @@ void ConCmdCvarlist(unsigned char numargs)
 		sprintf(symbolstring, "%s	:", symbol->name);
 		switch (symbol->type)
 		{
-		case ConsoleSymbolTypeConVar:
+		case ConsoleCore::ConsoleSymbolTypeConVar:
 			{
 				symbol->ptr.convar->GetValue(tempstring);
 				ResizeStringBuffer(symbolstring, _scprintf("%s %s	:", symbolstring, tempstring) + 1);
@@ -49,7 +49,7 @@ void ConCmdCvarlist(unsigned char numargs)
 				free(tempstring);
 				break;
 			}
-		case ConsoleSymbolTypeConCmd:
+		case ConsoleCore::ConsoleSymbolTypeConCmd:
 			{
 				ResizeStringBuffer(symbolstring, strlen(symbolstring) + 7);
 				sprintf(symbolstring, "%s cmd	:", symbolstring);

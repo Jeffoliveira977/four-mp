@@ -69,33 +69,6 @@ bool ConsoleCore::IsConsoleSymbolExist(const char *name)
 	return false;
 }
 
-ConsoleSymbol *ConsoleCore::GetConsoleSymbolByIndex(unsigned short index)
-{
-	if (index >= symbolbuffersize)
-	{
-		return NULL;
-	}
-	ConsoleSymbol *symbol = (ConsoleSymbol *)calloc(1, sizeof(ConsoleSymbol));
-	memcpy(symbol, &symbolbuffer[index], sizeof(ConsoleSymbol));
-	return symbol;
-}
-
-bool ConsoleCore::AddConsoleSymbol(ConsoleSymbol *symbol)
-{
-	if (symbolbuffersize == maxsymbolbuffersize)
-	{
-		return false;
-	}
-	if (this->IsConsoleSymbolExist(symbol->name))
-	{
-		return false;
-	}
-	symbolbuffersize++;
-	this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize);
-	symbolbuffer[symbolbuffersize-1] = *symbol;
-	return true;
-}
-
 bool ConsoleCore::DeleteConsoleSymbol(const char *name)
 {
 	unsigned short index;
@@ -268,6 +241,22 @@ void ConsoleCore::InterpretLine(const char *string)
 	}
 }
 
+bool ConsoleCore::AddConsoleSymbol(ConsoleSymbol *symbol)
+{
+	if (symbolbuffersize == maxsymbolbuffersize)
+	{
+		return false;
+	}
+	if (this->IsConsoleSymbolExist(symbol->name))
+	{
+		return false;
+	}
+	symbolbuffersize++;
+	this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize);
+	symbolbuffer[symbolbuffersize-1] = *symbol;
+	return true;
+}
+
 bool ConsoleCore::ResizeSymbolBuffer(ConsoleSymbol *&buffer, const unsigned short size)
 {
 	ConsoleSymbol *tempbuffer = (ConsoleSymbol *)realloc(buffer, size * sizeof(ConsoleSymbol));
@@ -279,7 +268,7 @@ bool ConsoleCore::ResizeSymbolBuffer(ConsoleSymbol *&buffer, const unsigned shor
 	return true;
 }
 
-ConsoleSymbol *ConsoleCore::GetConsoleSymbol(const char *name)
+ConsoleCore::ConsoleSymbol *ConsoleCore::GetConsoleSymbol(const char *name)
 {
 	for (unsigned short i = 0; i < symbolbuffersize; i++)
 	{
@@ -289,6 +278,17 @@ ConsoleSymbol *ConsoleCore::GetConsoleSymbol(const char *name)
 		}
 	}
 	return NULL;
+}
+
+ConsoleCore::ConsoleSymbol *ConsoleCore::GetConsoleSymbolByIndex(unsigned short index)
+{
+	if (index >= symbolbuffersize)
+	{
+		return NULL;
+	}
+	ConsoleSymbol *symbol = (ConsoleSymbol *)calloc(1, sizeof(ConsoleSymbol));
+	memcpy(symbol, &symbolbuffer[index], sizeof(ConsoleSymbol));
+	return symbol;
 }
 
 bool ConsoleCore::GetConsoleSymbolIndex(const char *name, unsigned short &index)

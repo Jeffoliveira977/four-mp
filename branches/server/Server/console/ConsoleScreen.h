@@ -9,15 +9,15 @@ class ConsoleScreen
 public:
 	ConsoleScreen(void);
 	~ConsoleScreen(void);
-	void SetCaption(const char *string);
+	void SetCaption(const char *string); //Sets caption (1st line)
 	void CheckUserInput(void); //Handles keyboard input
 	void Print(const char *string, ...); //Prints string to the output page
 private:
-	char *caption;
-	char **outputbuffer;
-	char **inputbuffer;
+	char *caption; //Holds caption text
+	char **outputbuffer; //Holds everything that was recently outputted to screen
+	char **inputbuffer; //Holds input history and current line
 #ifdef WIN32
-	HANDLE outputhandle;
+	HANDLE outputhandle; //Holds handle to the Win32 console
 #endif
 	unsigned short outputbuffersize; //Holds current size of the output buffer (in lines)
 	unsigned short maxoutputbuffersize; // Holds maximum size of the output buffer (in lines)

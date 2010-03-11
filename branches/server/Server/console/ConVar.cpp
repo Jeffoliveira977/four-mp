@@ -315,10 +315,10 @@ bool ConVar::GetBoundInt(ConVarBoundType type, int &bound)
 
 void ConVar::RegisterConVar(const char *cvarname)
 {
-	ConsoleSymbol *tempsymbol = (ConsoleSymbol *)calloc(1, sizeof(ConsoleSymbol));
+	ConsoleCore::ConsoleSymbol *tempsymbol = new ConsoleCore::ConsoleSymbol;
 	tempsymbol->name = (char *)calloc(strlen(cvarname) + 1, sizeof(char));
 	strcpy(tempsymbol->name, cvarname);
-	tempsymbol->type = ConsoleSymbolTypeConVar;
+	tempsymbol->type = ConsoleCore::ConsoleSymbolTypeConVar;
 	tempsymbol->ptr.convar = this;
 	concore.AddConsoleSymbol(tempsymbol);
 }
