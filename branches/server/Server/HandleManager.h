@@ -1,11 +1,5 @@
 #pragma once
 
-enum CoreHandleType
-{
-	HandleTypeConVar,
-	HandleTypeConCmd
-};
-
 class HandleManager
 {
 public:
@@ -20,6 +14,7 @@ public:
 	void *GetHandlePointer(const short owner, const int index);
 	bool SetHandlePointer(const short owner, const int index, void *ptr);
 	bool CloseHandle(const short owner, const int index);
+	friend class CoreHandleTypesManager;
 private:
 	struct HandleType
 	{

@@ -10,15 +10,15 @@
 #include "sq\squirrel.h"
 #include "sq\sqstdsystem.h"
 #include "main.h"
+#include "CoreHandleTypesManager.h"
 #include "console\ConsoleCore.h"
 #include "console\ConsoleScreen.h"
 #include "console\fmpconcommands.h"
-#include "console\ScriptCommandHandler.h"
 #include "VirtualMachineManager.h"
 
+extern CoreHandleTypesManager chtm;
 extern ConsoleCore concore;
 extern ConsoleScreen conscreen;
-extern ScriptCommandHandler cmdhandler;
 extern VirtualMachineManager vmm;
 
 #ifdef SQUNICODE 
@@ -154,8 +154,8 @@ void sq_RegServerCmd(HSQUIRRELVM v)
 	sq_getstring(v, 3, &cmdcallback);
 	sq_getstring(v, 4, &cmddesc);
 	sq_getinteger(v, 5, &cmdflags);
-	new ConCmd(cmdname, ConCmdSquirrel, cmddesc, cmdflags);
-	cmdhandler.AddScriptCommand(cmdname, cmdcallback);
+	//TODO
+	//chtm.AddScriptCommand(owner, cmdcallback, new ConCmd(cmdname, ConCmdSquirrel, cmddesc, cmdflags));
 }
 
 void sq_ServerCommand(HSQUIRRELVM v)

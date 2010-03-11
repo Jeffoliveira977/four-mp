@@ -5,12 +5,15 @@
 #include "main.h"
 #include "PluginManager.h"
 #include "HandleManager.h"
+#include "VirtualMachineManager.h"
 
 extern HandleManager hm;
 extern PluginManager pm;
+extern VirtualMachineManager vmm;
 
 PluginManager::PluginManager(void)
 {
+	handleowneroffset = 2 + vmm.GetMaxFilterScripts();
 	maxpluginbuffersize = 8;
 	pluginbuffersize = 0;
 	ph = new PluginHandler;
@@ -141,12 +144,13 @@ bool PluginManager::UnloadPlugin(const unsigned char index)
 		return false;
 	}
 	this->OnPluginUnload(index);
-	hm.ReleaseAllHandleTypes(index);
 	pluginbuffer[index]->paused = false;
 	FreeLibrary(pluginbuffer[index]->module);
 	free(pluginbuffer[index]->filename);
 	delete pluginbuffer[index];
 	pluginbuffer[index] = NULL;
+	hm.CloseAllHandles(handleowneroffset + index);
+	hm.ReleaseAllHandleTypes(index);
 	return true;
 }
 

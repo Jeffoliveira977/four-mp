@@ -68,4 +68,5 @@ private:
 	void OnGameModeExit(void);
 	void OnFilterScriptInit(const unsigned char index);
 	void OnFilterScriptExit(const unsigned char index);
+	void FireCommandCallback(const unsigned char index, const char *callback, const unsigned char numargs);
 };

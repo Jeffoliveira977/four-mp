@@ -25,9 +25,9 @@
 // Other
 #include "main.h"
 #include "HandleManager.h"
+#include "CoreHandleTypesManager.h"
 #include "console\ConsoleCore.h"
 #include "console\ConsoleScreen.h"
-#include "console\ScriptCommandHandler.h"
 #include "console\coreconcommands.h"
 #include "console\fmpconcommands.h"
 #include "PluginManager.h"
@@ -40,9 +40,9 @@
 //                V  A  R  S                 //
 ///////////////////////////////////////////////
 HandleManager hm;
+CoreHandleTypesManager chtm;
 ConsoleCore concore;
 ConsoleScreen conscreen;
-ScriptCommandHandler cmdhandler;
 RakPeerInterface *net;
 PluginManager pm;
 VirtualMachineManager vmm;

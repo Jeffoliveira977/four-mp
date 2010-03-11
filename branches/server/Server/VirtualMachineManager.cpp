@@ -4,6 +4,7 @@
 #include <io.h>
 
 #include "VirtualMachineManager.h"
+#include "HandleManager.h"
 #include "sq\sqstdaux.h"
 #include "sq\sqstdblob.h"
 #include "sq\sqstdio.h"
@@ -13,6 +14,8 @@
 
 #include "console\common.h"
 #include "sq.h"
+
+extern HandleManager hm;
 
 VirtualMachineManager::VirtualMachineManager(void)
 {
@@ -517,6 +520,7 @@ bool VirtualMachineManager::UnloadVirtualMachine(const unsigned char index)
 	free(vmbuffer[index]->name);
 	free(vmbuffer[index]->version);
 	free(vmbuffer[index]->author);
+	hm.CloseAllHandles(index + 1);
 	return true;
 }
 
@@ -644,6 +648,26 @@ void VirtualMachineManager::OnFilterScriptExit(const unsigned char index)
 	case VMLanguageSquirrel:
 		{
 			sc_OnFilterScriptExit(*vmbuffer[index]->ptr.squirrel);
+			break;
+		}
+	}
+}
+
+void VirtualMachineManager::FireCommandCallback(const unsigned char index, const char *callback, const unsigned char numargs)
+{
+	if (index > maxfilterscriptindex)
+	{
+		return;
+	}
+	if (vmbuffer[index] == NULL)
+	{
+		return;
+	}
+	switch (vmbuffer[index]->lang)
+	{
+	case VMLanguageSquirrel:
+		{
+			sc_CommandCallback(*vmbuffer[index]->ptr.squirrel, callback, numargs);
 			break;
 		}
 	}

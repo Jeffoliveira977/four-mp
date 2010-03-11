@@ -17,7 +17,7 @@ ConsoleCore::~ConsoleCore(void)
 	unsigned short i;
 	for (i = 0; i < symbolbuffersize; i++)
 	{
-		this->DeleteConsoleSymbol(symbolbuffer[i].name);
+		this->DeleteConsoleSymbolByIndex(i);
 	}
 	free(symbolbuffer);
 	if (commandbuffer != NULL)
@@ -72,26 +72,14 @@ bool ConsoleCore::IsConsoleSymbolExist(const char *name)
 bool ConsoleCore::DeleteConsoleSymbol(const char *name)
 {
 	unsigned short index;
-	if (!(this->GetConsoleSymbolIndex(name, index)))
+	if (!this->GetConsoleSymbolIndex(name, index))
 	{
 		return false;
 	}
-	free(symbolbuffer[index].name);
-	if (symbolbuffer[index].type = ConsoleSymbolTypeConVar)
+	if (!this->DeleteConsoleSymbolByIndex(index))
 	{
-		delete(symbolbuffer[index].ptr.convar);
+		return false;
 	}
-	else
-	{
-		delete(symbolbuffer[index].ptr.concmd);
-	}
-	//free(symbolbuffer[index]);
-	for (unsigned short i = index; i < (symbolbuffersize - 1); i++)
-	{
-		symbolbuffer[i] = symbolbuffer[i+1];
-	}
-	symbolbuffersize--;
-	this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize);
 	return true;
 }
 
@@ -255,6 +243,30 @@ bool ConsoleCore::AddConsoleSymbol(ConsoleSymbol *symbol)
 	this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize);
 	symbolbuffer[symbolbuffersize-1] = *symbol;
 	return true;
+}
+
+bool ConsoleCore::DeleteConsoleSymbolByIndex(const unsigned short index)
+{
+	if (index >= symbolbuffersize)
+	{
+		return false;
+	}
+	free(symbolbuffer[index].name);
+	if (symbolbuffer[index].type = ConsoleSymbolTypeConVar)
+	{
+		delete symbolbuffer[index].ptr.convar;
+	}
+	else
+	{
+		delete symbolbuffer[index].ptr.concmd;
+	}
+	//free(symbolbuffer[index]);
+	for (unsigned short i = index; i < (symbolbuffersize - 1); i++)
+	{
+		symbolbuffer[i] = symbolbuffer[i+1];
+	}
+	symbolbuffersize--;
+	this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize);
 }
 
 bool ConsoleCore::ResizeSymbolBuffer(ConsoleSymbol *&buffer, const unsigned short size)

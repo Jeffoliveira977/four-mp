@@ -177,6 +177,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CoreHandleTypesManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\HandleManager.cpp"
 				>
 			</File>
@@ -247,10 +251,6 @@
 					RelativePath=".\console\fmpconcommands.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\console\ScriptCommandHandler.cpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -260,6 +260,10 @@
 			>
 			<File
 				RelativePath=".\cfg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CoreHandleTypesManager.h"
 				>
 			</File>
 			<File
@@ -335,10 +339,6 @@
 				</File>
 				<File
 					RelativePath=".\console\fmpconcommands.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ScriptCommandHandler.h"
 					>
 				</File>
 			</Filter>

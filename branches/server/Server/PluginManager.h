@@ -27,6 +27,7 @@ public:
 	bool GetPluginInfoString(const unsigned char index, char *&string);
 	IPluginHandlerInterface *GetPluginHandler(void);
 private:
+	short handleowneroffset;
 	struct Plugin
 	{
 		bool paused;

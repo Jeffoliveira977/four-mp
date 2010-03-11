@@ -48,6 +48,7 @@ private:
 	unsigned int argpos; //Holds starting index of first argument in the current command
 	unsigned char numargs; //Holds number of arguments in the current command
 	bool AddConsoleSymbol(ConsoleSymbol *symbol); //Adds console symbol into symbol buffer
+	bool DeleteConsoleSymbolByIndex(const unsigned short index); //Deletes console symbol from symbol buffer by it's index
 	bool ResizeSymbolBuffer(ConsoleSymbol *&buffer, const unsigned short size); //Wrapper for realloc (don't touch)
 	ConsoleSymbol *GetConsoleSymbol(const char *name); //Returns console index by name
 	ConsoleSymbol *GetConsoleSymbolByIndex(unsigned short index); //Returns console symbol by it's index

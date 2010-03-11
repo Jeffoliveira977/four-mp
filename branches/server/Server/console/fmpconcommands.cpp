@@ -1,13 +1,13 @@
 #include "fmpconcommands.h"
+#include "..\CoreHandleTypesManager.h"
 #include "ConsoleCore.h"
 #include "ConsoleScreen.h"
-#include "ScriptCommandHandler.h"
 #include "..\PluginManager.h"
 #include "..\VirtualMachineManager.h"
 
+extern CoreHandleTypesManager chtm;
 extern ConsoleCore concore;
 extern ConsoleScreen conscreen;
-extern ScriptCommandHandler cmdhandler;
 extern PluginManager pm;
 extern VirtualMachineManager vmm;
 
@@ -338,13 +338,14 @@ void ConCmdSquirrel(unsigned char numargs)
 	{
 		return;
 	}
-	if (!cmdhandler.IsScriptCommandExist(cmdname))
-	{
-		conscreen.Print("Unknown command \"%s\"", cmdname);
-	}
-	if (!cmdhandler.Execute(cmdname, numargs))
-	{
-		conscreen.Print("Unknown command \"%s\"", cmdname);
-	}
+	//TODO
+	//if (!chtm.IsScriptCommandExist(cmdname))
+	//{
+	//	conscreen.Print("Unknown command \"%s\"", cmdname);
+	//}
+	//if (!cmdhandler.Execute(cmdname, numargs))
+	//{
+	//	conscreen.Print("Unknown command \"%s\"", cmdname);
+	//}
 	free(cmdname);
 }

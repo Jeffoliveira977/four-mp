@@ -30,6 +30,7 @@ void sc_OnFilterScriptExit(HSQUIRRELVM v);
 int sc_OnPlayerConnect(HSQUIRRELVM v, int playerid, char name[32]);
 void sc_OnPlayerDisconnect(HSQUIRRELVM v, int playerid);
 void sc_OnPlayerSpawn(HSQUIRRELVM v, int playerid, int);
+void sc_CommandCallback(HSQUIRRELVM v, const char *callback, const unsigned char numargs);
 // SQ Script Functions
 void sq_CreateCar(HSQUIRRELVM v);
 void sq_GiveWeapon(HSQUIRRELVM v);

@@ -2,13 +2,13 @@
 
 #include "main.h"
 #include "HandleManager.h"
+#include "CoreHandleTypesManager.h"
 #include "PluginManager.h"
 #include "VirtualMachineManager.h"
 
+extern CoreHandleTypesManager chtm;
 extern PluginManager pm;
 extern VirtualMachineManager vmm;
-
-#define NUM_CORE_HANDLE_TYPES 2
 
 HandleManager::HandleManager(void)
 {
@@ -366,7 +366,7 @@ bool HandleManager::DeleteHandleOwner(const int index, const short owner)
 	{
 		return false;
 	}
-	if ((owner < 0) || (owner >= maxcountbuffersize))
+	if ((owner < 0) || (owner >= countbuffersize))
 	{
 		return false;
 	}
@@ -394,6 +394,10 @@ bool HandleManager::DeleteHandleOwner(const int index, const short owner)
 	handlebuffer[index]->numowners--;
 	if (handlebuffer[index]->numowners == 0)
 	{
+		if (handlebuffer[index]->type < NUM_CORE_HANDLE_TYPES)
+		{
+			chtm.CloseHandle(index);
+		}
 		free(handlebuffer[index]->ptr);
 		free(handlebuffer[index]);
 		handlebuffer[index] = NULL;

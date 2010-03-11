@@ -101,3 +101,16 @@ void sc_OnPlayerSpawn(HSQUIRRELVM v, int playerid, int cl)
 	}
 	sq_settop(v,top); 
 }
+
+void sc_CommandCallback(HSQUIRRELVM v, const char *callback, const unsigned char numargs)
+{
+	int top = sq_gettop(v); 
+	sq_pushroottable(v);
+	sq_pushstring(v,_SC(callback),-1);
+	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
+		sq_pushroottable(v); 
+		sq_pushinteger(v,numargs); 
+		sq_call(v,2,0,0);
+	}
+	sq_settop(v,top);
+}
