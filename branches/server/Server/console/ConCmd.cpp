@@ -10,16 +10,15 @@ ConCmd::ConCmd(const char *cmdname, void *callback, const char *desc, const int 
 {
 	this->Init(cmdname, desc, cmdflags);
 	handler = callback;
-	ConsoleCore::ConsoleSymbol *tempsymbol = new ConsoleCore::ConsoleSymbol;
-	tempsymbol->name = (char *)calloc(strlen(cmdname) + 1, sizeof(char));
-	strcpy(tempsymbol->name, cmdname);
-	tempsymbol->type = ConsoleCore::ConsoleSymbolTypeConCmd;
-	tempsymbol->ptr.concmd = this;
-	concore.AddConsoleSymbol(tempsymbol);
+	if (!concore.AddConCmd(cmdname, this))
+	{
+		delete this;
+	}
 }
 
 ConCmd::~ConCmd(void)
 {
+	concore.DeleteConCmd(this->name, this);
 	this->Uninit();
 }
 

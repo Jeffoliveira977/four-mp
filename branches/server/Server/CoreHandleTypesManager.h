@@ -15,19 +15,21 @@ class CoreHandleTypesManager
 public:
 	CoreHandleTypesManager(void);
 	~CoreHandleTypesManager(void);
-	bool CloseHandle(const int index);
-	bool AddScriptCommand(const short owner, const char *callback, const ConCmd *ptr);
-	bool DeleteScriptCommand(const int index);
-	bool Execute(const int index, const unsigned char numargs);
+	bool CloseHandle(const int index); //Wisely closes given handle since HandleManager doesn't know what data it operates on
+	bool AddDynamicCommand(const short owner, const char *callback, const ConCmd *ptr); //Adds dynamic command. It is console command created by plugin or filterscript
+	int *GetDynamicCommandHandles(const char *name, unsigned char &numcmds); //Returns handle index of dynamic command
+	bool DeleteDynamicCommand(const int index); //Deletes dynamic command by given handle index
+	bool ExecuteDynamicCommand(const int index, const unsigned char numargs); //Executes dynamic command by given handle index
 private:
-	struct ScriptCommand
+	struct DynamicCommand
 	{
-		int index;
-		char *callback;
+		int index; //Holds handle index of current dynamic command
+		char *callback; //Holds callback of current dynamic command
 	};
-	ScriptCommand *commandbuffer;
-	unsigned short maxcommandbuffersize;
-	unsigned short commandbuffersize;
-	bool GetScriptCommandCallback(const int index, char *&callback);
-	bool ResizeCommandBuffer(ScriptCommand *&buffer, const unsigned short size);
+	DynamicCommand *commandbuffer; //Holds all additional data needed by dynamic commands
+	unsigned short maxcommandbuffersize; //Holds maximum size of dynamic commands buffer
+	unsigned short commandbuffersize; //Holds current size of dynamic commands buffer
+	bool ResizeHandleIndexBuffer(int *&buffer, const unsigned char size); //Wrapper for realloc
+	bool GetDynamicCommandCallback(const int index, char *&callback); //Returns callback of given handle index
+	bool ResizeCommandBuffer(DynamicCommand *&buffer, const unsigned short size); //Wrapper for realloc
 };

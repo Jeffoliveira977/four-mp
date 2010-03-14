@@ -3,9 +3,11 @@
 
 #include "CoreHandleTypesManager.h"
 #include "HandleManager.h"
+#include "VirtualMachineManager.h"
 
 extern HandleManager hm;
 extern ConsoleCore concore;
+extern VirtualMachineManager vmm;
 
 CoreHandleTypesManager::CoreHandleTypesManager(void)
 {
@@ -43,31 +45,52 @@ bool CoreHandleTypesManager::CloseHandle(const int index)
 	{
 	case HandleTypeConVar:
 		{
-			if (!concore.DeleteConsoleSymbol(((ConVar *)hm.handlebuffer[index]->ptr)->GetName()))
-			{
-				return false;
-			}
+			delete ((ConVar *)hm.handlebuffer[index]->ptr);
 			break;
 		}
 	case HandleTypeConCmd:
 		{
-			if (!concore.DeleteConsoleSymbol(((ConCmd *)hm.handlebuffer[index]->ptr)->GetName()))
-			{
-				return false;
-			}
+			delete ((ConCmd *)hm.handlebuffer[index]->ptr);
 			break;
 		}
 	}
 	return true;
 }
 
-bool CoreHandleTypesManager::AddScriptCommand(const short owner, const char *callback, const ConCmd *ptr)
+int *CoreHandleTypesManager::GetDynamicCommandHandles(const char *name, unsigned char &numcmds)
+{
+	if (name == NULL)
+	{
+		return NULL;
+	}
+	numcmds = 0;
+	int *handles = NULL;
+	for (unsigned short i = 0; i < commandbuffersize; i++)
+	{
+		if (strcmp(((ConCmd *)hm.handlebuffer[commandbuffer[i].index]->ptr)->GetName(), name) == 0)
+		{
+			if (!this->ResizeHandleIndexBuffer(handles, numcmds + 1))
+			{
+				return NULL;
+			}
+			handles[numcmds] = commandbuffer[i].index;
+			numcmds++;
+		}
+	}
+	if (numcmds == 0)
+	{
+		return NULL;
+	}
+	return handles;
+}
+
+bool CoreHandleTypesManager::AddDynamicCommand(const short owner, const char *callback, const ConCmd *ptr)
 {
 	if (ptr == NULL)
 	{
 		return false;
 	}
-	if ((owner < 0) || (owner >= hm.maxcountbuffersize))
+	if ((owner < 0) || (owner > hm.maxcountbuffersize))
 	{
 		return false;
 	}
@@ -76,12 +99,12 @@ bool CoreHandleTypesManager::AddScriptCommand(const short owner, const char *cal
 		return false;
 	}
 	int index = hm.FindHandle(ptr);
-	if (index != -1)
+	if (index != INVALID_HANDLE)
 	{
 		return false;
 	}
 	index = hm.AddNewHandle(owner, HandleTypeConCmd, (void *)ptr);
-	if (index != -1)
+	if (index == INVALID_HANDLE)
 	{
 		return false;
 	}
@@ -96,7 +119,7 @@ bool CoreHandleTypesManager::AddScriptCommand(const short owner, const char *cal
 	return true;
 }
 
-bool CoreHandleTypesManager::DeleteScriptCommand(const int index)
+bool CoreHandleTypesManager::DeleteDynamicCommand(const int index)
 {
 	for (unsigned short i = 0; i < commandbuffersize; i++)
 	{
@@ -109,20 +132,40 @@ bool CoreHandleTypesManager::DeleteScriptCommand(const int index)
 	return false;
 }
 
-bool CoreHandleTypesManager::Execute(const int index, const unsigned char numargs)
+bool CoreHandleTypesManager::ExecuteDynamicCommand(const int index, const unsigned char numargs)
 {
 	char *callback;
-	if (!this->GetScriptCommandCallback(index, callback))
+	if (!this->GetDynamicCommandCallback(index, callback))
 	{
 		return false;
 	}
-	//TODO
-	//vmm.FireCommandCallback(...);
+	for (short i = 0; i < hm.handlebuffer[index]->numowners; i++)
+	{
+		if ((hm.handlebuffer[index]->owner[i] > 0) && (hm.handlebuffer[index]->owner[i] < hm.pluginowneroffset))
+		{
+			vmm.FireCommandCallback(hm.handlebuffer[index]->owner[i] - 1, callback, numargs);
+		}
+		else if (hm.handlebuffer[index]->owner[i] >= hm.pluginowneroffset)
+		{
+			//Redirect to PluginManager;
+		}
+	}
 	free(callback);
 	return true;
 }
 
-bool CoreHandleTypesManager::GetScriptCommandCallback(const int index, char *&callback)
+bool CoreHandleTypesManager::ResizeHandleIndexBuffer(int *&buffer, const unsigned char size)
+{
+	int *tempbuffer = (int *)realloc(buffer, size * sizeof(int));
+	if ((tempbuffer == NULL) && (size != 0))
+	{
+		return false;
+	}
+	buffer = tempbuffer;
+	return true;
+}
+
+bool CoreHandleTypesManager::GetDynamicCommandCallback(const int index, char *&callback)
 {
 	for (unsigned short i = 0; i < commandbuffersize; i++)
 	{
@@ -136,9 +179,9 @@ bool CoreHandleTypesManager::GetScriptCommandCallback(const int index, char *&ca
 	return false;
 }
 
-bool CoreHandleTypesManager::ResizeCommandBuffer(ScriptCommand *&buffer, const unsigned short size)
+bool CoreHandleTypesManager::ResizeCommandBuffer(DynamicCommand *&buffer, const unsigned short size)
 {
-	ScriptCommand *tempbuffer = (ScriptCommand *)realloc(buffer, size * sizeof(ScriptCommand));
+	DynamicCommand *tempbuffer = (DynamicCommand *)realloc(buffer, size * sizeof(DynamicCommand));
 	if ((tempbuffer == NULL) && (size != 0))
 	{
 		return false;

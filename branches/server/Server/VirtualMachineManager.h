@@ -1,13 +1,7 @@
 #pragma once
 
 #include "sq\squirrel.h"
-
-enum VirtualMachineLanguage
-	{
-		VMLanguageSquirrel
-		//VMLanguagePawn
-		//VMLanguageLua
-	};
+#include "console\ConsoleCore.h"
 
 class VirtualMachineManager
 {
@@ -34,10 +28,18 @@ public:
 	void SetVirtualMachineName(const HSQUIRRELVM *v, const char *string);
 	void SetVirtualMachineVersion(const HSQUIRRELVM *v, const char *string);
 	void SetVirtualMachineAuthor(const HSQUIRRELVM *v, const char *string);
+	void RegServerCmd(const HSQUIRRELVM *v, const char *callback, const ConCmd *ptr);
 	int OnPlayerConnect(int playerid, char name[32]);
 	void OnPlayerDisconnect(int playerid);
 	void OnPlayerSpawn(int playerid, int cl);
+	void FireCommandCallback(const unsigned char index, const char *callback, const unsigned char numargs);
 private:
+	enum VirtualMachineLanguage
+	{
+		VMLanguageSquirrel
+		//VMLanguagePawn
+		//VMLanguageLua
+	};
 	union VirtualMachinePtr
 	{
 		HSQUIRRELVM *squirrel;
@@ -68,5 +70,4 @@ private:
 	void OnGameModeExit(void);
 	void OnFilterScriptInit(const unsigned char index);
 	void OnFilterScriptExit(const unsigned char index);
-	void FireCommandCallback(const unsigned char index, const char *callback, const unsigned char numargs);
 };

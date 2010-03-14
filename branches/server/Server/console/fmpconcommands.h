@@ -1,5 +1,6 @@
 #pragma once
 
+void ConCmdDynamic(unsigned char numargs);
 void ConCmdFsList(unsigned char numargs);
 void ConCmdFsLoad(unsigned char numargs);
 void ConCmdFsLoadAll(unsigned char numargs);
@@ -22,4 +23,3 @@ void ConCmdPluginUnload(unsigned char numargs);
 void ConCmdPluginUnloadAll(unsigned char numargs);
 void ConCmdPluginUnpause(unsigned char numargs);
 void ConCmdPluginUnpauseAll(unsigned char numargs);
-void ConCmdSquirrel(unsigned char numargs);

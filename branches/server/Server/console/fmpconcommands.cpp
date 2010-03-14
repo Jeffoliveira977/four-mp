@@ -11,6 +11,31 @@ extern ConsoleScreen conscreen;
 extern PluginManager pm;
 extern VirtualMachineManager vmm;
 
+void ConCmdDynamic(unsigned char numargs)
+{
+	char *cmdname;
+	if (!concore.GetCmdArg(0, cmdname))
+	{
+		return;
+	}
+	unsigned char numcmds;
+	int *indexes = chtm.GetDynamicCommandHandles(cmdname, numcmds);
+	if (indexes == NULL)
+	{
+		conscreen.Print("Unknown command \"%s\"", cmdname);
+		free(cmdname);
+		return;
+	}
+	for (unsigned char i = 0; i < numcmds; i++)
+	{
+		if (!chtm.ExecuteDynamicCommand(indexes[i], numargs))
+		{
+			conscreen.Print("Unknown command \"%s\"", cmdname);
+		}
+	}
+	free(cmdname);
+}
+
 void ConCmdFsList(unsigned char numargs)
 {
 	conscreen.Print("Loaded filterscripts:\n---------------------");
@@ -329,23 +354,4 @@ void ConCmdPluginUnpauseAll(unsigned char numargs)
 {
 	pm.UnpausePlugins();
 	conscreen.Print("Plugins enabled");
-}
-
-void ConCmdSquirrel(unsigned char numargs)
-{
-	char *cmdname;
-	if (!concore.GetCmdArg(0, cmdname))
-	{
-		return;
-	}
-	//TODO
-	//if (!chtm.IsScriptCommandExist(cmdname))
-	//{
-	//	conscreen.Print("Unknown command \"%s\"", cmdname);
-	//}
-	//if (!cmdhandler.Execute(cmdname, numargs))
-	//{
-	//	conscreen.Print("Unknown command \"%s\"", cmdname);
-	//}
-	free(cmdname);
 }

@@ -56,5 +56,4 @@ private:
 	ConVarValue defaultvalue;
 	ConVarBound minimum;
 	ConVarBound maximum;
-	void RegisterConVar(const char *cvarname);
 };

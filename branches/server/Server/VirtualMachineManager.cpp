@@ -5,6 +5,7 @@
 
 #include "VirtualMachineManager.h"
 #include "HandleManager.h"
+#include "CoreHandleTypesManager.h"
 #include "sq\sqstdaux.h"
 #include "sq\sqstdblob.h"
 #include "sq\sqstdio.h"
@@ -16,6 +17,7 @@
 #include "sq.h"
 
 extern HandleManager hm;
+extern CoreHandleTypesManager chtm;
 
 VirtualMachineManager::VirtualMachineManager(void)
 {
@@ -320,6 +322,16 @@ void VirtualMachineManager::SetVirtualMachineAuthor(const HSQUIRRELVM *v, const 
 	strcpy(vmbuffer[index]->author, string);
 }
 
+void VirtualMachineManager::RegServerCmd(const HSQUIRRELVM *v, const char *callback, const ConCmd *ptr)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return;
+	}
+	chtm.AddDynamicCommand(index + 1, callback, ptr);
+}
+
 int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
 {
 	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
@@ -371,6 +383,26 @@ void VirtualMachineManager::OnPlayerSpawn(int playerid, int cl)
 					break;
 				}
 			}
+		}
+	}
+}
+
+void VirtualMachineManager::FireCommandCallback(const unsigned char index, const char *callback, const unsigned char numargs)
+{
+	if (index > maxfilterscriptindex)
+	{
+		return;
+	}
+	if (vmbuffer[index] == NULL)
+	{
+		return;
+	}
+	switch (vmbuffer[index]->lang)
+	{
+	case VMLanguageSquirrel:
+		{
+			sc_CommandCallback(*vmbuffer[index]->ptr.squirrel, callback, numargs);
+			break;
 		}
 	}
 }
@@ -648,26 +680,6 @@ void VirtualMachineManager::OnFilterScriptExit(const unsigned char index)
 	case VMLanguageSquirrel:
 		{
 			sc_OnFilterScriptExit(*vmbuffer[index]->ptr.squirrel);
-			break;
-		}
-	}
-}
-
-void VirtualMachineManager::FireCommandCallback(const unsigned char index, const char *callback, const unsigned char numargs)
-{
-	if (index > maxfilterscriptindex)
-	{
-		return;
-	}
-	if (vmbuffer[index] == NULL)
-	{
-		return;
-	}
-	switch (vmbuffer[index]->lang)
-	{
-	case VMLanguageSquirrel:
-		{
-			sc_CommandCallback(*vmbuffer[index]->ptr.squirrel, callback, numargs);
 			break;
 		}
 	}

@@ -14,7 +14,8 @@ HandleManager::HandleManager(void)
 {
 	maxtypebuffersize = 65535;
 	maxhandlesperowner = 16384;
-	maxcountbuffersize = 2 + pm.GetMaxPluginBufferSize() + vmm.GetMaxFilterScripts();
+	pluginowneroffset = 2 + vmm.GetMaxFilterScripts();
+	maxcountbuffersize =  pluginowneroffset + pm.GetMaxPluginBufferSize();
 	maxhandlebuffersize = maxcountbuffersize * maxhandlesperowner;
 	typebuffer = (HandleType **)calloc(NUM_CORE_HANDLE_TYPES, sizeof(HandleType *));
 	for (unsigned short i = 0; i < NUM_CORE_HANDLE_TYPES; i++)
@@ -117,40 +118,40 @@ int HandleManager::AddNewHandle(const short owner, const unsigned short type, vo
 {
 	if (ptr == NULL)
 	{
-		return -1;
+		return INVALID_HANDLE;
 	}
-	if ((owner < 0) || (owner >= maxcountbuffersize))
+	if ((owner < 0) || (owner > maxcountbuffersize))
 	{
 		return false;
 	}
 	int index = this->FindHandle(ptr);
-	if (index != -1)
+	if (index != INVALID_HANDLE)
 	{
 		if (handlebuffer[index]->type != type)
 		{
-			return -1;
+			return INVALID_HANDLE;
 		}
 		if(!this->AddHandleOwner(index, owner))
 		{
-			return -1;
+			return INVALID_HANDLE;
 		}
 		return index;
 
 	}
 	index = this->GetHandleFreeSlot();
-	if (index == -1)
+	if (index == INVALID_HANDLE)
 	{
-		return -1;
+		return INVALID_HANDLE;
 	}
 	if (!this->IncreaseHandleCount(owner))
 	{
-		return -1;
+		return INVALID_HANDLE;
 	}
 	if (index == handlebuffersize)
 	{
 		if (!this->ResizeHandleBuffer(handlebuffer, index + 1))
 		{
-			return -1;
+			return INVALID_HANDLE;
 		}
 		handlebuffersize = index + 1;
 	}
@@ -288,7 +289,7 @@ int HandleManager::GetHandleFreeSlot(void)
 	}
 	if (handlebuffersize == maxhandlebuffersize)
 	{
-		return -1;
+		return INVALID_HANDLE;
 	}
 	return index;
 }
@@ -302,7 +303,7 @@ int HandleManager::FindHandle(const void *ptr)
 			return index;
 		}
 	}
-	return -1;
+	return INVALID_HANDLE;
 }
 
 bool HandleManager::IsHandleOwned(const int index, const short owner)
@@ -335,7 +336,7 @@ bool HandleManager::AddHandleOwner(const int index, const short owner)
 	{
 		return false;
 	}
-	if ((owner < 0) || (owner >= maxcountbuffersize))
+	if ((owner < 0) || (owner > maxcountbuffersize))
 	{
 		return false;
 	}
@@ -430,7 +431,7 @@ bool HandleManager::ResizeHandleBuffer(Handle **&buffer, const int size)
 
 bool HandleManager::IncreaseHandleCount(const short owner)
 {
-	if ((owner < 0) || (owner >= maxcountbuffersize))
+	if ((owner < 0) || (owner > maxcountbuffersize))
 	{
 		return false;
 	}

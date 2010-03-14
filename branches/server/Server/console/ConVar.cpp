@@ -34,7 +34,10 @@ ConVar::ConVar(const char *cvarname, const float defvalue, const char *desc, con
 	{
 		maximum.exist = false;
 	}
-	this->RegisterConVar(cvarname);
+	if (!concore.AddConVar(cvarname, this))
+	{
+		delete this;
+	}
 }
 
 ConVar::ConVar(const char *cvarname, const int defvalue, const char *desc, const int cvarflags, const bool hasMin, const int min, const bool hasMax, const int max)
@@ -63,7 +66,10 @@ ConVar::ConVar(const char *cvarname, const int defvalue, const char *desc, const
 	{
 		maximum.exist = false;
 	}
-	this->RegisterConVar(cvarname);
+	if (!concore.AddConVar(cvarname, this))
+	{
+		delete this;
+	}
 }
 
 ConVar::ConVar(const char *cvarname, const char *defvalue, const char *desc, const int cvarflags)
@@ -74,11 +80,15 @@ ConVar::ConVar(const char *cvarname, const char *defvalue, const char *desc, con
 	defaultvalue.value.s = (char *)calloc(length + 1, sizeof(char));
 	strcpy(defaultvalue.value.s, defvalue);
 	value = defaultvalue;
-	this->RegisterConVar(cvarname);
+	if (!concore.AddConVar(cvarname, this))
+	{
+		delete this;
+	}
 }
 
 ConVar::~ConVar(void)
 {
+	concore.DeleteConVar(this->name);
 	this->Uninit();
 	if (defaultvalue.type == ConVarTypeString)
 	{
@@ -311,14 +321,4 @@ bool ConVar::GetBoundInt(ConVarBoundType type, int &bound)
 	}
 	bound = tempbound.value.i;
 	return true;
-}
-
-void ConVar::RegisterConVar(const char *cvarname)
-{
-	ConsoleCore::ConsoleSymbol *tempsymbol = new ConsoleCore::ConsoleSymbol;
-	tempsymbol->name = (char *)calloc(strlen(cvarname) + 1, sizeof(char));
-	strcpy(tempsymbol->name, cvarname);
-	tempsymbol->type = ConsoleCore::ConsoleSymbolTypeConVar;
-	tempsymbol->ptr.convar = this;
-	concore.AddConsoleSymbol(tempsymbol);
 }
