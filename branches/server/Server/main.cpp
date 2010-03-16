@@ -39,13 +39,13 @@
 ///////////////////////////////////////////////
 //                V  A  R  S                 //
 ///////////////////////////////////////////////
-HandleManager hm;
 CoreHandleTypesManager chtm;
 ConsoleCore concore;
 ConsoleScreen conscreen;
 RakPeerInterface *net;
-PluginManager pm;
 VirtualMachineManager vmm;
+PluginManager pm;
+HandleManager hm;
 Player gPlayer[MAX_PLAYERS];
 Vehicle gVehicle[MAX_VEHICLES];
 Server sConf;

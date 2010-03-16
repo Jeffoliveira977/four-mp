@@ -103,7 +103,7 @@ void HandleManager::CloseAllHandles(const short owner)
 	{
 		if (handlebuffer[i] != NULL)
 		{
-			for (short j = 0; j < handlebuffer[i]->numowners; j++)
+			for (short j = 0; (handlebuffer[i] != NULL) && (j < handlebuffer[i]->numowners); j++)
 			{
 				if (handlebuffer[i]->owner[j] == owner)
 				{
@@ -120,7 +120,7 @@ int HandleManager::AddNewHandle(const short owner, const unsigned short type, vo
 	{
 		return INVALID_HANDLE;
 	}
-	if ((owner < 0) || (owner > maxcountbuffersize))
+	if ((owner < 0) || (owner >= maxcountbuffersize))
 	{
 		return false;
 	}
@@ -336,7 +336,7 @@ bool HandleManager::AddHandleOwner(const int index, const short owner)
 	{
 		return false;
 	}
-	if ((owner < 0) || (owner > maxcountbuffersize))
+	if ((owner < 0) || (owner >= maxcountbuffersize))
 	{
 		return false;
 	}
@@ -399,7 +399,11 @@ bool HandleManager::DeleteHandleOwner(const int index, const short owner)
 		{
 			chtm.CloseHandle(index);
 		}
-		free(handlebuffer[index]->ptr);
+		else
+		{
+			//TODO: Dynamic handle types
+			free(handlebuffer[index]->ptr);
+		}
 		free(handlebuffer[index]);
 		handlebuffer[index] = NULL;
 	}
@@ -431,7 +435,7 @@ bool HandleManager::ResizeHandleBuffer(Handle **&buffer, const int size)
 
 bool HandleManager::IncreaseHandleCount(const short owner)
 {
-	if ((owner < 0) || (owner > maxcountbuffersize))
+	if ((owner < 0) || (owner >= maxcountbuffersize))
 	{
 		return false;
 	}
@@ -445,6 +449,7 @@ bool HandleManager::IncreaseHandleCount(const short owner)
 		{
 			countbuffer[i] = NULL;
 		}
+		countbuffersize = owner + 1;
 	}
 	if (countbuffer[owner] == NULL)
 	{
@@ -452,7 +457,7 @@ bool HandleManager::IncreaseHandleCount(const short owner)
 		countbuffer[owner][0] = 1;
 		return true;
 	}
-	if (countbuffer[owner][0] = maxhandlesperowner)
+	if (countbuffer[owner][0] == maxhandlesperowner)
 	{
 		print("MEMORY LEAK IN MODULE %d. Unloading.", owner);
 		this->CloseAllHandles(owner);

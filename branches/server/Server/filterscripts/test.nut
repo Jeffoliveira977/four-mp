@@ -3,10 +3,10 @@ function OnFilterScriptInit()
 	SetScriptName("Test filterscript");
 	SetScriptVersion("1.0.0.0");
 	SetScriptAuthor("FaTony");
-	print("FILTERSCRIPT");
+	print("Filterscript loaded");
 }
 
 function OnFilterScriptExit()
 {
-	print("EXIT");
+	print("Filterscript unloading");
 }

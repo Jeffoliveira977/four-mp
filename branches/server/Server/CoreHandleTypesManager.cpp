@@ -90,7 +90,7 @@ bool CoreHandleTypesManager::AddDynamicCommand(const short owner, const char *ca
 	{
 		return false;
 	}
-	if ((owner < 0) || (owner > hm.maxcountbuffersize))
+	if ((owner < 0) || (owner >= hm.maxcountbuffersize))
 	{
 		return false;
 	}
@@ -108,14 +108,14 @@ bool CoreHandleTypesManager::AddDynamicCommand(const short owner, const char *ca
 	{
 		return false;
 	}
-	commandbuffersize++;
-	if (!this->ResizeCommandBuffer(commandbuffer, commandbuffersize))
+	if (!this->ResizeCommandBuffer(commandbuffer, commandbuffersize + 1))
 	{
 		return false;
 	}
-	commandbuffer[commandbuffersize-1].index = index;
-	commandbuffer[commandbuffersize-1].callback = (char *)calloc(strlen(callback) + 1, sizeof(char));
-	strcpy(commandbuffer[commandbuffersize-1].callback, callback);
+	commandbuffer[commandbuffersize].index = index;
+	commandbuffer[commandbuffersize].callback = (char *)calloc(strlen(callback) + 1, sizeof(char));
+	strcpy(commandbuffer[commandbuffersize].callback, callback);
+	commandbuffersize++;
 	return true;
 }
 
