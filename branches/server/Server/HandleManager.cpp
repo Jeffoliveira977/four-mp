@@ -99,6 +99,10 @@ void HandleManager::CloseAllHandles(const short owner)
 	{
 		return;
 	}
+	if (countbuffer[owner][0] == 0)
+	{
+		return;
+	}
 	for (int i = 0; i < handlebuffersize; i++)
 	{
 		if (handlebuffer[i] != NULL)

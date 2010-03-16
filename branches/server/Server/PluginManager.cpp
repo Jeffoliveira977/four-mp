@@ -4,6 +4,7 @@
 
 #include "main.h"
 #include "PluginManager.h"
+#include "CoreHandleTypesManager.h"
 #include "HandleManager.h"
 #include "VirtualMachineManager.h"
 
@@ -432,4 +433,14 @@ void PluginManager::PluginHandler::PrintToServer(const char *string, ...)
 	print(tempstring);
 	free(tempstring);
 	va_end(arglist);
+}
+
+void PluginManager::PluginHandler::RegServerCmd(const IPluginInterface *plugin, const char *name, void *callback, const char *description, const int flags)
+{
+	unsigned char pluginindex;
+	if (!pm.FindPlugin(plugin, pluginindex))
+	{
+		return;
+	}
+	hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConCmd, new ConCmd(name, callback, description, flags));
 }

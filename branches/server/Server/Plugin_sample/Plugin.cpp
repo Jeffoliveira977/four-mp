@@ -29,13 +29,14 @@ void Plugin::OnPluginLoad(void)
 	{
 		return;
 	}
-	ph = GetPluginHandlerFunction();
-	ph->PrintToServer("HELLO WORLD!");
+	server = GetPluginHandlerFunction();
+	server->PrintToServer("HELLO WORLD!");
 	unsigned short handletypeindex = 0;
-	if (ph->RequestNewHandleType(this, handletypeindex))
+	if (server->RequestNewHandleType(this, handletypeindex))
 	{
-		ph->PrintToServer("New handle type: %d", handletypeindex);
+		server->PrintToServer("New handle type: %d", handletypeindex);
 	}
+	server->RegServerCmd(this, "plugintest", CmdCallback, "Test plugin cmd", 0);
 }
 
 void Plugin::OnPluginUnload(void)
@@ -55,4 +56,9 @@ char *Plugin::GetVersion(void)
 char *Plugin::GetAuthor(void)
 {
 	return "FOUR-MP team";
+}
+
+void CmdCallback(unsigned char numargs)
+{
+	plugin.server->PrintToServer("Test plugin cmd");
 }

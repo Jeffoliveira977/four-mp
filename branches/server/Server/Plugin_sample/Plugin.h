@@ -14,5 +14,6 @@ public:
 	virtual char *GetVersion(void);
 	virtual char *GetAuthor(void);
 private:
-	IPluginHandlerInterface *ph;
+	IPluginHandlerInterface *server;
+	friend void CmdCallback(unsigned char numargs);
 };

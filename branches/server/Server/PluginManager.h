@@ -49,6 +49,7 @@ private:
 		virtual bool RequestNewHandleType(const IPluginInterface *plugin, unsigned short &index);
 		virtual bool ReleaseHandleType(const IPluginInterface *plugin, const unsigned short &index);
 		virtual void PrintToServer(const char *string, ...);
+		virtual void RegServerCmd(const IPluginInterface *plugin, const char *name, void *callback, const char *description = "", const int flags = 0);
 	};
 	IPluginHandlerInterface *ph;
 	bool LoadPluginInternal(const unsigned char index, const char *string);
