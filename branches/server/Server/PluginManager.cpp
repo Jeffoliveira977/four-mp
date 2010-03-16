@@ -287,6 +287,13 @@ bool PluginManager::LoadPluginInternal(const unsigned char index, const char *st
 		return false;
 	}
 	pluginbuffer[index]->ptr = GetPluginFunction();
+	if (!pluginbuffer[index]->ptr->AttachToServer())
+	{
+		FreeLibrary(pluginbuffer[index]->module);
+		delete pluginbuffer[index];
+		pluginbuffer[index] = NULL;
+		return false;
+	}
 	pluginbuffer[index]->paused = false;
 	pluginbuffer[index]->filename = (char *)calloc(strlen(string) + 1, sizeof(char));
 	strcpy(pluginbuffer[index]->filename, string);

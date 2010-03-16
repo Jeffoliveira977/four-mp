@@ -3,6 +3,7 @@
 class IPluginInterface
 {
 public:
+	virtual bool AttachToServer(void) = 0;
 	virtual void OnPluginLoad(void) = 0;
 	virtual void OnPluginUnload(void) = 0;
 	virtual char *GetName(void) = 0;

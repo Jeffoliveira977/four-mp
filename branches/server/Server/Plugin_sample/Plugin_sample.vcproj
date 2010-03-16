@@ -166,6 +166,10 @@
 				RelativePath=".\Plugin.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\PluginCore.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -174,6 +178,14 @@
 			>
 			<File
 				RelativePath=".\Plugin.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PluginConfig.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PluginCore.h"
 				>
 			</File>
 		</Filter>
