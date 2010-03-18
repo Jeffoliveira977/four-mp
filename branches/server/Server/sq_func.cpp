@@ -154,7 +154,7 @@ void sq_RegServerCmd(HSQUIRRELVM v)
 	sq_getstring(v, 3, &cmdcallback);
 	sq_getstring(v, 4, &cmddesc);
 	sq_getinteger(v, 5, &cmdflags);
-	vmm.RegServerCmd(&v, cmdcallback, new ConCmd(cmdname, ConCmdDynamic, cmddesc, cmdflags));
+	vmm.RegServerCmd(&v, cmdcallback, concore.AddConCmd(cmdname, ConCmdDynamic, cmddesc, cmdflags));
 }
 
 void sq_ServerCommand(HSQUIRRELVM v)

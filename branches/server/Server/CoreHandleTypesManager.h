@@ -16,7 +16,7 @@ public:
 	CoreHandleTypesManager(void);
 	~CoreHandleTypesManager(void);
 	bool CloseHandle(const int index); //Wisely closes given handle since HandleManager doesn't know what data it operates on
-	bool AddDynamicCommand(const short owner, const char *callback, const ConCmd *ptr); //Adds dynamic command. It is console command created by plugin or filterscript
+	bool AddDynamicCommand(const short owner, const char *callback, const ConCmd *ptr); //Adds dynamic command. It is console command created by filterscript
 	int *GetDynamicCommandHandles(const char *name, unsigned char &numcmds); //Returns handle index of dynamic command
 	bool DeleteDynamicCommand(const int index); //Deletes dynamic command by given handle index
 	bool ExecuteDynamicCommand(const int index, const unsigned char numargs); //Executes dynamic command by given handle index

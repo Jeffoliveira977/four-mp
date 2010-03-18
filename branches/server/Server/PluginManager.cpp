@@ -4,11 +4,13 @@
 
 #include "main.h"
 #include "PluginManager.h"
-#include "CoreHandleTypesManager.h"
 #include "HandleManager.h"
+#include "CoreHandleTypesManager.h"
+#include "console\ConsoleCore.h"
 #include "VirtualMachineManager.h"
 
 extern HandleManager hm;
+extern ConsoleCore concore;
 extern PluginManager pm;
 extern VirtualMachineManager vmm;
 
@@ -449,5 +451,5 @@ void PluginManager::PluginHandler::RegServerCmd(const IPluginInterface *plugin, 
 	{
 		return;
 	}
-	hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConCmd, new ConCmd(name, callback, description, flags));
+	hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConCmd, concore.AddConCmd(name, callback, description, flags));
 }

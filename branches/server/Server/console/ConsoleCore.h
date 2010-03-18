@@ -12,6 +12,10 @@ public:
 	void Output(const char *string, ...); //Outputs text into outside function
 	unsigned short GetNumberOfConsoleSymbols(void); //Returns total number of console symbols
 	bool IsConsoleSymbolExist(const char *name); //Checks if symbol exists
+	ConVar *AddConVar(const char *name, const float defaultvalue, const char *description = "", const int flags = 0, const bool hasMin = false, const float min = 0.0, const bool hasMax = false, const float max = 0.0); //Adds console variable into symbol buffer and returns pointer to it
+	ConVar *AddConVar(const char *name, const int defaultvalue, const char *description = "", const int flags = 0, const bool hasMin = false, const int min = 0, const bool hasMax = false, const int max = 0); //Adds console variable into symbol buffer and returns pointer to it
+	ConVar *AddConVar(const char *name, const char *defaultvalue, const char *description = "", const int flags = 0); //Adds console variable into symbol buffer and returns pointer to it
+	ConCmd *AddConCmd(const char *name, void *callback, const char *description = "", const int flags = 0); //Adds console command into symbol buffer and returns pointer to it
 	char *GetConsoleSymbolHelpString(const char *name); //Returns help string of given symbol
 	char *GetConsoleSymbolHelpStringByIndex(unsigned short index); //Returns help string of given symbol index
 	unsigned char GetCmdArgs(void); //Returns the number of arguments from the current console command
@@ -48,8 +52,6 @@ private:
 	char **commandargs; //Holds arguments of current command
 	unsigned int argpos; //Holds starting index of first argument in the current command
 	unsigned char numargs; //Holds number of arguments in the current command
-	bool AddConVar(const char *name, ConVar *ptr); //Adds console variable into symbol buffer
-	bool AddConCmd(const char *name, ConCmd *ptr); //Adds console command into symbol buffer
 	bool DeleteConsoleSymbolByIndex(const unsigned short index); //Deletes console symbol from symbol buffer by it's index
 	void DeleteConVar(const char *name); //Deletes console variable from symbol buffer
 	void DeleteConCmd(const char *name, ConCmd *ptr); //Deletes console command from symbol buffer

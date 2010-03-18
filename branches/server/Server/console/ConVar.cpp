@@ -34,10 +34,6 @@ ConVar::ConVar(const char *cvarname, const float defvalue, const char *desc, con
 	{
 		maximum.exist = false;
 	}
-	if (!concore.AddConVar(cvarname, this))
-	{
-		delete this;
-	}
 }
 
 ConVar::ConVar(const char *cvarname, const int defvalue, const char *desc, const int cvarflags, const bool hasMin, const int min, const bool hasMax, const int max)
@@ -66,10 +62,6 @@ ConVar::ConVar(const char *cvarname, const int defvalue, const char *desc, const
 	{
 		maximum.exist = false;
 	}
-	if (!concore.AddConVar(cvarname, this))
-	{
-		delete this;
-	}
 }
 
 ConVar::ConVar(const char *cvarname, const char *defvalue, const char *desc, const int cvarflags)
@@ -80,10 +72,6 @@ ConVar::ConVar(const char *cvarname, const char *defvalue, const char *desc, con
 	defaultvalue.value.s = (char *)calloc(length + 1, sizeof(char));
 	strcpy(defaultvalue.value.s, defvalue);
 	value = defaultvalue;
-	if (!concore.AddConVar(cvarname, this))
-	{
-		delete this;
-	}
 }
 
 ConVar::~ConVar(void)

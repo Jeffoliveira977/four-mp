@@ -10,10 +10,6 @@ ConCmd::ConCmd(const char *cmdname, void *callback, const char *desc, const int 
 {
 	this->Init(cmdname, desc, cmdflags);
 	handler = callback;
-	if (!concore.AddConCmd(cmdname, this))
-	{
-		delete this;
-	}
 }
 
 ConCmd::~ConCmd(void)

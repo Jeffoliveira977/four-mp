@@ -96,6 +96,141 @@ bool ConsoleCore::IsConsoleSymbolExist(const char *name)
 	return false;
 }
 
+ConVar *ConsoleCore::AddConVar(const char *name, const float defaultvalue, const char *description, const int flags, const bool hasMin, const float min, const bool hasMax, const float max)
+{
+	if (name == NULL)
+	{
+		return NULL;
+	}
+	if (hasMin && hasMax && (min > max))
+	{
+		return NULL;
+	}
+	if (symbolbuffersize == maxsymbolbuffersize)
+	{
+		return NULL;
+	}
+	if (this->IsConsoleSymbolExist(name))
+	{
+		return NULL;
+	}
+	if (!this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize + 1))
+	{
+		return NULL;
+	}
+	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
+	strcpy(symbolbuffer[symbolbuffersize].name, name);
+	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConVar;
+	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
+	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max);
+	symbolbuffer[symbolbuffersize].numcmds = 0;
+	symbolbuffersize++;
+	return symbolbuffer[symbolbuffersize-1].ptr->convar;
+}
+
+ConVar *ConsoleCore::AddConVar(const char *name, const int defaultvalue, const char *description, const int flags, const bool hasMin, const int min, const bool hasMax, const int max)
+{
+	if (name == NULL)
+	{
+		return NULL;
+	}
+	if (hasMin && hasMax && (min > max))
+	{
+		return NULL;
+	}
+	if (symbolbuffersize == maxsymbolbuffersize)
+	{
+		return NULL;
+	}
+	if (this->IsConsoleSymbolExist(name))
+	{
+		return NULL;
+	}
+	if (!this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize + 1))
+	{
+		return NULL;
+	}
+	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
+	strcpy(symbolbuffer[symbolbuffersize].name, name);
+	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConVar;
+	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
+	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max);
+	symbolbuffer[symbolbuffersize].numcmds = 0;
+	symbolbuffersize++;
+	return symbolbuffer[symbolbuffersize-1].ptr->convar;
+}
+
+ConVar *ConsoleCore::AddConVar(const char *name, const char *defaultvalue, const char *description, const int flags)
+{
+	if (name == NULL)
+	{
+		return NULL;
+	}
+	if (symbolbuffersize == maxsymbolbuffersize)
+	{
+		return NULL;
+	}
+	if (this->IsConsoleSymbolExist(name))
+	{
+		return NULL;
+	}
+	if (!this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize + 1))
+	{
+		return NULL;
+	}
+	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
+	strcpy(symbolbuffer[symbolbuffersize].name, name);
+	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConVar;
+	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
+	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(name, defaultvalue, description, flags);
+	symbolbuffer[symbolbuffersize].numcmds = 0;
+	symbolbuffersize++;
+	return symbolbuffer[symbolbuffersize-1].ptr->convar;
+}
+
+ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *description, const int flags)
+{
+	if (name == NULL)
+	{
+		return NULL;
+	}
+	if (callback == NULL)
+	{
+		return NULL;
+	}
+	ConsoleSymbol *symbol = this->GetConsoleSymbol(name);
+	if (symbol != NULL)
+	{
+		if (symbol->numcmds == maxcmdspersymbol)
+		{
+			return NULL;
+		}
+		if (!this->ResizeSymbolPtrBuffer(symbol->ptr, symbol->numcmds + 1))
+		{
+			return NULL;
+		}
+		symbol->ptr[symbol->numcmds].concmd = new ConCmd(name, callback, description, flags);
+		symbol->numcmds++;
+		return symbol->ptr[symbol->numcmds-1].concmd;
+	}
+	if (symbolbuffersize == maxsymbolbuffersize)
+	{
+		return NULL;
+	}
+	if (!this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize + 1))
+	{
+		return NULL;
+	}
+	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
+	strcpy(symbolbuffer[symbolbuffersize].name, name);
+	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConCmd;
+	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
+	symbolbuffer[symbolbuffersize].ptr[0].concmd = new ConCmd(name, callback, description, flags);
+	symbolbuffer[symbolbuffersize].numcmds = 1;
+	symbolbuffersize++;
+	return symbolbuffer[symbolbuffersize-1].ptr[0].concmd;
+}
+
 char *ConsoleCore::GetConsoleSymbolHelpString(const char *name)
 {
 	if (name == NULL)
@@ -244,81 +379,6 @@ void ConsoleCore::InterpretLine(const char *string)
 	free(commandbuffer);
 	commandbuffer = NULL;
 	}
-}
-
-bool ConsoleCore::AddConVar(const char *name, ConVar *ptr)
-{
-	if (name == NULL)
-	{
-		return false;
-	}
-	if (ptr == NULL)
-	{
-		return false;
-	}
-	if (symbolbuffersize == maxsymbolbuffersize)
-	{
-		return false;
-	}
-	if (this->IsConsoleSymbolExist(name))
-	{
-		return false;
-	}
-	if (!this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize + 1))
-	{
-		return false;
-	}
-	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
-	strcpy(symbolbuffer[symbolbuffersize].name, name);
-	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConVar;
-	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
-	symbolbuffer[symbolbuffersize].ptr->convar = ptr;
-	symbolbuffer[symbolbuffersize].numcmds = 0;
-	symbolbuffersize++;
-	return true;
-}
-
-bool ConsoleCore::AddConCmd(const char *name, ConCmd *ptr)
-{
-	if (name == NULL)
-	{
-		return false;
-	}
-	if (ptr == NULL)
-	{
-		return false;
-	}
-	ConsoleSymbol *symbol = this->GetConsoleSymbol(name);
-	if (symbol != NULL)
-	{
-		if (symbol->numcmds == maxcmdspersymbol)
-		{
-			return false;
-		}
-		if (!this->ResizeSymbolPtrBuffer(symbol->ptr, symbol->numcmds + 1))
-		{
-			return false;
-		}
-		symbol->ptr[symbol->numcmds].concmd = ptr;
-		symbol->numcmds++;
-		return true;
-	}
-	if (symbolbuffersize == maxsymbolbuffersize)
-	{
-		return false;
-	}
-	if (!this->ResizeSymbolBuffer(symbolbuffer, symbolbuffersize + 1))
-	{
-		return false;
-	}
-	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
-	strcpy(symbolbuffer[symbolbuffersize].name, name);
-	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConCmd;
-	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
-	symbolbuffer[symbolbuffersize].ptr[0].concmd = ptr;
-	symbolbuffer[symbolbuffersize].numcmds = 1;
-	symbolbuffersize++;
-	return true;
 }
 
 bool ConsoleCore::DeleteConsoleSymbolByIndex(const unsigned short index)
