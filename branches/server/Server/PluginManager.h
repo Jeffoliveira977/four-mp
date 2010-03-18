@@ -49,7 +49,14 @@ private:
 		virtual bool RequestNewHandleType(const IPluginInterface *plugin, unsigned short &index);
 		virtual bool ReleaseHandleType(const IPluginInterface *plugin, const unsigned short &index);
 		virtual void PrintToServer(const char *string, ...);
+		virtual unsigned char GetCmdArgs(void);
+		virtual bool GetCmdArgString(char *&arg);
+		virtual bool GetCmdArgType(const unsigned char argnum, ConVarType &type);
+		virtual bool GetCmdArg(const unsigned char argnum, char *&arg);
+		virtual bool GetCmdArg(const unsigned char argnum, int &arg);
+		virtual bool GetCmdArg(const unsigned char argnum, float &arg);
 		virtual void RegServerCmd(const IPluginInterface *plugin, const char *name, void *callback, const char *description = "", const int flags = 0);
+		virtual void ServerCommand(const char *string);
 	};
 	IPluginHandlerInterface *ph;
 	bool LoadPluginInternal(const unsigned char index, const char *string);

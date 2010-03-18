@@ -444,6 +444,36 @@ void PluginManager::PluginHandler::PrintToServer(const char *string, ...)
 	va_end(arglist);
 }
 
+unsigned char PluginManager::PluginHandler::GetCmdArgs(void)
+{
+	return concore.GetCmdArgs();
+}
+
+bool PluginManager::PluginHandler::GetCmdArgString(char *&arg)
+{
+	return concore.GetCmdArgString(arg);
+}
+
+bool PluginManager::PluginHandler::GetCmdArgType(const unsigned char argnum, ConVarType &type)
+{
+	return concore.GetCmdArgType(argnum, type);
+}
+
+bool PluginManager::PluginHandler::GetCmdArg(const unsigned char argnum, char *&arg)
+{
+	return concore.GetCmdArg(argnum, arg);
+}
+
+bool PluginManager::PluginHandler::GetCmdArg(const unsigned char argnum, int &arg)
+{
+	return concore.GetCmdArg(argnum, arg);
+}
+
+bool PluginManager::PluginHandler::GetCmdArg(const unsigned char argnum, float &arg)
+{
+	return concore.GetCmdArg(argnum, arg);
+}
+
 void PluginManager::PluginHandler::RegServerCmd(const IPluginInterface *plugin, const char *name, void *callback, const char *description, const int flags)
 {
 	unsigned char pluginindex;
@@ -452,4 +482,9 @@ void PluginManager::PluginHandler::RegServerCmd(const IPluginInterface *plugin, 
 		return;
 	}
 	hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConCmd, concore.AddConCmd(name, callback, description, flags));
+}
+
+void PluginManager::PluginHandler::ServerCommand(const char *string)
+{
+	concore.InterpretLine(string);
 }
