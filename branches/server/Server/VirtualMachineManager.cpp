@@ -322,6 +322,16 @@ void VirtualMachineManager::SetVirtualMachineAuthor(const HSQUIRRELVM *v, const 
 	strcpy(vmbuffer[index]->author, string);
 }
 
+int VirtualMachineManager::CreateConVar(const HSQUIRRELVM *v, const ConVar *ptr)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return INVALID_HANDLE;
+	}
+	return hm.AddNewHandle(index + 1, HandleTypeConVar, (void *)ptr);
+}
+
 void VirtualMachineManager::RegServerCmd(const HSQUIRRELVM *v, const char *callback, const ConCmd *ptr)
 {
 	unsigned char index;
@@ -470,6 +480,8 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptVersion, "SetScriptVersion");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptAuthor, "SetScriptAuthor");
 			// Console functions
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateConVar, "CreateConVar");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_RegServerCmd, "RegServerCmd");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgs, "GetCmdArgs");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgsAsString, "GetCmdArgsAsString");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgType, "GetCmdArgType");
@@ -477,7 +489,6 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgInt, "GetCmdArgInt");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgFloat, "GetCmdArgFloat");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_printr, "printr");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_RegServerCmd, "RegServerCmd");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ServerCommand, "ServerCommand");
 			// Car functions
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateCar, "CreateCar");

@@ -28,6 +28,7 @@ public:
 	void SetVirtualMachineName(const HSQUIRRELVM *v, const char *string);
 	void SetVirtualMachineVersion(const HSQUIRRELVM *v, const char *string);
 	void SetVirtualMachineAuthor(const HSQUIRRELVM *v, const char *string);
+	int CreateConVar(const HSQUIRRELVM *v, const ConVar *ptr);
 	void RegServerCmd(const HSQUIRRELVM *v, const char *callback, const ConCmd *ptr);
 	int OnPlayerConnect(int playerid, char name[32]);
 	void OnPlayerDisconnect(int playerid);

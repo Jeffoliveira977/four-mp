@@ -4,6 +4,7 @@ function OnFilterScriptInit()
 	SetScriptVersion("1.0.0.0");
 	SetScriptAuthor("FaTony");
 	print("Console test filterscript");
+	CreateConVar("sqcvar", "default", "Test squirrel variable", 0);
 	RegServerCmd("sqtest", "Command_sqtest", "Test squirrel command", 0);
 }
 

@@ -67,11 +67,13 @@ ConVar::ConVar(const char *cvarname, const int defvalue, const char *desc, const
 ConVar::ConVar(const char *cvarname, const char *defvalue, const char *desc, const int cvarflags)
 {
 	this->Init(cvarname, desc, cvarflags);
+	unsigned int length = strlen(defvalue);
 	defaultvalue.type = ConVarTypeString;
-	unsigned int length = strlen(desc);
 	defaultvalue.value.s = (char *)calloc(length + 1, sizeof(char));
 	strcpy(defaultvalue.value.s, defvalue);
-	value = defaultvalue;
+	value.type = ConVarTypeString;
+	value.value.s = (char *)calloc(length + 1, sizeof(char));
+	strcpy(value.value.s, defvalue);
 }
 
 ConVar::~ConVar(void)

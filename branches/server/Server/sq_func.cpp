@@ -10,6 +10,7 @@
 #include "sq\squirrel.h"
 #include "sq\sqstdsystem.h"
 #include "main.h"
+#include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 #include "console\ConsoleCore.h"
 #include "console\ConsoleScreen.h"
@@ -57,6 +58,96 @@ void sq_SetScriptAuthor(HSQUIRRELVM v)
 	const char *string;
 	sq_getstring(v, 2, &string);
 	vmm.SetVirtualMachineAuthor(&v, string);
+}
+
+void sq_CreateConVar(HSQUIRRELVM v)
+{
+	int args = sq_gettop(v);
+	if (args < 2)
+	{
+		sq_pushinteger(v, INVALID_HANDLE);
+		return;
+	}
+	const char *cvarname;
+	const char *cvardesc;
+	int cvarflags = 0;
+	sq_getstring(v, 2, &cvarname);
+	if (args >= 3)
+	{
+		sq_getstring(v, 4, &cvardesc);
+	}
+	if (args >= 4)
+	{
+		sq_getinteger(v, 5, &cvarflags);
+	}
+	switch (sq_gettype(v, 2))
+	{
+	case OT_STRING:
+		{
+			const char *cvarvalue;
+			sq_getstring(v, 3, &cvarvalue);
+			sq_pushinteger(v, vmm.CreateConVar(&v, concore.AddConVar(cvarname, cvarvalue, cvardesc, cvarflags)));
+			return;
+			break;
+		}
+	case OT_INTEGER:
+		{
+			int cvarvalue;
+			bool hasMin = false;
+			int cvarmin = 0;
+			bool hasMax = false;
+			int cvarmax = 0;
+			sq_getinteger(v, 3, &cvarvalue);
+			if (args >= 6)
+			{
+				sq_getbool(v, 6, (SQBool *)&hasMin);
+				sq_getinteger(v, 7, &cvarmin);
+			}
+			if (args >= 8)
+			{
+				sq_getbool(v, 6, (SQBool *)&hasMax);
+				sq_getinteger(v, 7, &cvarmax);
+			}
+			sq_pushinteger(v, vmm.CreateConVar(&v, concore.AddConVar(cvarname, cvarvalue, cvardesc, cvarflags, hasMin, cvarmin, hasMax, cvarmax)));
+			return;
+			break;
+		}
+	case OT_FLOAT:
+		{
+			float cvarvalue;
+			bool hasMin = false;
+			float cvarmin = 0;
+			bool hasMax = false;
+			float cvarmax = 0;
+			sq_getfloat(v, 3, &cvarvalue);
+			if (args >= 6)
+			{
+				sq_getbool(v, 6, (SQBool *)&hasMin);
+				sq_getfloat(v, 7, &cvarmin);
+			}
+			if (args >= 8)
+			{
+				sq_getbool(v, 6, (SQBool *)&hasMax);
+				sq_getfloat(v, 7, &cvarmax);
+			}
+			sq_pushinteger(v, vmm.CreateConVar(&v, concore.AddConVar(cvarname, cvarvalue, cvardesc, cvarflags, hasMin, cvarmin, hasMax, cvarmax)));
+			return;
+			break;
+		}
+	}
+}
+
+void sq_RegServerCmd(HSQUIRRELVM v)
+{
+	const char *cmdname;
+	const char *cmdcallback;
+	const char *cmddesc;
+	int cmdflags;
+	sq_getstring(v, 2, &cmdname);
+	sq_getstring(v, 3, &cmdcallback);
+	sq_getstring(v, 4, &cmddesc);
+	sq_getinteger(v, 5, &cmdflags);
+	vmm.RegServerCmd(&v, cmdcallback, concore.AddConCmd(cmdname, ConCmdDynamic, cmddesc, cmdflags));
 }
 
 void sq_GetCmdArgs(HSQUIRRELVM v)
@@ -142,19 +233,6 @@ void sq_GetCmdArgFloat(HSQUIRRELVM v)
 		return;
 	}
 	sq_pushfloat(v, arg);
-}
-
-void sq_RegServerCmd(HSQUIRRELVM v)
-{
-	const char *cmdname;
-	const char *cmdcallback;
-	const char *cmddesc;
-	int cmdflags;
-	sq_getstring(v, 2, &cmdname);
-	sq_getstring(v, 3, &cmdcallback);
-	sq_getstring(v, 4, &cmddesc);
-	sq_getinteger(v, 5, &cmdflags);
-	vmm.RegServerCmd(&v, cmdcallback, concore.AddConCmd(cmdname, ConCmdDynamic, cmddesc, cmdflags));
 }
 
 void sq_ServerCommand(HSQUIRRELVM v)

@@ -444,6 +444,46 @@ void PluginManager::PluginHandler::PrintToServer(const char *string, ...)
 	va_end(arglist);
 }
 
+int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const char *name, const float defaultvalue, const char *description, const int flags, const bool hasMin, const float min, const bool hasMax, const float max)
+{
+	unsigned char pluginindex;
+	if (!pm.FindPlugin(plugin, pluginindex))
+	{
+		return INVALID_HANDLE;
+	}
+	return hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max));
+}
+
+int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const char *name, const int defaultvalue, const char *description, const int flags, const bool hasMin, const int min, const bool hasMax, const int max)
+{
+	unsigned char pluginindex;
+	if (!pm.FindPlugin(plugin, pluginindex))
+	{
+		return INVALID_HANDLE;
+	}
+	return hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max));
+}
+
+int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const char *name, const char *defaultvalue, const char *description, const int flags)
+{
+	unsigned char pluginindex;
+	if (!pm.FindPlugin(plugin, pluginindex))
+	{
+		return INVALID_HANDLE;
+	}
+	return hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags));
+}
+
+void PluginManager::PluginHandler::RegServerCmd(const IPluginInterface *plugin, const char *name, void *callback, const char *description, const int flags)
+{
+	unsigned char pluginindex;
+	if (!pm.FindPlugin(plugin, pluginindex))
+	{
+		return;
+	}
+	hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConCmd, concore.AddConCmd(name, callback, description, flags));
+}
+
 unsigned char PluginManager::PluginHandler::GetCmdArgs(void)
 {
 	return concore.GetCmdArgs();
@@ -472,16 +512,6 @@ bool PluginManager::PluginHandler::GetCmdArg(const unsigned char argnum, int &ar
 bool PluginManager::PluginHandler::GetCmdArg(const unsigned char argnum, float &arg)
 {
 	return concore.GetCmdArg(argnum, arg);
-}
-
-void PluginManager::PluginHandler::RegServerCmd(const IPluginInterface *plugin, const char *name, void *callback, const char *description, const int flags)
-{
-	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
-	{
-		return;
-	}
-	hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConCmd, concore.AddConCmd(name, callback, description, flags));
 }
 
 void PluginManager::PluginHandler::ServerCommand(const char *string)
