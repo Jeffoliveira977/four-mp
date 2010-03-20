@@ -12,7 +12,7 @@ extern DWORD dwLoadOffset;
 LPD3DXFONT fFMP = NULL;
 LPD3DXFONT fChat = NULL;
 
-DWORD MouseX, MouseY;
+int MouseX, MouseY;
 
 //LPDIRECT3DTEXTURE9 g_Texture;
 //ID3DXSprite *g_Sprite;
@@ -211,12 +211,12 @@ HRESULT APIENTRY hkIDirect3DDevice9::DrawTriPatch(UINT Handle, CONST float *pNum
 
 HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 {
-	MouseY = *(DWORD*)(0x17DE968+dwLoadOffset); 
-	MouseX = *(DWORD*)(0x17DE95C+dwLoadOffset);
+	MouseY = *(int*)(0x17DE968+dwLoadOffset); 
+	MouseX = *(int*)(0x17DE95C+dwLoadOffset);
 
-	RECT rc = {2, 2, 800, 600}; 
 	if(fmp.chat && !fmp.gui && fmp.connect)
 	{
+		RECT rc = {2, 2, 800, 600}; 
 		for(int i = 7; i >= 0; i--)
 		{
 			fChat->DrawText(0, mChat[i].msg, -1, &rc, DT_TOP|DT_LEFT, 
@@ -233,15 +233,14 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 		}
 	}
 
-	if(1) // Показ меню
-		Gui.GetStartMenu()->SetVisible( true );
+	//if(1) // Показ меню
+		//Gui.GetStartMenu()->SetVisible( true );
 
 	if(fmp.gui)
 	{
 		Gui.MoveMouse(MouseX, MouseY);
 		Gui.Draw();
 	}
-
 	return m_pD3Ddev->EndScene();
 }
 

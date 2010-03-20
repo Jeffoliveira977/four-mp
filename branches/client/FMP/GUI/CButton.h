@@ -21,6 +21,5 @@ public:
 
 	void SetBackVisible(bool v);
 	bool GetBackVisible();
-
 	void UpdateTheme( int iIndex );
 };

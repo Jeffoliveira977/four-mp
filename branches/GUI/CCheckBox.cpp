@@ -27,7 +27,7 @@ void CCheckBox::Draw()
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
 	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), 15, 15, pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
-	gpGui->GetFont()->DrawString( Pos.GetX() + 20, Pos.GetY(), 0, pString, GetFormatted() );
+	GetFont()->DrawString( Pos.GetX() + 20, Pos.GetY(), 0, pString, GetFormatted() );
 
 	if( GetChecked() )
 	{
@@ -47,7 +47,7 @@ void CCheckBox::MouseMove( CMouse * pMouse )
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	SetElementState( SetMouseOver( pMouse->InArea( Pos.GetX(), Pos.GetY(), gpGui->GetFont()->GetStringWidth( GetFormatted().c_str() ) + 20, gpGui->GetFont()->GetStringHeight() ) )?"MouseOver":"Norm" );
+	SetElementState( SetMouseOver( pMouse->InArea( Pos.GetX(), Pos.GetY(), GetFont()->GetStringWidth( GetFormatted().c_str() ) + 20, GetFont()->GetStringHeight() ) )?"MouseOver":"Norm" );
 }
 
 void CCheckBox::KeyEvent( SKey sKey )
@@ -67,6 +67,7 @@ void CCheckBox::KeyEvent( SKey sKey )
 void CCheckBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+	SetFont(gpGui->GetFont());
 
 	pInner = pState->GetColor( "Inner" );
 	pBorder = pState->GetColor( "Border" );

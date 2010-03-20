@@ -135,6 +135,8 @@ public:
 	void SetVarInt(const char *name, int value);
 	void SetVarBool(const char *name, bool value);
 
+	bool IsFocus(CWindow * w);
+
 	std::map<std::string,CVar*> Cvars;
 };
 

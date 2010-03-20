@@ -49,13 +49,12 @@ void CWindow::AddElement( CElement * pElement )
 
 	m_vElements.push_back( pElement );
 }
-
 void CWindow::Draw()
 {	
 	if(m_bTitleVisible)
 	{
 		pTitlebar->Draw( *GetAbsPos(), GetWidth(), TITLEBAR_HEIGHT );
-		gpGui->GetFont()->DrawString( GetAbsPos()->GetX() + 5, GetAbsPos()->GetY() + 5, 0, pTitle, GetFormatted() );
+		GetFont()->DrawString( GetAbsPos()->GetX() + 5, GetAbsPos()->GetY() + 5, 0, pTitle, GetFormatted() );
 		pButton->Draw( CPos( GetAbsPos()->GetX() + GetWidth() - BUTTON_HEIGHT - 2, GetAbsPos()->GetY() + 2 ), BUTTON_HEIGHT, BUTTON_HEIGHT );
 	}
 
@@ -65,7 +64,7 @@ void CWindow::Draw()
 			gpGui->DrawOutlinedBox( GetAbsPos()->GetX(), GetAbsPos()->GetY() + TITLEBAR_HEIGHT, GetWidth(), GetHeight() - TITLEBAR_HEIGHT + 1,  pBodyInner->GetD3DCOLOR(), pBodyBorder->GetD3DCOLOR() );
 
 		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
-			m_vElements[iIndex]->Draw();
+			if(m_vElements[iIndex]) m_vElements[iIndex]->Draw();
 	}
 }
 
@@ -76,7 +75,7 @@ void CWindow::PreDraw()
 	if( GetMaximized() )
 		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
 		{
-			m_vElements[ iIndex ]->PreDraw();
+			if(m_vElements[iIndex]) m_vElements[ iIndex ]->PreDraw();
 		}
 }
 
@@ -102,7 +101,7 @@ void CWindow::MouseMove( CMouse * pMouse )
 
 	if( GetMaximized() )
 		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
-			m_vElements[ iIndex ]->MouseMove( pMouse );
+			if(m_vElements[iIndex]) m_vElements[ iIndex ]->MouseMove( pMouse );
 }
 
 void CWindow::KeyEvent( SKey sKey )
@@ -157,7 +156,7 @@ void CWindow::KeyEvent( SKey sKey )
 
 	if( GetMaximized() )
 		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
-			m_vElements[ iIndex ]->KeyEvent( sKey );
+			if(m_vElements[ iIndex ]) m_vElements[ iIndex ]->KeyEvent( sKey );
 }
 
 void CWindow::SetMaximized( bool bMaximized )
@@ -225,24 +224,27 @@ CElement * CWindow::GetFocussedElement()
 CElement * CWindow::GetNextElement( CElement * pElement )
 {
 	for( int i = 0; i < static_cast<int>( m_vElements.size() ); i++ )
-		if( m_vElements[i] == pElement )
-			return m_vElements[ i + 1 ];
+		if(m_vElements[ i ])
+			if( m_vElements[i] == pElement )
+				return m_vElements[ i + 1 ];
 	return *m_vElements.begin();
 }
 
 CElement * CWindow::GetElementByString( const char * pszString, int iIndex )
 {
 	for( int i = 0; i < static_cast<int>( m_vElements.size() ); i++ )
-		if( m_vElements[ i ]->GetString( false, iIndex ) == pszString )
-			return m_vElements[ i ];
+		if(m_vElements[ i ])
+			if( m_vElements[ i ]->GetString( false, iIndex ) == pszString )
+				return m_vElements[ i ];
 	return 0;
 }
 
 void CWindow::BringToTop( CElement * pElement )
 {
 	for( int i = 0; i < static_cast<int>( m_vElements.size() ); i++ )
-		if( m_vElements[i] == pElement )
-			m_vElements.erase( m_vElements.begin() + i );
+		if(m_vElements[i])
+			if( m_vElements[i] == pElement )
+				m_vElements.erase( m_vElements.begin() + i );
 	m_vElements.insert(  m_vElements.end(), pElement );
 }
 

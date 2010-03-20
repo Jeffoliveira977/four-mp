@@ -598,8 +598,9 @@ void FMPHook::GameThread()
 	}
 }
 
-void GameStart()
+void NulledState()
 {
+	fmp.chat = fmp.component = fmp.connect = fmp.gui = fmp.hook = fmp.run = fmp.skin = fmp.wait = 0;
 }
 
 void MainThread(void* dummy)
@@ -609,6 +610,8 @@ void MainThread(void* dummy)
 	fmp.run = 1;
 	HOOK.AttachGtaThread("FMP");
 
+	Debug("Atached");
+
 	CloseHandle(ThreadHandle);
 	ThreadHandle = NULL;
 }
@@ -617,6 +620,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 {
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
+		NulledState();
 		debug_clear();
 		log_clear();
 

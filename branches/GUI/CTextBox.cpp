@@ -20,11 +20,11 @@ void CTextBox::Draw()
 
 	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
-	int iAddHeight = gpGui->GetFont()->GetStringHeight();
+	int iAddHeight = GetFont()->GetStringHeight();
 	if( m_vStrings.size() )
-		for( int i = pSlider->GetValue(), iHeight = 0; i <= pSlider->GetMaxValue() && iHeight < GetHeight() - gpGui->GetFont()->GetStringHeight(); i++ )
+		for( int i = pSlider->GetValue(), iHeight = 0; i <= pSlider->GetMaxValue() && iHeight < GetHeight() - GetFont()->GetStringHeight(); i++ )
 		{
-			gpGui->GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pString, m_vStrings[ i ], GetWidth() - HELPERSLIDER_WIDTH );
+			GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pString, m_vStrings[ i ], GetWidth() - HELPERSLIDER_WIDTH );
 			iHeight += iAddHeight;
 		}
 
@@ -87,13 +87,13 @@ void CTextBox::AddString( std::string sString )
 	int iHeight = 0;
 	for( int i = pSlider->GetValue(); i <= pSlider->GetMaxValue(); i++ )
 	{
-		float fWidth = static_cast<float>( gpGui->GetFont()->GetStringWidth( m_vStrings[ i ].c_str() ) );
+		float fWidth = static_cast<float>( GetFont()->GetStringWidth( m_vStrings[ i ].c_str() ) );
 		int iLines = static_cast<int>( ceilf( fWidth / ( GetWidth() - HELPERSLIDER_WIDTH ) ) );
 
-		int iTempHeight = iLines*gpGui->GetFont()->GetStringHeight();
+		int iTempHeight = iLines*GetFont()->GetStringHeight();
 		iHeight += iTempHeight;
 	
-		while( iHeight > GetHeight() - gpGui->GetFont()->GetStringHeight() )
+		while( iHeight > GetHeight() - GetFont()->GetStringHeight() )
 		{
 			pSlider->SetValue( pSlider->GetValue() + iLines );
 			iHeight -= iTempHeight;
@@ -112,6 +112,7 @@ void CTextBox::Clear()
 void CTextBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+	SetFont(gpGui->GetFont());
 
 	pString = pState->GetColor( "String" );
 	pInner = pState->GetColor( "Inner" );

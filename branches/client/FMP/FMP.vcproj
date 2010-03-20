@@ -140,7 +140,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="RakNet.lib ws2_32.lib"
+				AdditionalDependencies="RakNet.lib ws2_32.lib Gui.lib"
 				OutputFile="$(OutDir)\xlive.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="$(ProjectDir)\xlive.def"

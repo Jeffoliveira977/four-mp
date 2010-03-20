@@ -22,9 +22,9 @@ void CListBox::Draw()
 
 	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
-	int iAddHeight = gpGui->GetFont()->GetStringHeight();
+	int iAddHeight = GetFont()->GetStringHeight();
 	if( m_vRows.size() )
-		for( int i = pSlider->GetValue(), iHeight = 0; i < static_cast<int>( m_vRows.size() ) && iHeight < GetHeight() - gpGui->GetFont()->GetStringHeight(); i++ )
+		for( int i = pSlider->GetValue(), iHeight = 0; i < static_cast<int>( m_vRows.size() ) && iHeight < GetHeight() - GetFont()->GetStringHeight(); i++ )
 		{
 			CColor * pColor = 0;
 
@@ -39,7 +39,7 @@ void CListBox::Draw()
 				pColor = pInner;
 			}
 
-			gpGui->GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pColor, m_vRows[ i ].c_str(), GetWidth() - HELPERSLIDER_WIDTH );
+			GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pColor, m_vRows[ i ].c_str(), GetWidth() - HELPERSLIDER_WIDTH );
 			iHeight += iAddHeight;
 		}
 
@@ -58,7 +58,7 @@ void CListBox::MouseMove( CMouse * pMouse )
 	SetMouseOver( pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight() ) );
 
 	m_iMouseOverIndex = -1;
-	for( int i = pSlider->GetValue(), iHeight = 0, iStringHeight = gpGui->GetFont()->GetStringHeight(); i < static_cast<int>( m_vRows.size() ) || iHeight < GetHeight(); i++ )
+	for( int i = pSlider->GetValue(), iHeight = 0, iStringHeight = GetFont()->GetStringHeight(); i < static_cast<int>( m_vRows.size() ) || iHeight < GetHeight(); i++ )
 	{
 		if( pMouse->InArea( Pos.GetX(), Pos.GetY() + iHeight, GetWidth() - BUTTON_HEIGHT, iStringHeight ) )
 			m_iMouseOverIndex = i;
@@ -123,6 +123,7 @@ void CListBox::Clear()
 void CListBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+	SetFont(gpGui->GetFont());
 
 	pInner = pState->GetColor( "Inner" );
 	pBorder = pState->GetColor( "Border" );

@@ -10,7 +10,7 @@ WNDPROC gameProc;
 
 LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	if(!fmp.run && fmp.gui) 
+	if(!fmp.run || fmp.gui) 
 		return CallWindowProc(gameProc, hWnd, Msg, wParam, lParam);
 
 	Gui.HandleMessage(Msg, wParam, lParam);

@@ -40,18 +40,18 @@ void CListView::Draw()
 
 	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
-	int iAddHeight = gpGui->GetFont()->GetStringHeight();
+	int iAddHeight = GetFont()->GetStringHeight();
 				
 	for( int j = 0; j < Count; j++)
 	{
 		if( static_cast<int>( mTitles.size() ) > j)
-			gpGui->GetFont()->DrawString( Pos.GetX() + 3 + Poss[j], Pos.GetY(), 0, pString, mTitles[j], Widths[j] );
+			GetFont()->DrawString( Pos.GetX() + 3 + Poss[j], Pos.GetY(), 0, pString, mTitles[j], Widths[j] );
 		
 		int iHeight = iAddHeight + 5;
 
 		if( m_vRows[j].size() )
 		{
-			for( int i = pSlider->GetValue(); i < static_cast<int>( m_vRows[j].size() ) && iHeight < GetHeight() - gpGui->GetFont()->GetStringHeight(); i++ )
+			for( int i = pSlider->GetValue(); i < static_cast<int>( m_vRows[j].size() ) && iHeight < GetHeight() - GetFont()->GetStringHeight(); i++ )
 			{
 				CColor * pColor = 0;
 
@@ -67,7 +67,7 @@ void CListView::Draw()
 					pColor = pInner;
 				}
 
-				gpGui->GetFont()->DrawString( Pos.GetX() + 3 + Poss[j], Pos.GetY() + iHeight, 0, pColor, m_vRows[j][i], Widths[j] );
+				GetFont()->DrawString( Pos.GetX() + 3 + Poss[j], Pos.GetY() + iHeight, 0, pColor, m_vRows[j][i], Widths[j] );
 
 				iHeight += iAddHeight;
 			}
@@ -88,7 +88,7 @@ void CListView::MouseMove( CMouse * pMouse )
 	SetMouseOver( pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight() ) );
 	
 	m_iMouseOverIndex = -1;
-	int iStringHeight = gpGui->GetFont()->GetStringHeight();
+	int iStringHeight = GetFont()->GetStringHeight();
 	for( int i = pSlider->GetValue(), iHeight = iStringHeight+5; i < static_cast<int>( m_vRows[0].size() ) || iHeight < GetHeight(); i++ )
 	{
 		if( pMouse->InArea( Pos.GetX(), Pos.GetY() + iHeight, GetWidth() - BUTTON_HEIGHT, iStringHeight ) )
@@ -173,6 +173,7 @@ void CListView::Clear()
 void CListView::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+	SetFont(gpGui->GetFont());
 
 	pInner = pState->GetColor( "Inner" );
 	pBorder = pState->GetColor( "Border" );

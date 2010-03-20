@@ -27,7 +27,7 @@ void CDropDown::Draw()
 		gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 		gpGui->DrawLine( Pos.GetX() + GetWidth() - 20, Pos.GetY() + 1, Pos.GetX() + GetWidth() - 20, Pos.GetY() + GetHeight() - 1, 1, pBorder->GetD3DCOLOR() );
 		
-		gpGui->GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + GetHeight() / 2, FT_VCENTER, pString, m_vEntrys[ m_iSelected ].m_sString.c_str() );
+		GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + GetHeight() / 2, FT_VCENTER, pString, m_vEntrys[ m_iSelected ].m_sString.c_str() );
 		
 		if( m_bDropped && m_vEntrys.size() )
 		{
@@ -38,10 +38,10 @@ void CDropDown::Draw()
 				if( iIndex == m_iMouseOverIndex )
 				{
 					gpGui->FillArea( Pos.GetX() + 1, Pos.GetY() + GetHeight() * ( iIndex + 1 ), GetWidth() - 2, GetHeight(),pSelectedInner->GetD3DCOLOR() );
-					gpGui->GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + GetHeight() * ( iIndex + 1 ) + GetHeight() / 2, FT_VCENTER, pSelectedString, m_vEntrys[ iIndex ].m_sString.c_str() );
+					GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + GetHeight() * ( iIndex + 1 ) + GetHeight() / 2, FT_VCENTER, pSelectedString, m_vEntrys[ iIndex ].m_sString.c_str() );
 				}
 				else
-					gpGui->GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + GetHeight() * ( iIndex + 1 ) + GetHeight() / 2, FT_VCENTER, pString, m_vEntrys[ iIndex ].m_sString.c_str() );
+					GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + GetHeight() * ( iIndex + 1 ) + GetHeight() / 2, FT_VCENTER, pString, m_vEntrys[ iIndex ].m_sString.c_str() );
 			}
 		}
 
@@ -123,6 +123,7 @@ std::string CDropDown::GetValue()
 void CDropDown::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+	SetFont(gpGui->GetFont());
 
 	pString = pState->GetColor( "String" );
 	pInner = pState->GetColor( "Inner" );

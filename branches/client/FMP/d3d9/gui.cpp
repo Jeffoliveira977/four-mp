@@ -8,10 +8,12 @@ CButton * sm_bExit;
 CTextBox * cc_tChat;
 CEditBox * cc_tEnter;
 CButton * cc_bEnter;
+CListView * sl_tList;
 
 void StartCallBack(CElement *pElement, CMSG msg, int Param)
 {
-	if(msg != CLICK) return;
+	Debug("Start callback");
+	if(msg != CLICK) { Debug("Start callback pre end"); return; }
 
 	if(pElement == sm_bExit)
 		exit(0);
@@ -19,10 +21,12 @@ void StartCallBack(CElement *pElement, CMSG msg, int Param)
 	{
 		// START GAME
 	}
+	Debug("Start callback end");
 }
 
 void ChatCallBack(CElement *pElement, CMSG msg, int Param)
 {
+	Debug("Chat callback");
 	if(pElement == cc_tChat && msg == SELECT)
 	{
 		// Select chat string
@@ -32,6 +36,12 @@ void ChatCallBack(CElement *pElement, CMSG msg, int Param)
 		// Send message
 		cc_tChat->AddString(cc_tEnter->GetString());
 	}
+	Debug("Chat callback end");
+}
+
+void ServerListCallback(CElement *pElement, CMSG msg, int Param)
+{
+	
 }
 
 FMPGUI::FMPGUI()
@@ -61,8 +71,6 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	gpGui->SetVarInt("Titlebar height", 24);
 	gpGui->SetVarInt("Button height", 20);
 
-	CText * tInfo = new CText(10, 10, 300, 100, "WAIT OR CREATE INTERFACE");
-
 	// Create Start Menu
 	StartMenu = new CWindow(100, 100, 600, 400, "FOUR-MP START MENU");
 	sm_bStart = new CButton(50, 50, 500, 0, "START", NULL, StartCallBack);
@@ -74,23 +82,41 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	// Create Servers List
 	ServerList = new CWindow(100, 100, 600, 400, "FOUR-MP SERVERS LIST");
-	ServerList->AddElement(tInfo);
-	ServerList->SetVisible( 0 );
+	int width[] = {20, 200, 180, 50, 100, 50};
+	sl_tList = new CListView(0, 0, width, 300, 6, NULL, NULL, ServerListCallback);
+	ServerList->AddElement(sl_tList);
+	ServerList->SetVisible( 1 );
+
+	sl_tList->SetTitle("Password");
+	sl_tList->SetTitle("Name");
+	sl_tList->SetTitle("Mode");
+	sl_tList->SetTitle("Players");
+	sl_tList->SetTitle("Location");
+	sl_tList->SetTitle("Ping");
+
+	sl_tList->PutStr("X", 0, 0);
+	sl_tList->PutStr("FOUR-MP Test server [FAKE]", 1, 0);
+	sl_tList->PutStr("Build mode by 009", 2, 0);
+	sl_tList->PutStr("0/0", 3, 0);
+	sl_tList->PutStr("Russia", 4, 0);
+	sl_tList->PutStr("0", 5, 0);
+
 
 	// Create Chat
 	Chat = new CWindow(10, 10, 200, 300, "FOUR-MP CHAT");
-	cc_tChat = new CTextBox(0, 0, 200, 275, NULL, NULL, ChatCallBack);
-	cc_tEnter = new CEditBox(0, 280, 170, 0, NULL, NULL, ChatCallBack);
-	cc_bEnter = new CButton(175, 280, 25, 0, "SEND", NULL, ChatCallBack);
+	cc_tChat = new CTextBox(0, 0, 200, 258, NULL, NULL, ChatCallBack);
+	cc_tEnter = new CEditBox(0, 257, 160, 0, NULL, NULL, ChatCallBack);
+	cc_bEnter = new CButton(160, 257, 40, 0, "SEND", NULL, ChatCallBack);
 	Chat->AddElement(cc_tChat);
 	Chat->AddElement(cc_tEnter);
 	Chat->AddElement(cc_bEnter);
-	Chat->SetVisible( 0 );
+	Chat->SetVisible( 1 );
 
 	// Create Option
-	ServerList = new CWindow(100, 100, 600, 400, "FOUR-MP OPTIONS");
-	ServerList->AddElement(tInfo);
-	ServerList->SetVisible( 0 );
+	Option = new CWindow(200, 200, 400, 300, "FOUR-MP OPTIONS");
+	CText * tInfo = new CText(10, 10, 300, 100, "WAIT OR CREATE INTERFACE");
+	Option->AddElement(tInfo);
+	Option->SetVisible( 0 );
 
 	gpGui->AddWindow( StartMenu );
 	gpGui->AddWindow( ServerList );

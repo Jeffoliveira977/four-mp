@@ -29,7 +29,7 @@ void CVerticalSliderBar::Draw()
 
 	pSlider->Draw( CPos( Pos.GetX() + 2, Pos.GetY() + GetHeight() - static_cast<int>( floor( static_cast<float>( GetHeight() ) / GetMaxValue() * GetValue() ) ) - 5 ), BUTTON_HEIGHT, 10 );
 
-	gpGui->GetFont()->DrawString( Pos.GetX() - TITLEBAR_HEIGHT + ( TITLEBAR_HEIGHT * 3 ) / 2, Pos.GetY() + GetHeight() + 5, FT_CENTER, pString, GetFormatted() );
+	GetFont()->DrawString( Pos.GetX() - TITLEBAR_HEIGHT + ( TITLEBAR_HEIGHT * 3 ) / 2, Pos.GetY() + GetHeight() + 5, FT_CENTER, pString, GetFormatted() );
 }
 
 void CVerticalSliderBar::MouseMove( CMouse * pMouse )
@@ -67,6 +67,7 @@ void CVerticalSliderBar::MouseMove( CMouse * pMouse )
 void CVerticalSliderBar::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+	SetFont(gpGui->GetFont());
 
 	pLines = pState->GetColor( "Lines" );
 	pString = pState->GetColor( "String" );

@@ -118,7 +118,7 @@ void CFont::CutString( int iMaxWidth, std::string & rString )
 	for( int iWidth = 0; iIndex < iLength && iWidth + 10 < iMaxWidth; )
 	{
 		char szCurrent[ 2 ] = { rString.c_str()[ iIndex ], 0 };
-		iWidth += gpGui->GetFont()->GetStringWidth( szCurrent );
+		iWidth += /*gpGui->GetFont()->*/GetStringWidth( szCurrent );
 		iIndex++;
 	}
 

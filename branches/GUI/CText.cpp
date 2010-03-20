@@ -16,7 +16,7 @@ void CText::Draw()
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 	
-	gpGui->GetFont()->DrawString( Pos.GetX(), Pos.GetY(), 0, pString, GetFormatted(), GetWidth() );
+	GetFont()->DrawString( Pos.GetX(), Pos.GetY(), 0, pString, GetFormatted(), GetWidth() );
 }
 
 void CText::PreDraw()
@@ -28,12 +28,13 @@ void CText::MouseMove( CMouse * pMouse )
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	SetElementState( SetMouseOver( pMouse->InArea( Pos.GetX(), Pos.GetY(), gpGui->GetFont()->GetStringWidth( GetFormatted().c_str() ), gpGui->GetFont()->GetStringHeight() ) )?"MouseOver":"Norm" );
+	SetElementState( SetMouseOver( pMouse->InArea( Pos.GetX(), Pos.GetY(), GetFont()->GetStringWidth( GetFormatted().c_str() ), GetFont()->GetStringHeight() ) )?"MouseOver":"Norm" );
 }
 
 void CText::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+	SetFont(gpGui->GetFont());
 
 	pString = pState->GetColor( "String" );
 }

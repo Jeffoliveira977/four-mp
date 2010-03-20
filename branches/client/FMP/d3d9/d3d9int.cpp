@@ -79,6 +79,7 @@ HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 		SetWindowLong(hFocusWindow,GWL_WNDPROC,(LONG)DefWndProc);
 		Gui.Load(ret->m_pD3Ddev);
 		Debug("Save Device");
+		fmp.gui = 1;
 
 		if(fFMP == NULL)
 		{
@@ -91,8 +92,6 @@ HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 				D3DX_DEFAULT, D3DCOLOR_XRGB(255, 0, 255),NULL, NULL, &g_Texture);*/
 		}
 	}
-
-	fmp.gui = 1;
 	return hRet;
 }
 

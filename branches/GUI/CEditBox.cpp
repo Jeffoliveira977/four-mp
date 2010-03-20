@@ -28,7 +28,7 @@ void CEditBox::Draw()
 	if( pState )
 	{
 		gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
-		gpGui->GetFont()->DrawString( Pos.GetX() + 4, Pos.GetY() + GetHeight() / 2, FT_VCENTER, pString, &GetString()[ GetStart() ], GetWidth() );
+		GetFont()->DrawString( Pos.GetX() + 4, Pos.GetY() + GetHeight() / 2, FT_VCENTER, pString, &GetString()[ GetStart() ], GetWidth() );
 		
 		if( m_bCursorState && HasFocus() )
 			gpGui->FillArea( Pos.GetX() + 2 + m_iCursorX, Pos.GetY() + 2, 2, GetHeight() - 4, pCursor->GetD3DCOLOR() );
@@ -66,16 +66,16 @@ void CEditBox::KeyEvent( SKey sKey )
 
 				std::string sString( &GetString()[ GetStart() ] );
 				
-				if( iX >= iAbsX + gpGui->GetFont()->GetStringWidth( sString.c_str() ) )
+				if( iX >= iAbsX + GetFont()->GetStringWidth( sString.c_str() ) )
 					SetIndex( sString.length() );
 				else
 				{
 					for( int i = 0; i <= static_cast<int>( sString.length() ); i++ )
 					{
-						if( iX <= iAbsX + gpGui->GetFont()->GetStringWidth( sString.c_str() ) )
+						if( iX <= iAbsX + GetFont()->GetStringWidth( sString.c_str() ) )
 						{
 							sString[ i ] = 0;
-							if( iX > iAbsX + gpGui->GetFont()->GetStringWidth( sString.c_str() ) )
+							if( iX > iAbsX + GetFont()->GetStringWidth( sString.c_str() ) )
 								SetIndex( i );
 						}
 						sString = &GetString()[ GetStart() ];
@@ -96,7 +96,7 @@ void CEditBox::KeyEvent( SKey sKey )
 
 				SetIndex( strlen( &sString[ GetStart() ] ) );
 
-				while( gpGui->GetFont()->GetStringWidth( &sString.c_str()[ GetStart() ] ) > GetWidth() - 5 || m_iCursorX > GetWidth() - 5 )
+				while( GetFont()->GetStringWidth( &sString.c_str()[ GetStart() ] ) > GetWidth() - 5 || m_iCursorX > GetWidth() - 5 )
 				{
 					SetStart( GetStart() + 1 );
 					SetIndex( GetIndex() - 1 );
@@ -156,7 +156,7 @@ void CEditBox::KeyEvent( SKey sKey )
 				std::string sString = GetString();
 				sString[ GetIndex() ] = 0;
 
-				while( gpGui->GetFont()->GetStringWidth( &sString.c_str()[ GetStart() ] ) > GetWidth() - 5 || m_iCursorX > GetWidth() - 5 )
+				while( GetFont()->GetStringWidth( &sString.c_str()[ GetStart() ] ) > GetWidth() - 5 || m_iCursorX > GetWidth() - 5 )
 				{
 					SetStart( GetStart() + 1 );
 					SetIndex( GetIndex() - 1 );
@@ -212,7 +212,7 @@ void CEditBox::KeyEvent( SKey sKey )
 				else
 					SetIndex( GetIndex() + sString.length() - iPrevLen );
 
-				while( gpGui->GetFont()->GetStringWidth( &GetString().c_str()[ GetStart() ] ) > GetWidth() - 5 )
+				while( GetFont()->GetStringWidth( &GetString().c_str()[ GetStart() ] ) > GetWidth() - 5 )
 				{
 					SetStart( GetStart() + 1 );
 					SetIndex( GetIndex() - 1 );
@@ -236,7 +236,7 @@ void CEditBox::SetIndex( int iIndex )
 	if( iIndex > static_cast<int>( sString.length() ) || iIndex < 0 )
 		return;
 	sString[ iIndex ] = 0;
-	m_iCursorX = gpGui->GetFont()->GetStringWidth( sString.c_str() );
+	m_iCursorX = GetFont()->GetStringWidth( sString.c_str() );
 
 	m_iIndex = iIndex;
 }
@@ -254,6 +254,7 @@ void CEditBox::SetStart( int iStart )
 void CEditBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+	SetFont(gpGui->GetFont());
 
 	pInner = pState->GetColor( "Inner" );
 	pBorder = pState->GetColor( "Border" );

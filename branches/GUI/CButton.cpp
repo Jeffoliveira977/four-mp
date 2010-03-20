@@ -20,7 +20,7 @@ void CButton::Draw()
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
 	if(m_bVisibleBack) pButton->Draw( Pos, GetWidth(), GetHeight() );
-	gpGui->GetFont()->DrawString( Pos.GetX() + GetWidth() / 2, Pos.GetY() + GetHeight() / 2, FT_CENTER|FT_VCENTER, pString, GetString().c_str() );
+	GetFont()->DrawString( Pos.GetX() + GetWidth() / 2, Pos.GetY() + GetHeight() / 2, FT_CENTER|FT_VCENTER, pString, GetString().c_str() );
 }
 
 void CButton::PreDraw()
@@ -67,6 +67,8 @@ bool CButton::GetBackVisible()
 void CButton::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+
+	SetFont(gpGui->GetFont());
 
 	pButton = pState->GetTexture( "Button" );
 	pString = pState->GetColor( "String" );

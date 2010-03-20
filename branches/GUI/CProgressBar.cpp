@@ -22,7 +22,7 @@ void CProgressBar::Draw()
 	if( GetProgress() )
 		pProgressBar->Draw( CPos( Pos.GetX() + 2, Pos.GetY() + 2 ), static_cast<int>( ( static_cast<float>( GetWidth() ) - 4 ) / 100 * GetProgress() ), GetHeight() - 4 );
 
-	gpGui->GetFont()->DrawString( Pos.GetX() + GetWidth() / 2, Pos.GetY() + GetHeight() / 2, FT_CENTER|FT_VCENTER, pString, m_sBuf );
+	GetFont()->DrawString( Pos.GetX() + GetWidth() / 2, Pos.GetY() + GetHeight() / 2, FT_CENTER|FT_VCENTER, pString, m_sBuf );
 }
 
 int CProgressBar::GetProgress()
@@ -43,13 +43,14 @@ void CProgressBar::SetProgress( int iProgress )
 	sStream << GetProgress() << static_cast<char>( 37 );
 	m_sBuf = sStream.str();
 
-	m_iStrWidth = gpGui->GetFont()->GetStringWidth( m_sBuf.c_str() ) / 2;
-	m_iStrHeight = gpGui->GetFont()->GetStringHeight() / 2;
+	m_iStrWidth = GetFont()->GetStringWidth( m_sBuf.c_str() ) / 2;
+	m_iStrHeight = GetFont()->GetStringHeight() / 2;
 }
 
 void CProgressBar::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+	SetFont(gpGui->GetFont());
 
 	pInner = pState->GetColor( "Inner" );
 	pBorder = pState->GetColor( "Border" );

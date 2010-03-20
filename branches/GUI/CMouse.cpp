@@ -5,7 +5,7 @@
 CMouse::CMouse( IDirect3DDevice9 * pDevice, ID3DXSprite * pSprite )
 {
 	m_pDevice = pDevice;
-	pCursor = new CTexture(pSprite, "FMPGUI\\cursor.png");
+	pCursor = new CTexture(pSprite, "FMPGUI/cursor.png");
 	SetSize(32);
 
 	SetLeftButton( 0 );
@@ -106,9 +106,13 @@ bool CMouse::InArea( CElement * pElement, int iHeight )
 
 void CMouse::Draw()
 {
-	/*static CColor * pColor = new CColor( 255, 1, 1, 255 );
-	gpGui->FillArea( m_pos.GetX(), m_pos.GetY(), 10, 10, pColor->GetD3DCOLOR() );*/
-	pCursor->Draw(m_pos, size, size);
+	if(!pCursor)
+	{
+		static CColor * pColor = new CColor( 255, 1, 1, 255 );
+		gpGui->FillArea( m_pos.GetX(), m_pos.GetY(), 10, 10, pColor->GetD3DCOLOR() );
+	}
+	else
+		pCursor->Draw(m_pos, size, size);
 }
 
 int CMouse::GetLeftButton( int iState )

@@ -72,7 +72,7 @@ void CHorizontalSliderBar::Draw()
 
 		pSlider->Draw( CPos( Pos.GetX() + static_cast<int>( floor( static_cast<float>( GetWidth() ) / ( GetMaxValue() - GetMinValue() ) * ( GetValue() - GetMinValue() ) ) ) - 5, Pos.GetY() + 2 ), 10, TITLEBAR_HEIGHT - 4 );
 
-		gpGui->GetFont()->DrawString( Pos.GetX() + GetWidth() / 2, Pos.GetY() - 15, FT_CENTER, pString, GetFormatted() );
+		GetFont()->DrawString( Pos.GetX() + GetWidth() / 2, Pos.GetY() - 15, FT_CENTER, pString, GetFormatted() );
 	}
 }
 
@@ -212,6 +212,7 @@ bool CHorizontalSliderBar::GetShowString()
 void CHorizontalSliderBar::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
+	SetFont(gpGui->GetFont());
 
 	pLines = pState->GetColor( "Lines" );
 	pString = pState->GetColor( "String" );

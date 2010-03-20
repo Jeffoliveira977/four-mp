@@ -32,6 +32,8 @@ class CElement
 	SElement * m_pThemeElement[ 3 ];
 	SElementState * m_pElementState[ 3 ];
 
+	CFont * pFont;
+
 public:
 
 	void SetElement( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL, bool abs = 0 );
@@ -79,4 +81,8 @@ public:
 	virtual void PreDraw();
 	virtual void MouseMove( CMouse * pMouse );
 	virtual void KeyEvent( SKey sKey );
+
+	CFont * GetFont();
+	void SetFont(int size, char *name);
+	void SetFont(CFont *font);
 };

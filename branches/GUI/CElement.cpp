@@ -35,6 +35,7 @@ void CElement::SetElement( int X, int Y, int Width, int Height, const char * Str
 	else
 		SetAction( 0 );
 
+	pFont = 0;
 	SetMouseOver( false );
 }
 
@@ -227,4 +228,21 @@ void CElement::MouseMove( CMouse * )
 
 void CElement::KeyEvent( SKey )
 {
+}
+
+void CElement::SetFont(int size, char *name)
+{
+	pFont = new CFont(gpGui->GetDevice(), size, name);
+}
+
+void CElement::SetFont(CFont *font)
+{
+	pFont = font;
+}
+
+CFont * CElement::GetFont()
+{
+	if(!pFont)
+		return gpGui->GetFont();
+	return pFont;
 }

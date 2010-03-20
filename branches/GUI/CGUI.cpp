@@ -9,6 +9,7 @@ CGUI::CGUI( IDirect3DDevice9 * pDevice )
 		MessageBoxA( 0, "pDevice invalid.", 0, 0 );
 
 	m_pDevice = pDevice;
+	m_wFocus = 0;
 
 	D3DXCreateSprite( pDevice, &m_pSprite );
 
@@ -196,8 +197,11 @@ CWindow * CGUI::AddWindow( CWindow * pWindow )
 void CGUI::BringToTop( CWindow * pWindow )
 {
 	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
+	{
+		if(!m_vWindows[i]) continue;
 		if( m_vWindows[i] == pWindow )
 			m_vWindows.erase( m_vWindows.begin() + i );
+	}
 
 	if(m_wFocus)
 		m_wFocus->LostFocus();
@@ -217,13 +221,14 @@ void CGUI::Draw()
 
 	for( int iIndex = 0; iIndex < static_cast<int>( m_vWindows.size() ); iIndex++ )
 	{
+		if(!m_vWindows[ iIndex ]) continue;
 		if( !m_vWindows[ iIndex ]->IsVisible() )
 			continue;
 
 		m_vWindows[ iIndex ]->Draw();
 	}
-
-	GetMouse()->Draw();
+	GetMouse
+		()->Draw();
 }
 
 void CGUI::PreDraw()
@@ -232,11 +237,13 @@ void CGUI::PreDraw()
 	{
 		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
 		{
+			if(!m_vWindows[ iIndex ]) continue;
 			if( !m_vWindows[ iIndex ]->IsVisible() )
 				continue;
-			
+
 			m_vWindows[ iIndex ]->PreDraw();
 		}
+
 		m_tPreDrawTimer.Start( 0.1f );
 	}
 }
@@ -244,12 +251,14 @@ void CGUI::PreDraw()
 void CGUI::MouseMove( CMouse * pMouse )
 {
 	CElement * pDragging = GetMouse()->GetDragging();
+
 	if( !pDragging )
 	{
 		bool bGotWindow = false;
 
 		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
 		{
+			if(!m_vWindows[ iIndex ]) continue;
 			if( !m_vWindows[ iIndex ]->IsVisible() )
 				continue;
 
@@ -288,6 +297,8 @@ bool CGUI::KeyEvent( SKey sKey )
 
 		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
 		{
+			if(!m_vWindows[ iIndex ]) continue;
+
 			if( !m_vWindows[ iIndex ]->IsVisible() )
 				continue;
 
@@ -317,6 +328,8 @@ bool CGUI::KeyEvent( SKey sKey )
 
 		for( int iIndex = 0; iIndex < static_cast<int>( vRepeat.size() ); iIndex++ )
 		{
+			if(!vRepeat[ iIndex ]) continue;
+
 			pMouse->SavePos();
 			pMouse->SetPos( CPos( -1, -1 ) );
 			vRepeat[ iIndex ]->KeyEvent( sKey );
@@ -328,6 +341,8 @@ bool CGUI::KeyEvent( SKey sKey )
 		bTop = false;
 
 		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
+		{
+			if(!m_vWindows[ iIndex ]) continue;
 			if( m_vWindows[ iIndex ]->IsVisible() )
 			{
 				if( m_vWindows[ iIndex ]->GetFocussedElement() && m_vWindows[ iIndex ]->GetMaximized() )
@@ -335,6 +350,7 @@ bool CGUI::KeyEvent( SKey sKey )
 
 				m_vWindows[ iIndex ]->KeyEvent( sKey );
 			}
+		}
 
 		if( !sKey.m_bDown )
 			bTop = false;
@@ -403,8 +419,9 @@ ID3DXSprite * CGUI::GetSprite()
 CWindow * CGUI::GetWindowByString( std::string sString, int iIndex )
 {
 	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
-		if( m_vWindows[ i ]->GetString( false, iIndex ) == sString )
-			return m_vWindows[ i ];
+		if( m_vWindows[ i ] )
+			if( m_vWindows[ i ]->GetString( false, iIndex ) == sString )
+				return m_vWindows[ i ];
 	return 0;
 }
 
@@ -431,4 +448,9 @@ bool CGUI::ShouldReload()
 void CGUI::Reload()
 {
 	m_bReload = true;
+}
+
+bool CGUI::IsFocus(CWindow * w)
+{
+	return w == m_wFocus;
 }
