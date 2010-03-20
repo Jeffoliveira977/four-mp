@@ -12,17 +12,6 @@ SQInteger register_global_func(HSQUIRRELVM v,SQFUNCTION f,const char *fname);
 void sq_SetScriptName(HSQUIRRELVM v);
 void sq_SetScriptVersion(HSQUIRRELVM v);
 void sq_SetScriptAuthor(HSQUIRRELVM v);
-void sq_CreateConVar(HSQUIRRELVM v);
-void sq_RegServerCmd(HSQUIRRELVM v);
-void sq_GetCmdArgs(HSQUIRRELVM v);
-void sq_GetCmdArgsAsString(HSQUIRRELVM v);
-void sq_GetCmdArgType(HSQUIRRELVM v);
-void sq_GetCmdArgString(HSQUIRRELVM v);
-void sq_GetCmdArgInt(HSQUIRRELVM v);
-void sq_GetCmdArgFloat(HSQUIRRELVM v);
-void sq_ServerCommand(HSQUIRRELVM v);
-void printfunc(HSQUIRRELVM v, const SQChar *s, ...);
-void sq_printr(HSQUIRRELVM v);
 // SQ Callbacks
 void sc_OnGameModeInit(HSQUIRRELVM v);
 void sc_OnGameModeExit(HSQUIRRELVM v);

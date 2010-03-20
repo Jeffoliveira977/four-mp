@@ -12,10 +12,10 @@ public:
 	bool ReleaseHandleType(const unsigned char pluginindex, const unsigned short typeindex); //For C++ plugins. Release handle type reserved by plugin
 	void CloseAllHandles(const short owner); //Closes all handles that was created or reserved by plugin or filterscript
 	int AddNewHandle(const short owner, const unsigned short type, void *ptr); //Adds new handle to the handle buffer and returns it's index
-	bool GetHandleType(const short owner, const int index, unsigned short &type); //Returns handle type given it's index
-	void *GetHandlePointer(const short owner, const int index); //Returns pointer to data which given handle points to
-	bool SetHandlePointer(const short owner, const int index, void *ptr); //Sets pointer to data which given handle points to
-	bool CloseHandle(const short owner, const int index); //Closes handle which was created or reserved by plugin or filterscript
+	bool GetHandleType(const short owner, const int handle, unsigned short &type); //Returns handle type given it's index
+	void *GetHandlePointer(const short owner, const int handle); //Returns pointer to data which given handle points to
+	bool SetHandlePointer(const short owner, const int handle, void *ptr); //Sets pointer to data which given handle points to
+	bool CloseHandle(const short owner, const int handle); //Closes handle which was created or reserved by plugin or filterscript
 	friend class CoreHandleTypesManager;
 private:
 	struct HandleType
@@ -40,13 +40,13 @@ private:
 	short maxcountbuffersize; //Holds maximum size of handle *count* buffer
 	short countbuffersize; //Holds current size of handle *count* buffer
 	short **countbuffer; //Holds number of handles each owner has reserved
-	bool GetHandleTypeFreeSlot(unsigned short &index); //Returns free slot in handle *types* buffer
+	bool GetHandleTypeFreeSlot(unsigned short &type); //Returns free slot in handle *types* buffer
 	bool ResizeHandleTypeBuffer(HandleType **&buffer, const unsigned short size); //Wrapper for realloc
-	int GetHandleFreeSlot(); //Returns free slot in handle buffer
+	int GetHandleFreeSlot(void); //Returns free slot in handle buffer
 	int FindHandle(const void *ptr); //Returns handle index given the pointer it points to
-	bool IsHandleOwned(const int index, const short owner); //Checks if given handle is owned by given owner
-	bool AddHandleOwner(const int index, const short owner); //Adds new owner to the given handle
-	bool DeleteHandleOwner(const int index, const short owner); //Deletes given owner from given handle
+	bool IsHandleOwned(const int handle, const short owner); //Checks if given handle is owned by given owner
+	bool AddHandleOwner(const int handle, const short owner); //Adds new owner to the given handle
+	bool DeleteHandleOwner(const int handle, const short owner); //Deletes given owner from given handle
 	bool ResizeHandleOwnerBuffer(short *&buffer, const short size); //Wrapper for realloc
 	bool ResizeHandleBuffer(Handle **&buffer, const int size); //Wrapper for realloc
 	bool IncreaseHandleCount(const short owner); //Increases number of handles reserved by given owner by one

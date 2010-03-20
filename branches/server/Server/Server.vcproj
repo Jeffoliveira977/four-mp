@@ -205,6 +205,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sq_consolenatives.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sq_func.cpp"
 				>
 			</File>
@@ -296,6 +300,10 @@
 			</File>
 			<File
 				RelativePath=".\sq.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sq_consolenatives.h"
 				>
 			</File>
 			<File

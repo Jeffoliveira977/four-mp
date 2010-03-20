@@ -551,12 +551,12 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 					symbol->ptr->convar->GetDefaultValue(value);
 					ResizeStringBuffer(helpstring, _scprintf("%s ( def. \"%f\" )", helpstring, value) + 1);
 					sprintf(helpstring, "%s ( def. \"%f\" )", helpstring, value);
-					if (symbol->ptr->convar->GetBoundFloat(ConVarBoundLower, value))
+					if (symbol->ptr->convar->GetBound(ConVarBoundLower, value))
 					{
 						ResizeStringBuffer(helpstring, _scprintf("%s min. %f", helpstring, value) + 1);
 						sprintf(helpstring, "%s min. %f", helpstring, value);
 					}
-					if (symbol->ptr->convar->GetBoundFloat(ConVarBoundUpper, value))
+					if (symbol->ptr->convar->GetBound(ConVarBoundUpper, value))
 					{
 						ResizeStringBuffer(helpstring, _scprintf("%s max. %f", helpstring, value) + 1);
 						sprintf(helpstring, "%s max. %f", helpstring, value);
@@ -569,12 +569,12 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 					symbol->ptr->convar->GetDefaultValue(value);
 					ResizeStringBuffer(helpstring, _scprintf("%s ( def. \"%d\" )", helpstring, value) + 1);
 					sprintf(helpstring, "%s ( def. \"%d\" )", helpstring, value);
-					if (symbol->ptr->convar->GetBoundInt(ConVarBoundLower, value))
+					if (symbol->ptr->convar->GetBound(ConVarBoundLower, value))
 					{
 						ResizeStringBuffer(helpstring, _scprintf("%s min. %d", helpstring, value) + 1);
 						sprintf(helpstring, "%s min. %d", helpstring, value);
 					}
-					if (symbol->ptr->convar->GetBoundInt(ConVarBoundUpper, value))
+					if (symbol->ptr->convar->GetBound(ConVarBoundUpper, value))
 					{
 						ResizeStringBuffer(helpstring, _scprintf("%s max. %d", helpstring, value) + 1);
 						sprintf(helpstring, "%s max. %d", helpstring, value);

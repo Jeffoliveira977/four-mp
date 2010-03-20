@@ -15,6 +15,7 @@
 
 #include "console\common.h"
 #include "sq.h"
+#include "sq_consolenatives.h"
 
 extern HandleManager hm;
 extern CoreHandleTypesManager chtm;
@@ -332,6 +333,156 @@ int VirtualMachineManager::CreateConVar(const HSQUIRRELVM *v, const ConVar *ptr)
 	return hm.AddNewHandle(index + 1, HandleTypeConVar, (void *)ptr);
 }
 
+int VirtualMachineManager::FindConVar(const HSQUIRRELVM *v, const char *name)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return INVALID_HANDLE;
+	}
+	return chtm.FindConVar(index + 1, name);
+}
+
+bool VirtualMachineManager::ResetConVar(const HSQUIRRELVM *v, const int handle)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.ResetConVar(index + 1, handle);
+}
+
+char *VirtualMachineManager::GetConVarName(const HSQUIRRELVM *v, const int handle)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return NULL;
+	}
+	return chtm.GetConVarName(index + 1, handle);
+}
+
+bool VirtualMachineManager::GetConVarValue(const HSQUIRRELVM *v, const int handle, float &value)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.GetConVarValue(index + 1, handle, value);
+}
+
+bool VirtualMachineManager::GetConVarValue(const HSQUIRRELVM *v, const int handle, int &value)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.GetConVarValue(index + 1, handle, value);
+}
+
+bool VirtualMachineManager::GetConVarValue(const HSQUIRRELVM *v, const int handle, char *&value)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.GetConVarValue(index + 1, handle, value);
+}
+
+bool VirtualMachineManager::GetConVarFlags(const HSQUIRRELVM *v, const int handle, int &flags)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.GetConVarFlags(index + 1, handle, flags);
+}
+
+bool VirtualMachineManager::GetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, float &bound)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.GetConVarBound(index + 1, handle, type, bound);
+}
+
+bool VirtualMachineManager::GetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, int &bound)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.GetConVarBound(index + 1, handle, type, bound);
+}
+
+bool VirtualMachineManager::SetConVarValue(const HSQUIRRELVM *v, const int handle, const float value)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.SetConVarValue(index + 1, handle, value);
+}
+
+bool VirtualMachineManager::SetConVarValue(const HSQUIRRELVM *v, const int handle, const int value)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.SetConVarValue(index + 1, handle, value);
+}
+
+bool VirtualMachineManager::SetConVarValue(const HSQUIRRELVM *v, const int handle, const char *value)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.SetConVarValue(index + 1, handle, value);
+}
+
+bool VirtualMachineManager::SetConVarFlags(const HSQUIRRELVM *v, const int handle, const int flags)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.SetConVarFlags(index + 1, handle, flags);
+}
+
+bool VirtualMachineManager::SetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, const float bound)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.SetConVarBound(index + 1, handle, type, bound);
+}
+
+bool VirtualMachineManager::SetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, const int bound)
+{
+	unsigned char index;
+	if (!this->FindVirtualMachine(v, index))
+	{
+		return false;
+	}
+	return chtm.SetConVarBound(index + 1, handle, type, bound);
+}
+
 void VirtualMachineManager::RegServerCmd(const HSQUIRRELVM *v, const char *callback, const ConCmd *ptr)
 {
 	unsigned char index;
@@ -473,7 +624,7 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			// Init Squirrel
 			*vmbuffer[index]->ptr.squirrel = sq_open(1024);
 			sqstd_seterrorhandlers(*vmbuffer[index]->ptr.squirrel);
-			sq_setprintfunc(*vmbuffer[index]->ptr.squirrel, printfunc);
+			sq_setprintfunc(*vmbuffer[index]->ptr.squirrel, sq_PrintToServer);
 			// Register Script Funcions
 			// Script identity functions
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptName, "SetScriptName");
@@ -481,6 +632,21 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptAuthor, "SetScriptAuthor");
 			// Console functions
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateConVar, "CreateConVar");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_FindConVar, "FindConVar");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ResetConVar, "ResetConVar");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarName, "GetConVarName");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarFloat, "GetConVarFloat");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarInt, "GetConVarInt");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarString, "GetConVarString");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarFlags, "GetConVarFlags");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarBoundFloat, "GetConVarBoundFloat");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarBoundInt, "GetConVarBoundInt");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarFloat, "SetConVarFloat");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarInt, "SetConVarInt");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarString, "SetConVarString");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarFlags, "SetConVarFlags");
+			//register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarBoundFloat, "SetConVarBoundFloat");
+			//register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarBoundInt, "SetConVarBoundInt");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_RegServerCmd, "RegServerCmd");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgs, "GetCmdArgs");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgsAsString, "GetCmdArgsAsString");
@@ -497,7 +663,7 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_addPlayerClass, "addPlayerClass");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_enableComponentSelect, "enableComponentSelect");
 			sq_pushroottable(*vmbuffer[index]->ptr.squirrel);
-			// Register Standart Script Functions
+			// Register Standard Script Functions
 			sqstd_register_stringlib(*vmbuffer[index]->ptr.squirrel);
 			sqstd_register_mathlib(*vmbuffer[index]->ptr.squirrel);
 			sqstd_register_systemlib(*vmbuffer[index]->ptr.squirrel);

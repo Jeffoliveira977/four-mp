@@ -70,7 +70,7 @@ void SendChatMessage(char *msg, int player, int r, int g, int b)
 	}
 }	
 
-void print(const char *string, ...)
+void PrintToServer(const char *string, ...)
 {
 	va_list arglist; 
     va_start(arglist, string);
@@ -131,7 +131,7 @@ void LoadConfig()
 
 int main()
 {
-	concore.SetOutputFunction(print);
+	concore.SetOutputFunction(PrintToServer);
 	conscreen.SetCaption("FOUR-MP");
 	//Core console functions
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("cvarlist", ConCmdCvarlist, "Show the list of convars/concommands.", 0));
@@ -161,8 +161,8 @@ int main()
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_unload_all", ConCmdPluginUnloadAll, "Unloads all plugins", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_unpause", ConCmdPluginUnpause, "fs_unpause <index> : unpauses a loaded plugin", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_unpause_all", ConCmdPluginUnpauseAll, "Unpauses all disabled plugins", 0));
-	print("FOUR-MP. Copyright 2009-2010 Four-mp team.");
-	print("Developer build. Loading...");
+	PrintToServer("FOUR-MP. Copyright 2009-2010 Four-mp team.");
+	PrintToServer("Developer build. Loading...");
 	LoadConfig();
 
 	// Init RakNet
@@ -197,7 +197,7 @@ int main()
 	vmm.LoadFilterScripts();
 	if (!vmm.LoadGameMode(sConf.GameMode[0]))
 	{
-		print("Can't load gamemode");
+		PrintToServer("Can't load gamemode");
 		return 1;
 	}
 	// Body
@@ -214,7 +214,7 @@ int main()
 			if((pack->data[0] == ID_DISCONNECTION_NOTIFICATION) || (pack->data[0] == ID_CONNECTION_LOST)) // Disconnect
 			{
 				int index = GetPlayerID(pack->systemAddress);
-				print("Player %s[%d] disconnected", gPlayer[GetPlayerID(pack->systemAddress)].name, GetPlayerID(pack->systemAddress));
+				PrintToServer("Player %s[%d] disconnected", gPlayer[GetPlayerID(pack->systemAddress)].name, GetPlayerID(pack->systemAddress));
 				Man_PlayerDisconnect(index);
 				for(int i=0; i<MAX_PLAYERS;i++)
 				{

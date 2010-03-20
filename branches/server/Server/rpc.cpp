@@ -60,7 +60,7 @@ void ClientConnect(RPCParameters *rpcParameters)
 	{
 		if(gPlayer[index].connected != 1)
 		{
-			print("New player %s[%d] connected", name, index);
+			PrintToServer("New player %s[%d] connected", name, index);
 
 			int r = Man_PlayerConnect(name, index);
 			if(r != 0)

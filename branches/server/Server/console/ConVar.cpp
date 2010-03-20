@@ -90,6 +90,51 @@ ConVar::~ConVar(void)
 	}
 }
 
+void ConVar::Reset(void)
+{
+	if (value.type == ConVarTypeString)
+	{
+		if (defaultvalue.type == ConVarTypeString)
+		{
+			if (!ResizeStringBuffer(value.value.s, strlen(defaultvalue.value.s) + 1))
+			{
+				return;
+			}
+			strcpy(value.value.s, defaultvalue.value.s);
+		}
+		else
+		{
+			free(value.value.s);
+		}
+	}
+	switch (defaultvalue.type)
+	{
+	case ConVarTypeFloat:
+		{
+			value.type = ConVarTypeFloat;
+			value.value.f = defaultvalue.value.f;
+			break;
+		}
+	case ConVarTypeInt:
+		{
+			value.type = ConVarTypeInt;
+			value.value.i = defaultvalue.value.i;
+			break;
+		}
+	case ConVarTypeString:
+		{
+			if (value.type == ConVarTypeString)
+			{
+				return;
+			}
+			value.type = ConVarTypeString;
+			value.value.s = (char *)calloc(strlen(defaultvalue.value.s) + 1, sizeof(char));
+			strcpy(value.value.s, defaultvalue.value.s);
+			break;
+		}
+	}
+}
+
 ConVarType ConVar::GetType(void)
 {
 	return value.type;
@@ -196,7 +241,7 @@ bool ConVar::GetDefaultValue(char *&val)
 	return true;
 }
 
-bool ConVar::SetValue(float val)
+bool ConVar::SetValue(const float val)
 {
 	if (((minimum.exist == true) && (minimum.type == ConVarTypeInt)) || ((maximum.exist == true) && (maximum.type == ConVarTypeInt)))
 	{
@@ -224,7 +269,7 @@ bool ConVar::SetValue(float val)
 	return true;
 }
 
-bool ConVar::SetValue(int val)
+bool ConVar::SetValue(const int val)
 {
 	if (((minimum.exist == true) && (minimum.type == ConVarTypeFloat)) || ((maximum.exist == true) && (maximum.type == ConVarTypeFloat)))
 	{
@@ -252,7 +297,7 @@ bool ConVar::SetValue(int val)
 	return true;
 }
 
-bool ConVar::SetValue(char *val)
+bool ConVar::SetValue(const char *val)
 {
 	if ((minimum.exist == true) || (maximum.exist == true))
 	{
@@ -275,7 +320,7 @@ bool ConVar::SetValue(char *val)
 	return true;
 }
 
-bool ConVar::GetBoundFloat(ConVarBoundType type, float &bound)
+bool ConVar::GetBound(ConVarBoundType type, float &bound)
 {
 	ConVarBound tempbound;
 	if (type == ConVarBoundLower)
@@ -294,7 +339,7 @@ bool ConVar::GetBoundFloat(ConVarBoundType type, float &bound)
 	return true;
 }
 
-bool ConVar::GetBoundInt(ConVarBoundType type, int &bound)
+bool ConVar::GetBound(ConVarBoundType type, int &bound)
 {
 	ConVarBound tempbound;
 	if (type == ConVarBoundLower)
@@ -310,5 +355,95 @@ bool ConVar::GetBoundInt(ConVarBoundType type, int &bound)
 		return false;
 	}
 	bound = tempbound.value.i;
+	return true;
+}
+
+bool ConVar::SetBound(ConVarBoundType type, const float bound)
+{
+	if (defaultvalue.type != ConVarTypeFloat)
+	{
+		return false;
+	}
+	if (type == ConVarBoundLower)
+	{
+		if (bound > defaultvalue.value.f)
+		{
+			return false;
+		}
+		minimum.exist = true;
+		minimum.type = ConVarTypeFloat;
+		minimum.value.f = bound;
+		if (value.type != ConVarTypeFloat)
+		{
+			this->Reset();
+		}
+		else if (value.value.f < bound)
+		{
+			value.value.f = bound;
+		}
+	}
+	if (type == ConVarBoundUpper)
+	{
+		if (bound < defaultvalue.value.f)
+		{
+			return false;
+		}
+		maximum.exist = true;
+		maximum.type = ConVarTypeFloat;
+		maximum.value.f = bound;
+		if (value.type != ConVarTypeFloat)
+		{
+			this->Reset();
+		}
+		else if (value.value.f > bound)
+		{
+			value.value.f = bound;
+		}
+	}
+	return true;
+}
+
+bool ConVar::SetBound(ConVarBoundType type, const int bound)
+{
+	if (defaultvalue.type != ConVarTypeInt)
+	{
+		return false;
+	}
+	if (type == ConVarBoundLower)
+	{
+		if (bound > defaultvalue.value.i)
+		{
+			return false;
+		}
+		minimum.exist = true;
+		minimum.type = ConVarTypeInt;
+		minimum.value.i = bound;
+		if (value.type != ConVarTypeInt)
+		{
+			this->Reset();
+		}
+		else if (value.value.i < bound)
+		{
+			value.value.i = bound;
+		}
+	}
+	if (type == ConVarBoundUpper)
+	{
+		if (bound < defaultvalue.value.i)
+		{
+			return false;
+		}
+		maximum.exist = true;
+		maximum.type = ConVarTypeInt;
+		maximum.value.i = bound;
+		if (value.type != ConVarTypeInt)
+		{
+			this->Reset();
+		}
+		else if (value.value.i > bound)
+		{
+			value.value.i = bound;
+		}
+	}
 	return true;
 }

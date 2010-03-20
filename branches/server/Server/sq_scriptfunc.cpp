@@ -113,7 +113,7 @@ void sq_addPlayerClass(HSQUIRRELVM v)
 	int id = sConf.NumSkins;
 	if(id == MAX_PCLASS) 
 	{
-		print("Not free player class (MAX CLASSES = %d)", MAX_PCLASS);
+		PrintToServer("Not free player class (MAX CLASSES = %d)", MAX_PCLASS);
 		sq_pushinteger(v, -1);
 	}
 

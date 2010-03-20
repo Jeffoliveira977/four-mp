@@ -19,6 +19,6 @@ extern Server sConf;
 extern PlayerClass pClass[MAX_PCLASS];
 
 void SendChatMessage(char *msg, int player, int r, int g, int b);
-void print(const char *string, ...);
+void PrintToServer(const char *string, ...);
 void debug(const char *string, ...);
 #endif

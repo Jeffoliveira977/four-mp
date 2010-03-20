@@ -21,6 +21,7 @@ public:
 	ConVar(const char *cvarname, const int defvalue, const char *desc = "", const int cvarflags = 0, const bool hasMin = false, const int min = 0, const bool hasMax = false, const int max = 0);
 	ConVar(const char *cvarname, const char *defvalue, const char *desc = "", const int cvarflags = 0);
 	~ConVar(void);
+	void Reset(void);
 	ConVarType GetType(void);
 	ConVarType GetDefaultType(void);
 	bool GetValue(float &val);
@@ -29,11 +30,13 @@ public:
 	bool GetDefaultValue(float &val);
 	bool GetDefaultValue(int &val);
 	bool GetDefaultValue(char *&val);
-	bool SetValue(float val);
-	bool SetValue(int val);
-	bool SetValue(char *val);
-	bool GetBoundFloat(ConVarBoundType type, float &bound);
-	bool GetBoundInt(ConVarBoundType type, int &bound);
+	bool SetValue(const float val);
+	bool SetValue(const int val);
+	bool SetValue(const char *val);
+	bool GetBound(ConVarBoundType type, float &bound);
+	bool GetBound(ConVarBoundType type, int &bound);
+	bool SetBound(ConVarBoundType type, const float bound);
+	bool SetBound(ConVarBoundType type, const int bound);
 private:
 	union ConVarValueUnion
 	{

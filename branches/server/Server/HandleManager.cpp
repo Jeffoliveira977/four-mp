@@ -128,22 +128,21 @@ int HandleManager::AddNewHandle(const short owner, const unsigned short type, vo
 	{
 		return false;
 	}
-	int index = this->FindHandle(ptr);
-	if (index != INVALID_HANDLE)
+	int handle = this->FindHandle(ptr);
+	if (handle != INVALID_HANDLE)
 	{
-		if (handlebuffer[index]->type != type)
+		if (handlebuffer[handle]->type != type)
 		{
 			return INVALID_HANDLE;
 		}
-		if(!this->AddHandleOwner(index, owner))
+		if(!this->AddHandleOwner(handle, owner))
 		{
 			return INVALID_HANDLE;
 		}
-		return index;
-
+		return handle;
 	}
-	index = this->GetHandleFreeSlot();
-	if (index == INVALID_HANDLE)
+	handle = this->GetHandleFreeSlot();
+	if (handle == INVALID_HANDLE)
 	{
 		return INVALID_HANDLE;
 	}
@@ -151,114 +150,114 @@ int HandleManager::AddNewHandle(const short owner, const unsigned short type, vo
 	{
 		return INVALID_HANDLE;
 	}
-	if (index == handlebuffersize)
+	if (handle == handlebuffersize)
 	{
-		if (!this->ResizeHandleBuffer(handlebuffer, index + 1))
+		if (!this->ResizeHandleBuffer(handlebuffer, handle + 1))
 		{
 			return INVALID_HANDLE;
 		}
-		handlebuffersize = index + 1;
+		handlebuffersize = handle + 1;
 	}
-	handlebuffer[index] = new Handle;
-	handlebuffer[index]->numowners = 1;
-	handlebuffer[index]->owner = new short;
-	handlebuffer[index]->owner[0] = owner;
-	handlebuffer[index]->type = type;
-	handlebuffer[index]->ptr = ptr;
-	return index;
+	handlebuffer[handle] = new Handle;
+	handlebuffer[handle]->numowners = 1;
+	handlebuffer[handle]->owner = new short;
+	handlebuffer[handle]->owner[0] = owner;
+	handlebuffer[handle]->type = type;
+	handlebuffer[handle]->ptr = ptr;
+	return handle;
 }
 
-bool HandleManager::GetHandleType(const short owner, const int index, unsigned short &type)
+bool HandleManager::GetHandleType(const short owner, const int handle, unsigned short &type)
 {
 	if ((owner < 0) || (owner >= countbuffersize))
 	{
 		return false;
 	}
-	if ((index < 0) || (index >= handlebuffersize))
+	if ((handle < 0) || (handle >= handlebuffersize))
 	{
 		return false;
 	}
-	if (handlebuffer[index] == NULL)
+	if (handlebuffer[handle] == NULL)
 	{
 		return false;
 	}
-	if (!this->IsHandleOwned(index, owner))
+	if (!this->IsHandleOwned(handle, owner))
 	{
 		return false;
 	}
-	type = handlebuffer[index]->type;
+	type = handlebuffer[handle]->type;
 	return true;
 }
 
-void *HandleManager::GetHandlePointer(const short owner, const int index)
+void *HandleManager::GetHandlePointer(const short owner, const int handle)
 {
 	if ((owner < 0) || (owner >= countbuffersize))
 	{
 		return NULL;
 	}
-	if ((index < 0) || (index >= handlebuffersize))
+	if ((handle < 0) || (handle >= handlebuffersize))
 	{
 		return NULL;
 	}
-	if (handlebuffer[index] == NULL)
+	if (handlebuffer[handle] == NULL)
 	{
 		return NULL;
 	}
-	if (!this->IsHandleOwned(index, owner))
+	if (!this->IsHandleOwned(handle, owner))
 	{
 		return NULL;
 	}
-	return handlebuffer[index]->ptr;
+	return handlebuffer[handle]->ptr;
 }
 
-bool HandleManager::SetHandlePointer(const short owner, const int index, void *ptr)
+bool HandleManager::SetHandlePointer(const short owner, const int handle, void *ptr)
 {
 	if ((owner < 0) || (owner >= countbuffersize))
 	{
 		return false;
 	}
-	if ((index < 0) || (index >= handlebuffersize))
+	if ((handle < 0) || (handle >= handlebuffersize))
 	{
 		return false;
 	}
-	if (handlebuffer[index] == NULL)
+	if (handlebuffer[handle] == NULL)
 	{
 		return false;
 	}
-	if (!this->IsHandleOwned(index, owner))
+	if (!this->IsHandleOwned(handle, owner))
 	{
 		return false;
 	}
-	handlebuffer[index]->ptr = ptr;
+	handlebuffer[handle]->ptr = ptr;
 	return true;
 }
 
-bool HandleManager::CloseHandle(const short owner, const int index)
+bool HandleManager::CloseHandle(const short owner, const int handle)
 {
 	if ((owner < 0) || (owner >= countbuffersize))
 	{
 		return false;
 	}
-	if ((index < 0) || (index >= handlebuffersize))
+	if ((handle < 0) || (handle >= handlebuffersize))
 	{
 		return false;
 	}
-	if (handlebuffer[index] == NULL)
+	if (handlebuffer[handle] == NULL)
 	{
 		return false;
 	}
-	if (!this->DeleteHandleOwner(index, owner))
+	if (!this->DeleteHandleOwner(handle, owner))
 	{
 		return false;
 	}
 	return true;
 }
 
-bool HandleManager::GetHandleTypeFreeSlot(unsigned short &index)
+bool HandleManager::GetHandleTypeFreeSlot(unsigned short &type)
 {
-	for (index = 0; index < typebuffersize; index++)
+	for (type = 0; type < typebuffersize; type++)
 	{
-		if (typebuffer[index] == NULL)
+		if (typebuffer[type] == NULL)
 		{
 			return true;
 		}
@@ -283,36 +282,36 @@ bool HandleManager::ResizeHandleTypeBuffer(HandleType **&buffer, const unsigned 
 
 int HandleManager::GetHandleFreeSlot(void)
 {
-	int index;
-	for (index = 0; index < handlebuffersize; index++)
+	int handle;
+	for (handle = 0; handle < handlebuffersize; handle++)
 	{
-		if (handlebuffer[index] == NULL)
+		if (handlebuffer[handle] == NULL)
 		{
-			return index;
+			return handle;
 		}
 	}
 	if (handlebuffersize == maxhandlebuffersize)
 	{
 		return INVALID_HANDLE;
 	}
-	return index;
+	return handle;
 }
 
 int HandleManager::FindHandle(const void *ptr)
 {
-	for (int index = 0; index < handlebuffersize; index++)
+	for (int handle = 0; handle < handlebuffersize; handle++)
 	{
-		if ((handlebuffer[index] != NULL) && (handlebuffer[index]->ptr == ptr))
+		if ((handlebuffer[handle] != NULL) && (handlebuffer[handle]->ptr == ptr))
 		{
-			return index;
+			return handle;
 		}
 	}
 	return INVALID_HANDLE;
 }
 
-bool HandleManager::IsHandleOwned(const int index, const short owner)
+bool HandleManager::IsHandleOwned(const int handle, const short owner)
 {
-	if ((index < 0) || (index >= handlebuffersize))
+	if ((handle < 0) || (handle >= handlebuffersize))
 	{
 		return false;
 	}
@@ -320,13 +319,13 @@ bool HandleManager::IsHandleOwned(const int index, const short owner)
 	{
 		return false;
 	}
-	if (handlebuffer[index] == NULL)
+	if (handlebuffer[handle] == NULL)
 	{
 		return false;
 	}
-	for (short i = 0; i < handlebuffer[index]->numowners; i++)
+	for (short i = 0; i < handlebuffer[handle]->numowners; i++)
 	{
-		if (handlebuffer[index]->owner[i] == owner)
+		if (handlebuffer[handle]->owner[i] == owner)
 		{
 			return true;
 		}
@@ -334,9 +333,9 @@ bool HandleManager::IsHandleOwned(const int index, const short owner)
 	return false;
 }
 
-bool HandleManager::AddHandleOwner(const int index, const short owner)
+bool HandleManager::AddHandleOwner(const int handle, const short owner)
 {
-	if ((index < 0) || (index >= handlebuffersize))
+	if ((handle < 0) || (handle >= handlebuffersize))
 	{
 		return false;
 	}
@@ -344,20 +343,20 @@ bool HandleManager::AddHandleOwner(const int index, const short owner)
 	{
 		return false;
 	}
-	if (handlebuffer[index] == NULL)
+	if (handlebuffer[handle] == NULL)
 	{
 		return false;
 	}
-	if (this->IsHandleOwned(index, owner))
+	if (this->IsHandleOwned(handle, owner))
 	{
 		return true;
 	}
-	if (!this->ResizeHandleOwnerBuffer(handlebuffer[index]->owner, handlebuffer[index]->numowners + 1))
+	if (!this->ResizeHandleOwnerBuffer(handlebuffer[handle]->owner, handlebuffer[handle]->numowners + 1))
 	{
 		return false;
 	}
-	handlebuffer[index]->owner[handlebuffer[index]->numowners] = owner;
-	handlebuffer[index]->numowners++;
+	handlebuffer[handle]->owner[handlebuffer[handle]->numowners] = owner;
+	handlebuffer[handle]->numowners++;
 	if (!this->IncreaseHandleCount(owner))
 	{
 		return false;
@@ -365,9 +364,9 @@ bool HandleManager::AddHandleOwner(const int index, const short owner)
 	return true;
 }
 
-bool HandleManager::DeleteHandleOwner(const int index, const short owner)
+bool HandleManager::DeleteHandleOwner(const int handle, const short owner)
 {
-	if ((index < 0) || (index >= handlebuffersize))
+	if ((handle < 0) || (handle >= handlebuffersize))
 	{
 		return false;
 	}
@@ -375,41 +374,41 @@ bool HandleManager::DeleteHandleOwner(const int index, const short owner)
 	{
 		return false;
 	}
-	if (handlebuffer[index] == NULL)
+	if (handlebuffer[handle] == NULL)
 	{
 		return false;
 	}
 	short i = 0;
-	while ((handlebuffer[index]->owner[i] != owner) && (i < handlebuffer[index]->numowners))
+	while ((handlebuffer[handle]->owner[i] != owner) && (i < handlebuffer[handle]->numowners))
 	{
 		i++;
 	}
-	if (i == handlebuffer[index]->numowners)
+	if (i == handlebuffer[handle]->numowners)
 	{
 		return false;
 	}
-	for (;i < (handlebuffer[index]->numowners - 1); i++)
+	for (;i < (handlebuffer[handle]->numowners - 1); i++)
 	{
-		handlebuffer[index]->owner[i] = handlebuffer[index]->owner[i+1];
+		handlebuffer[handle]->owner[i] = handlebuffer[handle]->owner[i+1];
 	}
-	if (!this->ResizeHandleOwnerBuffer(handlebuffer[index]->owner, handlebuffer[index]->numowners - 1))
+	if (!this->ResizeHandleOwnerBuffer(handlebuffer[handle]->owner, handlebuffer[handle]->numowners - 1))
 	{
 		return false;
 	}
-	handlebuffer[index]->numowners--;
-	if (handlebuffer[index]->numowners == 0)
+	handlebuffer[handle]->numowners--;
+	if (handlebuffer[handle]->numowners == 0)
 	{
-		if (handlebuffer[index]->type < NUM_CORE_HANDLE_TYPES)
+		if (handlebuffer[handle]->type < NUM_CORE_HANDLE_TYPES)
 		{
-			chtm.CloseHandle(index);
+			chtm.CloseHandle(handle);
 		}
 		else
 		{
 			//TODO: Dynamic handle types
-			free(handlebuffer[index]->ptr);
+			free(handlebuffer[handle]->ptr);
 		}
-		free(handlebuffer[index]);
-		handlebuffer[index] = NULL;
+		free(handlebuffer[handle]);
+		handlebuffer[handle] = NULL;
 	}
 	this->DecreaseHandleCount(owner);
 	return true;
@@ -463,7 +462,7 @@ bool HandleManager::IncreaseHandleCount(const short owner)
 	}
 	if (countbuffer[owner][0] == maxhandlesperowner)
 	{
-		print("MEMORY LEAK IN MODULE %d. Unloading.", owner);
+		PrintToServer("MEMORY LEAK IN MODULE %d. Unloading.", owner);
 		this->CloseAllHandles(owner);
 		return false;
 	}

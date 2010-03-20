@@ -30,7 +30,7 @@ int ConSymbolBase::GetFlags(void)
 	return flags;
 }
 
-void ConSymbolBase::SetFlags(int f)
+void ConSymbolBase::SetFlags(const int f)
 {
 	flags = f;
 }

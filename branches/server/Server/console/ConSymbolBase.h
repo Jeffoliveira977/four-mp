@@ -30,7 +30,7 @@ public:
 	char *GetName(void);
 	char *GetDescription(void);
 	int GetFlags(void);
-	void SetFlags(int f);
+	void SetFlags(const int f);
 protected:
 	char *name;
 	char *description;
