@@ -41,7 +41,7 @@
 ///////////////////////////////////////////////
 CoreHandleTypesManager chtm;
 ConsoleCore concore;
-ConsoleScreen conscreen;
+ConsoleScreen conscreen(&concore);
 RakPeerInterface *net;
 VirtualMachineManager vmm;
 PluginManager pm;

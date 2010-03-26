@@ -1,26 +1,28 @@
+/// \file
+/// \brief Source file that contains implementation of the core console commands.
+/// \details See coreconcommands.h.
+/// \author FaTony
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "common.h"
 #include "coreconcommands.h"
-#include "ConsoleCore.h"
 
-extern ConsoleCore concore;
-
-void ConCmdCvarlist(unsigned char numargs)
+void ConCmdCvarlist(ConsoleCore *concore, unsigned char numargs)
 {
 	bool search = false;
 	char *searchstring;
 	if (numargs > 0)
 	{
-		if (concore.GetCmdArg(1, searchstring))
+		if (concore->GetCmdArg(1, searchstring))
 		{
 			search = true;
 		}
 	}
-	concore.Output("cvar list\n--------------");
-	unsigned short numsymbols = concore.GetNumberOfConsoleSymbols();
+	concore->Output("cvar list\n--------------");
+	unsigned short numsymbols = concore->GetNumberOfConsoleSymbols();
 	unsigned short numfound = 0;
 	ConsoleCore::ConsoleSymbol *symbol;
 	unsigned char numcmds;
@@ -29,7 +31,7 @@ void ConCmdCvarlist(unsigned char numargs)
 	for (unsigned short i = 0; i < numsymbols; i++)
 	{
 		//TODO: Sort alphabetically
-		symbol = concore.GetConsoleSymbolByIndex(i);
+		symbol = concore->GetConsoleSymbolByIndex(i);
 		if (symbol->type == ConsoleCore::ConsoleSymbolTypeConCmd)
 		{
 			numcmds = symbol->numcmds;
@@ -76,60 +78,60 @@ void ConCmdCvarlist(unsigned char numargs)
 					break;
 				}
 			}
-			concore.Output(symbolstring);
+			concore->Output(symbolstring);
 			free(symbolstring);
 		}
 	}
-	concore.Output("--------------\n%d total convars/concommands", numsymbols);
+	concore->Output("--------------\n%d total convars/concommands", numsymbols);
 }
 
-void ConCmdFind(unsigned char numargs)
+void ConCmdFind(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs != 1)
 	{
-		concore.Output("Usage: find <string>");
+		concore->Output("Usage: find <string>");
 		return;
 	}
 	char *searchstring;
-	if (!concore.GetCmdArgString(searchstring))
+	if (!concore->GetCmdArgString(searchstring))
 	{
-		concore.Output("Usage: find <string>");
+		concore->Output("Usage: find <string>");
 		return;
 	}
-	unsigned short numsymbols = concore.GetNumberOfConsoleSymbols();
+	unsigned short numsymbols = concore->GetNumberOfConsoleSymbols();
 	char *tempstring;
 	for (unsigned short i = 0; i < numsymbols; i++)
 	{
 		//TODO: Sort alphabetically
-		tempstring = concore.GetConsoleSymbolHelpStringByIndex(i);
+		tempstring = concore->GetConsoleSymbolHelpStringByIndex(i);
 		if (strstr(tempstring, searchstring) != NULL)
 		{
-			concore.Output(tempstring);
+			concore->Output(tempstring);
 		}
 		free(tempstring);
 	}
 }
 
-void ConCmdHelp(unsigned char numargs)
+void ConCmdHelp(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs != 1)
 	{
-		concore.Output("Usage: help <cvarname>");
+		concore->Output("Usage: help <cvarname>");
 		return;
 	}
 	char *cvarname;
-	if (!concore.GetCmdArg(1, cvarname))
+	if (!concore->GetCmdArg(1, cvarname))
 	{
-		concore.Output("Usage: help <cvarname>");
+		concore->Output("Usage: help <cvarname>");
 		free(cvarname);
 		return;
 	}
-	if (!concore.IsConsoleSymbolExist(cvarname))
+	if (!concore->IsConsoleSymbolExist(cvarname))
 	{
-		concore.Output("help: no cvar or command named %s", cvarname);
+		concore->Output("help: no cvar or command named %s", cvarname);
 		free(cvarname);
 		return;
 	}
-	concore.Output(concore.GetConsoleSymbolHelpString(cvarname));
+	concore->Output(concore->GetConsoleSymbolHelpString(cvarname));
 	free(cvarname);
 }

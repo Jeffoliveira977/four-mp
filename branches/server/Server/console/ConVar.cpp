@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the ConVar class.
+/// \details See class description.
+/// \author FaTony
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,11 +11,9 @@
 #include "ConVar.h"
 #include "ConsoleCore.h"
 
-extern ConsoleCore concore;
-
-ConVar::ConVar(const char *cvarname, const float defvalue, const char *desc, const int cvarflags, const bool hasMin, const float min, const bool hasMax, const float max)
+ConVar::ConVar(ConsoleCore* core, const char *cvarname, const float defvalue, const char *desc, const int cvarflags, const bool hasMin, const float min, const bool hasMax, const float max)
 {
-	this->Init(cvarname, desc, cvarflags);
+	this->Init(core, cvarname, desc, cvarflags);
 	defaultvalue.type = ConVarTypeFloat;
 	defaultvalue.value.f = defvalue;
 	value = defaultvalue;
@@ -36,9 +39,9 @@ ConVar::ConVar(const char *cvarname, const float defvalue, const char *desc, con
 	}
 }
 
-ConVar::ConVar(const char *cvarname, const int defvalue, const char *desc, const int cvarflags, const bool hasMin, const int min, const bool hasMax, const int max)
+ConVar::ConVar(ConsoleCore* core, const char *cvarname, const int defvalue, const char *desc, const int cvarflags, const bool hasMin, const int min, const bool hasMax, const int max)
 {
-	this->Init(cvarname, desc, cvarflags);
+	this->Init(core, cvarname, desc, cvarflags);
 	defaultvalue.type = ConVarTypeInt;
 	defaultvalue.value.i = defvalue;
 	value = defaultvalue;
@@ -64,9 +67,9 @@ ConVar::ConVar(const char *cvarname, const int defvalue, const char *desc, const
 	}
 }
 
-ConVar::ConVar(const char *cvarname, const char *defvalue, const char *desc, const int cvarflags)
+ConVar::ConVar(ConsoleCore* core, const char *cvarname, const char *defvalue, const char *desc, const int cvarflags)
 {
-	this->Init(cvarname, desc, cvarflags);
+	this->Init(core, cvarname, desc, cvarflags);
 	unsigned int length = strlen(defvalue);
 	defaultvalue.type = ConVarTypeString;
 	defaultvalue.value.s = (char *)calloc(length + 1, sizeof(char));
@@ -78,7 +81,7 @@ ConVar::ConVar(const char *cvarname, const char *defvalue, const char *desc, con
 
 ConVar::~ConVar(void)
 {
-	concore.DeleteConVar(this->name);
+	concore->DeleteConVar(this->name);
 	this->Uninit();
 	if (defaultvalue.type == ConVarTypeString)
 	{

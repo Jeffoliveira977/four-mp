@@ -1,18 +1,16 @@
 #include "fmpconcommands.h"
 #include "..\CoreHandleTypesManager.h"
-#include "ConsoleCore.h"
 #include "..\PluginManager.h"
 #include "..\VirtualMachineManager.h"
 
 extern CoreHandleTypesManager chtm;
-extern ConsoleCore concore;
 extern PluginManager pm;
 extern VirtualMachineManager vmm;
 
-void ConCmdDynamic(unsigned char numargs)
+void ConCmdDynamic(ConsoleCore *concore, unsigned char numargs)
 {
 	char *cmdname;
-	if (!concore.GetCmdArg(0, cmdname))
+	if (!concore->GetCmdArg(0, cmdname))
 	{
 		return;
 	}
@@ -20,7 +18,7 @@ void ConCmdDynamic(unsigned char numargs)
 	int *indexes = chtm.GetDynamicCommandHandles(cmdname, numcmds);
 	if (indexes == NULL)
 	{
-		concore.Output("Unknown command \"%s\"", cmdname);
+		concore->Output("Unknown command \"%s\"", cmdname);
 		free(cmdname);
 		return;
 	}
@@ -28,328 +26,328 @@ void ConCmdDynamic(unsigned char numargs)
 	{
 		if (!chtm.ExecuteDynamicCommand(indexes[i], numargs))
 		{
-			concore.Output("Unknown command \"%s\"", cmdname);
+			concore->Output("Unknown command \"%s\"", cmdname);
 		}
 	}
 	free(cmdname);
 }
 
-void ConCmdFsList(unsigned char numargs)
+void ConCmdFsList(ConsoleCore *concore, unsigned char numargs)
 {
-	concore.Output("Loaded filterscripts:\n---------------------");
+	concore->Output("Loaded filterscripts:\n---------------------");
 	char *string;
 	unsigned char max = vmm.GetMaxFilterScriptIndex();
 	for (unsigned char i = 0; i <= max; i++)
 	{
 		if (vmm.GetVirtualMachineInfoString(i, string))
 		{
-			concore.Output(string);
+			concore->Output(string);
 		}
 	}
-	concore.Output("---------------------");
+	concore->Output("---------------------");
 }
 
-void ConCmdFsLoad(unsigned char numargs)
+void ConCmdFsLoad(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore.Output("Usage: fs_load <filename>");
+		concore->Output("Usage: fs_load <filename>");
 		return;
 	}
 	char *name;
-	if (!concore.GetCmdArg(1, name))
+	if (!concore->GetCmdArg(1, name))
 	{
-		concore.Output("Usage: fs_load <filename>");
+		concore->Output("Usage: fs_load <filename>");
 		return;
 	}
 	if (!vmm.LoadFilterScript(name))
 	{
-		concore.Output("Unable to load filterscript \"%s\"", name);
+		concore->Output("Unable to load filterscript \"%s\"", name);
 		return;
 	}
-	concore.Output("Filterscript \"%s\" has been loaded successfully", name);
+	concore->Output("Filterscript \"%s\" has been loaded successfully", name);
 	free(name);
 }
 
-void ConCmdFsLoadAll(unsigned char numargs)
+void ConCmdFsLoadAll(ConsoleCore *concore, unsigned char numargs)
 {
 	vmm.LoadFilterScripts();
-	concore.Output("Loaded all filterscripts");
+	concore->Output("Loaded all filterscripts");
 }
 
-void ConCmdFsPause(unsigned char numargs)
+void ConCmdFsPause(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore.Output("Usage: fs_pause <index>");
+		concore->Output("Usage: fs_pause <index>");
 		return;
 	}
 	int index;
-	if (!concore.GetCmdArg(1, index))
+	if (!concore->GetCmdArg(1, index))
 	{
-		concore.Output("Usage: fs_pause <index>");
+		concore->Output("Usage: fs_pause <index>");
 		return;
 	}
 	if (!vmm.PauseVirtualMachine(index))
 	{
 
-		concore.Output("Unable to pause filterscript \"%d\"", index);
+		concore->Output("Unable to pause filterscript \"%d\"", index);
 		return;
 	}
-	concore.Output("Filterscript \"%d\" disabled", index);
+	concore->Output("Filterscript \"%d\" disabled", index);
 }
 
-void ConCmdFsPauseAll(unsigned char numargs)
+void ConCmdFsPauseAll(ConsoleCore *concore, unsigned char numargs)
 {
 	vmm.PauseVirtualMachines();
-	concore.Output("Filterscripts disabled");
+	concore->Output("Filterscripts disabled");
 }
 
-void ConCmdFsReload(unsigned char numargs)
+void ConCmdFsReload(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore.Output("Usage: fs_reload <index>");
+		concore->Output("Usage: fs_reload <index>");
 		return;
 	}
 	int index;
-	if (!concore.GetCmdArg(1, index))
+	if (!concore->GetCmdArg(1, index))
 	{
-		concore.Output("Usage: fs_reload <index>");
+		concore->Output("Usage: fs_reload <index>");
 		return;
 	}
 	if (index == 0)
 	{
-		concore.Output("Can't reload gamemode");
+		concore->Output("Can't reload gamemode");
 		return;
 	}
 	if (!vmm.ReloadFilterScript(index))
 	{
 
-		concore.Output("Unable to reload filterscript \"%d\"", index);
+		concore->Output("Unable to reload filterscript \"%d\"", index);
 		return;
 	}
-	concore.Output("Filterscript \"%d\" has been reloaded successfully", index);
+	concore->Output("Filterscript \"%d\" has been reloaded successfully", index);
 }
 
-void ConCmdFsReloadAll(unsigned char numargs)
+void ConCmdFsReloadAll(ConsoleCore *concore, unsigned char numargs)
 {
 	vmm.ReloadFilterScripts();
-	concore.Output("Reloaded all filterscripts");
+	concore->Output("Reloaded all filterscripts");
 }
 
-void ConCmdFsUnload(unsigned char numargs)
+void ConCmdFsUnload(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore.Output("Usage: fs_unload <index>");
+		concore->Output("Usage: fs_unload <index>");
 		return;
 	}
 	int index;
-	if (!concore.GetCmdArg(1, index))
+	if (!concore->GetCmdArg(1, index))
 	{
-		concore.Output("Usage: fs_unload <index>");
+		concore->Output("Usage: fs_unload <index>");
 		return;
 	}
 	if (index == 0)
 	{
-		concore.Output("Can't unload gamemode");
+		concore->Output("Can't unload gamemode");
 		return;
 	}
 	if (!vmm.UnloadFilterScript(index))
 	{
 
-		concore.Output("Unable to unload filterscript \"%d\", not found", index);
+		concore->Output("Unable to unload filterscript \"%d\", not found", index);
 		return;
 	}
-	concore.Output("Filterscript \"%d\" has been unloaded successfully", index);
+	concore->Output("Filterscript \"%d\" has been unloaded successfully", index);
 }
 
-void ConCmdFsUnloadAll(unsigned char numargs)
+void ConCmdFsUnloadAll(ConsoleCore *concore, unsigned char numargs)
 {
 	vmm.UnloadFilterScripts();
-	concore.Output("Unloaded all filterscripts");
+	concore->Output("Unloaded all filterscripts");
 }
 
-void ConCmdFsUnpause(unsigned char numargs)
+void ConCmdFsUnpause(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore.Output("Usage: fs_unpause <index>");
+		concore->Output("Usage: fs_unpause <index>");
 		return;
 	}
 	int index;
-	if (!concore.GetCmdArg(1, index))
+	if (!concore->GetCmdArg(1, index))
 	{
-		concore.Output("Usage: fs_unpause <index>");
+		concore->Output("Usage: fs_unpause <index>");
 		return;
 	}
 	if (!vmm.UnpauseVirtualMachine(index))
 	{
 
-		concore.Output("Unable to unpause filterscript \"%d\"", index);
+		concore->Output("Unable to unpause filterscript \"%d\"", index);
 		return;
 	}
-	concore.Output("Filterscript \"%d\" enabled", index);
+	concore->Output("Filterscript \"%d\" enabled", index);
 }
 
-void ConCmdFsUnpauseAll(unsigned char numargs)
+void ConCmdFsUnpauseAll(ConsoleCore *concore, unsigned char numargs)
 {
 	vmm.UnpauseVirtualMachines();
-	concore.Output("Filterscripts enabled");
+	concore->Output("Filterscripts enabled");
 }
 
-void ConCmdPluginList(unsigned char numargs)
+void ConCmdPluginList(ConsoleCore *concore, unsigned char numargs)
 {
-	concore.Output("Loaded plugins:\n---------------------");
+	concore->Output("Loaded plugins:\n---------------------");
 	char *string;
 	unsigned char max = pm.GetPluginBufferSize();
 	for (unsigned char i = 0; i < max; i++)
 	{
 		if (pm.GetPluginInfoString(i, string))
 		{
-			concore.Output(string);
+			concore->Output(string);
 		}
 	}
-	concore.Output("---------------------");
+	concore->Output("---------------------");
 }
 
-void ConCmdPluginLoad(unsigned char numargs)
+void ConCmdPluginLoad(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore.Output("Usage: plugin_load <filename>");
+		concore->Output("Usage: plugin_load <filename>");
 		return;
 	}
 	char *name;
-	if (!concore.GetCmdArg(1, name))
+	if (!concore->GetCmdArg(1, name))
 	{
-		concore.Output("Usage: plugin_load <filename>");
+		concore->Output("Usage: plugin_load <filename>");
 		return;
 	}
 	if (!pm.LoadPlugin(name))
 	{
-		concore.Output("Unable to load plugin \"%s\"", name);
+		concore->Output("Unable to load plugin \"%s\"", name);
 		return;
 	}
-	concore.Output("Plugin \"%s\" has been loaded successfully", name);
+	concore->Output("Plugin \"%s\" has been loaded successfully", name);
 	free(name);
 }
 
-void ConCmdPluginLoadAll(unsigned char numargs)
+void ConCmdPluginLoadAll(ConsoleCore *concore, unsigned char numargs)
 {
 	pm.LoadPlugins();
-	concore.Output("Loaded all plugins");
+	concore->Output("Loaded all plugins");
 }
 
-void ConCmdPluginPause(unsigned char numargs)
+void ConCmdPluginPause(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore.Output("Usage: plugin_pause <index>");
+		concore->Output("Usage: plugin_pause <index>");
 		return;
 	}
 	int index;
-	if (!concore.GetCmdArg(1, index))
+	if (!concore->GetCmdArg(1, index))
 	{
-		concore.Output("Usage: plugin_pause <index>");
+		concore->Output("Usage: plugin_pause <index>");
 		return;
 	}
 	if (!pm.PausePlugin(index))
 	{
 
-		concore.Output("Unable to pause plugin \"%d\"", index);
+		concore->Output("Unable to pause plugin \"%d\"", index);
 		return;
 	}
-	concore.Output("Plugin \"%d\" disabled", index);
+	concore->Output("Plugin \"%d\" disabled", index);
 }
 
-void ConCmdPluginPauseAll(unsigned char numargs)
+void ConCmdPluginPauseAll(ConsoleCore *concore, unsigned char numargs)
 {
 	pm.PausePlugins();
-	concore.Output("Plugins disabled");
+	concore->Output("Plugins disabled");
 }
 
-void ConCmdPluginReload(unsigned char numargs)
+void ConCmdPluginReload(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore.Output("Usage: plugin_reload <index>");
+		concore->Output("Usage: plugin_reload <index>");
 		return;
 	}
 	int index;
-	if (!concore.GetCmdArg(1, index))
+	if (!concore->GetCmdArg(1, index))
 	{
-		concore.Output("Usage: plugin_reload <index>");
+		concore->Output("Usage: plugin_reload <index>");
 		return;
 	}
 	if (!pm.ReloadPlugin(index))
 	{
 
-		concore.Output("Unable to reload plugin \"%d\"", index);
+		concore->Output("Unable to reload plugin \"%d\"", index);
 		return;
 	}
-	concore.Output("Plugin \"%d\" has been reloaded successfully", index);
+	concore->Output("Plugin \"%d\" has been reloaded successfully", index);
 }
 
-void ConCmdPluginReloadAll(unsigned char numargs)
+void ConCmdPluginReloadAll(ConsoleCore *concore, unsigned char numargs)
 {
 	pm.ReloadPlugins();
-	concore.Output("Reloaded all plugins");
+	concore->Output("Reloaded all plugins");
 }
 
-void ConCmdPluginUnload(unsigned char numargs)
+void ConCmdPluginUnload(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore.Output("Usage: plugin_unload <index>");
+		concore->Output("Usage: plugin_unload <index>");
 		return;
 	}
 	int index;
-	if (!concore.GetCmdArg(1, index))
+	if (!concore->GetCmdArg(1, index))
 	{
-		concore.Output("Usage: plugin_unload <index>");
+		concore->Output("Usage: plugin_unload <index>");
 		return;
 	}
 	if (!pm.UnloadPlugin(index))
 	{
 
-		concore.Output("Unable to unload plugin \"%d\", not found", index);
+		concore->Output("Unable to unload plugin \"%d\", not found", index);
 		return;
 	}
-	concore.Output("Plugin \"%d\" has been unloaded successfully", index);
+	concore->Output("Plugin \"%d\" has been unloaded successfully", index);
 }
 
-void ConCmdPluginUnloadAll(unsigned char numargs)
+void ConCmdPluginUnloadAll(ConsoleCore *concore, unsigned char numargs)
 {
 	pm.UnloadPlugins();
-	concore.Output("Unloaded all plugins");
+	concore->Output("Unloaded all plugins");
 }
 
-void ConCmdPluginUnpause(unsigned char numargs)
+void ConCmdPluginUnpause(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore.Output("Usage: plugin_unpause <index>");
+		concore->Output("Usage: plugin_unpause <index>");
 		return;
 	}
 	int index;
-	if (!concore.GetCmdArg(1, index))
+	if (!concore->GetCmdArg(1, index))
 	{
-		concore.Output("Usage: plugin_unpause <index>");
+		concore->Output("Usage: plugin_unpause <index>");
 		return;
 	}
 	if (!pm.UnpausePlugin(index))
 	{
 
-		concore.Output("Unable to unpause plugin \"%d\"", index);
+		concore->Output("Unable to unpause plugin \"%d\"", index);
 		return;
 	}
-	concore.Output("Plugin \"%d\" enabled", index);
+	concore->Output("Plugin \"%d\" enabled", index);
 }
 
-void ConCmdPluginUnpauseAll(unsigned char numargs)
+void ConCmdPluginUnpauseAll(ConsoleCore *concore, unsigned char numargs)
 {
 	pm.UnpausePlugins();
-	concore.Output("Plugins enabled");
+	concore->Output("Plugins enabled");
 }

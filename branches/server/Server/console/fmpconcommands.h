@@ -1,25 +1,27 @@
 #pragma once
 
-void ConCmdDynamic(unsigned char numargs);
-void ConCmdFsList(unsigned char numargs);
-void ConCmdFsLoad(unsigned char numargs);
-void ConCmdFsLoadAll(unsigned char numargs);
-void ConCmdFsPause(unsigned char numargs);
-void ConCmdFsPauseAll(unsigned char numargs);
-void ConCmdFsReload(unsigned char numargs);
-void ConCmdFsReloadAll(unsigned char numargs);
-void ConCmdFsUnload(unsigned char numargs);
-void ConCmdFsUnloadAll(unsigned char numargs);
-void ConCmdFsUnpause(unsigned char numargs);
-void ConCmdFsUnpauseAll(unsigned char numargs);
-void ConCmdPluginList(unsigned char numargs);
-void ConCmdPluginLoad(unsigned char numargs);
-void ConCmdPluginLoadAll(unsigned char numargs);
-void ConCmdPluginPause(unsigned char numargs);
-void ConCmdPluginPauseAll(unsigned char numargs);
-void ConCmdPluginReload(unsigned char numargs);
-void ConCmdPluginReloadAll(unsigned char numargs);
-void ConCmdPluginUnload(unsigned char numargs);
-void ConCmdPluginUnloadAll(unsigned char numargs);
-void ConCmdPluginUnpause(unsigned char numargs);
-void ConCmdPluginUnpauseAll(unsigned char numargs);
+#include "ConsoleCore.h"
+
+void ConCmdDynamic(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsList(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsLoad(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsLoadAll(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsPause(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsPauseAll(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsReload(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsReloadAll(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsUnload(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsUnloadAll(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsUnpause(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFsUnpauseAll(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginList(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginLoad(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginLoadAll(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginPause(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginPauseAll(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginReload(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginReloadAll(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginUnload(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginUnloadAll(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginUnpause(ConsoleCore *concore, unsigned char numargs);
+void ConCmdPluginUnpauseAll(ConsoleCore *concore, unsigned char numargs);

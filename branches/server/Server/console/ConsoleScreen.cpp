@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the ConsoleScreen class.
+/// \details See class description.
+/// \author FaTony
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <conio.h>
@@ -6,12 +11,10 @@
 
 #include "common.h"
 #include "ConsoleScreen.h"
-#include "ConsoleCore.h"
 
-extern ConsoleCore concore;
-
-ConsoleScreen::ConsoleScreen(void)
+ConsoleScreen::ConsoleScreen(ConsoleCore *core)
 {
+	concore = core;
 	maxoutputbuffersize = 1024;
 	maxinputbuffersize = 255;
 	pagesize = 23;
@@ -591,7 +594,7 @@ void ConsoleScreen::AcceptUserInput(void)
 	char *tempstring = (char *)calloc(templength + 3, sizeof(char));
 	sprintf(tempstring, "> %s", inputbuffer[inputbuffersize-2]);
 	this->WriteToOutputBuffer(tempstring);
-	concore.InterpretLine(inputbuffer[inputbuffersize-2]);
+	concore->InterpretLine(inputbuffer[inputbuffersize-2]);
 	this->PrintInputLine();
 }
 

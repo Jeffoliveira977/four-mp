@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the ConSymbolBase class.
+/// \details See class description.
+/// \author FaTony
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -35,8 +40,9 @@ void ConSymbolBase::SetFlags(const int f)
 	flags = f;
 }
 
-void ConSymbolBase::Init(const char *symbolname, const char *desc, const int symbolflags)
+void ConSymbolBase::Init(ConsoleCore *core, const char *symbolname, const char *desc, const int symbolflags)
 {
+	concore = core;
 	name = (char *)calloc(strlen(symbolname) + 1, sizeof(char));
 	strcpy(name, symbolname);
 	description = (char *)calloc(strlen(desc) + 1, sizeof(char));

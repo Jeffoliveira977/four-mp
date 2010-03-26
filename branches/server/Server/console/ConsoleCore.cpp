@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the ConsoleCore class.
+/// \details See class description.
+/// \author FaTony
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -122,7 +127,7 @@ ConVar *ConsoleCore::AddConVar(const char *name, const float defaultvalue, const
 	strcpy(symbolbuffer[symbolbuffersize].name, name);
 	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConVar;
 	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
-	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max);
+	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(this, name, defaultvalue, description, flags, hasMin, min, hasMax, max);
 	symbolbuffer[symbolbuffersize].numcmds = 0;
 	symbolbuffersize++;
 	return symbolbuffer[symbolbuffersize-1].ptr->convar;
@@ -154,7 +159,7 @@ ConVar *ConsoleCore::AddConVar(const char *name, const int defaultvalue, const c
 	strcpy(symbolbuffer[symbolbuffersize].name, name);
 	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConVar;
 	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
-	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max);
+	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(this, name, defaultvalue, description, flags, hasMin, min, hasMax, max);
 	symbolbuffer[symbolbuffersize].numcmds = 0;
 	symbolbuffersize++;
 	return symbolbuffer[symbolbuffersize-1].ptr->convar;
@@ -182,7 +187,7 @@ ConVar *ConsoleCore::AddConVar(const char *name, const char *defaultvalue, const
 	strcpy(symbolbuffer[symbolbuffersize].name, name);
 	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConVar;
 	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
-	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(name, defaultvalue, description, flags);
+	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(this, name, defaultvalue, description, flags);
 	symbolbuffer[symbolbuffersize].numcmds = 0;
 	symbolbuffersize++;
 	return symbolbuffer[symbolbuffersize-1].ptr->convar;
@@ -209,7 +214,7 @@ ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *des
 		{
 			return NULL;
 		}
-		symbol->ptr[symbol->numcmds].concmd = new ConCmd(name, callback, description, flags);
+		symbol->ptr[symbol->numcmds].concmd = new ConCmd(this, name, callback, description, flags);
 		symbol->numcmds++;
 		return symbol->ptr[symbol->numcmds-1].concmd;
 	}
@@ -225,7 +230,7 @@ ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *des
 	strcpy(symbolbuffer[symbolbuffersize].name, name);
 	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConCmd;
 	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
-	symbolbuffer[symbolbuffersize].ptr[0].concmd = new ConCmd(name, callback, description, flags);
+	symbolbuffer[symbolbuffersize].ptr[0].concmd = new ConCmd(this, name, callback, description, flags);
 	symbolbuffer[symbolbuffersize].numcmds = 1;
 	symbolbuffersize++;
 	return symbolbuffer[symbolbuffersize-1].ptr[0].concmd;
