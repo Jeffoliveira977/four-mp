@@ -7,7 +7,7 @@
 
 #include "ConSymbolBase.h"
 
-/// \brief  A console command.
+/// \brief A console command.
 /// \details Represents a simple "bridge" between user input and function call.
 /// \author FaTony
 

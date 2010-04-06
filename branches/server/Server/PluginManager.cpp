@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the PluginManager class.
+/// \details See class description.
+/// \author FaTony
+
 #include <stdio.h>
 #include <string.h>
 #include <io.h>
@@ -17,7 +22,7 @@ extern VirtualMachineManager vmm;
 
 PluginManager::PluginManager(void)
 {
-	handleowneroffset = 2 + vmm.GetMaxFilterScripts();
+	handleowneroffset = 1 + vmm.GetMaxVirtualMachineBufferSize();
 	maxpluginbuffersize = 8;
 	pluginbuffersize = 0;
 	ph = new PluginHandler;
@@ -217,16 +222,17 @@ bool PluginManager::UnpausePlugin(const unsigned char index)
 	return true;
 }
 
-bool PluginManager::GetPluginInfoString(const unsigned char index, char *&string)
+char *PluginManager::GetPluginInfoString(const unsigned char index)
 {
 	if (index >= pluginbuffersize)
 	{
-		return false;
+		return NULL;
 	}
 	if (pluginbuffer[index] == NULL)
 	{
-		return false;
+		return NULL;
 	}
+	char *string;
 	char *name = pluginbuffer[index]->ptr->GetName();
 	char *version = pluginbuffer[index]->ptr->GetVersion();
 	char *author = pluginbuffer[index]->ptr->GetAuthor();
@@ -240,7 +246,7 @@ bool PluginManager::GetPluginInfoString(const unsigned char index, char *&string
 		string = (char *)calloc(_scprintf("%d (Paused) \"%s\" (%s) by %s", index, name, version, author) + 1, sizeof(char));
 		sprintf(string, "%d (Paused) \"%s\" (%s) by %s", index, name, version, author);
 	}
-	return true;
+	return string;
 }
 
 IPluginHandlerInterface *PluginManager::GetPluginHandler(void)
@@ -383,6 +389,9 @@ void PluginManager::OnPluginUnload(const unsigned char index)
 	pluginbuffer[index]->ptr->OnPluginUnload();
 }
 
+/// \brief Returns the pointer to the plugin handler interface.
+/// \note Used by plugins.
+/// \return Pointer to the plugin handler interface.
 extern "C" __declspec(dllexport) IPluginHandlerInterface *GetPluginHandler(void)
 {
 	return pm.GetPluginHandler();
@@ -605,24 +614,24 @@ bool PluginManager::PluginHandler::SetConVarFlags(const IPluginInterface *plugin
 	return chtm.SetConVarFlags(pm.handleowneroffset + pluginindex, handle, flags);
 }
 
-bool PluginManager::PluginHandler::SetConVarBound(const IPluginInterface *plugin, const int handle, const ConVarBoundType type, const float bound)
+bool PluginManager::PluginHandler::SetConVarBound(const IPluginInterface *plugin, const int handle, const ConVarBoundType type, const bool set, const float bound)
 {
 	unsigned char pluginindex;
 	if (!pm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.SetConVarBound(pm.handleowneroffset + pluginindex, handle, type, bound);
+	return chtm.SetConVarBound(pm.handleowneroffset + pluginindex, handle, type, set, bound);
 }
 
-bool PluginManager::PluginHandler::SetConVarBound(const IPluginInterface *plugin, const int handle, const ConVarBoundType type, const int bound)
+bool PluginManager::PluginHandler::SetConVarBound(const IPluginInterface *plugin, const int handle, const ConVarBoundType type, const bool set, const int bound)
 {
 	unsigned char pluginindex;
 	if (!pm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.SetConVarBound(pm.handleowneroffset + pluginindex, handle, type, bound);
+	return chtm.SetConVarBound(pm.handleowneroffset + pluginindex, handle, type, set, bound);
 }
 
 void PluginManager::PluginHandler::RegServerCmd(const IPluginInterface *plugin, const char *name, void *callback, const char *description, const int flags)
@@ -640,9 +649,9 @@ unsigned char PluginManager::PluginHandler::GetCmdArgs(void)
 	return concore.GetCmdArgs();
 }
 
-bool PluginManager::PluginHandler::GetCmdArgString(char *&arg)
+char *PluginManager::PluginHandler::GetCmdArgString(void)
 {
-	return concore.GetCmdArgString(arg);
+	return concore.GetCmdArgString();
 }
 
 bool PluginManager::PluginHandler::GetCmdArgType(const unsigned char argnum, ConVarType &type)

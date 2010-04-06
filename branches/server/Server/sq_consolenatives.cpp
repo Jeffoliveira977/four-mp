@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the callbacks for the Squirrel console natives.
+/// \details See sq_consolenatives.h.
+/// \author FaTony
+
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -292,11 +297,13 @@ void sq_SetConVarBoundFloat(HSQUIRRELVM v)
 {
 	int cvarhandle;
 	int type;
+	unsigned int set;
 	float cvarbound;
 	sq_getinteger(v, 2, &cvarhandle);
 	sq_getinteger(v, 3, &type);
-	sq_getfloat(v, 4, &cvarbound);
-	if (!vmm.SetConVarBound(&v, cvarhandle, (ConVarBoundType)type, cvarbound))
+	sq_getbool(v, 4, &set);
+	sq_getfloat(v, 5, &cvarbound);
+	if (!vmm.SetConVarBound(&v, cvarhandle, (ConVarBoundType)type, (bool)set, cvarbound))
 	{
 		sq_pushbool(v, false);
 		return;
@@ -308,11 +315,13 @@ void sq_SetConVarBoundInt(HSQUIRRELVM v)
 {
 	int cvarhandle;
 	int type;
+	unsigned int set;
 	int cvarbound;
 	sq_getinteger(v, 2, &cvarhandle);
 	sq_getinteger(v, 3, &type);
-	sq_getinteger(v, 4, &cvarbound);
-	if (!vmm.SetConVarBound(&v, cvarhandle, (ConVarBoundType)type, cvarbound))
+	sq_getbool(v, 4, &set);
+	sq_getinteger(v, 5, &cvarbound);
+	if (!vmm.SetConVarBound(&v, cvarhandle, (ConVarBoundType)type, (bool)set, cvarbound))
 	{
 		sq_pushbool(v, false);
 		return;
@@ -340,8 +349,8 @@ void sq_GetCmdArgs(HSQUIRRELVM v)
 
 void sq_GetCmdArgsAsString(HSQUIRRELVM v)
 {
-	char *arg;
-	if (!concore.GetCmdArgString(arg))
+	char *arg = concore.GetCmdArgString();
+	if (arg == NULL)
 	{
 		sq_pushnull(v);
 		return;

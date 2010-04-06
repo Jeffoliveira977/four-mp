@@ -269,15 +269,15 @@ unsigned char ConsoleCore::GetCmdArgs(void)
 	return numargs;
 }
 
-bool ConsoleCore::GetCmdArgString(char *&arg)
+char *ConsoleCore::GetCmdArgString(void)
 {
 	if ((argpos == 0) || (commandbuffer == NULL))
 	{
-		return false;
+		return NULL;
 	}
-	arg = (char *)calloc(strlen(commandbuffer + argpos) + 1, sizeof(char));
+	char *arg = (char *)calloc(strlen(commandbuffer + argpos) + 1, sizeof(char));
 	strcpy(arg, commandbuffer + argpos);
-	return true;
+	return arg;
 }
 
 bool ConsoleCore::GetCmdArgType(const unsigned char argnum, ConVarType &type)
@@ -795,8 +795,7 @@ void ConsoleCore::InterpretCommand(void)
 			}
 			else
 			{
-				char *arg;
-				this->GetCmdArgString(arg);
+				char *arg = this->GetCmdArgString();
 				symbol->ptr->convar->SetValue(arg);
 			}
 			break;

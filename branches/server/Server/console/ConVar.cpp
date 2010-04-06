@@ -361,7 +361,7 @@ bool ConVar::GetBound(ConVarBoundType type, int &bound)
 	return true;
 }
 
-bool ConVar::SetBound(ConVarBoundType type, const float bound)
+bool ConVar::SetBound(ConVarBoundType type, const bool set, const float bound)
 {
 	if (defaultvalue.type != ConVarTypeFloat)
 	{
@@ -369,6 +369,11 @@ bool ConVar::SetBound(ConVarBoundType type, const float bound)
 	}
 	if (type == ConVarBoundLower)
 	{
+		if (!set)
+		{
+			minimum.exist = false;
+			return true;
+		}
 		if (bound > defaultvalue.value.f)
 		{
 			return false;
@@ -387,6 +392,11 @@ bool ConVar::SetBound(ConVarBoundType type, const float bound)
 	}
 	if (type == ConVarBoundUpper)
 	{
+		if (!set)
+		{
+			maximum.exist = false;
+			return true;
+		}
 		if (bound < defaultvalue.value.f)
 		{
 			return false;
@@ -406,7 +416,7 @@ bool ConVar::SetBound(ConVarBoundType type, const float bound)
 	return true;
 }
 
-bool ConVar::SetBound(ConVarBoundType type, const int bound)
+bool ConVar::SetBound(ConVarBoundType type, const bool set, const int bound)
 {
 	if (defaultvalue.type != ConVarTypeInt)
 	{
@@ -414,6 +424,11 @@ bool ConVar::SetBound(ConVarBoundType type, const int bound)
 	}
 	if (type == ConVarBoundLower)
 	{
+		if (!set)
+		{
+			minimum.exist = false;
+			return true;
+		}
 		if (bound > defaultvalue.value.i)
 		{
 			return false;
@@ -432,6 +447,11 @@ bool ConVar::SetBound(ConVarBoundType type, const int bound)
 	}
 	if (type == ConVarBoundUpper)
 	{
+		if (!set)
+		{
+			maximum.exist = false;
+			return true;
+		}
 		if (bound < defaultvalue.value.i)
 		{
 			return false;

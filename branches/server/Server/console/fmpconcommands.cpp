@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the four-mp console commands.
+/// \details See fmpconcommands.h.
+/// \author FaTony
+
 #include "fmpconcommands.h"
 #include "..\CoreHandleTypesManager.h"
 #include "..\PluginManager.h"
@@ -36,10 +41,11 @@ void ConCmdFsList(ConsoleCore *concore, unsigned char numargs)
 {
 	concore->Output("Loaded filterscripts:\n---------------------");
 	char *string;
-	unsigned char max = vmm.GetMaxFilterScriptIndex();
-	for (unsigned char i = 0; i <= max; i++)
+	unsigned char max = vmm.GetVirtualMachineBufferSize();
+	for (unsigned char i = 0; i < max; i++)
 	{
-		if (vmm.GetVirtualMachineInfoString(i, string))
+		string = vmm.GetVirtualMachineInfoString(i);
+		if (string != NULL)
 		{
 			concore->Output(string);
 		}
@@ -204,7 +210,8 @@ void ConCmdPluginList(ConsoleCore *concore, unsigned char numargs)
 	unsigned char max = pm.GetPluginBufferSize();
 	for (unsigned char i = 0; i < max; i++)
 	{
-		if (pm.GetPluginInfoString(i, string))
+		string = pm.GetPluginInfoString(i);
+		if (string != NULL)
 		{
 			concore->Output(string);
 		}

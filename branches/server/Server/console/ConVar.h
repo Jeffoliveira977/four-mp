@@ -141,15 +141,17 @@ public:
 
 	/// \brief Sets the bound of the console variable.
 	/// \param[in] type Type of the bound.
+	/// \param[in] set True to set, false to remove.
 	/// \param[in] bound Value of the bound.
 	/// \return True on success, false otherwise.
-	bool SetBound(ConVarBoundType type, const float bound);
+	bool SetBound(ConVarBoundType type, const bool set, const float bound);
 
 	/// \brief Sets the bound of the console variable.
 	/// \param[in] type Type of the bound.
+	/// \param[in] set True to set, false to remove.
 	/// \param[in] bound Value of the bound.
 	/// \return True on success, false otherwise.
-	bool SetBound(ConVarBoundType type, const int bound);
+	bool SetBound(ConVarBoundType type, const bool set, const int bound);
 private:
 	/// \brief Used to wisely work with console variable value.
 	union ConVarValueUnion

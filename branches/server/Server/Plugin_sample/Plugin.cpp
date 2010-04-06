@@ -1,7 +1,11 @@
+/// \file
+/// \brief Source file that contains implementation of the Plugin class.
+/// \details See class description.
+
 #include "Plugin.h"
 
-Plugin plugin;
-IPluginInterface *pluginptr = &plugin;
+Plugin plugin; ///< Main instance of the plugin.
+IPluginInterface *pluginptr = &plugin; ///< Pointer to the instance. Used by host.
 
 Plugin::Plugin(void)
 {

@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the CoreHandleTypesManager class.
+/// \details See class description.
+/// \author FaTony
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -199,22 +204,22 @@ bool CoreHandleTypesManager::SetConVarFlags(const short owner, const int handle,
 	return true;
 }
 
-bool CoreHandleTypesManager::SetConVarBound(const short owner, const int handle, const ConVarBoundType type, const float bound)
+bool CoreHandleTypesManager::SetConVarBound(const short owner, const int handle, const ConVarBoundType type, const bool set, const float bound)
 {
 	if (!this->CheckConVar(owner, handle))
 	{
 		return false;
 	}
-	return ((ConVar *)hm.handlebuffer[handle]->ptr)->SetBound(type, bound);
+	return ((ConVar *)hm.handlebuffer[handle]->ptr)->SetBound(type, set, bound);
 }
 
-bool CoreHandleTypesManager::SetConVarBound(const short owner, const int handle, const ConVarBoundType type, const int bound)
+bool CoreHandleTypesManager::SetConVarBound(const short owner, const int handle, const ConVarBoundType type, const bool set, const int bound)
 {
 	if (!this->CheckConVar(owner, handle))
 	{
 		return false;
 	}
-	return ((ConVar *)hm.handlebuffer[handle]->ptr)->SetBound(type, bound);
+	return ((ConVar *)hm.handlebuffer[handle]->ptr)->SetBound(type, set, bound);
 }
 
 bool CoreHandleTypesManager::AddDynamicCommand(const short owner, const char *callback, const ConCmd *ptr)
@@ -309,8 +314,8 @@ bool CoreHandleTypesManager::ExecuteDynamicCommand(const int handle, const unsig
 	{
 		return false;
 	}
-	char *callback;
-	if (!this->GetDynamicCommandCallback(handle, callback))
+	char *callback = this->GetDynamicCommandCallback(handle);
+	if (callback == NULL)
 	{
 		return false;
 	}
@@ -365,22 +370,22 @@ bool CoreHandleTypesManager::CheckConVar(const short owner, const int handle)
 	return true;
 }
 
-bool CoreHandleTypesManager::GetDynamicCommandCallback(const int handle, char *&callback)
+char *CoreHandleTypesManager::GetDynamicCommandCallback(const int handle)
 {
 	if ((handle < 0) || (handle >= hm.handlebuffersize))
 	{
-		return false;
+		return NULL;
 	}
 	for (unsigned short i = 0; i < commandbuffersize; i++)
 	{
 		if (commandbuffer[i].index == handle)
 		{
-			callback = (char *)calloc(strlen(commandbuffer[i].callback) + 1, sizeof(char));
+			char *callback = (char *)calloc(strlen(commandbuffer[i].callback) + 1, sizeof(char));
 			strcpy(callback, commandbuffer[i].callback);
-			return true;
+			return callback;
 		}
 	}
-	return false;
+	return NULL;
 }
 
 bool CoreHandleTypesManager::ResizeCommandBuffer(DynamicCommand *&buffer, const unsigned short size)

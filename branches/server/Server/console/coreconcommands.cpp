@@ -92,8 +92,8 @@ void ConCmdFind(ConsoleCore *concore, unsigned char numargs)
 		concore->Output("Usage: find <string>");
 		return;
 	}
-	char *searchstring;
-	if (!concore->GetCmdArgString(searchstring))
+	char *searchstring = concore->GetCmdArgString();
+	if (searchstring == NULL)
 	{
 		concore->Output("Usage: find <string>");
 		return;

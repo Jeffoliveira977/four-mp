@@ -40,20 +40,22 @@ public:
 	void CheckUserInput(void);
 
 	/// \brief Prints string to the output page.
+	/// \param[in] string Format-control string.
+	/// \param[in] ... Optional arguments.
 	/// \return No return.
 	void Print(const char *string, ...);
 private:
 	ConsoleCore *concore; ///< Pointer to the console core this screen is wrapped around.
 	char *caption; ///< Holds caption text.
+	unsigned short maxoutputbuffersize; ///< Holds maximum size of the output buffer (in lines).
+	unsigned short outputbuffersize; ///< Holds current size of the output buffer (in lines).
 	char **outputbuffer; ///< Holds everything that was recently outputted to screen.
+	unsigned char maxinputbuffersize; ///< Holds maximum size of the input buffer (in lines).
+	unsigned char inputbuffersize; ///< Holds curent size of the input buffer (in lines).
 	char **inputbuffer; //< Holds input history and current line.
 #ifdef WIN32
 	HANDLE outputhandle; ///< Holds handle to the Win32 console.
 #endif
-	unsigned short outputbuffersize; ///< Holds current size of the output buffer (in lines).
-	unsigned short maxoutputbuffersize; ///< Holds maximum size of the output buffer (in lines).
-	unsigned char inputbuffersize; ///< Holds curent size of the input buffer (in lines).
-	unsigned char maxinputbuffersize; ///< Holds maximum size of the input buffer (in lines).
 	unsigned char inputbufferposition[2]; ///< Holds current cursor position in the input buffer ([0] - Line index, [1] - Character index).
 	unsigned char pagesize; ///< How many lines will be shown on one page (excluding caption and input line).
 	unsigned short screenposition; ///< Holds index of the first line in the output buffer that will be shown on the current page.

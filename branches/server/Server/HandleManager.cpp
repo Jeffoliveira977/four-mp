@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the HandleManager class.
+/// \details See class description.
+/// \author FaTony
+
 #include <stdlib.h>
 
 #include "main.h"
@@ -14,7 +19,7 @@ HandleManager::HandleManager(void)
 {
 	maxtypebuffersize = 65535;
 	maxhandlesperowner = 16384;
-	pluginowneroffset = 2 + vmm.GetMaxFilterScripts();
+	pluginowneroffset = 1 + vmm.GetMaxVirtualMachineBufferSize();
 	maxcountbuffersize =  pluginowneroffset + pm.GetMaxPluginBufferSize();
 	maxhandlebuffersize = maxcountbuffersize * maxhandlesperowner;
 	typebuffer = (HandleType **)calloc(NUM_CORE_HANDLE_TYPES, sizeof(HandleType *));
@@ -71,6 +76,7 @@ bool HandleManager::RequestNewHandleType(const unsigned char pluginindex, unsign
 	}
 	typebuffer[typeindex] = new HandleType;
 	typebuffer[typeindex]->owner = pluginindex;
+	typebuffer[typeindex]->handlecount = 0;
 	return true;
 }
 
@@ -86,6 +92,11 @@ bool HandleManager::ReleaseHandleType(const unsigned char pluginindex, const uns
 	}
 	if (typebuffer[typeindex]->owner != pluginindex)
 	{
+		return false;
+	}
+	if (typebuffer[typeindex]->handlecount != 0)
+	{
+		//TODO: Close all handles??
 		return false;
 	}
 	delete typebuffer[typeindex];
@@ -164,6 +175,7 @@ int HandleManager::AddNewHandle(const short owner, const unsigned short type, vo
 	handlebuffer[handle]->owner[0] = owner;
 	handlebuffer[handle]->type = type;
 	handlebuffer[handle]->ptr = ptr;
+	typebuffer[type]->handlecount++;
 	return handle;
 }
 
@@ -407,6 +419,7 @@ bool HandleManager::DeleteHandleOwner(const int handle, const short owner)
 			//TODO: Dynamic handle types
 			free(handlebuffer[handle]->ptr);
 		}
+		typebuffer[handlebuffer[handle]->type]->handlecount--;
 		free(handlebuffer[handle]);
 		handlebuffer[handle] = NULL;
 	}

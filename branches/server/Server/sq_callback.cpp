@@ -78,7 +78,7 @@ void sc_OnPlayerDisconnect(HSQUIRRELVM v, int playerid)
 	int result;
 	int top = sq_gettop(v); 
 	sq_pushroottable(v);
-	sq_pushstring(v,_SC("OnPlayerConnect"),-1);
+	sq_pushstring(v,_SC("OnPlayerDisconnect"),-1);
 	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
 		sq_pushroottable(v); 
 		sq_pushinteger(v,playerid); 

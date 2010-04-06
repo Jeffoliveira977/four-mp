@@ -1,3 +1,7 @@
+/// \file
+/// \brief Source file that contains implementation of the PluginCore class.
+/// \details See class description.
+
 #include "PluginCore.h"
 #include "PluginConfig.h"
 
@@ -7,6 +11,9 @@
 
 extern IPluginInterface *pluginptr;
 
+/// \brief Return the pointer to the plugin interface.
+/// \note Used by the host.
+/// \return Pointer to the plugin interface.
 extern "C" __declspec(dllexport) IPluginInterface *GetPlugin(void)
 {
 	return pluginptr;

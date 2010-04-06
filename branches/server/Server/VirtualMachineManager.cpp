@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the VirtualMachineManager class.
+/// \details See class description.
+/// \author FaTony
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,9 +27,9 @@ extern CoreHandleTypesManager chtm;
 
 VirtualMachineManager::VirtualMachineManager(void)
 {
-	maxfilterscripts = 16;
+	maxvmbuffersize = 17;
 	vmbuffer = (VirtualMachine **)calloc(1, sizeof(VirtualMachine *));
-	maxfilterscriptindex = 0;
+	vmbuffersize = 0;
 }
 
 VirtualMachineManager::~VirtualMachineManager(void)
@@ -79,14 +84,14 @@ bool VirtualMachineManager::UnloadGameMode(void)
 	return true;
 }
 
-unsigned char VirtualMachineManager::GetMaxFilterScripts(void)
+unsigned char VirtualMachineManager::GetMaxVirtualMachineBufferSize(void)
 {
-	return maxfilterscripts;
+	return maxvmbuffersize;
 }
 
-unsigned char VirtualMachineManager::GetMaxFilterScriptIndex(void)
+unsigned char VirtualMachineManager::GetVirtualMachineBufferSize(void)
 {
-	return maxfilterscriptindex;
+	return vmbuffersize;
 }
 
 void VirtualMachineManager::LoadFilterScripts(void)
@@ -115,7 +120,7 @@ void VirtualMachineManager::LoadFilterScripts(void)
 
 void VirtualMachineManager::UnloadFilterScripts(void)
 {
-	for (unsigned char i = 1; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 1; i < vmbuffersize; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -126,7 +131,7 @@ void VirtualMachineManager::UnloadFilterScripts(void)
 
 void VirtualMachineManager::ReloadFilterScripts(void)
 {
-	for (unsigned char i = 1; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 1; i < vmbuffersize; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -137,7 +142,7 @@ void VirtualMachineManager::ReloadFilterScripts(void)
 
 void VirtualMachineManager::PauseVirtualMachines(void)
 {
-	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -148,7 +153,7 @@ void VirtualMachineManager::PauseVirtualMachines(void)
 
 void VirtualMachineManager::UnpauseVirtualMachines(void)
 {
-	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -159,7 +164,7 @@ void VirtualMachineManager::UnpauseVirtualMachines(void)
 
 bool VirtualMachineManager::IsFilterScriptLoaded(const char *string)
 {
-	for (unsigned char i = 1; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 1; i < vmbuffersize; i++)
 	{
 		if ((vmbuffer[i] != NULL) && (strcmp(vmbuffer[i]->filename, string) == 0))
 		{
@@ -185,7 +190,7 @@ bool VirtualMachineManager::LoadFilterScript(const char *string)
 
 bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
 {
-	if (index > maxfilterscriptindex)
+	if (index >= vmbuffersize)
 	{
 		return false;
 	}
@@ -210,7 +215,7 @@ bool VirtualMachineManager::UnloadFilterScript(const unsigned char index)
 
 bool VirtualMachineManager::ReloadFilterScript(const unsigned char index)
 {
-	if (index > maxfilterscriptindex)
+	if (index >= vmbuffersize)
 	{
 		return false;
 	}
@@ -233,7 +238,7 @@ bool VirtualMachineManager::ReloadFilterScript(const unsigned char index)
 
 bool VirtualMachineManager::PauseVirtualMachine(const unsigned char index)
 {
-	if (index > maxfilterscriptindex)
+	if (index >= vmbuffersize)
 	{
 		return false;
 	}
@@ -251,7 +256,7 @@ bool VirtualMachineManager::PauseVirtualMachine(const unsigned char index)
 
 bool VirtualMachineManager::UnpauseVirtualMachine(const unsigned char index)
 {
-	if (index > maxfilterscriptindex)
+	if (index >= vmbuffersize)
 	{
 		return false;
 	}
@@ -267,16 +272,17 @@ bool VirtualMachineManager::UnpauseVirtualMachine(const unsigned char index)
 	return true;
 }
 
-bool VirtualMachineManager::GetVirtualMachineInfoString(const unsigned char index, char *&string)
+char *VirtualMachineManager::GetVirtualMachineInfoString(const unsigned char index)
 {
-	if (index > maxfilterscriptindex)
+	if (index >= vmbuffersize)
 	{
-		return false;
+		return NULL;
 	}
 	if (vmbuffer[index] == NULL)
 	{
-		return false;
+		return NULL;
 	}
+	char *string;
 	if (!vmbuffer[index]->paused)
 	{
 		string = (char *)calloc(_scprintf("%d \"%s\" (%s) by %s", index, vmbuffer[index]->name, vmbuffer[index]->version, vmbuffer[index]->author) + 1, sizeof(char));
@@ -287,7 +293,7 @@ bool VirtualMachineManager::GetVirtualMachineInfoString(const unsigned char inde
 		string = (char *)calloc(_scprintf("%d (Paused) \"%s\" (%s) by %s", index, vmbuffer[index]->name, vmbuffer[index]->version, vmbuffer[index]->author) + 1, sizeof(char));
 		sprintf(string, "%d (Paused) \"%s\" (%s) by %s", index, vmbuffer[index]->name, vmbuffer[index]->version, vmbuffer[index]->author);
 	}
-	return true;
+	return string;
 }
 
 void VirtualMachineManager::SetVirtualMachineName(const HSQUIRRELVM *v, const char *string)
@@ -463,24 +469,24 @@ bool VirtualMachineManager::SetConVarFlags(const HSQUIRRELVM *v, const int handl
 	return chtm.SetConVarFlags(index + 1, handle, flags);
 }
 
-bool VirtualMachineManager::SetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, const float bound)
+bool VirtualMachineManager::SetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, const bool set, const float bound)
 {
 	unsigned char index;
 	if (!this->FindVirtualMachine(v, index))
 	{
 		return false;
 	}
-	return chtm.SetConVarBound(index + 1, handle, type, bound);
+	return chtm.SetConVarBound(index + 1, handle, type, set, bound);
 }
 
-bool VirtualMachineManager::SetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, const int bound)
+bool VirtualMachineManager::SetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, const bool set, const int bound)
 {
 	unsigned char index;
 	if (!this->FindVirtualMachine(v, index))
 	{
 		return false;
 	}
-	return chtm.SetConVarBound(index + 1, handle, type, bound);
+	return chtm.SetConVarBound(index + 1, handle, type, set, bound);
 }
 
 void VirtualMachineManager::RegServerCmd(const HSQUIRRELVM *v, const char *callback, const ConCmd *ptr)
@@ -495,7 +501,7 @@ void VirtualMachineManager::RegServerCmd(const HSQUIRRELVM *v, const char *callb
 
 int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
 {
-	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
 		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
 		{
@@ -514,7 +520,7 @@ int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
 
 void VirtualMachineManager::OnPlayerDisconnect(int playerid)
 {
-	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
 		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
 		{
@@ -532,7 +538,7 @@ void VirtualMachineManager::OnPlayerDisconnect(int playerid)
 
 void VirtualMachineManager::OnPlayerSpawn(int playerid, int cl)
 {
-	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
 		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
 		{
@@ -550,7 +556,7 @@ void VirtualMachineManager::OnPlayerSpawn(int playerid, int cl)
 
 void VirtualMachineManager::FireCommandCallback(const unsigned char index, const char *callback, const unsigned char numargs)
 {
-	if (index > maxfilterscriptindex)
+	if (index >= vmbuffersize)
 	{
 		return;
 	}
@@ -585,13 +591,13 @@ bool VirtualMachineManager::LoadFilterScriptInternal(const unsigned char index, 
 
 bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const char *string)
 {
-	if (index > maxfilterscripts)
+	if (index >= maxvmbuffersize)
 	{
 		return false;
 	}
-	if (index > maxfilterscriptindex)
+	if (index >= vmbuffersize)
 	{
-		if (maxfilterscriptindex == maxfilterscripts)
+		if (vmbuffersize == maxvmbuffersize)
 		{
 			return false;
 		}
@@ -600,7 +606,7 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			return false;
 		}
 		vmbuffer[index] = NULL;
-		maxfilterscriptindex = index;
+		vmbuffersize = index + 1;
 	}
 	if (vmbuffer[index] != NULL)
 	{
@@ -645,8 +651,8 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarInt, "SetConVarInt");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarString, "SetConVarString");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarFlags, "SetConVarFlags");
-			//register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarBoundFloat, "SetConVarBoundFloat");
-			//register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarBoundInt, "SetConVarBoundInt");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarBoundFloat, "SetConVarBoundFloat");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarBoundInt, "SetConVarBoundInt");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_RegServerCmd, "RegServerCmd");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgs, "GetCmdArgs");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgsAsString, "GetCmdArgsAsString");
@@ -708,7 +714,7 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 
 bool VirtualMachineManager::UnloadVirtualMachine(const unsigned char index)
 {
-	if (index > maxfilterscriptindex)
+	if (index >= vmbuffersize)
 	{
 		return false;
 	}
@@ -736,27 +742,27 @@ bool VirtualMachineManager::UnloadVirtualMachine(const unsigned char index)
 unsigned char VirtualMachineManager::GetNumberOfFreeFilterScriptSlots(void)
 {
 	unsigned char slots = 0;
-	for (unsigned char i = 1; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 1; i < vmbuffersize; i++)
 	{
 		if (vmbuffer[i] == NULL)
 		{
 			slots++;
 		}
 	}
-	slots = maxfilterscripts - maxfilterscriptindex + slots;
+	slots = maxvmbuffersize - vmbuffersize + slots - 1;
 	return slots;
 }
 
 bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 {
-	for (index = 1; index <= maxfilterscriptindex; index++)
+	for (index = 1; index < vmbuffersize; index++)
 	{
 		if (vmbuffer[index] == NULL)
 		{
 			return true;
 		}
 	}
-	if (maxfilterscriptindex == maxfilterscripts)
+	if (vmbuffersize == maxvmbuffersize)
 	{
 		return false;
 	}
@@ -765,7 +771,7 @@ bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 
 bool VirtualMachineManager::FindVirtualMachine(const HSQUIRRELVM *v, unsigned char &index)
 {
-	for (index = 0; index <= maxfilterscriptindex; index++)
+	for (index = 0; index < vmbuffersize; index++)
 	{
 		if ((vmbuffer[index] != NULL) && (vmbuffer[index]->lang == VMLanguageSquirrel) && (*vmbuffer[index]->ptr.squirrel == *v))
 		{
@@ -788,7 +794,7 @@ bool VirtualMachineManager::ResizeVirtualMachineBuffer(VirtualMachine **&buffer,
 
 void VirtualMachineManager::OnGameModeInit(void)
 {
-	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -806,7 +812,7 @@ void VirtualMachineManager::OnGameModeInit(void)
 
 void VirtualMachineManager::OnGameModeExit(void)
 {
-	for (unsigned char i = 0; i <= maxfilterscriptindex; i++)
+	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
 		if (vmbuffer[i] != NULL)
 		{
@@ -824,7 +830,7 @@ void VirtualMachineManager::OnGameModeExit(void)
 
 void VirtualMachineManager::OnFilterScriptInit(const unsigned char index)
 {
-	if (index > maxfilterscriptindex)
+	if (index >= vmbuffersize)
 	{
 		return;
 	}
@@ -844,7 +850,7 @@ void VirtualMachineManager::OnFilterScriptInit(const unsigned char index)
 
 void VirtualMachineManager::OnFilterScriptExit(const unsigned char index)
 {
-	if (index > maxfilterscriptindex)
+	if (index >= vmbuffersize)
 	{
 		return;
 	}

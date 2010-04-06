@@ -85,7 +85,7 @@ public:
 	/// \param[in] description Optional description of the console command.
 	/// \param[in] flags Optional bitstring of flags determining how the console command should be handled. See FCVAR_* constants for more details.
 	/// \note Callback should be void func(unsigned char numargs);
-	/// \return Pointer to the console variable on success, NULL otherwise.
+	/// \return Pointer to the console command on success, NULL otherwise.
 	ConCmd *AddConCmd(const char *name, void *callback, const char *description = "", const int flags = 0);
 
 	/// \brief Returns help string of given symbol.
@@ -103,9 +103,8 @@ public:
 	unsigned char GetCmdArgs(void);
 
 	/// \brief Retrieves the entire command argument string in one lump from the current console command.
-	/// \param[out] arg Buffer to use for storing the string.
-	/// \return True on success, false otherwise.
-	bool GetCmdArgString(char *&arg);
+	/// \return Arguments string on success, NULL otherwise.
+	char *GetCmdArgString(void);
 
 	/// \brief Retrieves a command argument type given its index, from the current console command.
 	/// \param[in] argnum Argument number to retrieve.
@@ -131,6 +130,7 @@ public:
 	/// \return True on success, false otherwise.
 	bool GetCmdArg(const unsigned char argnum, float &arg);
 
+	//TODO: add ... ?
 	/// \brief Interprets line.
 	/// \param[in] string Line of text to interpret.
 	/// \note The input string can contain several commands separated by ;.
@@ -163,9 +163,9 @@ private:
 		ConsoleSymbolPtr *ptr; ///< Pointer to the underlying class.
 		unsigned char numcmds; ///< If console symbol is a console command, this indicates the number of commands that share this symbol's name.
 	};
-	ConsoleSymbol *symbolbuffer; ///< Holds all registered console symbols.
-	unsigned short symbolbuffersize; ///< Holds current size of the symbol buffer.
 	unsigned short maxsymbolbuffersize; ///< Holds maximum size of the symbol buffer.
+	unsigned short symbolbuffersize; ///< Holds current size of the symbol buffer.
+	ConsoleSymbol *symbolbuffer; ///< Holds all registered console symbols.
 	unsigned char maxcmdspersymbol; ///< Holds maximum number of commands per 1 console symbol.
 	char *commandbuffer; ///< Holds current command string.
 	char **commandargs; ///< Holds arguments of current command.
