@@ -41,7 +41,7 @@ HANDLE ThreadHandle;
 RakPeerInterface *net;
 SystemAddress servAddr;
 
-MP_STATE fmp;
+ClientState clientstate;
 int MyID = 0;
 int LastUpdate = 0;
 bool myEnter = 0;
@@ -381,165 +381,174 @@ void FMPHook::GameThread()
 
 	REGISTER_STATIC_RPC(net, ::Chat);
 
-	fmp.hook = 1;
 	//-------------------
 	Log("GameThread");
 	
-	while(IsThreadAlive() && fmp.run && fmp.hook)
+	while(IsThreadAlive())
 	{
 		//player_dump();
 		//car_dump();
 		Debug("FIBERFIBERFIBER");
-		if(!fmp.connect)
+		switch (clientstate.game)
 		{
-			RunMP();
-			LastUpdate = GetTickCount();
-
-			// Коннект
-			Log("MainThread Connect");
-			net->Connect(Conf.server, Conf.port, 0, 0, 0);
-			servAddr.SetBinaryAddress(Conf.server);
-			servAddr.port = Conf.port;
-
-			fmp.wait = 1;
-		}
-		else if(fmp.wait && !fmp.connect && GetTickCount() - LastUpdate > 15*1000)
-		{
-			net->Connect(Conf.server, Conf.port, 0, 0, 0);
-			LastUpdate = GetTickCount();
-		}
-		else if(fmp.skin)
-		{
-			SetPlayerControl(_GetPlayer(), 0);
-			if(GetAsyncKeyState(VK_SHIFT) != 0)
+		case GameStateOffline:
 			{
-				gPlayer[MyID].model = pClass[sel_cl].model;	
-				SetPlayerControl(_GetPlayer(), 1);
-				fmp.skin = 0;
-				if(Conf.ComponentSelect == 1) fmp.component = 1;
+				RunMP();
+				LastUpdate = GetTickCount();
 
-				if(Conf.ComponentSelect == 0)
+				// Коннект
+				Log("MainThread Connect");
+				net->Connect(Conf.server, Conf.port, 0, 0, 0);
+				servAddr.SetBinaryAddress(Conf.server);
+				servAddr.port = Conf.port;
+
+				clientstate.game = GameStateConnecting;
+				break;
+			}
+		case GameStateConnecting:
+			{
+				if(GetTickCount() - LastUpdate > 15*1000)
 				{
+					net->Connect(Conf.server, Conf.port, 0, 0, 0);
+					LastUpdate = GetTickCount();
+				}
+				break;
+			}
+		case GameStateSkinSelect:
+			{
+				SetPlayerControl(_GetPlayer(), 0);
+				if(GetAsyncKeyState(VK_SHIFT) != 0)
+				{
+					gPlayer[MyID].model = pClass[sel_cl].model;	
+					SetPlayerControl(_GetPlayer(), 1);
+					clientstate.game = GameStateInGame;
+					if(Conf.ComponentSelect == 1) clientstate.game = GameStateComponentSelect;
+
+					if(Conf.ComponentSelect == 0)
+					{
+						RakNet::BitStream bsSend;
+						bsSend.Write(sel_cl);
+						net->RPC("PlayerSpawn",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+						Log("Player Spawn");
+					}
+				}
+				else if(GetAsyncKeyState(VK_RIGHT) != 0)
+				{
+					sel_cl++;
+					if(sel_cl == Conf.NumSkins)
+						sel_cl = 0;
+					gPlayer[MyID].model = pClass[sel_cl].model;
+
 					RakNet::BitStream bsSend;
-					bsSend.Write(sel_cl);
-					net->RPC("PlayerSpawn",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+					bsSend.Write(gPlayer[MyID].model);
+					net->RPC("Select_ModelChanged",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+					Log("Select ModelChanged");
+					
+					RequestModel((eModel)gPlayer[MyID].model);
+					while(!HasModelLoaded((eModel)gPlayer[MyID].model)) wait(1);
+					ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
+					SetCharDefaultComponentVariation(_GetPlayerPed());
+
+					sprintf(model_select_text, "Sellected model id %d", sel_cl);
+				}
+				else if(GetAsyncKeyState(VK_LEFT) != 0)
+				{
+					sel_cl--;
+					if(sel_cl == -1)
+						sel_cl = Conf.NumSkins - 1;
+					gPlayer[MyID].model = pClass[sel_cl].model;
+
+					RakNet::BitStream bsSend;
+					bsSend.Write(gPlayer[MyID].model);
+					net->RPC("Select_ModelChanged",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+					Log("Select Model Changed");
+					
+					RequestModel((eModel)gPlayer[MyID].model);
+					while(!HasModelLoaded((eModel)gPlayer[MyID].model)) wait(1);
+					ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
+					SetCharDefaultComponentVariation(_GetPlayerPed());
+
+					sprintf(model_select_text, "Sellected model id %d", sel_cl);
+				}
+				break;
+			}
+		case GameStateComponentSelect:
+			{
+				SetPlayerControl(_GetPlayer(), 0);
+				if(GetAsyncKeyState(VK_SHIFT) != 0)
+				{
+					SetPlayerControl(_GetPlayer(), 1);
+					clientstate.game = GameStateInGame;
+
+					for(int i = 0; i < 11; i++)
+					{
+						gPlayer[MyID].CompD[i] = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)i);
+						gPlayer[MyID].CompT[i] = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)i);
+					}
+
+					RakNet::BitStream bsSend;
+					bsSend.Write(gPlayer[MyID].CompD);
+					bsSend.Write(gPlayer[MyID].CompT);
+					net->RPC("SyncSkinVariation",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+					Log("SEND SyncSkinVariation");
+
+					RakNet::BitStream bsSend2;
+					net->RPC("PlayerSpawn",&bsSend2,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 					Log("Player Spawn");
 				}
-			}
-			else if(GetAsyncKeyState(VK_RIGHT) != 0)
-			{
-				sel_cl++;
-				if(sel_cl == Conf.NumSkins)
-					sel_cl = 0;
-				gPlayer[MyID].model = pClass[sel_cl].model;
-
-				RakNet::BitStream bsSend;
-				bsSend.Write(gPlayer[MyID].model);
-				net->RPC("Select_ModelChanged",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
-				Log("Select ModelChanged");
-				
-				RequestModel((eModel)gPlayer[MyID].model);
-				while(!HasModelLoaded((eModel)gPlayer[MyID].model)) wait(1);
-				ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
-				SetCharDefaultComponentVariation(_GetPlayerPed());
-
-				sprintf(model_select_text, "Sellected model id %d", sel_cl);
-			}
-			else if(GetAsyncKeyState(VK_LEFT) != 0)
-			{
-				sel_cl--;
-				if(sel_cl == -1)
-					sel_cl = Conf.NumSkins - 1;
-				gPlayer[MyID].model = pClass[sel_cl].model;
-
-				RakNet::BitStream bsSend;
-				bsSend.Write(gPlayer[MyID].model);
-				net->RPC("Select_ModelChanged",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
-				Log("Select Model Changed");
-				
-				RequestModel((eModel)gPlayer[MyID].model);
-				while(!HasModelLoaded((eModel)gPlayer[MyID].model)) wait(1);
-				ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
-				SetCharDefaultComponentVariation(_GetPlayerPed());
-
-				sprintf(model_select_text, "Sellected model id %d", sel_cl);
-			}
-		}
-		else if(fmp.component)
-		{
-			SetPlayerControl(_GetPlayer(), 0);
-			if(GetAsyncKeyState(VK_SHIFT) != 0)
-			{
-				SetPlayerControl(_GetPlayer(), 1);
-				fmp.component = 0;
-
-				for(int i = 0; i < 11; i++)
+				else if(GetAsyncKeyState(VK_RIGHT) != 0)
 				{
-					gPlayer[MyID].CompD[i] = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)i);
-					gPlayer[MyID].CompT[i] = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)i);
+					int t = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)sel_cl)+1;
+					int d = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)sel_cl)+1;
+
+					SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)sel_cl, t, d);
+
+					sprintf(model_select_text, "Selected model id %d", sel_cl);
 				}
+				else if(GetAsyncKeyState(VK_LEFT) != 0)
+				{
+					int t = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)sel_cl)-1;
+					if(t == -1) t = 0;
+					int d = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)sel_cl)-1;
+					if(d == -1) t = 0;
 
-				RakNet::BitStream bsSend;
-				bsSend.Write(gPlayer[MyID].CompD);
-				bsSend.Write(gPlayer[MyID].CompT);
-				net->RPC("SyncSkinVariation",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
-				Log("SEND SyncSkinVariation");
-
-				RakNet::BitStream bsSend2;
-				net->RPC("PlayerSpawn",&bsSend2,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
-				Log("Player Spawn");
+					SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)sel_cl, t, d);
+					sprintf(model_select_text, "Selected model id %d", sel_cl);
+				}
+				else if(GetAsyncKeyState(VK_DOWN) != 0)
+				{
+					sel_cl++;
+					if(sel_cl == 11)
+						sel_cl = 0;
+					sprintf(model_select_text, "Selected model id %d", sel_cl);
+				}
+				else if(GetAsyncKeyState(VK_UP) != 0)
+				{
+					sel_cl--;
+					if(sel_cl == -1)
+						sel_cl = 10;
+					sprintf(model_select_text, "Selected model id %d", sel_cl);
+				}
+				break;
 			}
-			else if(GetAsyncKeyState(VK_RIGHT) != 0)
+		case GameStateInGame:
 			{
-				int t = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)sel_cl)+1;
-				int d = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)sel_cl)+1;
+				Debug("MPSTATE");
+				if(GetTickCount() - LastUpdate > 60*1000)
+				{
+					// Disconnect: Not info from server
+					PrintStringWithLiteralStringNow("STRING", "SERVER NOT SEND INFO TO YOU", 5000, 1);
+				}
+				MoveSync();
+				CarDoSync();
+				GunSync();
+				StatusSync();
 
-				SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)sel_cl, t, d);
-
-				sprintf(model_select_text, "Selected model id %d", sel_cl);
-			}
-			else if(GetAsyncKeyState(VK_LEFT) != 0)
-			{
-				int t = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)sel_cl)-1;
-				if(t == -1) t = 0;
-				int d = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)sel_cl)-1;
-				if(d == -1) t = 0;
-
-				SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)sel_cl, t, d);
-				sprintf(model_select_text, "Selected model id %d", sel_cl);
-			}
-			else if(GetAsyncKeyState(VK_DOWN) != 0)
-			{
-				sel_cl++;
-				if(sel_cl == 11)
-					sel_cl = 0;
-				sprintf(model_select_text, "Selected model id %d", sel_cl);
-			}
-			else if(GetAsyncKeyState(VK_UP) != 0)
-			{
-				sel_cl--;
-				if(sel_cl == -1)
-					sel_cl = 10;
-				sprintf(model_select_text, "Selected model id %d", sel_cl);
+				gPlayer[MyID].last_active = GetTickCount();
+				break;
 			}
 		}
-		else if(fmp.connect)
-		{
-			Debug("MPSTATE");
-			if(GetTickCount() - LastUpdate > 60*1000)
-			{
-				// Disconnect: Not info from server
-				PrintStringWithLiteralStringNow("STRING", "SERVER NOT SEND INFO TO YOU", 5000, 1);
-			}
-			MoveSync();
-			CarDoSync();
-			GunSync();
-			StatusSync();
-
-			gPlayer[MyID].last_active = GetTickCount();
-		}
-
-		if(fmp.connect)
+		if(clientstate.game == GameStateInGame)
 		{
 			Debug("PACKIFPACK");
 			pack = net->Receive();
@@ -598,16 +607,10 @@ void FMPHook::GameThread()
 	}
 }
 
-void NulledState()
-{
-	fmp.chat = fmp.component = fmp.connect = fmp.gui = fmp.hook = fmp.run = fmp.skin = fmp.wait = 0;
-}
-
 void MainThread(void* dummy)
 {
 	Debug("START (0x%x)", dwLoadOffset);
 
-	fmp.run = 1;
 	HOOK.AttachGtaThread("FMP");
 
 	Debug("Atached");
@@ -620,7 +623,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 {
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
-		NulledState();
 		debug_clear();
 		log_clear();
 

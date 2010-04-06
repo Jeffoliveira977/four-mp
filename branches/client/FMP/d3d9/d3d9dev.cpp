@@ -214,32 +214,32 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 	MouseY = *(int*)(0x17DE968+dwLoadOffset); 
 	MouseX = *(int*)(0x17DE95C+dwLoadOffset);
 
-	if(fmp.chat && !fmp.gui && fmp.connect)
+	switch (clientstate.input)
 	{
-		RECT rc = {2, 2, 800, 600}; 
-		for(int i = 7; i >= 0; i--)
+	case InputStateChat:
 		{
-			fChat->DrawText(0, mChat[i].msg, -1, &rc, DT_TOP|DT_LEFT, 
-				D3DCOLOR_XRGB(mChat[i].color.r, mChat[i].color.g, mChat[i].color.b));
-			rc.top += 11;
-		}
+			RECT rc = {2, 2, 800, 600}; 
+			for(int i = 7; i >= 0; i--)
+			{
+				fChat->DrawText(0, mChat[i].msg, -1, &rc, DT_TOP|DT_LEFT, 
+					D3DCOLOR_XRGB(mChat[i].color.r, mChat[i].color.g, mChat[i].color.b));
+				rc.top += 11;
+			}
 
-		if(enterChat != -1)
+			if(enterChat != -1)
+			{
+				rc.top += 2;
+				fChat->DrawText(0, ">", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
+				rc.left += 10;
+				fChat->DrawText(0, enterMsg, -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
+			}
+			break;
+		}
+	case InputStateGui:
 		{
-			rc.top += 2;
-			fChat->DrawText(0, ">", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
-			rc.left += 10;
-			fChat->DrawText(0, enterMsg, -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
+			Gui.MoveMouse(MouseX, MouseY);
+			Gui.Draw();
 		}
-	}
-
-	//if(1) // Показ меню
-		//Gui.GetStartMenu()->SetVisible( true );
-
-	if(fmp.gui)
-	{
-		Gui.MoveMouse(MouseX, MouseY);
-		Gui.Draw();
 	}
 	return m_pD3Ddev->EndScene();
 }
