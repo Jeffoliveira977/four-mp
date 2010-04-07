@@ -21,7 +21,6 @@ extern CHATMSG mChat[64];
 extern int enterChat;
 extern char enterMsg[256];
 
-extern RakPeerInterface *net;
 extern bool myEnter;
 
 #endif
