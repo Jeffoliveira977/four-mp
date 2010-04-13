@@ -118,10 +118,10 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	Option->AddElement(tInfo);
 	Option->SetVisible( 0 );
 
-	gpGui->AddWindow( StartMenu );
-	gpGui->AddWindow( ServerList );
-	gpGui->AddWindow( Chat );
-	gpGui->AddWindow( Option );
+	gpGui->AddWindow(StartMenu);
+	gpGui->AddWindow(ServerList);
+	gpGui->AddWindow(Chat);
+	gpGui->AddWindow(Option);
 
 	gpGui->SetVisible( true );
 }

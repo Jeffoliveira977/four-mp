@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="RakNetDebug.lib ws2_32.lib"
+				AdditionalDependencies="RakNetDebug.lib ws2_32.lib guid.lib"
 				OutputFile="$(OutDir)\xlive.dll"
 				LinkIncremental="2"
 				GenerateManifest="false"
@@ -186,6 +186,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ConsoleWindow.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\functions.cpp"
 				>
 			</File>
@@ -265,6 +269,10 @@
 			>
 			<File
 				RelativePath=".\chat.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ConsoleWindow.h"
 				>
 			</File>
 			<File
