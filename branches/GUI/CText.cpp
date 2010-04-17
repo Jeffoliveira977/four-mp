@@ -1,10 +1,10 @@
 #include "CGUI.h"
 
-CText::CText( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CText::CText(CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement(Gui, X, Y, Width, Height, String, String2, Callback );
 
-	SetThemeElement( gpGui->GetThemeElement( "Text" ) );
+	SetThemeElement( pGui->GetThemeElement( "Text" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "Text", 0 );
@@ -34,7 +34,7 @@ void CText::MouseMove( CMouse * pMouse )
 void CText::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
-	SetFont(gpGui->GetFont());
+	SetFont(pGui->GetFont());
 
 	pString = pState->GetColor( "String" );
 }

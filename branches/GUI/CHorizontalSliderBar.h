@@ -16,9 +16,9 @@ class CHorizontalSliderBar : public CElement
 
 public:
 	CHorizontalSliderBar();
-	CHorizontalSliderBar( int X, int Y, int Width, int Height, int minValue = 0, int maxValue = 0, int step = 1, int value = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CHorizontalSliderBar(CGUI *Gui, int X, int Y, int Width, int Height, int minValue = 0, int maxValue = 0, int step = 1, int value = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
-	void SetSliderElement( int X, int Y, int Width, int Height, int minValue = 0, int maxValue = 0, int step = 1, int value = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	void SetSliderElement(CGUI *Gui, int X, int Y, int Width, int Height, int minValue = 0, int maxValue = 0, int step = 1, int value = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 	void PreDraw();

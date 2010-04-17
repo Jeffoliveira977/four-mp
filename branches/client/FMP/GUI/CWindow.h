@@ -16,7 +16,7 @@ class CWindow : public CElement
 	CColor * pTitle, * pBodyInner, * pBodyBorder;
 	CTexture * pTitlebar, * pButton;
 public:
-	CWindow( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CWindow(CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 	~CWindow();
 
 	void AddElement( CElement * pElement );

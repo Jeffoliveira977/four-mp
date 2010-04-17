@@ -1,13 +1,13 @@
 #include "CGUI.h"
 
-CButton::CButton( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CButton::CButton(CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement(Gui, X, Y, Width, Height, String, String2, Callback );
 	SetHeight( BUTTON_HEIGHT );
 
 	m_bVisibleBack = 1;
 
-	SetThemeElement( gpGui->GetThemeElement( "Button" ) );
+	SetThemeElement( pGui->GetThemeElement( "Button" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "Button", 0 );
@@ -40,7 +40,7 @@ void CButton::KeyEvent( SKey sKey )
 {
 	if( !sKey.m_vKey )
 	{
-		if( GetMouseOver() && gpGui->GetMouse()->GetLeftButton( 0 ) )
+		if( GetMouseOver() && pGui->GetMouse()->GetLeftButton( 0 ) )
 		{
 			SetElementState( "Pressed" );
 
@@ -68,7 +68,7 @@ void CButton::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
 
-	SetFont(gpGui->GetFont());
+	SetFont(pGui->GetFont());
 
 	pButton = pState->GetTexture( "Button" );
 	pString = pState->GetColor( "String" );

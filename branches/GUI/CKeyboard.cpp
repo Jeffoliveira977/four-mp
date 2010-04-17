@@ -1,8 +1,13 @@
 #include "CGUI.h"
 
+CKeyboard::CKeyboard(CGUI *Gui)
+{
+	pGui = Gui;
+}
+
 bool CKeyboard::HandleMessage( unsigned int uMsg, __w64 unsigned int wParam, _w64 long lParam )
 {
-	if( !gpGui->IsVisible() || uMsg < WM_KEYFIRST || uMsg > WM_KEYLAST || gpGui->GetMouse()->GetLeftButton() )
+	if( !pGui->IsVisible() || uMsg < WM_KEYFIRST || uMsg > WM_KEYLAST || pGui->GetMouse()->GetLeftButton() )
 		return false;
 
 	switch( uMsg )
@@ -15,7 +20,7 @@ bool CKeyboard::HandleMessage( unsigned int uMsg, __w64 unsigned int wParam, _w6
 		break;
 	}
 
-	return gpGui->KeyEvent( GetKey() );
+	return pGui->KeyEvent( GetKey() );
 }
 
 void CKeyboard::SetKey( SKey sKey )

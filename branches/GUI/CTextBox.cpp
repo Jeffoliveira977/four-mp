@@ -1,12 +1,12 @@
 #include "CGUI.h"
 
-CTextBox::CTextBox( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CTextBox::CTextBox(CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement(Gui, X, Y, Width, Height, String, String2, Callback );
 
-	pSlider = new CHelperSlider( CPos( GetWidth() - HELPERSLIDER_WIDTH + 2, 0 ), GetHeight() );
+	pSlider = new CHelperSlider(pGui, CPos( GetWidth() - HELPERSLIDER_WIDTH + 2, 0 ), GetHeight() );
 
-	SetThemeElement( gpGui->GetThemeElement( "TextBox" ) );
+	SetThemeElement( pGui->GetThemeElement( "TextBox" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "TextBox", 0 );
@@ -18,7 +18,7 @@ void CTextBox::Draw()
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
 	int iAddHeight = GetFont()->GetStringHeight();
 	if( m_vStrings.size() )
@@ -48,10 +48,10 @@ void CTextBox::MouseMove( CMouse * pMouse )
 void CTextBox::KeyEvent( SKey sKey )
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
-	if(GetMouseOver() && gpGui->GetMouse()->GetLeftButton())
+	if(GetMouseOver() && pGui->GetMouse()->GetLeftButton())
 		SendMsg(CLICK, 0);
 
-	if( GetMouseOver() || ( !sKey.m_bDown && !gpGui->GetMouse()->GetWheel() )  )
+	if( GetMouseOver() || ( !sKey.m_bDown && !pGui->GetMouse()->GetWheel() )  )
 		pSlider->KeyEvent( Pos, sKey );
 }
 
@@ -112,7 +112,7 @@ void CTextBox::Clear()
 void CTextBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
-	SetFont(gpGui->GetFont());
+	SetFont(pGui->GetFont());
 
 	pString = pState->GetColor( "String" );
 	pInner = pState->GetColor( "Inner" );

@@ -10,7 +10,7 @@ class CProgressBar : public CElement
 	CColor * pInner, * pBorder, * pString;
 	CTexture * pProgressBar;
 public:
-	CProgressBar( int X, int Y, int Width, int Height, int value = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CProgressBar(CGUI *Gui, int X, int Y, int Width, int Height, int value = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 

@@ -12,7 +12,7 @@ class CButton : public CElement
 	bool m_bVisibleBack;
 
 public:
-	CButton( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CButton(CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 	void PreDraw();

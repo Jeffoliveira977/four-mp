@@ -7,15 +7,15 @@ CHorizontalSliderBar::CHorizontalSliderBar()
 	m_iMinValue = 0, m_iMaxValue = 0, m_iValue = 0;
 }
 
-CHorizontalSliderBar::CHorizontalSliderBar( int X, int Y, int Width, int Height, int minValue, int maxValue, int step, int value, const char * String, const char * String2, tAction Callback )
+CHorizontalSliderBar::CHorizontalSliderBar(CGUI *Gui, int X, int Y, int Width, int Height, int minValue, int maxValue, int step, int value, const char * String, const char * String2, tAction Callback )
 {
 	SetDragged( false );
 	SetAction( 0 );
 	m_iMinValue = 0, m_iMaxValue = 0, m_iValue = 0;
 
-	SetSliderElement( X, Y, Width, Height, minValue, maxValue, step, value, String, String2, Callback );
+	SetSliderElement(Gui, X, Y, Width, Height, minValue, maxValue, step, value, String, String2, Callback );
 
-	SetThemeElement( gpGui->GetThemeElement( "HorizontalSliderBar" ) );
+	SetThemeElement( pGui->GetThemeElement( "HorizontalSliderBar" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "HorizontalSliderBar", 0 );
@@ -23,9 +23,9 @@ CHorizontalSliderBar::CHorizontalSliderBar( int X, int Y, int Width, int Height,
 		SetElementState( "Norm" );
 }
 
-void CHorizontalSliderBar::SetSliderElement( int X, int Y, int Width, int Height, int minValue, int maxValue, int step, int value, const char * String, const char * String2, tAction Callback )
+void CHorizontalSliderBar::SetSliderElement(CGUI *Gui, int X, int Y, int Width, int Height, int minValue, int maxValue, int step, int value, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement(Gui, X, Y, Width, Height, String, String2, Callback );
 
 	if( String )
 		SetShowString( false );
@@ -65,10 +65,10 @@ void CHorizontalSliderBar::Draw()
 	{
 		D3DCOLOR d3dLineColor = pLines->GetD3DCOLOR();
 
-		gpGui->DrawLine( Pos.GetX(),					Pos.GetY() + TITLEBAR_HEIGHT / 2,Pos.GetX() + GetWidth(),		Pos.GetY() + TITLEBAR_HEIGHT / 2,		1, d3dLineColor );
-		gpGui->DrawLine( Pos.GetX(),					Pos.GetY() + TITLEBAR_HEIGHT / 4, Pos.GetX(),					Pos.GetY() + TITLEBAR_HEIGHT / 4 * 3,	1, d3dLineColor );
-		gpGui->DrawLine( Pos.GetX() + GetWidth(),		Pos.GetY() + TITLEBAR_HEIGHT / 4, Pos.GetX() + GetWidth(),		Pos.GetY() + TITLEBAR_HEIGHT / 4 * 3,	1, d3dLineColor );
-		gpGui->DrawLine( Pos.GetX() + GetWidth() / 2,	Pos.GetY() + TITLEBAR_HEIGHT / 4, Pos.GetX() + GetWidth() / 2,	Pos.GetY() + TITLEBAR_HEIGHT / 4 * 3,	1, d3dLineColor );
+		pGui->DrawLine( Pos.GetX(),					Pos.GetY() + TITLEBAR_HEIGHT / 2,Pos.GetX() + GetWidth(),		Pos.GetY() + TITLEBAR_HEIGHT / 2,		1, d3dLineColor );
+		pGui->DrawLine( Pos.GetX(),					Pos.GetY() + TITLEBAR_HEIGHT / 4, Pos.GetX(),					Pos.GetY() + TITLEBAR_HEIGHT / 4 * 3,	1, d3dLineColor );
+		pGui->DrawLine( Pos.GetX() + GetWidth(),		Pos.GetY() + TITLEBAR_HEIGHT / 4, Pos.GetX() + GetWidth(),		Pos.GetY() + TITLEBAR_HEIGHT / 4 * 3,	1, d3dLineColor );
+		pGui->DrawLine( Pos.GetX() + GetWidth() / 2,	Pos.GetY() + TITLEBAR_HEIGHT / 4, Pos.GetX() + GetWidth() / 2,	Pos.GetY() + TITLEBAR_HEIGHT / 4 * 3,	1, d3dLineColor );
 
 		pSlider->Draw( CPos( Pos.GetX() + static_cast<int>( floor( static_cast<float>( GetWidth() ) / ( GetMaxValue() - GetMinValue() ) * ( GetValue() - GetMinValue() ) ) ) - 5, Pos.GetY() + 2 ), 10, TITLEBAR_HEIGHT - 4 );
 
@@ -115,19 +115,19 @@ void CHorizontalSliderBar::MouseMove( CMouse * pMouse )
 				GetAction()( this, CHANGE, GetValue() );
 	}
 	else
-		SetElementState( SetMouseOver( gpGui->GetMouse()->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), TITLEBAR_HEIGHT ) )?"MouseOver":"Norm" );
+		SetElementState( SetMouseOver( pGui->GetMouse()->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), TITLEBAR_HEIGHT ) )?"MouseOver":"Norm" );
 }
 
 void CHorizontalSliderBar::KeyEvent( SKey sKey )
 {
 	if( !sKey.m_vKey )
 	{
-		SetDragged( GetMouseOver() && gpGui->GetMouse()->GetLeftButton() );
+		SetDragged( GetMouseOver() && pGui->GetMouse()->GetLeftButton() );
 
 		SetElementState( GetDragged()?"Pressed":( GetMouseOver()?"MouseOver":"Norm" ) );
 
 		if( GetDragged() )
-			MouseMove( gpGui->GetMouse() );
+			MouseMove( pGui->GetMouse() );
 	}
 }
 
@@ -212,7 +212,7 @@ bool CHorizontalSliderBar::GetShowString()
 void CHorizontalSliderBar::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
-	SetFont(gpGui->GetFont());
+	SetFont(pGui->GetFont());
 
 	pLines = pState->GetColor( "Lines" );
 	pString = pState->GetColor( "String" );

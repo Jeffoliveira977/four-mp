@@ -10,8 +10,9 @@ bool CHelperSlider::GetDragged()
 	return m_bDragged;
 }
 
-CHelperSlider::CHelperSlider( CPos relPos, int iHeight )
+CHelperSlider::CHelperSlider(CGUI *Gui, CPos relPos, int iHeight )
 {
+	pGui = Gui;
 	SetRelPos( relPos );
 	SetHeight( iHeight );
 
@@ -20,8 +21,8 @@ CHelperSlider::CHelperSlider( CPos relPos, int iHeight )
 	m_bMouseOver[ 0 ] = m_bMouseOver[ 1 ] = m_bMouseOver[ 2 ] = false;
 	SetDragged( false );
 
-	SetThemeElement( gpGui->GetThemeElement( "HelperSlider" ) );
-	SetThemeElement( gpGui->GetThemeElement( "HelperSlider" ), 2 );
+	SetThemeElement( pGui->GetThemeElement( "HelperSlider" ) );
+	SetThemeElement( pGui->GetThemeElement( "HelperSlider" ), 2 );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "HelperSlider", 0 );
@@ -31,7 +32,7 @@ CHelperSlider::CHelperSlider( CPos relPos, int iHeight )
 		SetElementState( "Norm", 2 );
 	}
 
-	SetThemeElement( gpGui->GetThemeElement( "HorizontalSliderBar" ), 1 );
+	SetThemeElement( pGui->GetThemeElement( "HorizontalSliderBar" ), 1 );
 
 	if( !GetThemeElement( 1 ) )
 		MessageBoxA( 0, "Theme element invalid.", "HorizontalSliderBar", 0 );
@@ -44,7 +45,7 @@ void CHelperSlider::Draw( CPos basePos )
 	if(!Show) return;
 	CPos Pos = basePos + *GetRelPos();
 
-	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), HELPERSLIDER_WIDTH, GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), HELPERSLIDER_WIDTH, GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
 	pUpArrow->Draw( CPos( Pos.GetX() + 1, Pos.GetY() + 1 ), HELPERSLIDER_WIDTH - 2, HELPERSLIDER_WIDTH - 2 );
 
@@ -114,7 +115,7 @@ bool CHelperSlider::KeyEvent( CPos basePos, SKey sKey )
 
 	if( !sKey.m_vKey )
 	{
-		if( gpGui->GetMouse()->GetLeftButton() )
+		if( pGui->GetMouse()->GetLeftButton() )
 		{
 			if( m_bMouseOver[ 0 ] )
 			{
@@ -136,12 +137,12 @@ bool CHelperSlider::KeyEvent( CPos basePos, SKey sKey )
 
 				m_tDownArrow.Start( 0.1f );
 			}
-			else if( gpGui->GetMouse()->InArea( Pos.GetX() + 1, Pos.GetY() + HELPERSLIDER_WIDTH, HELPERSLIDER_WIDTH, GetHeight() - HELPERSLIDER_WIDTH * 2 ) )
+			else if( pGui->GetMouse()->InArea( Pos.GetX() + 1, Pos.GetY() + HELPERSLIDER_WIDTH, HELPERSLIDER_WIDTH, GetHeight() - HELPERSLIDER_WIDTH * 2 ) )
 			{	
 				SetElementState( "Pressed", 1 );
 
 				SetDragged( true );
-				MouseMove( Pos, gpGui->GetMouse() );
+				MouseMove( Pos, pGui->GetMouse() );
 			}
 		}
 		else
@@ -150,9 +151,9 @@ bool CHelperSlider::KeyEvent( CPos basePos, SKey sKey )
 			SetDragged( false );
 		}
 
-		if( !GetDragged() && gpGui->GetMouse()->GetWheel() )
+		if( !GetDragged() && pGui->GetMouse()->GetWheel() )
 		{
-			int iState = gpGui->GetMouse()->GetWheel( 0 );
+			int iState = pGui->GetMouse()->GetWheel( 0 );
 
 			int iTenth = ( GetMaxValue() / 10 )?GetMaxValue() / 10:1;
 

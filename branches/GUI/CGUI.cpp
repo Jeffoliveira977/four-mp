@@ -1,8 +1,6 @@
 #include "CGUI.h"
 #include "CD3DRender.h"
 
-CGUI * gpGui = 0;
-
 CGUI::CGUI( IDirect3DDevice9 * pDevice )
 {
 	if( !pDevice )
@@ -20,8 +18,8 @@ CGUI::CGUI( IDirect3DDevice9 * pDevice )
 	m_pRender->Initialize( pDevice );
 #endif
 
-	m_pMouse = new CMouse( pDevice, m_pSprite );
-	m_pKeyboard = new CKeyboard();
+	m_pMouse = new CMouse(this, pDevice, m_pSprite );
+	m_pKeyboard = new CKeyboard(this);
 	m_pFont = 0;
 
 	Cvars[ "$Value" ] = new CVar( SliderValue );
@@ -55,7 +53,7 @@ CGUI::~CGUI()
 
 void CGUI::LoadFont(int size, char *font)
 {
-	m_pFont = new CFont( gpGui->GetDevice(), size, font );
+	m_pFont = new CFont( this, GetDevice(), size, font );
 }
 
 void CGUI::SetFontColors(int Index, int r, int g, int b, int a)
@@ -65,17 +63,17 @@ void CGUI::SetFontColors(int Index, int r, int g, int b, int a)
 
 void CGUI::SetVarInt(const char *name, int value)
 {
-	gpGui->Cvars[ name ] = new CVar( value );
+	Cvars[ name ] = new CVar( value );
 }
 
 void CGUI::SetVarString(const char *name, std::string value)
 {
-	gpGui->Cvars[ name ] = new CVar( value );
+	Cvars[ name ] = new CVar( value );
 }
 
 void CGUI::SetVarBool(const char *name, bool value)
 {
-	gpGui->Cvars[ name ] = new CVar( value );
+	Cvars[ name ] = new CVar( value );
 }
 
 void CGUI::LoadInterfaceFromFile( const char * pszFilePath )
@@ -214,7 +212,7 @@ void CGUI::BringToTop( CWindow * pWindow )
 
 void CGUI::Draw()
 {
-	if( !gpGui->IsVisible() )
+	if( !IsVisible() )
 		return;
 
 	PreDraw();
@@ -267,7 +265,7 @@ void CGUI::MouseMove( CMouse * pMouse )
 			if( !m_vWindows[ iIndex ]->GetMaximized() )
 				iHeight = TITLEBAR_HEIGHT;
 
-			if( !bGotWindow && gpGui->GetMouse()->InArea( m_vWindows[ iIndex ], iHeight ) )
+			if( !bGotWindow && GetMouse()->InArea( m_vWindows[ iIndex ], iHeight ) )
 			{
 				m_vWindows[ iIndex ]->MouseMove( pMouse );
 				bGotWindow = true;
@@ -291,7 +289,7 @@ bool CGUI::KeyEvent( SKey sKey )
 
 	if( !sKey.m_vKey && ( sKey.m_bDown || ( GetMouse()->GetWheel() && !sKey.m_bDown ) ) )
 	{
-		CMouse * pMouse = gpGui->GetMouse();
+		CMouse * pMouse = GetMouse();
 
 		std::vector<CWindow*> vRepeat;
 

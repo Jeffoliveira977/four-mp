@@ -15,6 +15,8 @@ enum CMSG
 	END,
 };
 
+class CGUI;
+
 typedef void ( __cdecl * tAction )( CElement *, CMSG, int );
 
 class CElement
@@ -36,7 +38,7 @@ class CElement
 
 public:
 
-	void SetElement( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL, bool abs = 0 );
+	void SetElement(CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL, bool abs = 0 );
 
 	void SetParent( CWindow * pParent );
 	CWindow * GetParent();
@@ -85,4 +87,6 @@ public:
 	CFont * GetFont();
 	void SetFont(int size, char *name);
 	void SetFont(CFont *font);
+protected:
+	CGUI *pGui;
 };

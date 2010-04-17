@@ -6,6 +6,7 @@
 
 class FMPGUI
 {
+	CGUI *m_Gui;
 	bool g_Mouse[3];
 	CWindow * StartMenu;
 	CWindow * ServerList;

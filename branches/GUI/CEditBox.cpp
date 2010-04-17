@@ -1,8 +1,8 @@
 #include "CGUI.h"
 
-CEditBox::CEditBox( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CEditBox::CEditBox(CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement(Gui, X, Y, Width, Height, String, String2, Callback );
 	SetHeight( BUTTON_HEIGHT );
 
 	m_iStart = 0;
@@ -13,7 +13,7 @@ CEditBox::CEditBox( int X, int Y, int Width, int Height, const char * String, co
 	{
 		SetAction( Callback );
 	}
-	SetThemeElement( gpGui->GetThemeElement( "EditBox" ) );
+	SetThemeElement( pGui->GetThemeElement( "EditBox" ) );
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "EditBox", 0 );
 	else
@@ -27,11 +27,11 @@ void CEditBox::Draw()
 	SElementState * pState = GetElementState();
 	if( pState )
 	{
-		gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+		pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 		GetFont()->DrawString( Pos.GetX() + 4, Pos.GetY() + GetHeight() / 2, FT_VCENTER, pString, &GetString()[ GetStart() ], GetWidth() );
 		
 		if( m_bCursorState && HasFocus() )
-			gpGui->FillArea( Pos.GetX() + 2 + m_iCursorX, Pos.GetY() + 2, 2, GetHeight() - 4, pCursor->GetD3DCOLOR() );
+			pGui->FillArea( Pos.GetX() + 2 + m_iCursorX, Pos.GetY() + 2, 2, GetHeight() - 4, pCursor->GetD3DCOLOR() );
 	}
 }
 
@@ -55,13 +55,13 @@ void CEditBox::KeyEvent( SKey sKey )
 {
 	if( !sKey.m_vKey )
 	{
-		if( gpGui->GetMouse()->GetLeftButton() )
+		if( pGui->GetMouse()->GetLeftButton() )
 		{
 			if( GetMouseOver() )
 			{
 				SendMsg(CLICK, 0);
 
-				int iX = gpGui->GetMouse()->GetPos().GetX();
+				int iX = pGui->GetMouse()->GetPos().GetX();
 				int iAbsX = ( *GetParent()->GetAbsPos() + *GetRelPos() ).GetX();
 
 				std::string sString( &GetString()[ GetStart() ] );
@@ -254,7 +254,7 @@ void CEditBox::SetStart( int iStart )
 void CEditBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
-	SetFont(gpGui->GetFont());
+	SetFont(pGui->GetFont());
 
 	pInner = pState->GetColor( "Inner" );
 	pBorder = pState->GetColor( "Border" );

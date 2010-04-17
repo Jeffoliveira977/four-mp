@@ -139,5 +139,3 @@ public:
 
 	std::map<std::string,CVar*> Cvars;
 };
-
-extern CGUI * gpGui;

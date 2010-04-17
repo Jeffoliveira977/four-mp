@@ -1,11 +1,11 @@
 #include "CGUI.h"
 
-CProgressBar::CProgressBar( int X, int Y, int Width, int Height, int value, const char * String, const char * String2, tAction Callback )
+CProgressBar::CProgressBar(CGUI *Gui, int X, int Y, int Width, int Height, int value, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement(Gui, X, Y, Width, Height, String, String2, Callback );
 	SetProgress( value );
 
-	SetThemeElement( gpGui->GetThemeElement( "ProgressBar" ) );
+	SetThemeElement( pGui->GetThemeElement( "ProgressBar" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "ProgressBar", 0 );
@@ -17,7 +17,7 @@ void CProgressBar::Draw()
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
 	if( GetProgress() )
 		pProgressBar->Draw( CPos( Pos.GetX() + 2, Pos.GetY() + 2 ), static_cast<int>( ( static_cast<float>( GetWidth() ) - 4 ) / 100 * GetProgress() ), GetHeight() - 4 );
@@ -50,7 +50,7 @@ void CProgressBar::SetProgress( int iProgress )
 void CProgressBar::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
-	SetFont(gpGui->GetFont());
+	SetFont(pGui->GetFont());
 
 	pInner = pState->GetColor( "Inner" );
 	pBorder = pState->GetColor( "Border" );

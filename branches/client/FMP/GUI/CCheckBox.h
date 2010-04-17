@@ -9,7 +9,7 @@ class CCheckBox : public CElement
 	CColor * pInner, * pBorder, * pString, * pCross;
 
 public:
-	CCheckBox( int X, int Y, int Width, int Height, bool Checked = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CCheckBox(CGUI *Gui, int X, int Y, int Width, int Height, bool Checked = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	bool GetChecked();
 	void SetChecked( bool bChecked );

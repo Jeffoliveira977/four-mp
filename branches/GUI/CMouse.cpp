@@ -2,8 +2,9 @@
 
 #define DBLCLICK_TIME 0.3f
 
-CMouse::CMouse( IDirect3DDevice9 * pDevice, ID3DXSprite * pSprite )
+CMouse::CMouse(CGUI *Gui, IDirect3DDevice9 * pDevice, ID3DXSprite * pSprite )
 {
+	pGui = Gui;
 	m_pDevice = pDevice;
 	pCursor = new CTexture(pSprite, "FMPGUI/cursor.png");
 	SetSize(32);
@@ -22,7 +23,7 @@ CMouse::~CMouse()
 
 bool CMouse::HandleMessage( unsigned int uMsg, WPARAM wParam, LPARAM lParam )
 {
-	if( !gpGui->IsVisible() || uMsg < WM_MOUSEFIRST || uMsg > WM_MOUSELAST )
+	if( !pGui->IsVisible() || uMsg < WM_MOUSEFIRST || uMsg > WM_MOUSELAST )
 		return false;
 
 	bool bDown = false;
@@ -32,7 +33,7 @@ bool CMouse::HandleMessage( unsigned int uMsg, WPARAM wParam, LPARAM lParam )
 	case WM_MOUSEMOVE:
 		{
 			SetPos( GET_X_LPARAM( lParam ), GET_Y_LPARAM( lParam ) );
-			gpGui->MouseMove( this );
+			pGui->MouseMove( this );
 			return false;
 		}
 
@@ -72,7 +73,7 @@ bool CMouse::HandleMessage( unsigned int uMsg, WPARAM wParam, LPARAM lParam )
 		break;
 	}
 
-	return gpGui->KeyEvent( SKey( 0, bDown ) );
+	return pGui->KeyEvent( SKey( 0, bDown ) );
 }
 
 void CMouse::SetPos( CPos cPos )
@@ -109,7 +110,7 @@ void CMouse::Draw()
 	if(!pCursor)
 	{
 		static CColor * pColor = new CColor( 255, 1, 1, 255 );
-		gpGui->FillArea( m_pos.GetX(), m_pos.GetY(), 10, 10, pColor->GetD3DCOLOR() );
+		pGui->FillArea( m_pos.GetX(), m_pos.GetY(), 10, 10, pColor->GetD3DCOLOR() );
 	}
 	else
 		pCursor->Draw(m_pos, size, size);

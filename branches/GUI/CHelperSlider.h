@@ -18,7 +18,7 @@ class CHelperSlider : public CHorizontalSliderBar
 
 public:
 	bool Show;
-	CHelperSlider( CPos relPos, int iHeight );
+	CHelperSlider(CGUI *Gui, CPos relPos, int iHeight );
 
 	void Draw( CPos basePos );
 	void PreDraw();

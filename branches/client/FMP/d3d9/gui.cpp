@@ -53,37 +53,37 @@ FMPGUI::FMPGUI()
 
 void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 {
-	gpGui = new CGUI( g_pDevice );
-	gpGui->LoadInterfaceFromFile( "ColorThemes.xml" );
+	m_Gui = new CGUI( g_pDevice );
+	m_Gui->LoadInterfaceFromFile( "ColorThemes.xml" );
 
-	gpGui->LoadFont();
-	gpGui->SetFontColors(0, 0, 0, 0, 255); // <!--black-->
-	gpGui->SetFontColors(1, 255, 255, 255, 255); // <!--white-->
-	gpGui->SetFontColors(2, 0, 0, 255, 255); // <!--blue-->
-	gpGui->SetFontColors(3, 0, 255, 0, 255); // <!--green-->
-	gpGui->SetFontColors(4, 255, 0, 0, 255); // <!--red-->
-	gpGui->SetFontColors(5, 255, 0, 128, 255); // <!--pink-->
-	gpGui->SetFontColors(6, 255, 0, 255, 255); // <!--purple-->
-	gpGui->SetFontColors(7, 255, 150, 0, 255); // <!--orange-->
-	gpGui->SetFontColors(8, 255, 255, 0, 255); // <!--yellow-->
-	gpGui->SetFontColors(9, 0, 0, 128, 255); // <!--dark blue-->
+	m_Gui->LoadFont();
+	m_Gui->SetFontColors(0, 0, 0, 0, 255); // <!--black-->
+	m_Gui->SetFontColors(1, 255, 255, 255, 255); // <!--white-->
+	m_Gui->SetFontColors(2, 0, 0, 255, 255); // <!--blue-->
+	m_Gui->SetFontColors(3, 0, 255, 0, 255); // <!--green-->
+	m_Gui->SetFontColors(4, 255, 0, 0, 255); // <!--red-->
+	m_Gui->SetFontColors(5, 255, 0, 128, 255); // <!--pink-->
+	m_Gui->SetFontColors(6, 255, 0, 255, 255); // <!--purple-->
+	m_Gui->SetFontColors(7, 255, 150, 0, 255); // <!--orange-->
+	m_Gui->SetFontColors(8, 255, 255, 0, 255); // <!--yellow-->
+	m_Gui->SetFontColors(9, 0, 0, 128, 255); // <!--dark blue-->
 
-	gpGui->SetVarInt("Titlebar height", 24);
-	gpGui->SetVarInt("Button height", 20);
+	m_Gui->SetVarInt("Titlebar height", 24);
+	m_Gui->SetVarInt("Button height", 20);
 
 	// Create Start Menu
-	StartMenu = new CWindow(100, 100, 600, 400, "FOUR-MP START MENU");
-	sm_bStart = new CButton(50, 50, 500, 0, "START", NULL, StartCallBack);
-	sm_bExit = new CButton(50, 100, 500, 0, "EXIT", NULL, StartCallBack);
+	StartMenu = new CWindow(m_Gui, 100, 100, 600, 400, "FOUR-MP START MENU");
+	sm_bStart = new CButton(m_Gui, 50, 50, 500, 0, "START", NULL, StartCallBack);
+	sm_bExit = new CButton(m_Gui, 50, 100, 500, 0, "EXIT", NULL, StartCallBack);
 
 	StartMenu->AddElement(sm_bStart);
 	StartMenu->AddElement(sm_bExit);
 	StartMenu->SetVisible( 0 );
 
 	// Create Servers List
-	ServerList = new CWindow(100, 100, 600, 400, "FOUR-MP SERVERS LIST");
+	ServerList = new CWindow(m_Gui, 100, 100, 600, 400, "FOUR-MP SERVERS LIST");
 	int width[] = {20, 200, 180, 50, 100, 50};
-	sl_tList = new CListView(0, 0, width, 300, 6, NULL, NULL, ServerListCallback);
+	sl_tList = new CListView(m_Gui, 0, 0, width, 300, 6, NULL, NULL, ServerListCallback);
 	ServerList->AddElement(sl_tList);
 	ServerList->SetVisible( 1 );
 
@@ -103,73 +103,68 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 
 	// Create Chat
-	Chat = new CWindow(10, 10, 200, 300, "FOUR-MP CHAT");
-	cc_tChat = new CTextBox(0, 0, 200, 258, NULL, NULL, ChatCallBack);
-	cc_tEnter = new CEditBox(0, 257, 160, 0, NULL, NULL, ChatCallBack);
-	cc_bEnter = new CButton(160, 257, 40, 0, "SEND", NULL, ChatCallBack);
+	Chat = new CWindow(m_Gui, 10, 10, 200, 300, "FOUR-MP CHAT");
+	cc_tChat = new CTextBox(m_Gui, 0, 0, 200, 258, NULL, NULL, ChatCallBack);
+	cc_tEnter = new CEditBox(m_Gui, 0, 257, 160, 0, NULL, NULL, ChatCallBack);
+	cc_bEnter = new CButton(m_Gui, 160, 257, 40, 0, "SEND", NULL, ChatCallBack);
 	Chat->AddElement(cc_tChat);
 	Chat->AddElement(cc_tEnter);
 	Chat->AddElement(cc_bEnter);
 	Chat->SetVisible( 1 );
 
 	// Create Option
-	Option = new CWindow(200, 200, 400, 300, "FOUR-MP OPTIONS");
-	CText * tInfo = new CText(10, 10, 300, 100, "WAIT OR CREATE INTERFACE");
+	Option = new CWindow(m_Gui, 200, 200, 400, 300, "FOUR-MP OPTIONS");
+	CText * tInfo = new CText(m_Gui, 10, 10, 300, 100, "WAIT OR CREATE INTERFACE");
 	Option->AddElement(tInfo);
 	Option->SetVisible( 0 );
 
-	gpGui->AddWindow(StartMenu);
-	gpGui->AddWindow(ServerList);
-	gpGui->AddWindow(Chat);
-	gpGui->AddWindow(Option);
-
-	gpGui->SetVisible( true );
+	m_Gui->SetVisible( true );
 }
 
 void FMPGUI::HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	if( gpGui->IsVisible() )
+	if( m_Gui->IsVisible() )
 	{
-		gpGui->GetMouse()->HandleMessage(Msg, wParam, lParam);
-		gpGui->GetKeyboard()->HandleMessage(Msg, wParam, lParam);
+		m_Gui->GetMouse()->HandleMessage(Msg, wParam, lParam);
+		m_Gui->GetKeyboard()->HandleMessage(Msg, wParam, lParam);
 	}
 }
 
 void FMPGUI::MoveMouse(int x, int y)
 {
-	if( gpGui->IsVisible() )
+	if( m_Gui->IsVisible() )
 	{
-		gpGui->GetMouse()->SetPos(x, y);
-		gpGui->MouseMove(gpGui->GetMouse());
+		m_Gui->GetMouse()->SetPos(x, y);
+		m_Gui->MouseMove(m_Gui->GetMouse());
 
 		bool mouse = 0;
 		if(g_Mouse[0] != (GetAsyncKeyState(1) != 0))
 		{
 			g_Mouse[0] = GetAsyncKeyState(1) != 0;
-			gpGui->GetMouse()->SetLeftButton(g_Mouse[0]);
+			m_Gui->GetMouse()->SetLeftButton(g_Mouse[0]);
 			mouse = 1;
 		}
 		if(g_Mouse[1] != (GetAsyncKeyState(2) != 0))
 		{
 			g_Mouse[1] = GetAsyncKeyState(2) != 0;
-			gpGui->GetMouse()->SetRightButton(g_Mouse[1]);
+			m_Gui->GetMouse()->SetRightButton(g_Mouse[1]);
 			mouse = 1;
 		}
 		if(g_Mouse[2] != (GetAsyncKeyState(3) != 0))
 		{
 			g_Mouse[2] = GetAsyncKeyState(3) != 0;
-			gpGui->GetMouse()->SetMiddleButton(g_Mouse[2]);
+			m_Gui->GetMouse()->SetMiddleButton(g_Mouse[2]);
 			mouse = 1;
 		}
 
 		if(mouse)
-			gpGui->KeyEvent( SKey( 0, (GetAsyncKeyState(1)||GetAsyncKeyState(2)||GetAsyncKeyState(3)) && 1 ) );
+			m_Gui->KeyEvent( SKey( 0, (GetAsyncKeyState(1)||GetAsyncKeyState(2)||GetAsyncKeyState(3)) && 1 ) );
 	}
 }
 
 void FMPGUI::Draw()
 {
-	gpGui->Draw();
+	m_Gui->Draw();
 }
 
 CWindow * FMPGUI::GetStartMenu()

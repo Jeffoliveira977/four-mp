@@ -1,6 +1,6 @@
 #include "CListView.h"
 
-CListView::CListView( int X, int Y, int *Width, int Height, int Columns, const char *String, const char *String2, tAction Callback )
+CListView::CListView(CGUI *Gui, int X, int Y, int *Width, int Height, int Columns, const char *String, const char *String2, tAction Callback )
 {
 	Count = Columns;
 	Poss = new int[Count];
@@ -17,14 +17,14 @@ CListView::CListView( int X, int Y, int *Width, int Height, int Columns, const c
 			Poss[i] = Poss[i-1]+Widths[i-1];
 	}
 
-	SetElement( X, Y, AllWidth, Height, String, String2, Callback );
+	SetElement(Gui, X, Y, AllWidth, Height, String, String2, Callback );
 	m_iMouseOverIndex = -1;
 	m_iMouseSelect = -1;
 	m_vRows = new std::vector<std::string>[Count];
 
-	pSlider = new CHelperSlider( CPos( GetWidth() - HELPERSLIDER_WIDTH + 2, 0 ), GetHeight() );
+	pSlider = new CHelperSlider(pGui, CPos( GetWidth() - HELPERSLIDER_WIDTH + 2, 0 ), GetHeight() );
 
-	SetThemeElement( gpGui->GetThemeElement( "ListBox" ) );
+	SetThemeElement( pGui->GetThemeElement( "ListBox" ) );
 
 	ShowSlider(1);
 
@@ -38,7 +38,7 @@ void CListView::Draw()
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
 	int iAddHeight = GetFont()->GetStringHeight();
 				
@@ -63,7 +63,7 @@ void CListView::Draw()
 				if(m_iMouseSelect == i)	
 				{
 					if(j == 0)
-						gpGui->DrawOutlinedBox( Pos.GetX() + 2, Pos.GetY() + iHeight, GetWidth() - HELPERSLIDER_WIDTH, iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
+						pGui->DrawOutlinedBox( Pos.GetX() + 2, Pos.GetY() + iHeight, GetWidth() - HELPERSLIDER_WIDTH, iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
 					pColor = pInner;
 				}
 
@@ -107,7 +107,7 @@ void CListView::KeyEvent( SKey sKey )
 	{
 		if( GetMouseOver() )
 		{
-			if( m_iMouseOverIndex >= 0 && gpGui->GetMouse()->GetLeftButton() )
+			if( m_iMouseOverIndex >= 0 && pGui->GetMouse()->GetLeftButton() )
 			{
 				if(m_iMouseSelect > -2) m_iMouseSelect = m_iMouseOverIndex;
 				if( GetAction() )
@@ -116,10 +116,10 @@ void CListView::KeyEvent( SKey sKey )
 		}
 	}
 
-	if( GetMouseOver() || ( !sKey.m_bDown && !gpGui->GetMouse()->GetWheel() )  )
+	if( GetMouseOver() || ( !sKey.m_bDown && !pGui->GetMouse()->GetWheel() )  )
 	{
 		pSlider->KeyEvent( Pos, sKey );
-		MouseMove( gpGui->GetMouse() );
+		MouseMove( pGui->GetMouse() );
 	}
 }
 
@@ -173,7 +173,7 @@ void CListView::Clear()
 void CListView::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
-	SetFont(gpGui->GetFont());
+	SetFont(pGui->GetFont());
 
 	pInner = pState->GetColor( "Inner" );
 	pBorder = pState->GetColor( "Border" );

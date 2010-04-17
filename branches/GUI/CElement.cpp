@@ -1,7 +1,8 @@
 #include "CGUI.h"
 
-void CElement::SetElement( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback, bool abs)
+void CElement::SetElement(CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback, bool abs)
 {
+	pGui = Gui;
 	if(!abs)
 		SetRelPos( CPos( X, Y ) );
 	else
@@ -118,7 +119,7 @@ std::string CElement::GetString( bool bReplaceVars, int iIndex )
 
 	if( bReplaceVars && m_sRaw[ iIndex ].find( "$" ) != std::string::npos )
 	{
-		for( std::map<std::string,CVar*>::reverse_iterator iIter = gpGui->Cvars.rbegin(); iIter != gpGui->Cvars.rend(); iIter++ )
+		for( std::map<std::string,CVar*>::reverse_iterator iIter = pGui->Cvars.rbegin(); iIter != pGui->Cvars.rend(); iIter++ )
 		{
 			int iPos = m_sFormatted[ iIndex ].find( iIter->first );
 
@@ -232,7 +233,7 @@ void CElement::KeyEvent( SKey )
 
 void CElement::SetFont(int size, char *name)
 {
-	pFont = new CFont(gpGui->GetDevice(), size, name);
+	pFont = new CFont(pGui, pGui->GetDevice(), size, name);
 }
 
 void CElement::SetFont(CFont *font)
@@ -243,6 +244,6 @@ void CElement::SetFont(CFont *font)
 CFont * CElement::GetFont()
 {
 	if(!pFont)
-		return gpGui->GetFont();
+		return pGui->GetFont();
 	return pFont;
 }
