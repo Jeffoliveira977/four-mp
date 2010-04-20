@@ -1,7 +1,4 @@
 #include "CGUI.h"
-#include "CD3DRender.h"
-
-CGUI * gpGui = 0;
 
 CGUI::CGUI( IDirect3DDevice9 * pDevice )
 {
@@ -12,16 +9,10 @@ CGUI::CGUI( IDirect3DDevice9 * pDevice )
 	m_wFocus = 0;
 
 	D3DXCreateSprite( pDevice, &m_pSprite );
-
-#ifdef USE_D3DX
 	D3DXCreateLine( pDevice, &m_pLine );
-#else
-	m_pRender = new CD3DRender( 128 );
-	m_pRender->Initialize( pDevice );
-#endif
 
-	m_pMouse = new CMouse( pDevice, m_pSprite );
-	m_pKeyboard = new CKeyboard();
+	m_pMouse = new CMouse( this, pDevice, m_pSprite );
+	m_pKeyboard = new CKeyboard(this);
 	m_pFont = 0;
 
 	Cvars[ "$Value" ] = new CVar( SliderValue );
@@ -42,12 +33,7 @@ CGUI::~CGUI()
 	SAFE_DELETE( m_pKeyboard )
 
 	SAFE_RELEASE( m_pSprite )
-
-#ifdef USE_D3DX
 	SAFE_RELEASE( m_pLine )
-#else
-	SAFE_DELETE( m_pRender )
-#endif
 
 	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
 		SAFE_DELETE( m_vWindows[i] )
@@ -55,7 +41,7 @@ CGUI::~CGUI()
 
 void CGUI::LoadFont(int size, char *font)
 {
-	m_pFont = new CFont( gpGui->GetDevice(), size, font );
+	m_pFont = new CFont( this, GetDevice(), size, font );
 }
 
 void CGUI::SetFontColors(int Index, int r, int g, int b, int a)
@@ -65,17 +51,17 @@ void CGUI::SetFontColors(int Index, int r, int g, int b, int a)
 
 void CGUI::SetVarInt(const char *name, int value)
 {
-	gpGui->Cvars[ name ] = new CVar( value );
+	Cvars[ name ] = new CVar( value );
 }
 
 void CGUI::SetVarString(const char *name, std::string value)
 {
-	gpGui->Cvars[ name ] = new CVar( value );
+	Cvars[ name ] = new CVar( value );
 }
 
 void CGUI::SetVarBool(const char *name, bool value)
 {
-	gpGui->Cvars[ name ] = new CVar( value );
+	Cvars[ name ] = new CVar( value );
 }
 
 void CGUI::LoadInterfaceFromFile( const char * pszFilePath )
@@ -203,7 +189,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 					else if(strcmp(name, "name") == 0) Element->SetString(value);
 					else if(strcmp(name, "x") == 0) Element->SetRelPos(atoi(value), -1);
 					else if(strcmp(name, "y") == 0) Element->SetRelPos(-1, atoi(value));
-					else if(strcmp(name, "style") == 0) Element->SetThemeElement( gpGui->GetThemeElement( value ) );
+					else if(strcmp(name, "style") == 0) Element->SetThemeElement( GetThemeElement( value ) );
 				}
 
 				TiXmlElement * pElem = pElementElement->FirstChildElement( "Font" );
@@ -214,7 +200,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 			}
 			else if(strcmp(Element, "Line") == 0)
 			{
-				CLine *tLine = new CLine(atoi(pElementElement->Attribute("sx")), atoi(pElementElement->Attribute("sy")),
+				CLine *tLine = new CLine(this, atoi(pElementElement->Attribute("sx")), atoi(pElementElement->Attribute("sy")),
 					atoi(pElementElement->Attribute("ex")),	atoi(pElementElement->Attribute("ey")),
 					atoi(pElementElement->Attribute("size")), new CColor(pElementElement), wParent);
 
@@ -233,7 +219,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 				if(strcmp(pColorElement->Attribute("string"), "Inner") == 0) Inner = new CColor(pColorElement);
 				else if(strcmp(pColorElement->Attribute("string"), "Border") == 0) Border = new CColor(pColorElement);
 
-				CBox *tBox = new CBox(atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
+				CBox *tBox = new CBox(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
 					atoi(pElementElement->Attribute("width")), atoi(pElementElement->Attribute("height")),
 					Inner, Border, wParent);
 
@@ -242,7 +228,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 			}
 			else if(strcmp(Element, "Text") == 0)
 			{
-				CText *tText = new CText(atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
+				CText *tText = new CText(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
 					atoi(pElementElement->Attribute("width")), 20, pElementElement->Attribute("string"), 
 					pElementElement->Attribute("name"), NULL);
 				if(!wParent) m_eText[Index].push_back(tText);
@@ -252,7 +238,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 			{
 				CTexture *tTexture = new CTexture(GetSprite(), pElementElement->Attribute("src"), new CColor(pElementElement));
 
-				CImage *tImg = new CImage(atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
+				CImage *tImg = new CImage(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
 					atoi(pElementElement->Attribute("width")), atoi(pElementElement->Attribute("height")),
 					tTexture, wParent);
 
@@ -265,16 +251,11 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 
 void CGUI::FillArea( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3dColor )
 {
-#ifdef USE_D3DX
 	DrawLine( iX + iWidth / 2, iY, iX + iWidth / 2, iY + iHeight, iWidth, d3dColor );
-#else
-	m_pRender->D3DAddQuad( iX, iY, iWidth, iHeight, d3dColor);
-#endif
 }
 
 void CGUI::DrawLine( int iStartX, int iStartY, int iEndX, int iEndY, int iWidth, D3DCOLOR d3dColor )
 {
-#ifdef USE_D3DX
 	m_pLine->SetWidth( static_cast<float>( iWidth ) );
 
 	D3DXVECTOR2 d3dxVector[2];
@@ -285,15 +266,6 @@ void CGUI::DrawLine( int iStartX, int iStartY, int iEndX, int iEndY, int iWidth,
 	m_pLine->Begin();
 	m_pLine->Draw( d3dxVector, 2, d3dColor );
 	m_pLine->End();
-#else
-	iWidth;
-
-	m_pRender->Begin( D3DPT_LINELIST );
-	m_pRender->D3DColour( d3dColor );
-	m_pRender->D3DVertex2f( static_cast<float>( iStartX ), static_cast<float>( iStartY ) );
-	m_pRender->D3DVertex2f( static_cast<float>( iEndX ), static_cast<float>( iEndY ) );
-	m_pRender->End();
-#endif
 }
 
 void CGUI::DrawOutlinedBox( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3dInnerColor, D3DCOLOR d3dBorderColor )
@@ -332,7 +304,7 @@ void CGUI::BringToTop( CWindow * pWindow )
 void Log(char*);
 void CGUI::Draw()
 {
-	if( !gpGui->IsVisible() )
+	if( !IsVisible() )
 		return;
 
 	PreDraw();
@@ -409,7 +381,7 @@ void CGUI::MouseMove( CMouse * pMouse )
 			if( !m_vWindows[ iIndex ]->GetMaximized() )
 				iHeight = m_vWindows[ iIndex ]->GetTitleBarHeight();
 
-			if( !bGotWindow && gpGui->GetMouse()->InArea( m_vWindows[ iIndex ], iHeight ) )
+			if( !bGotWindow && GetMouse()->InArea( m_vWindows[ iIndex ], iHeight ) )
 			{
 				m_vWindows[ iIndex ]->MouseMove( pMouse );
 				bGotWindow = true;
@@ -433,7 +405,7 @@ bool CGUI::KeyEvent( SKey sKey )
 
 	if( !sKey.m_vKey && ( sKey.m_bDown || ( GetMouse()->GetWheel() && !sKey.m_bDown ) ) )
 	{
-		CMouse * pMouse = gpGui->GetMouse();
+		CMouse * pMouse = GetMouse();
 
 		std::vector<CWindow*> vRepeat;
 
@@ -509,12 +481,7 @@ void CGUI::OnLostDevice()
 		GetFont()->OnLostDevice();
 	GetSprite()->OnLostDevice();
 	
-#ifdef USE_D3DX
 	m_pLine->OnLostDevice();
-#else
-	m_pRender->Invalidate();
-	SAFE_DELETE( m_pRender )
-#endif
 }
 
 void CGUI::OnResetDevice( IDirect3DDevice9 * pDevice )
@@ -525,12 +492,7 @@ void CGUI::OnResetDevice( IDirect3DDevice9 * pDevice )
 		GetFont()->OnResetDevice( pDevice );
 	GetSprite()->OnResetDevice();
 	
-#ifdef USE_D3DX
 	m_pLine->OnResetDevice();
-#else
-	m_pRender = new CD3DRender( 128 );
-	m_pRender->Initialize( pDevice );
-#endif
 }
 
 CMouse * CGUI::GetMouse()

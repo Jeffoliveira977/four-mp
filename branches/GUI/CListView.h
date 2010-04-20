@@ -19,7 +19,7 @@ class CListView : public CElement
 	CColor * pInner, * pBorder, * pString, * pMouseOverString;
 	CColor * pTitle, * pbTitle, * pbInner, * pTitleString;
 public:
-	CListView( int X, int Y, int *Width, int Height, int Columns, const char * String = NULL, const char *String2 = NULL, tAction Callback = NULL );
+	CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Columns, const char * String = NULL, const char *String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 	void PreDraw();

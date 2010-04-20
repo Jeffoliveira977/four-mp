@@ -1,7 +1,5 @@
 #pragma once
 
-#define USE_D3DX
-
 #define SAFE_DELETE( pData ) if( pData ){ delete pData; pData = 0; }
 
 class CTexture;
@@ -70,11 +68,7 @@ class CGUI
 
 	ID3DXSprite * m_pSprite;
 
-#ifdef USE_D3DX
 	ID3DXLine * m_pLine;
-#else
-	CD3DRender * m_pRender;
-#endif
 	
 	CTimer m_tPreDrawTimer;
 
@@ -139,5 +133,3 @@ public:
 
 	std::map<std::string,CVar*> Cvars;
 };
-
-extern CGUI * gpGui;

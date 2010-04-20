@@ -1,6 +1,6 @@
 #include "CGUI.h"
 
-CWindow::CWindow( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CWindow::CWindow( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
 	m_pFocussedElement = 0;
 	SetMaximized( true );
@@ -9,7 +9,7 @@ CWindow::CWindow( int X, int Y, int Width, int Height, const char * String, cons
 	posDif = CPos();
 	m_bDragging = false;
 
-	SetElement( X, Y, Width, Height, String, String2, Callback, 1 );
+	SetElement( Gui, X, Y, Width, Height, String, String2, Callback, 1 );
 
 	SetMouseOver( false );
 	SetVisible( true );

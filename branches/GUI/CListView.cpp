@@ -1,6 +1,6 @@
 #include "CListView.h"
 
-CListView::CListView( int X, int Y, int *Width, int Height, int Columns, const char *String, const char *String2, tAction Callback )
+CListView::CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Columns, const char *String, const char *String2, tAction Callback )
 {
 	Count = Columns;
 	Poss = new int[Count];
@@ -16,12 +16,12 @@ CListView::CListView( int X, int Y, int *Width, int Height, int Columns, const c
 			Poss[i] = Poss[i-1]+Widths[i-1];
 	}
 
-	SetElement( X, Y, AllWidth, Height, String, String2, Callback );
+	SetElement( Gui, X, Y, AllWidth, Height, String, String2, Callback );
 	m_iMouseOverIndex = -1;
 	m_iMouseSelect = -1;
 	m_vRows = new std::vector<std::string>[Count];
 
-	pSlider = new CScrollBar( CPos( GetWidth() - 1, 1 ), GetHeight()-2 );
+	pSlider = new CScrollBar( Gui, CPos( GetWidth() - 1, 1 ), GetHeight()-2 );
 
 	SetThemeElement( gpGui->GetThemeElement( "ListView" ) );
 

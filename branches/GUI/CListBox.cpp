@@ -1,12 +1,12 @@
 #include "CListBox.h"
 
-CListBox::CListBox( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CListBox::CListBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 	m_iMouseOverIndex = -1;
 	m_iMouseSelect = -1;
 
-	pSlider = new CScrollBar( CPos( GetWidth() + 2, 0 ), GetHeight() );
+	pSlider = new CScrollBar( Gui, CPos( GetWidth() + 2, 0 ), GetHeight() );
 
 	SetThemeElement( gpGui->GetThemeElement( "ListBox" ) );
 

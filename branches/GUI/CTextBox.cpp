@@ -1,11 +1,11 @@
 #include "CGUI.h"
 
-CTextBox::CTextBox( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CTextBox::CTextBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
 	m_iLimit = 128;
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 
-	pSlider = new CScrollBar( CPos( GetWidth() + 2, 0 ), GetHeight() );
+	pSlider = new CScrollBar( Gui, CPos( GetWidth() + 2, 0 ), GetHeight() );
 
 	SetThemeElement( gpGui->GetThemeElement( "TextBox" ) );
 

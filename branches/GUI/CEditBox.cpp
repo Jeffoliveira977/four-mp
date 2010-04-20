@@ -1,8 +1,8 @@
 #include "CGUI.h"
 
-CEditBox::CEditBox( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CEditBox::CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 	SetHeight( 20 );
 
 	SizeEdge = 0;

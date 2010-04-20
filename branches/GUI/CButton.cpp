@@ -1,8 +1,8 @@
 #include "CGUI.h"
 
-CButton::CButton( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CButton::CButton( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 
 	m_bVisibleBack = 1;
 	SizeEdge = 0;

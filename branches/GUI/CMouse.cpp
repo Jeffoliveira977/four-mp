@@ -2,8 +2,9 @@
 
 #define DBLCLICK_TIME 0.3f
 
-CMouse::CMouse( IDirect3DDevice9 * pDevice, ID3DXSprite * pSprite )
+CMouse::CMouse( CGUI *Gui, IDirect3DDevice9 * pDevice, ID3DXSprite * pSprite )
 {
+	gpGui = Gui;
 	m_pDevice = pDevice;
 	pCursor = new CTexture(pSprite, "FMPGUI/cursor.png");
 	SetSize(32);
@@ -106,13 +107,7 @@ bool CMouse::InArea( CElement * pElement, int iHeight )
 
 void CMouse::Draw()
 {
-	if(!pCursor)
-	{
-		static CColor * pColor = new CColor( 255, 1, 1, 255 );
-		gpGui->FillArea( m_pos.GetX(), m_pos.GetY(), 10, 10, pColor->GetD3DCOLOR() );
-	}
-	else
-		pCursor->Draw(m_pos, size, size);
+	pCursor->Draw(m_pos, size, size);
 }
 
 int CMouse::GetLeftButton( int iState )

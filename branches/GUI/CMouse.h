@@ -4,6 +4,7 @@
 
 class CMouse
 {
+	CGUI *gpGui;
 	IDirect3DDevice9 * m_pDevice;
 	CPos m_pos, m_bpos;
 	int size;
@@ -16,7 +17,7 @@ class CMouse
 	int m_iLeftButton, m_iRightButton, m_iMiddleButton, m_iWheel;
 	CTimer m_tLeftButton, m_tRightButton, m_tMiddleButton;
 public:
-	CMouse( IDirect3DDevice9 * pDevice, ID3DXSprite * pSprite );
+	CMouse( CGUI *Gui, IDirect3DDevice9 * pDevice, ID3DXSprite * pSprite );
 	~CMouse();
 
 	bool HandleMessage( unsigned int uMsg, WPARAM wParam, LPARAM lParam );

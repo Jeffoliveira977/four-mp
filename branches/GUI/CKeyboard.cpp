@@ -1,5 +1,10 @@
 #include "CGUI.h"
 
+CKeyboard::CKeyboard(CGUI *Gui)
+{
+	gpGui = Gui;
+}
+
 bool CKeyboard::HandleMessage( unsigned int uMsg, __w64 unsigned int wParam, _w64 long lParam )
 {
 	if( !gpGui->IsVisible() || uMsg < WM_KEYFIRST || uMsg > WM_KEYLAST || gpGui->GetMouse()->GetLeftButton() )

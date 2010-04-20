@@ -1,8 +1,8 @@
 #include "CGUI.h"
 
-CCheckBox::CCheckBox( int X, int Y, int Width, int Height, bool Checked, const char * String, const char * String2, tAction Callback )
+CCheckBox::CCheckBox( CGUI *Gui, int X, int Y, int Width, int Height, bool Checked, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 	SetChecked( Checked );
 
 	SetThemeElement( gpGui->GetThemeElement( "CheckBox" ) );

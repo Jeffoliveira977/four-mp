@@ -1,7 +1,9 @@
 #include "CGUI.h"
 
-void CElement::SetElement( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback, bool abs)
+void CElement::SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback, bool abs)
 {
+	gpGui = Gui;
+
 	if(!abs)
 		SetRelPos( CPos( X, Y ) );
 	else
@@ -235,7 +237,7 @@ bool CElement::KeyEvent( SKey )
 
 void CElement::SetFont(int size, char *name)
 {
-	pFont = new CFont(gpGui->GetDevice(), size, name);
+	pFont = new CFont(gpGui, gpGui->GetDevice(), size, name);
 }
 
 void CElement::SetFont(CFont *font)

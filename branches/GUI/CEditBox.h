@@ -16,7 +16,7 @@ class CEditBox : public CElement
 	bool CenterAlign;
 
 public:
-	CEditBox( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 

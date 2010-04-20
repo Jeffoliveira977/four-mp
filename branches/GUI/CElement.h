@@ -2,6 +2,8 @@
 
 #include "CPos.h"
 
+class CGUI;
+
 enum CMSG
 {
 	KEY_DOWN,
@@ -33,10 +35,11 @@ class CElement
 	SElementState * m_pElementState[ 3 ];
 
 	CFont * pFont;
-
+protected:
+	CGUI *gpGui;
 public:
 
-	void SetElement( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL, bool abs = 0 );
+	void SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL, bool abs = 0 );
 
 	void SetParent( CWindow * pParent );
 	CWindow * GetParent();

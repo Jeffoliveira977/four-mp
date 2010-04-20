@@ -24,7 +24,7 @@ class CDropDown : public CElement
 	int iEdge, iButton;
 
 public:
-	CDropDown( int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 	bool MouseMove( CMouse * pMouse, bool );

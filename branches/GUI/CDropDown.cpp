@@ -1,8 +1,8 @@
 #include "CGUI.h"
 
-CDropDown::CDropDown( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CDropDown::CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
-	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 
 	m_bDropped = false;
 	m_iSelected = m_iMouseOverIndex = 0;
