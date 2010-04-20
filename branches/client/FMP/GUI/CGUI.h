@@ -1,11 +1,5 @@
 #pragma once
 
-#define USE_D3DX
-
-#define TITLEBAR_HEIGHT 24
-#define BUTTON_HEIGHT	20
-#define HELPERSLIDER_WIDTH 22
-
 #define SAFE_DELETE( pData ) if( pData ){ delete pData; pData = 0; }
 
 class CTexture;
@@ -48,15 +42,14 @@ class CListBox;
 #include "CMouse.h"
 #include "CKeyboard.h"
 
+#include "CFigure.h"
+
 #include "CElement.h"
+#include "CText.h"
 #include "CWindow.h"
-#include "CHorizontalSliderBar.h"
-#include "CVerticalSliderBar.h"
-#include "CHelperSlider.h"
+#include "CScrollBar.h"
 #include "CButton.h"
 #include "CCheckBox.h"
-#include "CProgressBar.h"
-#include "CText.h"
 #include "CEditBox.h"
 #include "CDropDown.h"
 #include "CTextBox.h"
@@ -75,11 +68,7 @@ class CGUI
 
 	ID3DXSprite * m_pSprite;
 
-#ifdef USE_D3DX
 	ID3DXLine * m_pLine;
-#else
-	CD3DRender * m_pRender;
-#endif
 	
 	CTimer m_tPreDrawTimer;
 
@@ -87,6 +76,10 @@ class CGUI
 	CWindow * m_wFocus;
 
 	std::string m_sCurTheme;
+	std::vector<CLine*> m_eLine[2];
+	std::vector<CBox*> m_eBox[2];
+	std::vector<CText*> m_eText[2];
+	std::vector<CImage*> m_eImage[2];
 
 	typedef std::map<std::string, SElement*> tTheme;
 	std::map<std::string, tTheme> m_mThemes;
@@ -98,6 +91,7 @@ public:
 	void LoadFont(int size = 10, char *font = "Tahoma");
 	void SetFontColors(int Index, int r, int g, int b, int a);
 	void LoadInterfaceFromFile( const char * pszFilePath );
+	void UpdateFromFile( const char * pszFilePath );
 
 	void FillArea( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3dColor );
 	void DrawLine( int iStartX, int iStartY, int iEndX, int iEndY, int iWidth, D3DCOLOR d3dColor );

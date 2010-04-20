@@ -8,10 +8,6 @@ class FMPGUI
 {
 	CGUI *m_Gui;
 	bool g_Mouse[3];
-	CWindow * StartMenu;
-	CWindow * ServerList;
-	CWindow * Chat;
-	CWindow * Option;
 public:
 	FMPGUI();
 
@@ -19,11 +15,6 @@ public:
 	void HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
 	void MoveMouse(int x, int y);
 	void Draw();
-
-	CWindow * GetStartMenu();
-	CWindow * GetServerList();
-	CWindow * GetChat();
-	CWindow * GetOption();
 };
 
 extern FMPGUI Gui;

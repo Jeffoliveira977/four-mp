@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string>
 #include "D3D9.h"
-#include "CD3DRender.h"
 #include "CColor.h"
 
 class CGUI;
@@ -13,14 +12,10 @@ class CFont
 	CGUI *pGui;
 	CColor m_cColors[9];
 
-#ifdef USE_D3DX
 	ID3DXFont * m_pFont;
-#else
-	CD3DFont * m_pFont;
-#endif
 
 public:
-	CFont(CGUI *Gui, IDirect3DDevice9 * pDevice, int iHeight, char * pszFaceName );
+	CFont( CGUI *Gui, IDirect3DDevice9 * pDevice, int iHeight, char * pszFaceName );
 	~CFont();
 
 	void OnLostDevice();

@@ -9,22 +9,27 @@ class CEditBox : public CElement
 	CTimer m_tCursorTimer;
 	bool m_bCursorState;
 
-	CColor * pInner, * pBorder, * pString, * pCursor;
+	CColor * pString, * pCursor;
+	CTexture *pEdit[3];
+
+	int SizeEdge;
+	bool CenterAlign;
 
 public:
-	CEditBox(CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 
 	void PreDraw();
-	void MouseMove( CMouse * pMouse );
-	void KeyEvent( SKey sKey );
+	bool MouseMove( CMouse * pMouse, bool );
+	bool KeyEvent( SKey sKey );
 
 	int GetIndex();
 	void SetIndex( int iIndex );
 
 	int GetStart();
 	void SetStart( int iStart );
+	void SetAlignCenter(bool);
 
 	void UpdateTheme( int iIndex );
 };

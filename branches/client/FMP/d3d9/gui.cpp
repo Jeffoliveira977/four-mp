@@ -3,25 +3,31 @@
 #include "../log.h"
 
 FMPGUI Gui;
-CButton * sm_bStart;
-CButton * sm_bExit;
+// Windows
+CWindow * fServBrouser;
+CWindow * fChat;
+CWindow * fOption;
+// Chat elements
 CTextBox * cc_tChat;
 CEditBox * cc_tEnter;
 CButton * cc_bEnter;
-CListView * sl_tList;
+// Server Brouser elemenets
+CListView *sbServList, *sbPlayerList;
+CButton *sbTabInet, *sbTabLAN, *sbTabVIP, *sbTabFav;
+CEditBox *sbEnterIP, *sbEnterPort;
+CButton *sbConnect, *sbRefresh, *sbAddToFav;
+CDropDown *sbFltPing; 
+CCheckBox *sbFltNotFull, *sbFltNoPassword, *sbFltNotEmpty;
+CEditBox *sbFltLocation, *sbFltMode;
 
-void StartCallBack(CElement *pElement, CMSG msg, int Param)
+
+void ServerBrCallBack(CElement *pElement, CMSG msg, int Param)
 {
-	Debug("Start callback");
-	if(msg != CLICK) { Debug("Start callback pre end"); return; }
+	Debug("SB callback");
+	if((pElement == sbEnterIP || pElement == sbEnterPort) && msg == GOT_FOCUS)
+		pElement->SetString("");
 
-	if(pElement == sm_bExit)
-		exit(0);
-	else if(pElement == sm_bStart)
-	{
-		// START GAME
-	}
-	Debug("Start callback end");
+	Debug("SB callback end");
 }
 
 void ChatCallBack(CElement *pElement, CMSG msg, int Param)
@@ -39,11 +45,6 @@ void ChatCallBack(CElement *pElement, CMSG msg, int Param)
 	Debug("Chat callback end");
 }
 
-void ServerListCallback(CElement *pElement, CMSG msg, int Param)
-{
-	
-}
-
 FMPGUI::FMPGUI()
 {
 	 g_Mouse[0] = 0;
@@ -54,7 +55,7 @@ FMPGUI::FMPGUI()
 void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 {
 	m_Gui = new CGUI( g_pDevice );
-	m_Gui->LoadInterfaceFromFile( "ColorThemes.xml" );
+	m_Gui->LoadInterfaceFromFile( "GUITheme.xml" );
 
 	m_Gui->LoadFont();
 	m_Gui->SetFontColors(0, 0, 0, 0, 255); // <!--black-->
@@ -68,57 +69,99 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	m_Gui->SetFontColors(8, 255, 255, 0, 255); // <!--yellow-->
 	m_Gui->SetFontColors(9, 0, 0, 128, 255); // <!--dark blue-->
 
-	m_Gui->SetVarInt("Titlebar height", 24);
-	m_Gui->SetVarInt("Button height", 20);
+	// Create Servers Brouser
+	fServBrouser = new CWindow(m_Gui, 20, 20, 750, 500, "SERVER BROUSER", "SERVER_BROUSER", ServerBrCallBack);
+	
+	int ServerWidth[6] = {16, 210, 60, 60, 100, 100};
+	sbServList = new CListView(m_Gui, 0, 29, ServerWidth, 350, 6, NULL, "SERVER_LIST", ServerBrCallBack);
 
-	// Create Start Menu
-	StartMenu = new CWindow(m_Gui, 100, 100, 600, 400, "FOUR-MP START MENU");
-	sm_bStart = new CButton(m_Gui, 50, 50, 500, 0, "START", NULL, StartCallBack);
-	sm_bExit = new CButton(m_Gui, 50, 100, 500, 0, "EXIT", NULL, StartCallBack);
+	sbServList->SetTitle("P");
+	sbServList->SetTitle("Server Name");
+	sbServList->SetTitle("Slots");
+	sbServList->SetTitle("Ping");
+	sbServList->SetTitle("Mode");
+	sbServList->SetTitle("Location");
 
-	StartMenu->AddElement(sm_bStart);
-	StartMenu->AddElement(sm_bExit);
-	StartMenu->SetVisible( 0 );
+	sbServList->PutStr("*", 0);
+	sbServList->PutStr("FOUR-MP Official server", 1);
+	sbServList->PutStr("3/32", 2);
+	sbServList->PutStr("4", 3);
+	sbServList->PutStr("FreeDM", 4);
+	sbServList->PutStr("Russia", 5);
 
-	// Create Servers List
-	ServerList = new CWindow(m_Gui, 100, 100, 600, 400, "FOUR-MP SERVERS LIST");
-	int width[] = {20, 200, 180, 50, 100, 50};
-	sl_tList = new CListView(m_Gui, 0, 0, width, 300, 6, NULL, NULL, ServerListCallback);
-	ServerList->AddElement(sl_tList);
-	ServerList->SetVisible( 1 );
+	int PlayerWidth[2] = {128, 76};
+	sbPlayerList = new CListView(m_Gui, 546, 49, PlayerWidth, 200, 2, NULL, "PLAYER_LIST", ServerBrCallBack);
 
-	sl_tList->SetTitle("Password");
-	sl_tList->SetTitle("Name");
-	sl_tList->SetTitle("Mode");
-	sl_tList->SetTitle("Players");
-	sl_tList->SetTitle("Location");
-	sl_tList->SetTitle("Ping");
+	sbPlayerList->SetTitle("Player");
+	sbPlayerList->SetTitle("Score");
 
-	sl_tList->PutStr("X", 0, 0);
-	sl_tList->PutStr("FOUR-MP Test server [FAKE]", 1, 0);
-	sl_tList->PutStr("Build mode by 009", 2, 0);
-	sl_tList->PutStr("0/0", 3, 0);
-	sl_tList->PutStr("Russia", 4, 0);
-	sl_tList->PutStr("0", 5, 0);
+	sbTabInet = new CButton(m_Gui, 20, 0, 200, 0, "Internet", "TAB_INTERNET", ServerBrCallBack);
+	sbTabLAN = new CButton(m_Gui, 169, 0, 200, 0, "LAN", "TAB_LAN", ServerBrCallBack);
+	sbTabVIP = new CButton(m_Gui, 318, 0, 200, 0, "VIP", "TAB_VIP", ServerBrCallBack);
+	sbTabFav = new CButton(m_Gui, 467, 0, 200, 0, "Favorite", "TAB_FAVORITE", ServerBrCallBack);
 
+	sbEnterIP = new CEditBox(m_Gui, 600, 290, 120, 0, "127.0.0.1", "EDIT_IP", ServerBrCallBack);
+	sbEnterPort = new CEditBox(m_Gui, 625, 330, 60, 0, "7777", "EDIT_PORT", ServerBrCallBack);
+
+	CText *sbTextIP = new CText(m_Gui, 560, 295, 100, 20, "IP", "TEXT_IP", NULL);
+	CText *sbTextPort = new CText(m_Gui, 560, 335, 100, 20, "Port", "TEXT_PORT", NULL);
+
+	sbConnect = new CButton(m_Gui, 560, 380, 80, 0, "Connect", "MAN_CONNECT", ServerBrCallBack);
+	sbRefresh = new CButton(m_Gui, 660, 380, 80, 0, "Refresh", "MAN_REFRESH", ServerBrCallBack);
+	sbAddToFav = new CButton(m_Gui, 600, 405, 120, 0, "Add to favorites", "MAN_ADDFAV", ServerBrCallBack);
+
+	sbFltPing = new CDropDown(m_Gui, 150, 380, 80, 20, "Ping", "FILTER_PING", ServerBrCallBack);
+	sbFltNotFull = new CCheckBox(m_Gui, 150, 410, 0, 0, 0, "", "FILTER_NOT_FULL", ServerBrCallBack);
+	sbFltLocation = new CEditBox(m_Gui, 305, 380, 80, 20, "", "FILTER_LOCATION", ServerBrCallBack);
+	sbFltMode = new CEditBox(m_Gui, 305, 410, 80, 20, "", "FILTER_Mode", ServerBrCallBack);
+	sbFltNotEmpty = new CCheckBox(m_Gui, 480, 385, 0, 0, 0, "", "FILTER_NOT_EMPTY", ServerBrCallBack);
+	sbFltNoPassword = new CCheckBox(m_Gui, 480, 410, 0, 0, 1, "", "FILTER_NO_PASSWORD", ServerBrCallBack);
+
+	sbFltPing->AddElement("< 50", "50");
+	sbFltPing->AddElement("50 - 100", "50100");
+	sbFltPing->AddElement("100 - 200", "100200");
+	sbFltPing->AddElement("200 - 500", "200500");
+	sbFltPing->AddElement("> 500", "500");
+
+	fServBrouser->AddElement(sbServList);
+	fServBrouser->AddElement(sbPlayerList);
+	fServBrouser->AddElement(sbTabInet);
+	fServBrouser->AddElement(sbTabLAN);
+	fServBrouser->AddElement(sbTabVIP);
+	fServBrouser->AddElement(sbTabFav);
+	fServBrouser->AddElement(sbEnterPort);
+	fServBrouser->AddElement(sbEnterIP);
+	fServBrouser->AddElement(sbTextIP);
+	fServBrouser->AddElement(sbTextPort);
+	fServBrouser->AddElement(sbConnect);
+	fServBrouser->AddElement(sbRefresh);
+	fServBrouser->AddElement(sbAddToFav);
+	fServBrouser->AddElement(sbFltPing);
+	fServBrouser->AddElement(sbFltLocation);
+	fServBrouser->AddElement(sbFltMode);
+	fServBrouser->AddElement(sbFltNotFull);
+	fServBrouser->AddElement(sbFltNotEmpty);
+	fServBrouser->AddElement(sbFltNoPassword);
+	m_Gui->AddWindow(fServBrouser);
 
 	// Create Chat
-	Chat = new CWindow(m_Gui, 10, 10, 200, 300, "FOUR-MP CHAT");
+	fChat = new CWindow(m_Gui, 10, 10, 200, 300, "FOUR-MP CHAT");
 	cc_tChat = new CTextBox(m_Gui, 0, 0, 200, 258, NULL, NULL, ChatCallBack);
 	cc_tEnter = new CEditBox(m_Gui, 0, 257, 160, 0, NULL, NULL, ChatCallBack);
 	cc_bEnter = new CButton(m_Gui, 160, 257, 40, 0, "SEND", NULL, ChatCallBack);
-	Chat->AddElement(cc_tChat);
-	Chat->AddElement(cc_tEnter);
-	Chat->AddElement(cc_bEnter);
-	Chat->SetVisible( 1 );
+	fChat->AddElement(cc_tChat);
+	fChat->AddElement(cc_tEnter);
+	fChat->AddElement(cc_bEnter);
+	fChat->SetVisible( 1 );
 
 	// Create Option
-	Option = new CWindow(m_Gui, 200, 200, 400, 300, "FOUR-MP OPTIONS");
+	fOption = new CWindow(m_Gui, 200, 200, 400, 300, "FOUR-MP OPTIONS");
 	CText * tInfo = new CText(m_Gui, 10, 10, 300, 100, "WAIT OR CREATE INTERFACE");
-	Option->AddElement(tInfo);
-	Option->SetVisible( 0 );
+	fOption->AddElement(tInfo);
+	fOption->SetVisible( 0 );
 
 	m_Gui->SetVisible( true );
+	m_Gui->UpdateFromFile("GUIStyle.xml");
 }
 
 void FMPGUI::HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam)
@@ -165,21 +208,4 @@ void FMPGUI::MoveMouse(int x, int y)
 void FMPGUI::Draw()
 {
 	m_Gui->Draw();
-}
-
-CWindow * FMPGUI::GetStartMenu()
-{
-	return StartMenu;
-}
-CWindow * FMPGUI::GetServerList()
-{
-	return ServerList;
-}
-CWindow * FMPGUI::GetChat()
-{
-	return Chat;
-}
-CWindow * FMPGUI::GetOption()
-{
-	return Option;
 }

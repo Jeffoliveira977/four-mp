@@ -13,18 +13,24 @@ class CWindow : public CElement
 	CTimer m_tCloseButtonPressed;
 	bool m_bTitleVisible;
 
-	CColor * pTitle, * pBodyInner, * pBodyBorder;
+	CColor * pTitle, * pBody;
 	CTexture * pTitlebar, * pButton;
+	CTexture * tBorder[8];
+	int hTitleBar, hwBorder[3], mButton[2], sButton[2]; 
 public:
-	CWindow(CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	std::vector<CLine*> m_eLine[2];
+	std::vector<CBox*> m_eBox[2];
+	std::vector<CImage*> m_eImage[2];
+
+	CWindow( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 	~CWindow();
 
 	void AddElement( CElement * pElement );
 
 	void Draw();
 	void PreDraw();
-	void MouseMove( CMouse * pMouse );
-	void KeyEvent( SKey sKey );
+	bool MouseMove( CMouse * pMouse, bool over = 1 );
+	bool KeyEvent( SKey sKey );
 
 	void SetMaximized( bool bMaximized );
 	bool GetMaximized();
@@ -50,4 +56,6 @@ public:
 
 	void SetTitleVisible( bool v );
 	bool GetTitleVisible();
+
+	int GetTitleBarHeight();
 };

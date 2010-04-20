@@ -20,14 +20,15 @@ class CDropDown : public CElement
 	std::vector<SEntry> m_vEntrys;
 
 	CColor * pInner, * pBorder, * pString, * pSelectedInner, * pSelectedString;
-	CTexture * pButton;
+	CTexture * pButton, *pLeft, *pMiddle;
+	int iEdge, iButton;
 
 public:
-	CDropDown(CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
-	void MouseMove( CMouse * pMouse );
-	void KeyEvent( SKey sKey );
+	bool MouseMove( CMouse * pMouse, bool );
+	bool KeyEvent( SKey sKey );
 
 	void AddElement( std::string sElem, std::string sValue );
 	std::string GetValue();

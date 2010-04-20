@@ -2,6 +2,8 @@
 
 #include "CPos.h"
 
+class CGUI;
+
 enum CMSG
 {
 	KEY_DOWN,
@@ -15,13 +17,11 @@ enum CMSG
 	END,
 };
 
-class CGUI;
-
 typedef void ( __cdecl * tAction )( CElement *, CMSG, int );
 
 class CElement
 {
-	bool m_bHasFocus, m_bMouseOver;
+	bool m_bHasFocus, m_bMouseOver, m_bEnabled;
 
 	std::string m_sRaw[2], m_sFormatted[2];
 	int m_iWidth, m_iHeight;
@@ -35,10 +35,11 @@ class CElement
 	SElementState * m_pElementState[ 3 ];
 
 	CFont * pFont;
-
+protected:
+	CGUI *pGui;
 public:
 
-	void SetElement(CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL, bool abs = 0 );
+	void SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL, bool abs = 0 );
 
 	void SetParent( CWindow * pParent );
 	CWindow * GetParent();
@@ -46,6 +47,7 @@ public:
 	void SetAction( tAction pAction );
 	tAction GetAction();
 
+	void SetRelPos( int X = -1, int Y = -1 );
 	void SetRelPos( CPos relPos );
 	void SetAbsPos( CPos absPos );
 
@@ -81,12 +83,13 @@ public:
 
 	virtual void Draw();
 	virtual void PreDraw();
-	virtual void MouseMove( CMouse * pMouse );
-	virtual void KeyEvent( SKey sKey );
+	virtual bool MouseMove( CMouse * pMouse, bool over = 1 );
+	virtual bool KeyEvent( SKey sKey );
 
 	CFont * GetFont();
 	void SetFont(int size, char *name);
 	void SetFont(CFont *font);
-protected:
-	CGUI *pGui;
+
+	void SetEnabled(bool on = 1);
+	bool GetEnabled();
 };
