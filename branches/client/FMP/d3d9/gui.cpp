@@ -4,14 +4,14 @@
 
 FMPGUI Gui;
 // Windows
-CWindow * fServBrouser;
+CWindow * fServBrowser;
 CWindow * fChat;
 CWindow * fOption;
 // Chat elements
 CTextBox * cc_tChat;
 CEditBox * cc_tEnter;
 CButton * cc_bEnter;
-// Server Brouser elemenets
+// Server Browser elemenets
 CListView *sbServList, *sbPlayerList;
 CButton *sbTabInet, *sbTabLAN, *sbTabVIP, *sbTabFav;
 CEditBox *sbEnterIP, *sbEnterPort;
@@ -70,7 +70,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	m_Gui->SetFontColors(9, 0, 0, 128, 255); // <!--dark blue-->
 
 	// Create Servers Brouser
-	fServBrouser = new CWindow(m_Gui, 20, 20, 750, 500, "SERVER BROUSER", "SERVER_BROUSER", ServerBrCallBack);
+	fServBrowser = new CWindow(m_Gui, 20, 20, 750, 500, "SERVER BROWSER", "SERVER_BROWSER", ServerBrCallBack);
 	
 	int ServerWidth[6] = {16, 210, 60, 60, 100, 100};
 	sbServList = new CListView(m_Gui, 0, 29, ServerWidth, 350, 6, NULL, "SERVER_LIST", ServerBrCallBack);
@@ -98,7 +98,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	sbTabInet = new CButton(m_Gui, 20, 0, 200, 0, "Internet", "TAB_INTERNET", ServerBrCallBack);
 	sbTabLAN = new CButton(m_Gui, 169, 0, 200, 0, "LAN", "TAB_LAN", ServerBrCallBack);
 	sbTabVIP = new CButton(m_Gui, 318, 0, 200, 0, "VIP", "TAB_VIP", ServerBrCallBack);
-	sbTabFav = new CButton(m_Gui, 467, 0, 200, 0, "Favorite", "TAB_FAVORITE", ServerBrCallBack);
+	sbTabFav = new CButton(m_Gui, 467, 0, 200, 0, "Favourite", "TAB_FAVOURITE", ServerBrCallBack);
 
 	sbEnterIP = new CEditBox(m_Gui, 600, 290, 120, 0, "127.0.0.1", "EDIT_IP", ServerBrCallBack);
 	sbEnterPort = new CEditBox(m_Gui, 625, 330, 60, 0, "7777", "EDIT_PORT", ServerBrCallBack);
@@ -108,7 +108,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	sbConnect = new CButton(m_Gui, 560, 380, 80, 0, "Connect", "MAN_CONNECT", ServerBrCallBack);
 	sbRefresh = new CButton(m_Gui, 660, 380, 80, 0, "Refresh", "MAN_REFRESH", ServerBrCallBack);
-	sbAddToFav = new CButton(m_Gui, 600, 405, 120, 0, "Add to favorites", "MAN_ADDFAV", ServerBrCallBack);
+	sbAddToFav = new CButton(m_Gui, 600, 405, 120, 0, "Add to favourites", "MAN_ADDFAV", ServerBrCallBack);
 
 	sbFltPing = new CDropDown(m_Gui, 150, 380, 80, 20, "Ping", "FILTER_PING", ServerBrCallBack);
 	sbFltNotFull = new CCheckBox(m_Gui, 150, 410, 0, 0, 0, "", "FILTER_NOT_FULL", ServerBrCallBack);
@@ -123,26 +123,25 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	sbFltPing->AddElement("200 - 500", "200500");
 	sbFltPing->AddElement("> 500", "500");
 
-	fServBrouser->AddElement(sbServList);
-	fServBrouser->AddElement(sbPlayerList);
-	fServBrouser->AddElement(sbTabInet);
-	fServBrouser->AddElement(sbTabLAN);
-	fServBrouser->AddElement(sbTabVIP);
-	fServBrouser->AddElement(sbTabFav);
-	fServBrouser->AddElement(sbEnterPort);
-	fServBrouser->AddElement(sbEnterIP);
-	fServBrouser->AddElement(sbTextIP);
-	fServBrouser->AddElement(sbTextPort);
-	fServBrouser->AddElement(sbConnect);
-	fServBrouser->AddElement(sbRefresh);
-	fServBrouser->AddElement(sbAddToFav);
-	fServBrouser->AddElement(sbFltPing);
-	fServBrouser->AddElement(sbFltLocation);
-	fServBrouser->AddElement(sbFltMode);
-	fServBrouser->AddElement(sbFltNotFull);
-	fServBrouser->AddElement(sbFltNotEmpty);
-	fServBrouser->AddElement(sbFltNoPassword);
-	m_Gui->AddWindow(fServBrouser);
+	fServBrowser->AddElement(sbServList);
+	fServBrowser->AddElement(sbPlayerList);
+	fServBrowser->AddElement(sbTabInet);
+	fServBrowser->AddElement(sbTabLAN);
+	fServBrowser->AddElement(sbTabVIP);
+	fServBrowser->AddElement(sbTabFav);
+	fServBrowser->AddElement(sbEnterPort);
+	fServBrowser->AddElement(sbEnterIP);
+	fServBrowser->AddElement(sbTextIP);
+	fServBrowser->AddElement(sbTextPort);
+	fServBrowser->AddElement(sbConnect);
+	fServBrowser->AddElement(sbRefresh);
+	fServBrowser->AddElement(sbAddToFav);
+	fServBrowser->AddElement(sbFltPing);
+	fServBrowser->AddElement(sbFltLocation);
+	fServBrowser->AddElement(sbFltMode);
+	fServBrowser->AddElement(sbFltNotFull);
+	fServBrowser->AddElement(sbFltNotEmpty);
+	fServBrowser->AddElement(sbFltNoPassword);
 
 	// Create Chat
 	fChat = new CWindow(m_Gui, 10, 10, 200, 300, "FOUR-MP CHAT");

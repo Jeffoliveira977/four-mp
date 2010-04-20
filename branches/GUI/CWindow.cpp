@@ -42,6 +42,8 @@ CWindow::CWindow( CGUI *Gui, int X, int Y, int Width, int Height, const char * S
 
 		MouseMove( pGui->GetMouse() );
 	}
+
+	Gui->AddWindow(this);
 }
 
 CWindow::~CWindow()
