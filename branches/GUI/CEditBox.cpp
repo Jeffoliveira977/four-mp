@@ -1,11 +1,14 @@
 #include "CGUI.h"
 
-CEditBox::CEditBox(CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CEditBox::CEditBox( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
-	SetElement(Gui, X, Y, Width, Height, String, String2, Callback );
-	SetHeight( BUTTON_HEIGHT );
+	SetElement( X, Y, Width, Height, String, String2, Callback );
+	SetHeight( 20 );
+
+	SizeEdge = 0;
 
 	m_iStart = 0;
+	CenterAlign = 0;
 	SetIndex( 0 );
 	m_bCursorState = false;
 	SetAction( 0 );
@@ -13,7 +16,7 @@ CEditBox::CEditBox(CGUI *Gui, int X, int Y, int Width, int Height, const char * 
 	{
 		SetAction( Callback );
 	}
-	SetThemeElement( pGui->GetThemeElement( "EditBox" ) );
+	SetThemeElement( gpGui->GetThemeElement( "EditBox" ) );
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "EditBox", 0 );
 	else
@@ -27,16 +30,31 @@ void CEditBox::Draw()
 	SElementState * pState = GetElementState();
 	if( pState )
 	{
-		pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
-		GetFont()->DrawString( Pos.GetX() + 4, Pos.GetY() + GetHeight() / 2, FT_VCENTER, pString, &GetString()[ GetStart() ], GetWidth() );
-		
-		if( m_bCursorState && HasFocus() )
-			pGui->FillArea( Pos.GetX() + 2 + m_iCursorX, Pos.GetY() + 2, 2, GetHeight() - 4, pCursor->GetD3DCOLOR() );
+		pEdit[0]->Draw( Pos, SizeEdge, GetHeight() );
+		pEdit[2]->Draw( Pos.GetX()+GetWidth()-SizeEdge, Pos.GetY(), SizeEdge, GetHeight() );
+		pEdit[1]->Draw( Pos.GetX()+SizeEdge-1, Pos.GetY(), GetWidth()-2*SizeEdge+2, GetHeight() );
+
+		if(CenterAlign)
+			GetFont()->DrawString( Pos.GetX() + GetWidth() / 2, Pos.GetY() + GetHeight() / 2, FT_VCENTER|FT_CENTER, pString, &GetString()[ GetStart() ], GetWidth() );
+		else
+			GetFont()->DrawString( Pos.GetX() + 4, Pos.GetY() + GetHeight() / 2, FT_VCENTER, pString, &GetString()[ GetStart() ], GetWidth() );
+
+		int hgt = (GetHeight()-GetFont()->GetStringHeight())/2;
+
+		if( m_bCursorState && HasFocus() && GetEnabled() )
+			gpGui->FillArea( Pos.GetX() + 2 + m_iCursorX, Pos.GetY() + hgt, 2, GetHeight() - 2*hgt, pCursor->GetD3DCOLOR() );
 	}
+}
+
+void CEditBox::SetAlignCenter(bool al)
+{
+	CenterAlign = al;
 }
 
 void CEditBox::PreDraw()
 {
+	SetElementState( HasFocus()?"Active":"Norm" );
+
 	if( !m_tCursorTimer.Running() )
 	{
 		m_bCursorState = !m_bCursorState;
@@ -44,24 +62,28 @@ void CEditBox::PreDraw()
 	}
 }
 
-void CEditBox::MouseMove( CMouse * pMouse )
+bool CEditBox::MouseMove( CMouse * pMouse, bool over )
 {
+	if(!GetEnabled()) return 0;
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	SetMouseOver( pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight() ) );
+	bool inArea = pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight() ) && over;
+	SetMouseOver( inArea );
+	return inArea;
 }
 
-void CEditBox::KeyEvent( SKey sKey )
+bool CEditBox::KeyEvent( SKey sKey )
 {
+	if(!GetEnabled()) return 0;
 	if( !sKey.m_vKey )
 	{
-		if( pGui->GetMouse()->GetLeftButton() )
+		if( gpGui->GetMouse()->GetLeftButton() )
 		{
 			if( GetMouseOver() )
 			{
 				SendMsg(CLICK, 0);
 
-				int iX = pGui->GetMouse()->GetPos().GetX();
+				int iX = gpGui->GetMouse()->GetPos().GetX();
 				int iAbsX = ( *GetParent()->GetAbsPos() + *GetRelPos() ).GetX();
 
 				std::string sString( &GetString()[ GetStart() ] );
@@ -222,6 +244,7 @@ void CEditBox::KeyEvent( SKey sKey )
 			}
 		}
 	}
+	return 0;
 }
 
 int CEditBox::GetIndex()
@@ -254,10 +277,17 @@ void CEditBox::SetStart( int iStart )
 void CEditBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
-	SetFont(pGui->GetFont());
 
-	pInner = pState->GetColor( "Inner" );
-	pBorder = pState->GetColor( "Border" );
 	pString = pState->GetColor( "String" );
 	pCursor = pState->GetColor( "Cursor" );
+
+	if(SizeEdge == 0 || pState->GetInt("Height"))
+	{
+		SizeEdge = pState->GetInt("SizeEdge");
+		SetHeight( pState->GetInt("Height") );
+	}
+
+	pEdit[0] = pState->GetTexture( "Left" );
+	pEdit[1] = pState->GetTexture( "Middle" );
+	pEdit[2] = pState->GetTexture( "Right" );
 }

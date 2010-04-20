@@ -20,6 +20,7 @@ public:
 	void SetAlpha( int iAlpha );
 
 	D3DCOLOR GetD3DCOLOR();
+	D3DCOLOR GetD3DXCOLOR();
 	int GetRed();
 	int GetGreen();
 	int GetBlue();
@@ -40,9 +41,11 @@ struct SElementState
 
 	CColor * GetColor( std::string sString );
 	CTexture * GetTexture( std::string sString );
+	int GetInt( std::string sString );
 
 	std::map<std::string, CColor*> mColors;
 	std::map<std::string, CTexture*> mTextures;
+	std::map<std::string, int> mInts;
 };
 
 struct SElement

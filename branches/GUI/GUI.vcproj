@@ -121,7 +121,7 @@
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				StructMemberAlignment="0"
 				BrowseInformation="0"
 				WarningLevel="4"
@@ -194,19 +194,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFigure.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CFont.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\CGUI.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CHelperSlider.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CHorizontalSliderBar.cpp"
 				>
 			</File>
 			<File
@@ -230,7 +226,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CProgressBar.cpp"
+				RelativePath=".\CScrollBar.cpp"
 				>
 			</File>
 			<File
@@ -251,10 +247,6 @@
 			</File>
 			<File
 				RelativePath=".\CVar.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\CVerticalSliderBar.cpp"
 				>
 			</File>
 			<File
@@ -296,19 +288,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFigure.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CFont.h"
 				>
 			</File>
 			<File
 				RelativePath=".\CGUI.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CHelperSlider.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CHorizontalSliderBar.h"
 				>
 			</File>
 			<File
@@ -332,7 +320,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\CProgressBar.h"
+				RelativePath=".\CScrollBar.h"
 				>
 			</File>
 			<File
@@ -353,10 +341,6 @@
 			</File>
 			<File
 				RelativePath=".\CVar.h"
-				>
-			</File>
-			<File
-				RelativePath=".\CVerticalSliderBar.h"
 				>
 			</File>
 			<File

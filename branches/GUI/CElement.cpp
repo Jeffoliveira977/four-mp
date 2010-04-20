@@ -1,8 +1,7 @@
 #include "CGUI.h"
 
-void CElement::SetElement(CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback, bool abs)
+void CElement::SetElement( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback, bool abs)
 {
-	pGui = Gui;
 	if(!abs)
 		SetRelPos( CPos( X, Y ) );
 	else
@@ -22,21 +21,13 @@ void CElement::SetElement(CGUI *Gui, int X, int Y, int Width, int Height, const 
 
 	if( Callback )
 	{
-		/*CVar * pCvar = gpGui->Cvars[ Callback ];
-	
-		if( pCvar )
-			SetAction( pCvar->GetAction() );
-		else
-		{
-			SetAction( 0 );
-			MessageBoxA( 0, "Cvar invalid", Callback, 0 );
-		}*/
 		SetAction( Callback );
 	}
 	else
 		SetAction( 0 );
 
-	pFont = 0;
+	pFont = gpGui->GetFont();
+	m_bEnabled = 1;
 	SetMouseOver( false );
 }
 
@@ -63,6 +54,14 @@ tAction CElement::GetAction()
 void CElement::SetRelPos( CPos relPos )
 {
 	m_relPos = relPos;
+}
+
+void CElement::SetRelPos( int X, int Y )
+{ 
+	if(X != -1)
+		m_relPos.SetX(X);
+	if(Y != -1)
+		m_relPos.SetY(Y);
 }
 
 CPos * CElement::GetRelPos()
@@ -119,7 +118,7 @@ std::string CElement::GetString( bool bReplaceVars, int iIndex )
 
 	if( bReplaceVars && m_sRaw[ iIndex ].find( "$" ) != std::string::npos )
 	{
-		for( std::map<std::string,CVar*>::reverse_iterator iIter = pGui->Cvars.rbegin(); iIter != pGui->Cvars.rend(); iIter++ )
+		for( std::map<std::string,CVar*>::reverse_iterator iIter = gpGui->Cvars.rbegin(); iIter != gpGui->Cvars.rend(); iIter++ )
 		{
 			int iPos = m_sFormatted[ iIndex ].find( iIter->first );
 
@@ -165,6 +164,7 @@ bool CElement::SetMouseOver( bool bMouseOver )
 	if(GetAction())
 		if(bMouseOver) GetAction()(this, MOUSE_OVER, 0);
 		else GetAction()(this, MOUSE_OUT, 0);
+
 	return m_bMouseOver = bMouseOver;
 }
 
@@ -223,17 +223,19 @@ void CElement::PreDraw()
 {
 }
 
-void CElement::MouseMove( CMouse * )
+bool CElement::MouseMove( CMouse *, bool )
 {
+	return 0;
 }
 
-void CElement::KeyEvent( SKey )
+bool CElement::KeyEvent( SKey )
 {
+	return 0;
 }
 
 void CElement::SetFont(int size, char *name)
 {
-	pFont = new CFont(pGui, pGui->GetDevice(), size, name);
+	pFont = new CFont(gpGui->GetDevice(), size, name);
 }
 
 void CElement::SetFont(CFont *font)
@@ -243,7 +245,19 @@ void CElement::SetFont(CFont *font)
 
 CFont * CElement::GetFont()
 {
-	if(!pFont)
-		return pGui->GetFont();
 	return pFont;
+}
+
+void CElement::SetEnabled(bool on)
+{
+	m_bEnabled = on;
+	if(on)
+		SetElementState( "Norm" );
+	else
+		SetElementState( "Disabled" );
+}
+
+bool CElement::GetEnabled()
+{
+	return m_bEnabled;
 }

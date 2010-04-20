@@ -89,6 +89,11 @@ D3DCOLOR CColor::GetD3DCOLOR()
 	return D3DCOLOR_RGBA( GetRed(), GetGreen(), GetBlue(), GetAlpha() );
 }
 
+D3DCOLOR CColor::GetD3DXCOLOR()
+{
+	return D3DCOLOR_ARGB( GetAlpha(), GetRed(), GetGreen(), GetBlue() );
+}
+
 int CColor::GetRed()
 {
 	return m_iRed;
@@ -129,5 +134,11 @@ CTexture * SElementState::GetTexture( std::string sString )
 	if( !pRet )
 		pRet = pParent->m_mStates[ pParent->sDefaultState ]->mTextures[ sString ];
 
+	return pRet;
+}
+
+int SElementState::GetInt( std::string sString )
+{
+	int pRet = mInts[ sString ];
 	return pRet;
 }

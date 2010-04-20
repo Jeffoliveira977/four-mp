@@ -30,11 +30,10 @@ struct SKey
 
 class CKeyboard
 {
-	CGUI *pGui;
 	SKey m_sKey;
 
 public:
-	CKeyboard(CGUI *Gui);
+
 	bool HandleMessage( unsigned int uMsg, __w64 unsigned int wParam, _w64 long lParam );
 
 	void SetKey( SKey sKey );

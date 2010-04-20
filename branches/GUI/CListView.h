@@ -11,19 +11,20 @@ class CListView : public CElement
 	int m_iMouseOverIndex;
 	int m_iMouseSelect;
 
-	CHelperSlider * pSlider;
+	CScrollBar * pSlider;
 
 	std::vector<std::string> *m_vRows;
 	std::vector<std::string> mTitles;
 
 	CColor * pInner, * pBorder, * pString, * pMouseOverString;
+	CColor * pTitle, * pbTitle, * pbInner, * pTitleString;
 public:
-	CListView(CGUI *Gui, int X, int Y, int *Width, int Height, int Columns, const char * String = NULL, const char *String2 = NULL, tAction Callback = NULL );
+	CListView( int X, int Y, int *Width, int Height, int Columns, const char * String = NULL, const char *String2 = NULL, tAction Callback = NULL );
 
 	void Draw();
 	void PreDraw();
-	void MouseMove( CMouse * pMouse );
-	void KeyEvent( SKey sKey );
+	bool MouseMove( CMouse * pMouse, bool );
+	bool KeyEvent( SKey sKey );
 
 	int GetSize(int Index = 0);
 

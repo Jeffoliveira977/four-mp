@@ -1,14 +1,12 @@
 #include "CGUI.h"
 
-CFont::CFont(CGUI *Gui, IDirect3DDevice9 * pDevice, int iHeight, char * pszFaceName )
+CFont::CFont( IDirect3DDevice9 * pDevice, int iHeight, char * pszFaceName )
 {
-	pGui = Gui;
 #ifdef USE_D3DX
 	HRESULT hResult = D3DXCreateFontA( pDevice, -MulDiv( iHeight, GetDeviceCaps( GetDC( 0 ), LOGPIXELSY ), 72 ), 0, FW_NORMAL, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, pszFaceName, &m_pFont );
 
 	if( FAILED( hResult ) )
 		MessageBoxA( 0, /*DXGetErrorDescription9A( hResult )*/"Error", "D3DXCreateFontA failed", 0 );
-
 	m_pFont->PreloadCharacters( 0, 255 );
 #else
 	m_pFont = new CD3DFont( pszFaceName, iHeight, 0 );
@@ -50,17 +48,17 @@ void CFont::DrawString( int iX, int iY, DWORD dwFlags, CColor * pColor, std::str
 	if( iWidth )
 		CutString( iWidth, sString );
 #ifdef USE_D3DX
-		pGui->GetSprite()->Begin( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+		gpGui->GetSprite()->Begin( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
 
 		D3DXMATRIX mat;
 		D3DXMatrixTranslation( &mat, static_cast<float>( iX ), static_cast<float>( iY ), 0 );
-		pGui->GetSprite()->SetTransform( &mat );
+		gpGui->GetSprite()->SetTransform( &mat );
 
 		RECT drawRect = { 0 };
 		DWORD dwDrawFlags = DT_NOCLIP | ( ( dwFlags & FT_CENTER ) ? DT_CENTER : 0 ) | ( ( dwFlags & FT_VCENTER ) ? DT_VCENTER : 0 );
-		m_pFont->DrawTextA( pGui->GetSprite(), sString.c_str(), -1, &drawRect, dwDrawFlags, pColor->GetD3DCOLOR() );
+		m_pFont->DrawTextA( gpGui->GetSprite(), sString.c_str(), -1, &drawRect, dwDrawFlags, pColor->GetD3DCOLOR() );
 
-		pGui->GetSprite()->End();
+		gpGui->GetSprite()->End();
 #else
 		m_pFont->Print( static_cast<float>( iX ), static_cast<float>( iY ), pColor->GetD3DCOLOR(), sString.c_str(), dwFlags );
 #endif

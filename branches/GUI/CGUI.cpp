@@ -1,6 +1,8 @@
 #include "CGUI.h"
 #include "CD3DRender.h"
 
+CGUI * gpGui = 0;
+
 CGUI::CGUI( IDirect3DDevice9 * pDevice )
 {
 	if( !pDevice )
@@ -18,8 +20,8 @@ CGUI::CGUI( IDirect3DDevice9 * pDevice )
 	m_pRender->Initialize( pDevice );
 #endif
 
-	m_pMouse = new CMouse(this, pDevice, m_pSprite );
-	m_pKeyboard = new CKeyboard(this);
+	m_pMouse = new CMouse( pDevice, m_pSprite );
+	m_pKeyboard = new CKeyboard();
 	m_pFont = 0;
 
 	Cvars[ "$Value" ] = new CVar( SliderValue );
@@ -53,7 +55,7 @@ CGUI::~CGUI()
 
 void CGUI::LoadFont(int size, char *font)
 {
-	m_pFont = new CFont( this, GetDevice(), size, font );
+	m_pFont = new CFont( gpGui->GetDevice(), size, font );
 }
 
 void CGUI::SetFontColors(int Index, int r, int g, int b, int a)
@@ -63,17 +65,17 @@ void CGUI::SetFontColors(int Index, int r, int g, int b, int a)
 
 void CGUI::SetVarInt(const char *name, int value)
 {
-	Cvars[ name ] = new CVar( value );
+	gpGui->Cvars[ name ] = new CVar( value );
 }
 
 void CGUI::SetVarString(const char *name, std::string value)
 {
-	Cvars[ name ] = new CVar( value );
+	gpGui->Cvars[ name ] = new CVar( value );
 }
 
 void CGUI::SetVarBool(const char *name, bool value)
 {
-	Cvars[ name ] = new CVar( value );
+	gpGui->Cvars[ name ] = new CVar( value );
 }
 
 void CGUI::LoadInterfaceFromFile( const char * pszFilePath )
@@ -132,13 +134,131 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath )
 							std::stringstream sStream;
 
 							sStream << pThemeElement->Value() << "/" << pTextureElement->Attribute( "path" );
+							
+							pState->mTextures[ pTextureElement->Attribute( "string" ) ] = new CTexture( GetSprite(), sStream.str().c_str(), new CColor(pTextureElement) );
+						}
+						for( TiXmlElement * pIntElement = pStateElement->FirstChildElement( "Int" ); pIntElement; pIntElement = pIntElement->NextSiblingElement( "Int" ) )
+						{
+							pszString = pIntElement->Attribute( "string" );
 
-							pState->mTextures[ pTextureElement->Attribute( "string" ) ] = new CTexture( GetSprite(), sStream.str().c_str() );
+							if( !pszString )
+								continue;
+
+							pState->mInts[ pszString ] = atoi(pIntElement->Attribute("value"));
 						}
 
 						m_mThemes[ pThemeElement->Value() ][ pElementElement->Value() ] = sCurElement;
 					}
 				}
+		}
+	}
+}
+
+void CGUI::UpdateFromFile( const char * pszFilePath )
+{
+	TiXmlDocument Document;
+
+	if( !Document.LoadFile( pszFilePath ) )
+	{
+		MessageBoxA(NULL, Document.ErrorDesc(), "UpdateGUI", MB_OK);
+		return;
+	}
+
+	TiXmlHandle hDoc( &Document );
+
+	TiXmlElement * pGUI = hDoc.FirstChildElement( "GUI" ).Element();
+	if( !pGUI ) 
+	{
+		MessageBoxA(NULL, "XML Error", "UpdateGUI", MB_OK);
+		return;
+	}
+
+	for( TiXmlElement * pThemeElement = pGUI->FirstChildElement(); pThemeElement; pThemeElement = pThemeElement->NextSiblingElement() )
+	{
+		int Index = 0;
+		CWindow *wParent = NULL;
+
+		if(strcmp(pThemeElement->Value(), "Over") == 0) Index = 1;
+		if(strcmp(pThemeElement->Attribute("parent"), "none") != 0)
+			wParent = GetWindowByString(pThemeElement->Attribute("parent"), 1);
+
+		for( TiXmlElement * pElementElement = pThemeElement->FirstChildElement(); pElementElement; pElementElement = pElementElement->NextSiblingElement() )
+		{
+			const char *Element = pElementElement->Value();
+
+			if(strcmp(Element, "Element") == 0)
+			{
+				CElement *Element;
+				if(wParent == NULL)
+					Element = GetWindowByString(pElementElement->Attribute("name"), 1);
+				else
+					Element = wParent->GetElementByString(pElementElement->Attribute("name"), 1);
+				
+				for(TiXmlElement * pElem = pElementElement->FirstChildElement( "Base" ); pElem; pElem = pElem->NextSiblingElement( "Base" ))
+				{
+					const char *name = pElem->Attribute("string");
+					const char *value = pElem->Attribute("value");
+					if(strcmp(name, "height") == 0) Element->SetHeight(atoi(value));
+					else if(strcmp(name, "width") == 0) Element->SetWidth(atoi(value));
+					else if(strcmp(name, "name") == 0) Element->SetString(value);
+					else if(strcmp(name, "x") == 0) Element->SetRelPos(atoi(value), -1);
+					else if(strcmp(name, "y") == 0) Element->SetRelPos(-1, atoi(value));
+					else if(strcmp(name, "style") == 0) Element->SetThemeElement( gpGui->GetThemeElement( value ) );
+				}
+
+				TiXmlElement * pElem = pElementElement->FirstChildElement( "Font" );
+				if(pElem)
+				{
+					Element->SetFont(atoi(pElem->Attribute("size")), (char*)pElem->Attribute("name"));
+				}
+			}
+			else if(strcmp(Element, "Line") == 0)
+			{
+				CLine *tLine = new CLine(atoi(pElementElement->Attribute("sx")), atoi(pElementElement->Attribute("sy")),
+					atoi(pElementElement->Attribute("ex")),	atoi(pElementElement->Attribute("ey")),
+					atoi(pElementElement->Attribute("size")), new CColor(pElementElement), wParent);
+
+				if(!wParent) m_eLine[Index].push_back(tLine);
+				else wParent->m_eLine[Index].push_back(tLine);
+			}
+			else if(strcmp(Element, "Box") == 0)
+			{
+				CColor *Inner, *Border;
+
+				TiXmlElement * pColorElement = pElementElement->FirstChildElement( "Color" ); 
+				if(strcmp(pColorElement->Attribute("string"), "Inner") == 0) Inner = new CColor(pColorElement);
+				else if(strcmp(pColorElement->Attribute("string"), "Border") == 0) Border = new CColor(pColorElement);
+
+				pColorElement = pColorElement->NextSiblingElement( "Color" );
+				if(strcmp(pColorElement->Attribute("string"), "Inner") == 0) Inner = new CColor(pColorElement);
+				else if(strcmp(pColorElement->Attribute("string"), "Border") == 0) Border = new CColor(pColorElement);
+
+				CBox *tBox = new CBox(atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
+					atoi(pElementElement->Attribute("width")), atoi(pElementElement->Attribute("height")),
+					Inner, Border, wParent);
+
+				if(!wParent) m_eBox[Index].push_back(tBox);
+				else wParent->m_eBox[Index].push_back(tBox);
+			}
+			else if(strcmp(Element, "Text") == 0)
+			{
+				CText *tText = new CText(atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
+					atoi(pElementElement->Attribute("width")), 20, pElementElement->Attribute("string"), 
+					pElementElement->Attribute("name"), NULL);
+				if(!wParent) m_eText[Index].push_back(tText);
+				else wParent->AddElement(tText);
+			}
+			else if(strcmp(Element, "Image") == 0)
+			{
+				CTexture *tTexture = new CTexture(GetSprite(), pElementElement->Attribute("src"), new CColor(pElementElement));
+
+				CImage *tImg = new CImage(atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
+					atoi(pElementElement->Attribute("width")), atoi(pElementElement->Attribute("height")),
+					tTexture, wParent);
+
+				if(!wParent) m_eImage[Index].push_back(tImg);
+				else wParent->m_eImage[Index].push_back(tImg);
+			}
 		}
 	}
 }
@@ -209,13 +329,25 @@ void CGUI::BringToTop( CWindow * pWindow )
 	m_vWindows.insert(  m_vWindows.end(), pWindow );
 	m_wFocus = pWindow;
 }
-
+void Log(char*);
 void CGUI::Draw()
 {
-	if( !IsVisible() )
+	if( !gpGui->IsVisible() )
 		return;
 
 	PreDraw();
+
+	for(int i = 0; i < (int)m_eLine[0].size(); i++)
+		m_eLine[0][i]->Draw();
+
+	for(int i = 0; i < (int)m_eBox[0].size(); i++)
+		m_eBox[0][i]->Draw();
+
+	for(int i = 0; i < (int)m_eText[0].size(); i++)
+		m_eText[0][i]->Draw();
+
+	for(int i = 0; i < (int)m_eImage[0].size(); i++)
+		m_eImage[0][i]->Draw();
 
 	for( int iIndex = 0; iIndex < static_cast<int>( m_vWindows.size() ); iIndex++ )
 	{
@@ -225,8 +357,20 @@ void CGUI::Draw()
 
 		m_vWindows[ iIndex ]->Draw();
 	}
-	GetMouse
-		()->Draw();
+	
+	for(int i = 0; i < (int)m_eLine[1].size(); i++)
+		m_eLine[1][i]->Draw();
+
+	for(int i = 0; i < (int)m_eBox[1].size(); i++)
+		m_eBox[1][i]->Draw();
+
+	for(int i = 0; i < (int)m_eText[1].size(); i++)
+		m_eText[1][i]->Draw();
+
+	for(int i = 0; i < (int)m_eImage[1].size(); i++)
+		m_eImage[1][i]->Draw();
+
+	GetMouse()->Draw();
 }
 
 void CGUI::PreDraw()
@@ -263,9 +407,9 @@ void CGUI::MouseMove( CMouse * pMouse )
 			int iHeight = 0;
 
 			if( !m_vWindows[ iIndex ]->GetMaximized() )
-				iHeight = TITLEBAR_HEIGHT;
+				iHeight = m_vWindows[ iIndex ]->GetTitleBarHeight();
 
-			if( !bGotWindow && GetMouse()->InArea( m_vWindows[ iIndex ], iHeight ) )
+			if( !bGotWindow && gpGui->GetMouse()->InArea( m_vWindows[ iIndex ], iHeight ) )
 			{
 				m_vWindows[ iIndex ]->MouseMove( pMouse );
 				bGotWindow = true;
@@ -289,7 +433,7 @@ bool CGUI::KeyEvent( SKey sKey )
 
 	if( !sKey.m_vKey && ( sKey.m_bDown || ( GetMouse()->GetWheel() && !sKey.m_bDown ) ) )
 	{
-		CMouse * pMouse = GetMouse();
+		CMouse * pMouse = gpGui->GetMouse();
 
 		std::vector<CWindow*> vRepeat;
 
@@ -305,7 +449,7 @@ bool CGUI::KeyEvent( SKey sKey )
 				int iHeight = 0;
 
 				if( !m_vWindows[ iIndex ]->GetMaximized() )
-					iHeight = TITLEBAR_HEIGHT;
+					iHeight = m_vWindows[ iIndex ]->GetTitleBarHeight();
 
 				if( pMouse->InArea( m_vWindows[ iIndex ], iHeight ) && !bTop )
 				{

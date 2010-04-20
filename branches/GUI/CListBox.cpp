@@ -1,14 +1,14 @@
 #include "CListBox.h"
 
-CListBox::CListBox(CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CListBox::CListBox( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
-	SetElement(Gui, X, Y, Width, Height, String, String2, Callback );
+	SetElement( X, Y, Width, Height, String, String2, Callback );
 	m_iMouseOverIndex = -1;
 	m_iMouseSelect = -1;
 
-	pSlider = new CHelperSlider(pGui, CPos( GetWidth() - HELPERSLIDER_WIDTH + 2, 0 ), GetHeight() );
+	pSlider = new CScrollBar( CPos( GetWidth() + 2, 0 ), GetHeight() );
 
-	SetThemeElement( pGui->GetThemeElement( "ListBox" ) );
+	SetThemeElement( gpGui->GetThemeElement( "ListBox" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "ListBox", 0 );
@@ -20,7 +20,7 @@ void CListBox::Draw()
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
 	int iAddHeight = GetFont()->GetStringHeight();
 	if( m_vRows.size() )
@@ -35,11 +35,11 @@ void CListBox::Draw()
 
 			if(m_iMouseSelect == i)	
 			{
-				pGui->DrawOutlinedBox( Pos.GetX() + 2, Pos.GetY() + iHeight, GetWidth() - HELPERSLIDER_WIDTH, iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
+				gpGui->DrawOutlinedBox( Pos.GetX() + 2, Pos.GetY() + iHeight, GetWidth() -  pSlider->GetSliderWidth(), iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
 				pColor = pInner;
 			}
 
-			GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pColor, m_vRows[ i ].c_str(), GetWidth() - HELPERSLIDER_WIDTH );
+			GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pColor, m_vRows[ i ].c_str(), GetWidth() -  pSlider->GetSliderWidth() );
 			iHeight += iAddHeight;
 		}
 
@@ -51,25 +51,27 @@ void CListBox::PreDraw()
 	pSlider->PreDraw();
 }
 
-void CListBox::MouseMove( CMouse * pMouse )
+bool CListBox::MouseMove( CMouse * pMouse, bool over )
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	SetMouseOver( pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight() ) );
+	bool inArea = pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight() ) && over;
+	SetMouseOver( inArea );
 
 	m_iMouseOverIndex = -1;
 	for( int i = pSlider->GetValue(), iHeight = 0, iStringHeight = GetFont()->GetStringHeight(); i < static_cast<int>( m_vRows.size() ) || iHeight < GetHeight(); i++ )
 	{
-		if( pMouse->InArea( Pos.GetX(), Pos.GetY() + iHeight, GetWidth() - BUTTON_HEIGHT, iStringHeight ) )
+		if( pMouse->InArea( Pos.GetX(), Pos.GetY() + iHeight, GetWidth() -  pSlider->GetSliderWidth(), iStringHeight ) )
 			m_iMouseOverIndex = i;
 
 		iHeight += iStringHeight;
 	}
 
 	pSlider->MouseMove( Pos, pMouse );
+	return inArea;
 }
 
-void CListBox::KeyEvent( SKey sKey )
+bool CListBox::KeyEvent( SKey sKey )
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
@@ -78,16 +80,17 @@ void CListBox::KeyEvent( SKey sKey )
 		if( GetMouseOver() )
 		{
 			if(m_iMouseSelect > -2) m_iMouseSelect = m_iMouseOverIndex;
-			if( m_iMouseOverIndex >= 0 && GetAction() && pGui->GetMouse()->GetLeftButton() )
+			if( m_iMouseOverIndex >= 0 && GetAction() && gpGui->GetMouse()->GetLeftButton() )
 				GetAction()( this, SELECT, m_iMouseOverIndex );
 		}
 	}
 
-	if( GetMouseOver() || ( !sKey.m_bDown && !pGui->GetMouse()->GetWheel() )  )
+	if( GetMouseOver() || ( !sKey.m_bDown && !gpGui->GetMouse()->GetWheel() )  )
 	{
 		pSlider->KeyEvent( Pos, sKey );
-		MouseMove( pGui->GetMouse() );
+		MouseMove( gpGui->GetMouse(), 1 );
 	}
+	return 0;
 }
 
 int CListBox::GetSize()
@@ -123,7 +126,6 @@ void CListBox::Clear()
 void CListBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
-	SetFont(pGui->GetFont());
 
 	pInner = pState->GetColor( "Inner" );
 	pBorder = pState->GetColor( "Border" );
@@ -133,7 +135,7 @@ void CListBox::UpdateTheme( int iIndex )
 
 void CListBox::ShowSlider( bool bShow )
 {
-	pSlider->Show = bShow;
+	pSlider->SetShow(bShow);
 }
 
 int CListBox::GetSelected()

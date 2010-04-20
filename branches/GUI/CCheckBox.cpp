@@ -1,11 +1,11 @@
 #include "CGUI.h"
 
-CCheckBox::CCheckBox(CGUI *Gui, int X, int Y, int Width, int Height, bool Checked, const char * String, const char * String2, tAction Callback )
+CCheckBox::CCheckBox( int X, int Y, int Width, int Height, bool Checked, const char * String, const char * String2, tAction Callback )
 {
-	SetElement(Gui, X, Y, Width, Height, String, String2, Callback );
+	SetElement( X, Y, Width, Height, String, String2, Callback );
 	SetChecked( Checked );
 
-	SetThemeElement( pGui->GetThemeElement( "CheckBox" ) );
+	SetThemeElement( gpGui->GetThemeElement( "CheckBox" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "No color scheme element found.", "CheckBox", 0 );
@@ -26,16 +26,13 @@ void CCheckBox::Draw()
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), 15, 15, pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+
 	GetFont()->DrawString( Pos.GetX() + 20, Pos.GetY(), 0, pString, GetFormatted() );
 
 	if( GetChecked() )
-	{
-		D3DCOLOR d3dCrossColor = pCross->GetD3DCOLOR();
-
-		pGui->DrawLine( Pos.GetX(), Pos.GetY(), Pos.GetX() + 14, Pos.GetY() + 14, 1, d3dCrossColor );
-		pGui->DrawLine( Pos.GetX() + 14, Pos.GetY(), Pos.GetX(), Pos.GetY() + 14, 1, d3dCrossColor );
-	}
+		tChecked->Draw(Pos, GetWidth(), GetHeight());
+	else
+		tCheck->Draw(Pos, GetWidth(), GetHeight());
 }
 
 void CCheckBox::PreDraw()
@@ -43,18 +40,20 @@ void CCheckBox::PreDraw()
 	GetString( true );
 }
 
-void CCheckBox::MouseMove( CMouse * pMouse )
+bool CCheckBox::MouseMove( CMouse * pMouse, bool over )
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	SetElementState( SetMouseOver( pMouse->InArea( Pos.GetX(), Pos.GetY(), GetFont()->GetStringWidth( GetFormatted().c_str() ) + 20, GetFont()->GetStringHeight() ) )?"MouseOver":"Norm" );
+	bool inArea = pMouse->InArea( Pos.GetX(), Pos.GetY(), GetFont()->GetStringWidth( GetFormatted().c_str() ) + GetWidth(), GetFont()->GetStringHeight() ) && over;
+	SetElementState( SetMouseOver( inArea )?"MouseOver":"Norm" );
+	return inArea;
 }
 
-void CCheckBox::KeyEvent( SKey sKey )
+bool CCheckBox::KeyEvent( SKey sKey )
 {
 	if( !sKey.m_vKey )
 	{
-		if( GetMouseOver() && pGui->GetMouse()->GetLeftButton( 0 ) )
+		if( GetMouseOver() && gpGui->GetMouse()->GetLeftButton( 0 ) )
 		{
 			m_bChecked = !m_bChecked;
 			
@@ -62,15 +61,20 @@ void CCheckBox::KeyEvent( SKey sKey )
 				GetAction()( this, SELECT, m_bChecked );
 		}
 	}
+	return 0;
 }
 
 void CCheckBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
-	SetFont(pGui->GetFont());
 
-	pInner = pState->GetColor( "Inner" );
-	pBorder = pState->GetColor( "Border" );
 	pString = pState->GetColor( "String" );
-	pCross = pState->GetColor( "Cross" );
+	tCheck = pState->GetTexture("CheckBox");
+	tChecked = pState->GetTexture("CheckBoxChecked");
+
+	if(GetWidth() == 0)
+	{
+		SetWidth(pState->GetInt("Width"));
+		SetHeight(pState->GetInt("Height"));
+	}
 }

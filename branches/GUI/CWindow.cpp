@@ -1,6 +1,6 @@
 #include "CGUI.h"
 
-CWindow::CWindow(CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CWindow::CWindow( int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
 	m_pFocussedElement = 0;
 	SetMaximized( true );
@@ -9,19 +9,29 @@ CWindow::CWindow(CGUI *Gui, int X, int Y, int Width, int Height, const char * St
 	posDif = CPos();
 	m_bDragging = false;
 
-	SetElement(Gui, X, Y, Width, Height, String, String2, Callback, 1 );
+	SetElement( X, Y, Width, Height, String, String2, Callback, 1 );
 
 	SetMouseOver( false );
 	SetVisible( true );
 
-	SetThemeElement( pGui->GetThemeElement( "Window" ) );
+	hTitleBar = 0;
+	sButton[0] = sButton[1] = mButton[0] = mButton[1] = 0;
+
+	SetThemeElement( gpGui->GetThemeElement( "Window" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "Window", 0 );
 	else
 		SetElementState( "Norm" );
 
-	SetThemeElement( pGui->GetThemeElement( "CloseButton" ), 1 );
+	SetThemeElement( gpGui->GetThemeElement( "TitleBar" ), 2 );
+
+	if( !GetThemeElement( 2 ) )
+		MessageBoxA( 0, "Theme element invalid.", "TitleBar", 0 );
+	else
+		SetElementState( "Norm", 2 );
+
+	SetThemeElement( gpGui->GetThemeElement( "CloseButton" ), 1 );
 
 	if( !GetThemeElement( 1 ) )
 		MessageBoxA( 0, "Theme element invalid.", "CloseButton", 0 );
@@ -30,9 +40,8 @@ CWindow::CWindow(CGUI *Gui, int X, int Y, int Width, int Height, const char * St
 		SetElementState( "Norm", 1 );
 		SetCloseButton( true );
 
-		MouseMove( pGui->GetMouse() );
+		MouseMove( gpGui->GetMouse() );
 	}
-	pGui->AddWindow(this);
 }
 
 CWindow::~CWindow()
@@ -45,7 +54,7 @@ CWindow::~CWindow()
 void CWindow::AddElement( CElement * pElement )
 {
 	if(m_bTitleVisible)
-		pElement->SetRelPos( *pElement->GetRelPos() + CPos( 0, TITLEBAR_HEIGHT ) );
+		pElement->SetRelPos( *pElement->GetRelPos() + CPos( 0, hTitleBar ) );
 	pElement->SetParent( this );
 
 	m_vElements.push_back( pElement );
@@ -54,18 +63,73 @@ void CWindow::Draw()
 {	
 	if(m_bTitleVisible)
 	{
-		pTitlebar->Draw( *GetAbsPos(), GetWidth(), TITLEBAR_HEIGHT );
+		pTitlebar->Draw( GetAbsPos()->GetX(), GetAbsPos()->GetY(), GetWidth(), hTitleBar );
 		GetFont()->DrawString( GetAbsPos()->GetX() + 5, GetAbsPos()->GetY() + 5, 0, pTitle, GetFormatted() );
-		pButton->Draw( CPos( GetAbsPos()->GetX() + GetWidth() - BUTTON_HEIGHT - 2, GetAbsPos()->GetY() + 2 ), BUTTON_HEIGHT, BUTTON_HEIGHT );
+		pButton->Draw( GetAbsPos()->GetX() + GetWidth() - mButton[0], GetAbsPos()->GetY() + mButton[1], sButton[0], sButton[1] );
 	}
 
 	if( GetMaximized() )
 	{
 		if(m_bTitleVisible)
-			pGui->DrawOutlinedBox( GetAbsPos()->GetX(), GetAbsPos()->GetY() + TITLEBAR_HEIGHT, GetWidth(), GetHeight() - TITLEBAR_HEIGHT + 1,  pBodyInner->GetD3DCOLOR(), pBodyBorder->GetD3DCOLOR() );
+		{
+			gpGui->DrawOutlinedBox( GetAbsPos()->GetX(), GetAbsPos()->GetY()+hTitleBar, GetWidth(), GetHeight() - hTitleBar,  pBody->GetD3DCOLOR(), pBody->GetD3DCOLOR() );
+		}
+
+		for(int i = 0; i < (int)m_eLine[0].size(); i++)
+			m_eLine[0][i]->Draw();
+
+		for(int i = 0; i < (int)m_eBox[0].size(); i++)
+			m_eBox[0][i]->Draw();
+	
+		for(int i = 0; i < (int)m_eImage[0].size(); i++)
+			m_eImage[0][i]->Draw();
 
 		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
 			if(m_vElements[iIndex]) m_vElements[iIndex]->Draw();
+
+		for(int i = 0; i < (int)m_eLine[1].size(); i++)
+			m_eLine[1][i]->Draw();
+
+		for(int i = 0; i < (int)m_eBox[1].size(); i++)
+			m_eBox[1][i]->Draw();
+
+		for(int i = 0; i < (int)m_eImage[1].size(); i++)
+			m_eImage[1][i]->Draw();
+
+		if(m_bTitleVisible)
+		{
+			CPos *pos = GetAbsPos();
+			int width = GetWidth();
+			int height = GetHeight();
+			int xx = pos->GetX();
+			int yy = pos->GetY();
+
+			tBorder[0]->Draw( xx-hwBorder[2], yy+hwBorder[1]-hwBorder[2], hwBorder[0], height-2*hwBorder[1]+2*hwBorder[2] );
+			tBorder[1]->Draw( xx+width-hwBorder[0]+hwBorder[2], yy+hwBorder[1]-hwBorder[2], hwBorder[0], height-2*hwBorder[1]+2*hwBorder[2] );
+			tBorder[2]->Draw( xx-hwBorder[2], yy-hwBorder[2], hwBorder[0], hwBorder[1] );
+			tBorder[3]->Draw( xx-hwBorder[2], yy+height-hwBorder[1]+hwBorder[2]-1, hwBorder[0], hwBorder[1] );
+			tBorder[4]->Draw( xx+width-hwBorder[0]+hwBorder[2], yy-hwBorder[2], hwBorder[0], hwBorder[1] );
+			tBorder[5]->Draw( xx+width-hwBorder[0]+hwBorder[2], yy+height+hwBorder[2]-hwBorder[1]-1, hwBorder[0], hwBorder[1] );
+			tBorder[6]->Draw( xx-hwBorder[2]+hwBorder[0], yy-hwBorder[2], width+2*hwBorder[2]-2*hwBorder[1], hwBorder[1] );
+			tBorder[7]->Draw( xx-hwBorder[2]+hwBorder[0], yy+height-hwBorder[1]+hwBorder[2]-1, width+2*hwBorder[2]-2*hwBorder[1], hwBorder[1] );
+		}
+	}
+	else
+	{
+		CPos *pos = GetAbsPos();
+		int width = GetWidth();
+		int height = hTitleBar;
+		int xx = pos->GetX();
+		int yy = pos->GetY();
+
+		tBorder[0]->Draw( xx-hwBorder[2], yy+hwBorder[1]-hwBorder[2], hwBorder[0], height-2*hwBorder[1]+2*hwBorder[2] );
+		tBorder[1]->Draw( xx+width-hwBorder[0]+hwBorder[2], yy+hwBorder[1]-hwBorder[2], hwBorder[0], height-2*hwBorder[1]+2*hwBorder[2] );
+		tBorder[2]->Draw( xx-hwBorder[2], yy-hwBorder[2], hwBorder[0], hwBorder[1] );
+		tBorder[3]->Draw( xx-hwBorder[2], yy+height-hwBorder[1]+hwBorder[2]-1, hwBorder[0], hwBorder[1] );
+		tBorder[4]->Draw( xx+width-hwBorder[0]+hwBorder[2], yy-hwBorder[2], hwBorder[0], hwBorder[1] );
+		tBorder[5]->Draw( xx+width-hwBorder[0]+hwBorder[2], yy+height+hwBorder[2]-hwBorder[1]-1, hwBorder[0], hwBorder[1] );
+		tBorder[6]->Draw( xx-hwBorder[2]+hwBorder[0], yy-hwBorder[2], width+2*hwBorder[2]-2*hwBorder[1], hwBorder[1] );
+		tBorder[7]->Draw( xx-hwBorder[2]+hwBorder[0], yy+height-hwBorder[1]+hwBorder[2]-1, width+2*hwBorder[2]-2*hwBorder[1], hwBorder[1] );
 	}
 }
 
@@ -80,7 +144,7 @@ void CWindow::PreDraw()
 		}
 }
 
-void CWindow::MouseMove( CMouse * pMouse )
+bool CWindow::MouseMove( CMouse * pMouse, bool )
 {
 	if( GetDragging() )
 	{
@@ -94,20 +158,24 @@ void CWindow::MouseMove( CMouse * pMouse )
 				mPos = pMouse->GetSavedPos();
 
 			SetAbsPos( mPos + posDif );
+			SendMsg(CHANGE, 0);
 		}
 	}
 
 	if( GetCloseButton() && m_bTitleVisible )
-		SetElementState( SetMouseOver( pMouse->InArea( GetAbsPos()->GetX() + GetWidth() - BUTTON_HEIGHT - 2, GetAbsPos()->GetY() + 2, BUTTON_HEIGHT, BUTTON_HEIGHT ) )?"MouseOver":"Norm", 1 );
+		SetElementState( SetMouseOver( pMouse->InArea( GetAbsPos()->GetX() + GetWidth() - mButton[0], GetAbsPos()->GetY() + mButton[1], sButton[0], sButton[1] ) )?"MouseOver":"Norm", 1 );
 
+	bool isOver = 1;
 	if( GetMaximized() )
-		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
-			if(m_vElements[iIndex]) m_vElements[ iIndex ]->MouseMove( pMouse );
+		for( int iIndex = static_cast<int>( m_vElements.size() ) - 1; iIndex >= 0; iIndex-- )
+			if(m_vElements[iIndex]) if(m_vElements[ iIndex ]->MouseMove( pMouse, isOver)) isOver = 0;
+
+	return 0;
 }
 
-void CWindow::KeyEvent( SKey sKey )
+bool CWindow::KeyEvent( SKey sKey )
 {
-	CMouse * pMouse = pGui->GetMouse();
+	CMouse * pMouse = gpGui->GetMouse();
 
 	if( pMouse->GetLeftButton() )
 	{
@@ -119,31 +187,31 @@ void CWindow::KeyEvent( SKey sKey )
 			SendMsg(END, 0);
 			this->SetVisible( false );
 		}
-		else if( pMouse->InArea( GetAbsPos()->GetX(), GetAbsPos()->GetY(), GetWidth(), TITLEBAR_HEIGHT ) && m_bTitleVisible )
+		else if( pMouse->InArea( GetAbsPos()->GetX(), GetAbsPos()->GetY(), GetWidth(), hTitleBar ) && m_bTitleVisible )
 		{
 			if( !pMouse->GetDragging() )
 			{
 				if( pMouse->GetLeftButton() == 1 )
 				{
-					pGui->BringToTop( this );
+					gpGui->BringToTop( this );
 
 					SetDragging( true );
 					pMouse->SetDragging( this );
 
-					SetElementState( "Dragging" );
+					SetElementState( "Dragging", 2 );
 				}
 				else
 				{
 					SetMaximized( !GetMaximized() );
 
-					SetElementState( GetMaximized()?"Norm":"Minimized" );
+					SetElementState( GetMaximized()?"Norm":"Minimized", 2 );
 
-					pGui->BringToTop( this );
+					gpGui->BringToTop( this );
 				}
 			}
 		}
 		else if(  pMouse->InArea( GetAbsPos()->GetX(), GetAbsPos()->GetY(), GetWidth(), GetHeight() ) )
-			pGui->BringToTop( this );
+			gpGui->BringToTop( this );
 	}
 	else
 	{
@@ -152,12 +220,14 @@ void CWindow::KeyEvent( SKey sKey )
 		pMouse->SetDragging( 0 );
 		SetDragging( false );
 
-		SetElementState( GetMaximized()?"Norm":"Minimized" );
+		SetElementState( GetMaximized()?"Norm":"Minimized", 2 );
 	}
 
 	if( GetMaximized() )
 		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
 			if(m_vElements[ iIndex ]) m_vElements[ iIndex ]->KeyEvent( sKey );
+
+	return 0;
 }
 
 void CWindow::SetMaximized( bool bMaximized )
@@ -194,8 +264,10 @@ void CWindow::SetCloseButton( bool bEnabled )
 {
 	m_bCloseButtonEnabled = bEnabled;
 
-	if( GetCloseButton() )
+	if(!bEnabled)
 		SetElementState( "Disabled", 1 );
+	else
+		SetElementState( "Norm", 1 );
 }
 
 bool CWindow::GetCloseButton()
@@ -252,16 +324,40 @@ void CWindow::BringToTop( CElement * pElement )
 void CWindow::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
-	if( !iIndex )
+	if( iIndex == 2 )
 	{
 		pTitle = pState->GetColor( "Title" );
-		pBodyInner = pState->GetColor( "BodyInner" );
-		pBodyBorder = pState->GetColor( "BodyBorder" );
-
 		pTitlebar = pState->GetTexture( "Titlebar" );
+		if(hTitleBar == 0)
+			hTitleBar = pState->GetInt("Height");
+	}
+	else if(iIndex == 1)
+	{
+		pButton = pState->GetTexture( "Button" );
+		if(mButton[0] == 0 && mButton[1] == 0 && sButton[0] == 0 && sButton[1] == 0)
+		{
+			mButton[0] = pState->GetInt("RightMargin");
+			mButton[1] = pState->GetInt("TopMargin");
+			sButton[0] = pState->GetInt("Width");
+			sButton[1] = pState->GetInt("Height");
+		}
 	}
 	else
-		pButton = pState->GetTexture( "Button" );
+	{
+		pBody = pState->GetColor( "Body" );
+		hwBorder[0] = pState->GetInt("BorderWidth");
+		hwBorder[1] = pState->GetInt("BorderHeight");
+		hwBorder[2] = pState->GetInt("BorderMargin");
+
+		tBorder[0] = pState->GetTexture("BorderCL");
+		tBorder[1] = pState->GetTexture("BorderCR"); 
+		tBorder[2] = pState->GetTexture("BorderUL");
+		tBorder[3] = pState->GetTexture("BorderDL");
+		tBorder[4] = pState->GetTexture("BorderUR");
+		tBorder[5] = pState->GetTexture("BorderDR");
+		tBorder[6] = pState->GetTexture("BorderUC");
+		tBorder[7] = pState->GetTexture("BorderRC");
+	}
 }
 
 void CWindow::SetTitleVisible( bool v )
@@ -272,4 +368,9 @@ void CWindow::SetTitleVisible( bool v )
 bool CWindow::GetTitleVisible()
 {
 	return m_bTitleVisible;
+}
+
+int CWindow::GetTitleBarHeight()
+{
+	return hTitleBar;
 }
