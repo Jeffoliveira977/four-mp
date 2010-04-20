@@ -2,7 +2,7 @@
 
 CLine::CLine( CGUI *Gui, int sX, int sY, int eX, int eY, int size, CColor *color, CWindow *eP )
 {
-	gpGui = Gui;
+	pGui = Gui;
 	this->sX = sX;
 	this->sY = sY;
 	this->eX = eX;
@@ -17,12 +17,12 @@ void CLine::Draw()
 	CPos Pos = new CPos(0,0);
 	if(wParent)
 		Pos = wParent->GetAbsPos();
-	gpGui->DrawLine(Pos.GetX()+sX, Pos.GetY()+sY, Pos.GetX()+eX, Pos.GetY()+eY, Size, color->GetD3DCOLOR());
+	pGui->DrawLine(Pos.GetX()+sX, Pos.GetY()+sY, Pos.GetX()+eX, Pos.GetY()+eY, Size, color->GetD3DCOLOR());
 }
 
 CBox::CBox( CGUI *Gui, int iX, int iY, int iWidth, int iHeight, CColor *In, CColor *Bo, CWindow *eP )
 {
-	gpGui = Gui;
+	pGui = Gui;
 	X = iX; Y = iY; Width = iWidth; Height = iHeight;
 	pInner = In;
 	pBorder = Bo;
@@ -34,12 +34,12 @@ void CBox::Draw()
 	CPos Pos = new CPos(0,0);
 	if(wParent)
 		Pos = wParent->GetAbsPos();
-	gpGui->DrawOutlinedBox(Pos.GetX()+X, Pos.GetY()+Y, Width, Height, pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR());
+	pGui->DrawOutlinedBox(Pos.GetX()+X, Pos.GetY()+Y, Width, Height, pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR());
 }
 
 CImage::CImage( CGUI *Gui, int iX, int iY, int iWidth, int iHeight, CTexture *cTxt, CWindow *eP )
 {
-	gpGui = Gui;
+	pGui = Gui;
 	X = iX; Y= iY; Width = iWidth; Height = iHeight;
 	pImg = cTxt;
 	wParent = eP;

@@ -7,7 +7,7 @@ CTextBox::CTextBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 
 	pSlider = new CScrollBar( Gui, CPos( GetWidth() + 2, 0 ), GetHeight() );
 
-	SetThemeElement( gpGui->GetThemeElement( "TextBox" ) );
+	SetThemeElement( pGui->GetThemeElement( "TextBox" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "TextBox", 0 );
@@ -20,7 +20,7 @@ void CTextBox::Draw()
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
 	int iAddHeight = GetFont()->GetStringHeight();
 	int iMaxHeight = GetHeight() - iAddHeight;
@@ -53,10 +53,10 @@ bool CTextBox::MouseMove( CMouse * pMouse, bool over )
 bool CTextBox::KeyEvent( SKey sKey )
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
-	if(GetMouseOver() && gpGui->GetMouse()->GetLeftButton())
+	if(GetMouseOver() && pGui->GetMouse()->GetLeftButton())
 		SendMsg(CLICK, 0);
 
-	if( GetMouseOver() || ( !sKey.m_bDown && !gpGui->GetMouse()->GetWheel() )  )
+	if( GetMouseOver() || ( !sKey.m_bDown && !pGui->GetMouse()->GetWheel() )  )
 		pSlider->KeyEvent( Pos, sKey );
 	
 	return 0;

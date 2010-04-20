@@ -7,7 +7,7 @@ CButton::CButton( CGUI *Gui, int X, int Y, int Width, int Height, const char * S
 	m_bVisibleBack = 1;
 	SizeEdge = 0;
 
-	SetThemeElement( gpGui->GetThemeElement( "Button" ) );
+	SetThemeElement( pGui->GetThemeElement( "Button" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "Button", 0 );
@@ -52,7 +52,7 @@ bool CButton::KeyEvent( SKey sKey )
 
 	if( !sKey.m_vKey )
 	{
-		if( GetMouseOver() && gpGui->GetMouse()->GetLeftButton( 0 ) )
+		if( GetMouseOver() && pGui->GetMouse()->GetLeftButton( 0 ) )
 		{
 			SetElementState( "Pressed" );
 

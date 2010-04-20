@@ -23,7 +23,7 @@ CListView::CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Colum
 
 	pSlider = new CScrollBar( Gui, CPos( GetWidth() - 1, 1 ), GetHeight()-2 );
 
-	SetThemeElement( gpGui->GetThemeElement( "ListView" ) );
+	SetThemeElement( pGui->GetThemeElement( "ListView" ) );
 
 	ShowSlider(1);
 	Widths[Count-1] -= pSlider->GetWidth();
@@ -38,22 +38,22 @@ void CListView::Draw()
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
 	int iAddHeight = GetFont()->GetStringHeight();
 
-	gpGui->DrawOutlinedBox( Pos.GetX() + 1, Pos.GetY() + 1, GetWidth()-2, iAddHeight, pTitle->GetD3DCOLOR(), pTitle->GetD3DCOLOR() );
+	pGui->DrawOutlinedBox( Pos.GetX() + 1, Pos.GetY() + 1, GetWidth()-2, iAddHeight, pTitle->GetD3DCOLOR(), pTitle->GetD3DCOLOR() );
 	for( int j = 0; j < Count; j++)
 	{
 		if( static_cast<int>( mTitles.size() ) > j)
 		{
 			GetFont()->DrawString( Pos.GetX() + Widths[j]/2 + (Poss[j]?Poss[j]:0), Pos.GetY(), FT_CENTER, pTitleString, mTitles[j], Widths[j] );
-			if(j != Count-1) gpGui->DrawLine(Pos.GetX()+Widths[j]+(Poss[j]?Poss[j]:0), Pos.GetY()+2, Pos.GetX()+Widths[j]+Poss[j] , Pos.GetY()+iAddHeight-1, 1, pbTitle->GetD3DCOLOR());
+			if(j != Count-1) pGui->DrawLine(Pos.GetX()+Widths[j]+(Poss[j]?Poss[j]:0), Pos.GetY()+2, Pos.GetX()+Widths[j]+Poss[j] , Pos.GetY()+iAddHeight-1, 1, pbTitle->GetD3DCOLOR());
 		}
 
 		int iHeight = iAddHeight + 5;
 
-		if(j != Count-1) gpGui->DrawLine(Pos.GetX()+Widths[j]+(Poss[j]?Poss[j]:0), Pos.GetY()+iHeight, Pos.GetX()+Widths[j]+Poss[j] , Pos.GetY()+GetHeight()-2, 1, pbInner->GetD3DCOLOR());
+		if(j != Count-1) pGui->DrawLine(Pos.GetX()+Widths[j]+(Poss[j]?Poss[j]:0), Pos.GetY()+iHeight, Pos.GetX()+Widths[j]+Poss[j] , Pos.GetY()+GetHeight()-2, 1, pbInner->GetD3DCOLOR());
 
 		if( m_vRows[j].size() )
 		{
@@ -69,14 +69,14 @@ void CListView::Draw()
 				if(m_iMouseSelect == i)	
 				{
 					if(j == 0)
-						gpGui->DrawOutlinedBox( Pos.GetX() + 1, Pos.GetY() + iHeight, GetWidth()-2, iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
+						pGui->DrawOutlinedBox( Pos.GetX() + 1, Pos.GetY() + iHeight, GetWidth()-2, iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
 					pColor = pInner;
 				}
 
 				GetFont()->DrawString( Pos.GetX() + (Poss[j]?Poss[j]:0) + Widths[j]/2, Pos.GetY() + iHeight, FT_CENTER, pColor, m_vRows[j][i], Widths[j] );
 
 				if(j == 0 && iHeight != iAddHeight + 5)
-					gpGui->DrawLine(Pos.GetX()+2, Pos.GetY()+iHeight, Pos.GetX()+GetWidth()-4 , Pos.GetY()+iHeight, 1, pbInner->GetD3DCOLOR());
+					pGui->DrawLine(Pos.GetX()+2, Pos.GetY()+iHeight, Pos.GetX()+GetWidth()-4 , Pos.GetY()+iHeight, 1, pbInner->GetD3DCOLOR());
 
 				iHeight += iAddHeight;
 			}
@@ -120,7 +120,7 @@ bool CListView::KeyEvent( SKey sKey )
 	{
 		if( GetMouseOver() )
 		{
-			if( m_iMouseOverIndex >= 0 && gpGui->GetMouse()->GetLeftButton() )
+			if( m_iMouseOverIndex >= 0 && pGui->GetMouse()->GetLeftButton() )
 			{
 				if(m_iMouseSelect > -2) m_iMouseSelect = m_iMouseOverIndex;
 				if( GetAction() )
@@ -129,10 +129,10 @@ bool CListView::KeyEvent( SKey sKey )
 		}
 	}
 
-	if( GetMouseOver() || ( !sKey.m_bDown && !gpGui->GetMouse()->GetWheel() )  )
+	if( GetMouseOver() || ( !sKey.m_bDown && !pGui->GetMouse()->GetWheel() )  )
 	{
 		pSlider->KeyEvent( Pos, sKey );
-		MouseMove( gpGui->GetMouse(), 1 );
+		MouseMove( pGui->GetMouse(), 1 );
 	}
 
 	return 0;

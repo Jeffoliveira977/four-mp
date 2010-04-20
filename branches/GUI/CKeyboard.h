@@ -30,7 +30,7 @@ struct SKey
 
 class CKeyboard
 {
-	CGUI *gpGui;
+	CGUI *pGui;
 	SKey m_sKey;
 
 public:

@@ -4,7 +4,7 @@
 
 class CMouse
 {
-	CGUI *gpGui;
+	CGUI *pGui;
 	IDirect3DDevice9 * m_pDevice;
 	CPos m_pos, m_bpos;
 	int size;

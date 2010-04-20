@@ -22,9 +22,9 @@ CScrollBar::CScrollBar( CGUI *Gui, CPos relPos, int inHeight )
 	m_bMouseOver[ 0 ] = m_bMouseOver[ 1 ] = m_bMouseOver[ 2 ] = false;
 	SetDragged( false );
 
-	SetThemeElement( gpGui->GetThemeElement( "ScrollBar" ) );
-	SetThemeElement( gpGui->GetThemeElement( "ScrollBar" ), 1 );
-	SetThemeElement( gpGui->GetThemeElement( "ScrollBar" ), 2 );
+	SetThemeElement( pGui->GetThemeElement( "ScrollBar" ) );
+	SetThemeElement( pGui->GetThemeElement( "ScrollBar" ), 1 );
+	SetThemeElement( pGui->GetThemeElement( "ScrollBar" ), 2 );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "ScrollBar", 0 );
@@ -53,7 +53,7 @@ void CScrollBar::Draw( CPos basePos )
 	if(!GetShow()) return;
 	CPos Pos = basePos + *GetRelPos();
 
-	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), ibWidth, GetHeight(), back->GetD3DCOLOR(), back->GetD3DCOLOR() );
+	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), ibWidth, GetHeight(), back->GetD3DCOLOR(), back->GetD3DCOLOR() );
 
 	pUpArrow->Draw( CPos( Pos.GetX() + 1, Pos.GetY() + 1 ), ibWidth - 2, ibHeight - 2 );
 	pDownArrow->Draw( CPos( Pos.GetX() + 1, Pos.GetY() + 1 + GetHeight() - ibHeight ), ibWidth - 2, ibHeight - 2 );
@@ -67,12 +67,12 @@ void CScrollBar::Draw( CPos basePos )
 void CScrollBar::PreDraw()
 {
 	if(!GetShow()) return;
-	if( (m_bPressed[ 0 ] && !gpGui->GetMouse()->GetLeftButton()) || !m_bMouseOver[ 0 ] )
+	if( (m_bPressed[ 0 ] && !pGui->GetMouse()->GetLeftButton()) || !m_bMouseOver[ 0 ] )
 	{
 		m_bPressed[ 0 ] = false;
 		SetElementState( m_bMouseOver[ 0 ]?"MouseOver":"Norm" );
 	}
-	if( (m_bPressed[ 2 ] && !gpGui->GetMouse()->GetLeftButton()) || m_bMouseOver[ 2 ] )
+	if( (m_bPressed[ 2 ] && !pGui->GetMouse()->GetLeftButton()) || m_bMouseOver[ 2 ] )
 	{
 		m_bPressed[ 2 ] = false;
 		SetElementState( m_bMouseOver[ 2 ]?"MouseOver":"Norm", 2 );
@@ -124,7 +124,7 @@ bool CScrollBar::KeyEvent( CPos basePos, SKey sKey )
 
 	if( !sKey.m_vKey )
 	{
-		if( gpGui->GetMouse()->GetLeftButton() )
+		if( pGui->GetMouse()->GetLeftButton() )
 		{
 			if( m_bMouseOver[ 0 ] )
 			{
@@ -142,13 +142,13 @@ bool CScrollBar::KeyEvent( CPos basePos, SKey sKey )
 				m_bPressed[ 2 ] = true;
 				SetElementState( "Pressed", 2 );
 			}
-			else if( gpGui->GetMouse()->InArea( Pos.GetX() + 1, Pos.GetY() + ibHeight, ibWidth, GetHeight() - ibHeight * 2 ) )
+			else if( pGui->GetMouse()->InArea( Pos.GetX() + 1, Pos.GetY() + ibHeight, ibWidth, GetHeight() - ibHeight * 2 ) )
 			{	
 				SetElementState( "Pressed", 1 );
 				m_bPressed[ 1 ] = true;
 
 				SetDragged( true );
-				MouseMove( Pos, gpGui->GetMouse() );
+				MouseMove( Pos, pGui->GetMouse() );
 			}
 		}
 		else
@@ -157,9 +157,9 @@ bool CScrollBar::KeyEvent( CPos basePos, SKey sKey )
 			SetDragged( false );
 		}
 
-		if( !GetDragged() && gpGui->GetMouse()->GetWheel() )
+		if( !GetDragged() && pGui->GetMouse()->GetWheel() )
 		{
-			int iState = gpGui->GetMouse()->GetWheel( 0 );
+			int iState = pGui->GetMouse()->GetWheel( 0 );
 
 			int iTenth = ( GetMaxValue() / 10 )?GetMaxValue() / 10:1;
 

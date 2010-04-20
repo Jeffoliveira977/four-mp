@@ -16,7 +16,7 @@ CEditBox::CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 	{
 		SetAction( Callback );
 	}
-	SetThemeElement( gpGui->GetThemeElement( "EditBox" ) );
+	SetThemeElement( pGui->GetThemeElement( "EditBox" ) );
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "EditBox", 0 );
 	else
@@ -42,7 +42,7 @@ void CEditBox::Draw()
 		int hgt = (GetHeight()-GetFont()->GetStringHeight())/2;
 
 		if( m_bCursorState && HasFocus() && GetEnabled() )
-			gpGui->FillArea( Pos.GetX() + 2 + m_iCursorX, Pos.GetY() + hgt, 2, GetHeight() - 2*hgt, pCursor->GetD3DCOLOR() );
+			pGui->FillArea( Pos.GetX() + 2 + m_iCursorX, Pos.GetY() + hgt, 2, GetHeight() - 2*hgt, pCursor->GetD3DCOLOR() );
 	}
 }
 
@@ -77,13 +77,13 @@ bool CEditBox::KeyEvent( SKey sKey )
 	if(!GetEnabled()) return 0;
 	if( !sKey.m_vKey )
 	{
-		if( gpGui->GetMouse()->GetLeftButton() )
+		if( pGui->GetMouse()->GetLeftButton() )
 		{
 			if( GetMouseOver() )
 			{
 				SendMsg(CLICK, 0);
 
-				int iX = gpGui->GetMouse()->GetPos().GetX();
+				int iX = pGui->GetMouse()->GetPos().GetX();
 				int iAbsX = ( *GetParent()->GetAbsPos() + *GetRelPos() ).GetX();
 
 				std::string sString( &GetString()[ GetStart() ] );

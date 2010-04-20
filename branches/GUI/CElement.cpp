@@ -2,7 +2,7 @@
 
 void CElement::SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback, bool abs)
 {
-	gpGui = Gui;
+	pGui = Gui;
 
 	if(!abs)
 		SetRelPos( CPos( X, Y ) );
@@ -28,7 +28,7 @@ void CElement::SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const
 	else
 		SetAction( 0 );
 
-	pFont = gpGui->GetFont();
+	pFont = pGui->GetFont();
 	m_bEnabled = 1;
 	SetMouseOver( false );
 }
@@ -120,7 +120,7 @@ std::string CElement::GetString( bool bReplaceVars, int iIndex )
 
 	if( bReplaceVars && m_sRaw[ iIndex ].find( "$" ) != std::string::npos )
 	{
-		for( std::map<std::string,CVar*>::reverse_iterator iIter = gpGui->Cvars.rbegin(); iIter != gpGui->Cvars.rend(); iIter++ )
+		for( std::map<std::string,CVar*>::reverse_iterator iIter = pGui->Cvars.rbegin(); iIter != pGui->Cvars.rend(); iIter++ )
 		{
 			int iPos = m_sFormatted[ iIndex ].find( iIter->first );
 
@@ -237,7 +237,7 @@ bool CElement::KeyEvent( SKey )
 
 void CElement::SetFont(int size, char *name)
 {
-	pFont = new CFont(gpGui, gpGui->GetDevice(), size, name);
+	pFont = new CFont(pGui, pGui->GetDevice(), size, name);
 }
 
 void CElement::SetFont(CFont *font)

@@ -8,7 +8,7 @@ CListBox::CListBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 
 	pSlider = new CScrollBar( Gui, CPos( GetWidth() + 2, 0 ), GetHeight() );
 
-	SetThemeElement( gpGui->GetThemeElement( "ListBox" ) );
+	SetThemeElement( pGui->GetThemeElement( "ListBox" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "ListBox", 0 );
@@ -20,7 +20,7 @@ void CListBox::Draw()
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
-	gpGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
 	int iAddHeight = GetFont()->GetStringHeight();
 	if( m_vRows.size() )
@@ -35,7 +35,7 @@ void CListBox::Draw()
 
 			if(m_iMouseSelect == i)	
 			{
-				gpGui->DrawOutlinedBox( Pos.GetX() + 2, Pos.GetY() + iHeight, GetWidth() -  pSlider->GetSliderWidth(), iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
+				pGui->DrawOutlinedBox( Pos.GetX() + 2, Pos.GetY() + iHeight, GetWidth() -  pSlider->GetSliderWidth(), iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
 				pColor = pInner;
 			}
 
@@ -80,15 +80,15 @@ bool CListBox::KeyEvent( SKey sKey )
 		if( GetMouseOver() )
 		{
 			if(m_iMouseSelect > -2) m_iMouseSelect = m_iMouseOverIndex;
-			if( m_iMouseOverIndex >= 0 && GetAction() && gpGui->GetMouse()->GetLeftButton() )
+			if( m_iMouseOverIndex >= 0 && GetAction() && pGui->GetMouse()->GetLeftButton() )
 				GetAction()( this, SELECT, m_iMouseOverIndex );
 		}
 	}
 
-	if( GetMouseOver() || ( !sKey.m_bDown && !gpGui->GetMouse()->GetWheel() )  )
+	if( GetMouseOver() || ( !sKey.m_bDown && !pGui->GetMouse()->GetWheel() )  )
 	{
 		pSlider->KeyEvent( Pos, sKey );
-		MouseMove( gpGui->GetMouse(), 1 );
+		MouseMove( pGui->GetMouse(), 1 );
 	}
 	return 0;
 }

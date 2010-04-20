@@ -9,7 +9,7 @@ class CGUI;
 
 class CFont
 {
-	CGUI *gpGui;
+	CGUI *pGui;
 	CColor m_cColors[9];
 
 	ID3DXFont * m_pFont;

@@ -5,7 +5,7 @@ CCheckBox::CCheckBox( CGUI *Gui, int X, int Y, int Width, int Height, bool Check
 	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 	SetChecked( Checked );
 
-	SetThemeElement( gpGui->GetThemeElement( "CheckBox" ) );
+	SetThemeElement( pGui->GetThemeElement( "CheckBox" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "No color scheme element found.", "CheckBox", 0 );
@@ -53,7 +53,7 @@ bool CCheckBox::KeyEvent( SKey sKey )
 {
 	if( !sKey.m_vKey )
 	{
-		if( GetMouseOver() && gpGui->GetMouse()->GetLeftButton( 0 ) )
+		if( GetMouseOver() && pGui->GetMouse()->GetLeftButton( 0 ) )
 		{
 			m_bChecked = !m_bChecked;
 			

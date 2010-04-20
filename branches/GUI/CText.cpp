@@ -4,7 +4,7 @@ CText::CText( CGUI *Gui, int X, int Y, int Width, int Height, const char * Strin
 {
 	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 
-	SetThemeElement( gpGui->GetThemeElement( "Text" ) );
+	SetThemeElement( pGui->GetThemeElement( "Text" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "Text", 0 );

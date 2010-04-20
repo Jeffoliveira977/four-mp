@@ -6,7 +6,7 @@ class CGUI;
 
 class CLine
 {
-	CGUI *gpGui;
+	CGUI *pGui;
 	CColor *color;
 	int sX, sY, eX, eY, Size;
 	CWindow *wParent;
@@ -17,7 +17,7 @@ public:
 
 class CBox
 {
-	CGUI *gpGui;
+	CGUI *pGui;
 	CColor * pInner, * pBorder;
 	int X, Y, Width, Height;
 	CWindow *wParent;
@@ -28,7 +28,7 @@ public:
 
 class CImage
 {
-	CGUI *gpGui;
+	CGUI *pGui;
 	int X, Y, Width, Height;
 	CTexture * pImg;
 	CWindow *wParent;

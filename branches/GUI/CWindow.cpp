@@ -17,21 +17,21 @@ CWindow::CWindow( CGUI *Gui, int X, int Y, int Width, int Height, const char * S
 	hTitleBar = 0;
 	sButton[0] = sButton[1] = mButton[0] = mButton[1] = 0;
 
-	SetThemeElement( gpGui->GetThemeElement( "Window" ) );
+	SetThemeElement( pGui->GetThemeElement( "Window" ) );
 
 	if( !GetThemeElement() )
 		MessageBoxA( 0, "Theme element invalid.", "Window", 0 );
 	else
 		SetElementState( "Norm" );
 
-	SetThemeElement( gpGui->GetThemeElement( "TitleBar" ), 2 );
+	SetThemeElement( pGui->GetThemeElement( "TitleBar" ), 2 );
 
 	if( !GetThemeElement( 2 ) )
 		MessageBoxA( 0, "Theme element invalid.", "TitleBar", 0 );
 	else
 		SetElementState( "Norm", 2 );
 
-	SetThemeElement( gpGui->GetThemeElement( "CloseButton" ), 1 );
+	SetThemeElement( pGui->GetThemeElement( "CloseButton" ), 1 );
 
 	if( !GetThemeElement( 1 ) )
 		MessageBoxA( 0, "Theme element invalid.", "CloseButton", 0 );
@@ -40,7 +40,7 @@ CWindow::CWindow( CGUI *Gui, int X, int Y, int Width, int Height, const char * S
 		SetElementState( "Norm", 1 );
 		SetCloseButton( true );
 
-		MouseMove( gpGui->GetMouse() );
+		MouseMove( pGui->GetMouse() );
 	}
 }
 
@@ -72,7 +72,7 @@ void CWindow::Draw()
 	{
 		if(m_bTitleVisible)
 		{
-			gpGui->DrawOutlinedBox( GetAbsPos()->GetX(), GetAbsPos()->GetY()+hTitleBar, GetWidth(), GetHeight() - hTitleBar,  pBody->GetD3DCOLOR(), pBody->GetD3DCOLOR() );
+			pGui->DrawOutlinedBox( GetAbsPos()->GetX(), GetAbsPos()->GetY()+hTitleBar, GetWidth(), GetHeight() - hTitleBar,  pBody->GetD3DCOLOR(), pBody->GetD3DCOLOR() );
 		}
 
 		for(int i = 0; i < (int)m_eLine[0].size(); i++)
@@ -175,7 +175,7 @@ bool CWindow::MouseMove( CMouse * pMouse, bool )
 
 bool CWindow::KeyEvent( SKey sKey )
 {
-	CMouse * pMouse = gpGui->GetMouse();
+	CMouse * pMouse = pGui->GetMouse();
 
 	if( pMouse->GetLeftButton() )
 	{
@@ -193,7 +193,7 @@ bool CWindow::KeyEvent( SKey sKey )
 			{
 				if( pMouse->GetLeftButton() == 1 )
 				{
-					gpGui->BringToTop( this );
+					pGui->BringToTop( this );
 
 					SetDragging( true );
 					pMouse->SetDragging( this );
@@ -206,12 +206,12 @@ bool CWindow::KeyEvent( SKey sKey )
 
 					SetElementState( GetMaximized()?"Norm":"Minimized", 2 );
 
-					gpGui->BringToTop( this );
+					pGui->BringToTop( this );
 				}
 			}
 		}
 		else if(  pMouse->InArea( GetAbsPos()->GetX(), GetAbsPos()->GetY(), GetWidth(), GetHeight() ) )
-			gpGui->BringToTop( this );
+			pGui->BringToTop( this );
 	}
 	else
 	{
