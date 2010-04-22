@@ -6,7 +6,6 @@
 
 #include "sq\squirrel.h"
 #include "sq\sqstdsystem.h"
-#include "main.h"
 
 void sc_OnGameModeInit(HSQUIRRELVM v)
 {
@@ -56,24 +55,27 @@ void sc_OnFilterScriptExit(HSQUIRRELVM v)
 	sq_settop(v,top); 
 }
 
-int sc_OnPlayerConnect(HSQUIRRELVM v, int playerid, char name[32])
+int sc_OnPlayerConnect(HSQUIRRELVM v, const unsigned char index, char *name)
 {
-	int result;
+	int result = 1;
 	int top = sq_gettop(v); 
 	sq_pushroottable(v);
 	sq_pushstring(v,_SC("OnPlayerConnect"),-1);
 	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
 		sq_pushroottable(v); 
-		sq_pushinteger(v,playerid); 
+		sq_pushinteger(v,index); 
 		sq_pushstring(v,name,-1);
-		sq_call(v,3,1,0); 
+		if (SQ_FAILED(sq_call(v,3,1,0)))
+		{
+			return 1;
+		}
 		sq_getinteger(v, sq_gettop(v), &result);
 	}
 	sq_settop(v,top);
 	return result;
 }
 
-void sc_OnPlayerDisconnect(HSQUIRRELVM v, int playerid)
+void sc_OnPlayerDisconnect(HSQUIRRELVM v, const unsigned char index)
 {
 	int result;
 	int top = sq_gettop(v); 
@@ -81,13 +83,13 @@ void sc_OnPlayerDisconnect(HSQUIRRELVM v, int playerid)
 	sq_pushstring(v,_SC("OnPlayerDisconnect"),-1);
 	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
 		sq_pushroottable(v); 
-		sq_pushinteger(v,playerid); 
+		sq_pushinteger(v,index); 
 		sq_call(v,2,0,0); 
 	}
 	sq_settop(v,top); 
 }
 
-void sc_OnPlayerSpawn(HSQUIRRELVM v, int playerid, int cl)
+void sc_OnPlayerSpawn(HSQUIRRELVM v, const unsigned char playerindex, const unsigned char classindex)
 {
 	int result;
 	int top = sq_gettop(v); 
@@ -95,8 +97,8 @@ void sc_OnPlayerSpawn(HSQUIRRELVM v, int playerid, int cl)
 	sq_pushstring(v,_SC("OnPlayerSpawn"),-1);
 	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
 		sq_pushroottable(v); 
-		sq_pushinteger(v,playerid); 
-		sq_pushinteger(v,cl); 
+		sq_pushinteger(v,playerindex); 
+		sq_pushinteger(v,classindex); 
 		sq_call(v,3,0,0); 
 	}
 	sq_settop(v,top); 

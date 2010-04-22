@@ -10,8 +10,8 @@
 #include <windows.h>
 #endif
 
-#include "main.h"
 #include "sq_consolenatives.h"
+#include "logging.h"
 #include "HandleManager.h"
 #include "console\ConsoleCore.h"
 #include "console\fmpconcommands.h"

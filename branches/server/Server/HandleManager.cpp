@@ -5,14 +5,14 @@
 
 #include <stdlib.h>
 
-#include "main.h"
 #include "HandleManager.h"
+#include "logging.h"
 #include "CoreHandleTypesManager.h"
 #include "PluginManager.h"
 #include "VirtualMachineManager.h"
 
 extern CoreHandleTypesManager chtm;
-extern PluginManager pm;
+extern PluginManager plugm;
 extern VirtualMachineManager vmm;
 
 HandleManager::HandleManager(void)
@@ -20,7 +20,7 @@ HandleManager::HandleManager(void)
 	maxtypebuffersize = 65535;
 	maxhandlesperowner = 16384;
 	pluginowneroffset = 1 + vmm.GetMaxVirtualMachineBufferSize();
-	maxcountbuffersize =  pluginowneroffset + pm.GetMaxPluginBufferSize();
+	maxcountbuffersize =  pluginowneroffset + plugm.GetMaxPluginBufferSize();
 	maxhandlebuffersize = maxcountbuffersize * maxhandlesperowner;
 	typebuffer = (HandleType **)calloc(NUM_CORE_HANDLE_TYPES, sizeof(HandleType *));
 	for (unsigned short i = 0; i < NUM_CORE_HANDLE_TYPES; i++)

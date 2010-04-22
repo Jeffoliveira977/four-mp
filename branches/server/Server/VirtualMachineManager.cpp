@@ -1,7 +1,7 @@
 /// \file
 /// \brief Source file that contains implementation of the VirtualMachineManager class.
 /// \details See class description.
-/// \author FaTony
+/// \author FaTony. Wrapped around initial WNeZRoS' code.
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -499,7 +499,7 @@ void VirtualMachineManager::RegServerCmd(const HSQUIRRELVM *v, const char *callb
 	chtm.AddDynamicCommand(index + 1, callback, ptr);
 }
 
-int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
+int VirtualMachineManager::OnPlayerConnect(const unsigned char index, char *name)
 {
 	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
@@ -509,7 +509,7 @@ int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
 			{
 			case VMLanguageSquirrel:
 				{
-					sc_OnPlayerConnect(*vmbuffer[i]->ptr.squirrel, playerid, name);
+					sc_OnPlayerConnect(*vmbuffer[i]->ptr.squirrel, index, name);
 					break;
 				}
 			}
@@ -518,7 +518,7 @@ int VirtualMachineManager::OnPlayerConnect(int playerid, char name[32])
 	return 1; //Temp
 }
 
-void VirtualMachineManager::OnPlayerDisconnect(int playerid)
+void VirtualMachineManager::OnPlayerDisconnect(const unsigned char index)
 {
 	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
@@ -528,7 +528,7 @@ void VirtualMachineManager::OnPlayerDisconnect(int playerid)
 			{
 			case VMLanguageSquirrel:
 				{
-					sc_OnPlayerDisconnect(*vmbuffer[i]->ptr.squirrel, playerid);
+					sc_OnPlayerDisconnect(*vmbuffer[i]->ptr.squirrel, index);
 					break;
 				}
 			}
@@ -536,7 +536,7 @@ void VirtualMachineManager::OnPlayerDisconnect(int playerid)
 	}
 }
 
-void VirtualMachineManager::OnPlayerSpawn(int playerid, int cl)
+void VirtualMachineManager::OnPlayerSpawn(const unsigned char playerindex, const unsigned char classindex)
 {
 	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
@@ -546,7 +546,7 @@ void VirtualMachineManager::OnPlayerSpawn(int playerid, int cl)
 			{
 			case VMLanguageSquirrel:
 				{
-					sc_OnPlayerSpawn(*vmbuffer[i]->ptr.squirrel, playerid, cl);
+					sc_OnPlayerSpawn(*vmbuffer[i]->ptr.squirrel, playerindex, classindex);
 					break;
 				}
 			}

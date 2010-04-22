@@ -9,7 +9,7 @@
 #include "..\VirtualMachineManager.h"
 
 extern CoreHandleTypesManager chtm;
-extern PluginManager pm;
+extern PluginManager plugm;
 extern VirtualMachineManager vmm;
 
 void ConCmdDynamic(ConsoleCore *concore, unsigned char numargs)
@@ -207,10 +207,10 @@ void ConCmdPluginList(ConsoleCore *concore, unsigned char numargs)
 {
 	concore->Output("Loaded plugins:\n---------------------");
 	char *string;
-	unsigned char max = pm.GetPluginBufferSize();
+	unsigned char max = plugm.GetPluginBufferSize();
 	for (unsigned char i = 0; i < max; i++)
 	{
-		string = pm.GetPluginInfoString(i);
+		string = plugm.GetPluginInfoString(i);
 		if (string != NULL)
 		{
 			concore->Output(string);
@@ -232,7 +232,7 @@ void ConCmdPluginLoad(ConsoleCore *concore, unsigned char numargs)
 		concore->Output("Usage: plugin_load <filename>");
 		return;
 	}
-	if (!pm.LoadPlugin(name))
+	if (!plugm.LoadPlugin(name))
 	{
 		concore->Output("Unable to load plugin \"%s\"", name);
 		return;
@@ -243,7 +243,7 @@ void ConCmdPluginLoad(ConsoleCore *concore, unsigned char numargs)
 
 void ConCmdPluginLoadAll(ConsoleCore *concore, unsigned char numargs)
 {
-	pm.LoadPlugins();
+	plugm.LoadPlugins();
 	concore->Output("Loaded all plugins");
 }
 
@@ -260,7 +260,7 @@ void ConCmdPluginPause(ConsoleCore *concore, unsigned char numargs)
 		concore->Output("Usage: plugin_pause <index>");
 		return;
 	}
-	if (!pm.PausePlugin(index))
+	if (!plugm.PausePlugin(index))
 	{
 
 		concore->Output("Unable to pause plugin \"%d\"", index);
@@ -271,7 +271,7 @@ void ConCmdPluginPause(ConsoleCore *concore, unsigned char numargs)
 
 void ConCmdPluginPauseAll(ConsoleCore *concore, unsigned char numargs)
 {
-	pm.PausePlugins();
+	plugm.PausePlugins();
 	concore->Output("Plugins disabled");
 }
 
@@ -288,7 +288,7 @@ void ConCmdPluginReload(ConsoleCore *concore, unsigned char numargs)
 		concore->Output("Usage: plugin_reload <index>");
 		return;
 	}
-	if (!pm.ReloadPlugin(index))
+	if (!plugm.ReloadPlugin(index))
 	{
 
 		concore->Output("Unable to reload plugin \"%d\"", index);
@@ -299,7 +299,7 @@ void ConCmdPluginReload(ConsoleCore *concore, unsigned char numargs)
 
 void ConCmdPluginReloadAll(ConsoleCore *concore, unsigned char numargs)
 {
-	pm.ReloadPlugins();
+	plugm.ReloadPlugins();
 	concore->Output("Reloaded all plugins");
 }
 
@@ -316,7 +316,7 @@ void ConCmdPluginUnload(ConsoleCore *concore, unsigned char numargs)
 		concore->Output("Usage: plugin_unload <index>");
 		return;
 	}
-	if (!pm.UnloadPlugin(index))
+	if (!plugm.UnloadPlugin(index))
 	{
 
 		concore->Output("Unable to unload plugin \"%d\", not found", index);
@@ -327,7 +327,7 @@ void ConCmdPluginUnload(ConsoleCore *concore, unsigned char numargs)
 
 void ConCmdPluginUnloadAll(ConsoleCore *concore, unsigned char numargs)
 {
-	pm.UnloadPlugins();
+	plugm.UnloadPlugins();
 	concore->Output("Unloaded all plugins");
 }
 
@@ -344,7 +344,7 @@ void ConCmdPluginUnpause(ConsoleCore *concore, unsigned char numargs)
 		concore->Output("Usage: plugin_unpause <index>");
 		return;
 	}
-	if (!pm.UnpausePlugin(index))
+	if (!plugm.UnpausePlugin(index))
 	{
 
 		concore->Output("Unable to unpause plugin \"%d\"", index);
@@ -355,6 +355,6 @@ void ConCmdPluginUnpause(ConsoleCore *concore, unsigned char numargs)
 
 void ConCmdPluginUnpauseAll(ConsoleCore *concore, unsigned char numargs)
 {
-	pm.UnpausePlugins();
+	plugm.UnpausePlugins();
 	concore->Output("Plugins enabled");
 }

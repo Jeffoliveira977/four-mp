@@ -7,8 +7,8 @@
 #include <string.h>
 #include <io.h>
 
-#include "main.h"
 #include "PluginManager.h"
+#include "logging.h"
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 #include "console\ConsoleCore.h"
@@ -17,7 +17,7 @@
 extern HandleManager hm;
 extern CoreHandleTypesManager chtm;
 extern ConsoleCore concore;
-extern PluginManager pm;
+extern PluginManager plugm;
 extern VirtualMachineManager vmm;
 
 PluginManager::PluginManager(void)
@@ -394,7 +394,7 @@ void PluginManager::OnPluginUnload(const unsigned char index)
 /// \return Pointer to the plugin handler interface.
 extern "C" __declspec(dllexport) IPluginHandlerInterface *GetPluginHandler(void)
 {
-	return pm.GetPluginHandler();
+	return plugm.GetPluginHandler();
 }
 
 PluginManager::PluginHandler::PluginHandler(void)
@@ -408,7 +408,7 @@ PluginManager::PluginHandler::~PluginHandler(void)
 void PluginManager::PluginHandler::ReleaseAllHandleTypes(const IPluginInterface *plugin)
 {
 	unsigned char index;
-	if (!pm.FindPlugin(plugin, index))
+	if (!plugm.FindPlugin(plugin, index))
 	{
 		return;
 	}
@@ -418,7 +418,7 @@ void PluginManager::PluginHandler::ReleaseAllHandleTypes(const IPluginInterface 
 bool PluginManager::PluginHandler::RequestNewHandleType(const IPluginInterface *plugin, unsigned short &index)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
@@ -432,7 +432,7 @@ bool PluginManager::PluginHandler::RequestNewHandleType(const IPluginInterface *
 bool PluginManager::PluginHandler::ReleaseHandleType(const IPluginInterface *plugin, const unsigned short &index)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
@@ -457,191 +457,191 @@ void PluginManager::PluginHandler::PrintToServer(const char *string, ...)
 int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const char *name, const float defaultvalue, const char *description, const int flags, const bool hasMin, const float min, const bool hasMax, const float max)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return INVALID_HANDLE;
 	}
-	return hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max));
+	return hm.AddNewHandle(plugm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max));
 }
 
 int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const char *name, const int defaultvalue, const char *description, const int flags, const bool hasMin, const int min, const bool hasMax, const int max)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return INVALID_HANDLE;
 	}
-	return hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max));
+	return hm.AddNewHandle(plugm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max));
 }
 
 int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const char *name, const char *defaultvalue, const char *description, const int flags)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return INVALID_HANDLE;
 	}
-	return hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags));
+	return hm.AddNewHandle(plugm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags));
 }
 
 int PluginManager::PluginHandler::FindConVar(const IPluginInterface *plugin, const char *name)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return INVALID_HANDLE;
 	}
-	return chtm.FindConVar(pm.handleowneroffset + pluginindex, name);
+	return chtm.FindConVar(plugm.handleowneroffset + pluginindex, name);
 }
 
 bool PluginManager::PluginHandler::ResetConVar(const IPluginInterface *plugin, const int handle)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.ResetConVar(pm.handleowneroffset + pluginindex, handle);
+	return chtm.ResetConVar(plugm.handleowneroffset + pluginindex, handle);
 }
 
 char *PluginManager::PluginHandler::GetConVarName(const IPluginInterface *plugin, const int handle)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.GetConVarName(pm.handleowneroffset + pluginindex, handle);
+	return chtm.GetConVarName(plugm.handleowneroffset + pluginindex, handle);
 }
 
 bool PluginManager::PluginHandler::GetConVarValue(const IPluginInterface *plugin, const int handle, float &value)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.GetConVarValue(pm.handleowneroffset + pluginindex, handle, value);
+	return chtm.GetConVarValue(plugm.handleowneroffset + pluginindex, handle, value);
 }
 
 bool PluginManager::PluginHandler::GetConVarValue(const IPluginInterface *plugin, const int handle, int &value)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.GetConVarValue(pm.handleowneroffset + pluginindex, handle, value);
+	return chtm.GetConVarValue(plugm.handleowneroffset + pluginindex, handle, value);
 }
 
 bool PluginManager::PluginHandler::GetConVarValue(const IPluginInterface *plugin, const int handle, char *&value)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.GetConVarValue(pm.handleowneroffset + pluginindex, handle, value);
+	return chtm.GetConVarValue(plugm.handleowneroffset + pluginindex, handle, value);
 }
 
 bool PluginManager::PluginHandler::GetConVarFlags(const IPluginInterface *plugin, const int handle, int &flags)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.GetConVarFlags(pm.handleowneroffset + pluginindex, handle, flags);
+	return chtm.GetConVarFlags(plugm.handleowneroffset + pluginindex, handle, flags);
 }
 
 bool PluginManager::PluginHandler::GetConVarBound(const IPluginInterface *plugin, const int handle, const ConVarBoundType type, float &bound)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.GetConVarBound(pm.handleowneroffset + pluginindex, handle, type, bound);
+	return chtm.GetConVarBound(plugm.handleowneroffset + pluginindex, handle, type, bound);
 }
 
 bool PluginManager::PluginHandler::GetConVarBound(const IPluginInterface *plugin, const int handle, const ConVarBoundType type, int &bound)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.GetConVarBound(pm.handleowneroffset + pluginindex, handle, type, bound);
+	return chtm.GetConVarBound(plugm.handleowneroffset + pluginindex, handle, type, bound);
 }
 
 bool PluginManager::PluginHandler::SetConVarValue(const IPluginInterface *plugin, const int handle, const float value)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.SetConVarValue(pm.handleowneroffset + pluginindex, handle, value);
+	return chtm.SetConVarValue(plugm.handleowneroffset + pluginindex, handle, value);
 }
 
 bool PluginManager::PluginHandler::SetConVarValue(const IPluginInterface *plugin, const int handle, const int value)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.SetConVarValue(pm.handleowneroffset + pluginindex, handle, value);
+	return chtm.SetConVarValue(plugm.handleowneroffset + pluginindex, handle, value);
 }
 
 bool PluginManager::PluginHandler::SetConVarValue(const IPluginInterface *plugin, const int handle, const char *value)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.SetConVarValue(pm.handleowneroffset + pluginindex, handle, value);
+	return chtm.SetConVarValue(plugm.handleowneroffset + pluginindex, handle, value);
 }
 
 bool PluginManager::PluginHandler::SetConVarFlags(const IPluginInterface *plugin, const int handle, const int flags)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.SetConVarFlags(pm.handleowneroffset + pluginindex, handle, flags);
+	return chtm.SetConVarFlags(plugm.handleowneroffset + pluginindex, handle, flags);
 }
 
 bool PluginManager::PluginHandler::SetConVarBound(const IPluginInterface *plugin, const int handle, const ConVarBoundType type, const bool set, const float bound)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.SetConVarBound(pm.handleowneroffset + pluginindex, handle, type, set, bound);
+	return chtm.SetConVarBound(plugm.handleowneroffset + pluginindex, handle, type, set, bound);
 }
 
 bool PluginManager::PluginHandler::SetConVarBound(const IPluginInterface *plugin, const int handle, const ConVarBoundType type, const bool set, const int bound)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return false;
 	}
-	return chtm.SetConVarBound(pm.handleowneroffset + pluginindex, handle, type, set, bound);
+	return chtm.SetConVarBound(plugm.handleowneroffset + pluginindex, handle, type, set, bound);
 }
 
 void PluginManager::PluginHandler::RegServerCmd(const IPluginInterface *plugin, const char *name, void *callback, const char *description, const int flags)
 {
 	unsigned char pluginindex;
-	if (!pm.FindPlugin(plugin, pluginindex))
+	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
 		return;
 	}
-	hm.AddNewHandle(pm.handleowneroffset + pluginindex, HandleTypeConCmd, concore.AddConCmd(name, callback, description, flags));
+	hm.AddNewHandle(plugm.handleowneroffset + pluginindex, HandleTypeConCmd, concore.AddConCmd(name, callback, description, flags));
 }
 
 unsigned char PluginManager::PluginHandler::GetCmdArgs(void)

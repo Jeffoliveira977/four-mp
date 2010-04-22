@@ -17,7 +17,7 @@
 /// machines: one for the always changing gamemode and other for always-on filterscripts.
 /// All virtual machines can be called through the single interface. Each call is 
 /// internally converted into the language specific one.
-/// \author FaTony
+/// \author FaTony. Wrapped around initial WNeZRoS' code.
 
 class VirtualMachineManager
 {
@@ -244,21 +244,21 @@ public:
 	void RegServerCmd(const HSQUIRRELVM *v, const char *callback, const ConCmd *ptr);
 
 	/// \brief Called when a player connects the server.
-	/// \param[in] playerid TODO:
-	/// \param[in] name TODO:
+	/// \param[in] index Index of the player.
+	/// \param[in] name Name of the player.
 	/// \return TODO:
-	int OnPlayerConnect(int playerid, char name[32]);
+	int OnPlayerConnect(const unsigned char index, char *name);
 
 	/// \brief Called when a player is disconnecting from the server.
-	/// \param[in] playerid TODO:
+	/// \param[in] index Index of the player.
 	/// \return No return.
-	void OnPlayerDisconnect(int playerid);
+	void OnPlayerDisconnect(const unsigned char index);
 
 	/// \brief Called when a player is spawning.
-	/// \param[in] playerid TODO:
-	/// \param[in] cl TODO:
+	/// \param[in] playerindex Index of the player.
+	/// \param[in] classindex Index of the class.
 	/// \return No return.
-	void OnPlayerSpawn(int playerid, int cl);
+	void OnPlayerSpawn(const unsigned char playerindex, const unsigned char classindex);
 
 	/// \brief Fires a dynamic command callback.
 	/// \param[in] index Index of the virtual machine.

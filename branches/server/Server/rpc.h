@@ -4,24 +4,24 @@
 *	Last Modifed:		-
 */
 
-void ClientConnect(RPCParameters *rpcParameters);
-void Check(RPCParameters *rpcParameters);
+void RPC_ClientConnect(RPCParameters *rpcParameters);
+void RPC_Check(RPCParameters *rpcParameters);
 
-void MovePlayer(RPCParameters *rpcParameters);
-void JumpPlayer(RPCParameters *rpcParameters);
-void DuckPlayer(RPCParameters *rpcParameters);
+void RPC_MovePlayer(RPCParameters *rpcParameters);
+void RPC_JumpPlayer(RPCParameters *rpcParameters);
+void RPC_DuckPlayer(RPCParameters *rpcParameters);
 
-void PlayerCancelEnterInVehicle(RPCParameters *rpcParameters);
-void PlayerExitFromVehicle(RPCParameters *rpcParameters);
-void PlayerEnterInVehicle(RPCParameters *rpcParameters);
+void RPC_PlayerCancelEnterInVehicle(RPCParameters *rpcParameters);
+void RPC_PlayerExitFromVehicle(RPCParameters *rpcParameters);
+void RPC_PlayerEnterInVehicle(RPCParameters *rpcParameters);
 
-void PlayerFire(RPCParameters *rpcParameters);
-void PlayerAim(RPCParameters *rpcParameters);
-void SwapGun(RPCParameters *rpcParameters);
-void PlayerParams(RPCParameters *rpcParameters);
+void RPC_PlayerFire(RPCParameters *rpcParameters);
+void RPC_PlayerAim(RPCParameters *rpcParameters);
+void RPC_SwapGun(RPCParameters *rpcParameters);
+void RPC_PlayerParams(RPCParameters *rpcParameters);
 
-void PlayerSpawn(RPCParameters *rpcParameters);
-void Select_ModelChanged(RPCParameters *rpcParameters);
-void SyncSkinVariation(RPCParameters *rpcParameters);
+void RPC_PlayerSpawn(RPCParameters *rpcParameters);
+void RPC_Select_ModelChanged(RPCParameters *rpcParameters);
+void RPC_SyncSkinVariation(RPCParameters *rpcParameters);
 
-void Chat(RPCParameters *rpcParameters);
+void RPC_Chat(RPCParameters *rpcParameters);

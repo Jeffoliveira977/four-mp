@@ -33,21 +33,21 @@ void sc_OnFilterScriptInit(HSQUIRRELVM v);
 void sc_OnFilterScriptExit(HSQUIRRELVM v);
 
 /// \brief Called when a player connects the server.
-/// \param[in] playerid TODO:
-/// \param[in] name TODO:
+/// \param[in] index Index of the player.
+/// \param[in] name Name of the player.
 /// \return TODO:
-int sc_OnPlayerConnect(HSQUIRRELVM v, int playerid, char name[32]);
+int sc_OnPlayerConnect(HSQUIRRELVM v, unsigned char index, char *name);
 
 /// \brief Called when a player is disconnecting from the server.
-/// \param[in] playerid TODO:
+/// \param[in] index Index of the player.
 /// \return No return.
-void sc_OnPlayerDisconnect(HSQUIRRELVM v, int playerid);
+void sc_OnPlayerDisconnect(HSQUIRRELVM v, unsigned char index);
 
 /// \brief Called when a player is spawning.
-/// \param[in] playerid TODO:
-/// \param[in] cl TODO:
+/// \param[in] playerindex Index of the player.
+/// \param[in] classindex Index of the class.
 /// \return No return.
-void sc_OnPlayerSpawn(HSQUIRRELVM v, int playerid, int);
+void sc_OnPlayerSpawn(HSQUIRRELVM v, const unsigned char playerindex, const unsigned char classindex);
 
 /// \brief Fires a dynamic command callback.
 /// \param[in] callback Name of the callback to call.

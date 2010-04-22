@@ -32,6 +32,10 @@ public:
 	/// \return No return.
 	void SetOutputFunction(void *function);
 
+	/// \brief Registers standard console variables and commands.
+	/// \return No return.
+	void RegisterStandardLibrary(void);
+
 	/// \brief Outputs text into the outside function.
 	/// \param[in] string Format-control string.
 	/// \param[in] ... Optional arguments.

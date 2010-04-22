@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="RakNetDebug.lib ws2_32.lib"
+				AdditionalDependencies="RakNetDebug.lib ws2_32.lib Console.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -133,7 +133,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="RakNet.lib ws2_32.lib"
+				AdditionalDependencies="RakNet.lib ws2_32.lib Console.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -185,11 +185,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\logging.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\manager.cpp"
+				RelativePath=".\NetworkManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\PlayerManager.cpp"
 				>
 			</File>
 			<File
@@ -198,6 +206,10 @@
 			</File>
 			<File
 				RelativePath=".\rpc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ServerCore.cpp"
 				>
 			</File>
 			<File
@@ -217,6 +229,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\VehicleManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\VirtualMachineManager.cpp"
 				>
 			</File>
@@ -224,31 +240,7 @@
 				Name="Console"
 				>
 				<File
-					RelativePath=".\console\common.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConCmd.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConsoleCore.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\console\ConsoleScreen.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConSymbolBase.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConVar.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\coreconcommands.cpp"
 					>
 				</File>
 				<File
@@ -283,11 +275,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\main.h"
+				RelativePath=".\logging.h"
 				>
 			</File>
 			<File
-				RelativePath=".\manager.h"
+				RelativePath=".\NetworkManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PlayerManager.h"
 				>
 			</File>
 			<File
@@ -299,6 +295,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ServerCore.h"
+				>
+			</File>
+			<File
 				RelativePath=".\sq.h"
 				>
 			</File>
@@ -307,7 +307,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\struct.h"
+				RelativePath=".\VehicleManager.h"
 				>
 			</File>
 			<File
@@ -318,31 +318,7 @@
 				Name="Console"
 				>
 				<File
-					RelativePath=".\console\common.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConCmd.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConsoleCore.h"
-					>
-				</File>
-				<File
 					RelativePath=".\console\ConsoleScreen.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConSymbolBase.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\ConVar.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\coreconcommands.h"
 					>
 				</File>
 				<File
