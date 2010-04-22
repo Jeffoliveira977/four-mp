@@ -15,6 +15,8 @@ extern PlayerManager playm;
 
 NetworkManager::NetworkManager(void)
 {
+	maxaddressbuffersize = playm.GetMaxPlayers();
+	addressbuffersize = 0;
 }
 
 NetworkManager::~NetworkManager(void)
@@ -110,7 +112,7 @@ void NetworkManager::RemoveClient(const unsigned char index)
 	addressbuffer[index] = NULL;
 }
 
-void NetworkManager::SendNewPlayerInfoToAll(const unsigned char index, const char *name, const int model, const float position[3], const float angle, const unsigned char vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4])
+void NetworkManager::SendNewPlayerInfoToAll(const unsigned char index, const char *name, const int model, const float position[3], const float angle, const short vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4])
 {
 	if (index >= addressbuffersize)
 	{
@@ -162,7 +164,7 @@ void NetworkManager::SendNewPlayerInfoToAll(const unsigned char index, const cha
 	}
 }
 
-void NetworkManager::SendNewPlayerInfo(const unsigned char client, const unsigned char index, const char *name, const int model, const float position[3], const float angle, const unsigned char vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4])
+void NetworkManager::SendNewPlayerInfo(const unsigned char client, const unsigned char index, const char *name, const int model, const float position[3], const float angle, const short vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4])
 {
 	if (client >= addressbuffersize)
 	{
@@ -247,10 +249,11 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 		this->SendConnectionError(rpcParameters->sender, ConnectionErrorAllocationError);
 		return;
 	}
+	char *name;
 	unsigned char namesize = 0;
-	char name[32];
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, clientindex);
 	bsData->Read(namesize);
+	name = (char *)calloc(namesize + 1, sizeof(char));
 	bsData->Read(name, namesize);
 	free(bsData);
 	name[namesize] = '\0';

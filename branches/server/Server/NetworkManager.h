@@ -27,8 +27,8 @@ public:
 	void Tick(void);
 	void CheckClients(void);
 	void RemoveClient(const unsigned char index);
-	void SendNewPlayerInfoToAll(const unsigned char index, const char *name, const int model, const float position[3], const float angle, const unsigned char vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4]);
-	void SendNewPlayerInfo(const unsigned char client, const unsigned char index, const char *name, const int model, const float position[3], const float angle, const unsigned char vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4]);
+	void SendNewPlayerInfoToAll(const unsigned char index, const char *name, const int model, const float position[3], const float angle, const short vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4]);
+	void SendNewPlayerInfo(const unsigned char client, const unsigned char index, const char *name, const int model, const float position[3], const float angle, const short vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4]);
 	void DisconnectClient(const unsigned char index);
 	void RecieveClientConnection(const RPCParameters *rpcParameters);
 	void RecievePlayerMove(const RPCParameters *rpcParameters);

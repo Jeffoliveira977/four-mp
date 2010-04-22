@@ -45,12 +45,6 @@ bool PlayerManager::IsServerFull(void)
 
 bool PlayerManager::RegisterNewPlayer(const unsigned char index, char *name)
 {
-	if (playerbuffer[index] != NULL)
-	{
-		nm.SendConnectionError(index, ConnectionErrorAllocationError);
-		nm.RemoveClient(index);
-		return false;
-	}
 	if (index >= playerbuffersize)
 	{
 		if (playerbuffersize == maxplayerbuffersize)
@@ -68,6 +62,12 @@ bool PlayerManager::RegisterNewPlayer(const unsigned char index, char *name)
 		playerbuffer[index] = NULL;
 		playerbuffersize = index + 1;
 	}
+	if (playerbuffer[index] != NULL)
+	{
+		nm.SendConnectionError(index, ConnectionErrorAllocationError);
+		nm.RemoveClient(index);
+		return false;
+	}
 	if (vmm.OnPlayerConnect(index, name) == 0)
 	{
 		nm.SendConnectionError(index, ConnectionErrorScriptLock);
@@ -75,6 +75,7 @@ bool PlayerManager::RegisterNewPlayer(const unsigned char index, char *name)
 		return false;
 	}
 	playerbuffer[index] = new Player;
+	playerbuffer[index]->name = (char *)calloc(strlen(name) + 1, sizeof(char));
 	strcpy(playerbuffer[index]->name, name);
 	playerbuffer[index]->model = 0x98E29920;
 	playerbuffer[index]->position[0] = 0;
@@ -458,6 +459,7 @@ bool PlayerManager::AddPlayerClass(const int model, const float position[3], con
 	classbuffer[index]->ammo[6] = ammo[6];
 	classbuffer[index]->ammo[7] = ammo[7];
 	//TODO: sync it? Does classes even sync?
+	return true;
 }
 
 bool PlayerManager::GetPlayerClassData(const unsigned char index, int &model, float (&position)[3], float &angle, int (&weapons)[8], int (&ammo)[8])

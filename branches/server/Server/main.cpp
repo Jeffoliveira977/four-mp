@@ -28,11 +28,11 @@ ServerCore server;
 CoreHandleTypesManager chtm;
 ConsoleCore concore;
 ConsoleScreen conscreen(&concore);
+PlayerManager playm;
 NetworkManager nm;
 VirtualMachineManager vmm;
 PluginManager plugm;
 HandleManager hm;
-PlayerManager playm;
 VehicleManager vm;
 
 int main()

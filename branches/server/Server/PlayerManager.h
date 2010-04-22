@@ -38,7 +38,7 @@ public:
 private:
 	struct Player
 	{
-		char name[32];
+		char *name;
 		int model;
 		float position[3];
 		float angle;
