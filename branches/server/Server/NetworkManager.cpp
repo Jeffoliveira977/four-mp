@@ -175,7 +175,7 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 		return;
 	}
 	RakNet::BitStream *bsSend = new RakNet::BitStream;
-	bsSend->Write(playerdata);
+	bsSend->Write(*playerdata);
 	free(playerdata);
 	this->SendDataToAll("ConnectPlayer", bsSend);
 	free(bsSend);
@@ -188,7 +188,7 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 			if (playerdata != NULL)
 			{
 				bsSend = new RakNet::BitStream;
-				bsSend->Write(playerdata);
+				bsSend->Write(*playerdata);
 				free(playerdata);
 				net->RPC("ConnectPlayer", bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[clientindex][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
 				free(bsSend);
@@ -202,7 +202,7 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 		if (vehicledata != NULL)
 		{
 			bsSend = new RakNet::BitStream;
-			bsSend->Write(vehicledata);
+			bsSend->Write(*vehicledata);
 			free(vehicledata);
 			net->RPC("CreateVehicle", bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[clientindex][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
 			free(bsSend);

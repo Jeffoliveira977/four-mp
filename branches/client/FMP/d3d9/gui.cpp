@@ -1,8 +1,10 @@
 #include <windows.h>
 #include "gui.h"
 #include "../log.h"
+#include "..\ConsoleWindow.h"
 
-FMPGUI Gui;
+extern ConsoleWindow conwindow;
+
 // Windows
 CWindow * fServBrowser;
 CWindow * fChat;
@@ -23,16 +25,16 @@ CEditBox *sbFltLocation, *sbFltMode;
 
 void ServerBrCallBack(CElement *pElement, CMSG msg, int Param)
 {
-	Debug("SB callback");
+	//Debug("SB callback");
 	if((pElement == sbEnterIP || pElement == sbEnterPort) && msg == GOT_FOCUS)
 		pElement->SetString("");
 
-	Debug("SB callback end");
+	//Debug("SB callback end");
 }
 
 void ChatCallBack(CElement *pElement, CMSG msg, int Param)
 {
-	Debug("Chat callback");
+	//Debug("Chat callback");
 	if(pElement == cc_tChat && msg == SELECT)
 	{
 		// Select chat string
@@ -42,7 +44,7 @@ void ChatCallBack(CElement *pElement, CMSG msg, int Param)
 		// Send message
 		cc_tChat->AddString(cc_tEnter->GetString());
 	}
-	Debug("Chat callback end");
+	//Debug("Chat callback end");
 }
 
 FMPGUI::FMPGUI()
@@ -158,6 +160,8 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	CText * tInfo = new CText(m_Gui, 10, 10, 300, 100, "WAIT OR CREATE INTERFACE");
 	fOption->AddElement(tInfo);
 	fOption->SetVisible( 0 );
+
+	conwindow.Load();
 
 	m_Gui->SetVisible( true );
 	m_Gui->UpdateFromFile("GUIStyle.xml");

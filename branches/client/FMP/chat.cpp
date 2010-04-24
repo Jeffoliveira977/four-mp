@@ -4,12 +4,12 @@
 #include "log.h"
 #include "main.h"
 // RakNet
-#include "net\RakNetworkFactory.h"
-#include "net\RakPeerInterface.h"
-#include "net\MessageIdentifiers.h"
-#include "net\BitStream.h"
-#include "net\NetworkIDObject.h"
-#include "net\NetworkIDManager.h"
+#include "..\..\Shared\RakNet\RakNetworkFactory.h"
+#include "..\..\Shared\RakNet\RakPeerInterface.h"
+#include "..\..\Shared\RakNet\MessageIdentifiers.h"
+#include "..\..\Shared\RakNet\BitStream.h"
+#include "..\..\Shared\RakNet\NetworkIDObject.h"
+#include "..\..\Shared\RakNet\NetworkIDManager.h"
 
 extern RakPeerInterface *net;
 
@@ -35,7 +35,7 @@ void SendChatMessage()
 	RakNet::BitStream bsSend;
 	bsSend.Write(enterChat);
 	bsSend.Write(enterMsg);
-	net->RPC("Chat",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+	net->RPC("RPC_Chat",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 
 	enterChat = -1;
 	enterMsg[0] = 0;

@@ -8,6 +8,7 @@
 #define D3DHOOK_TEXTURES //comment this to disable texture hooking
 
 extern DWORD dwLoadOffset;
+extern FMPGUI Gui;
 
 LPD3DXFONT fFMP = NULL;
 LPD3DXFONT fChat = NULL;

@@ -9,11 +9,12 @@
 #include "Hook\classes.h"
 #include "structs.h"
 #include "chat.h"
+#include "..\..\Shared\Network\NetworkProtocol.h"
 
-#include "net\RakNetworkFactory.h"
-#include "net\RakPeerInterface.h"
-#include "net\MessageIdentifiers.h"
-#include "net\BitStream.h"
+#include "..\..\Shared\RakNet\RakNetworkFactory.h"
+#include "..\..\Shared\RakNet\RakPeerInterface.h"
+#include "..\..\Shared\RakNet\MessageIdentifiers.h"
+#include "..\..\Shared\RakNet\BitStream.h"
 
 extern FMPHook HOOK;
 extern int LastUpdate;
@@ -38,75 +39,59 @@ void ErrorConnect(RPCParameters *rpcParameters)
 
 	switch(error)
 	{
-	case 1:
+	case NetworkPlayerConnectionErrorServerFull:
 		{
-		// ERROR 1 - Имя уже существует
-			Log("ConnectError: %d Name already exist", error);
-		} break;
-	case 2:
+			// НЕТ МЕСТ
+			Log("ConnectError: %d. Server is full.", error);
+			break;
+		}
+	case NetworkPlayerConnectionErrorAlreadyConnected:
 		{
-		// ERROR 2 - НЕТ МЕСТ
-			Log("ConnectError: %d Free slots is NULL", error);
-		} break;
-	case 3:
+			// Уже присоединён
+			Log("ConnectError: %d. You are already connected.", error);
+			break;
+		}
+	case NetworkPlayerConnectionErrorAllocationError:
 		{
-		// ERROR 3 - Скипт не пускает
+			// Ошибка сервера
+			Log("ConnectError: %d. Server was unable to allocate player resources.", error);
+			break;
+		}
+	case NetworkPlayerConnectionErrorScriptLock:
+		{
+			// Скипт не пускает
 			Log("ConnectError: %d Script lock connect", error);
-		} break;
-	default:
-		break;
+			break;
+		}
 	}
 }
 
 void ConnectPlayer(RPCParameters *rpcParameters)
 {
-	Log("ConnectPlayer Start");
+	Log("Recieving server info");
 	LastUpdate = GetTickCount();
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	char name[32];
-	int index, size = 0;
+	NetworkPlayerFullUpdateData data;
 
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(size);
-	bsData.Read(name, size);
-	bsData.Read(index);
-	bsData.Read(gPlayer[index].model);
-	bsData.Read(gPlayer[index].x);
-	bsData.Read(gPlayer[index].y);
-	bsData.Read(gPlayer[index].z);
+	bsData.Read(data);
+	gPlayer[data.index].model = data.model;
+	memcpy(gPlayer[data.index].position, data.position, sizeof(float) * 3);
+	gPlayer[data.index].angle = data.angle;
+	gPlayer[data.index].vehicleindex = data.vehicleindex;
+	gPlayer[data.index].seat_id = data.seat_id;
+	gPlayer[data.index].score = data.score;
+	gPlayer[data.index].health = data.health;
+	gPlayer[data.index].armour = data.armour;
+	gPlayer[data.index].room = data.room;
+	memcpy(gPlayer[data.index].weapons, data.weapons, sizeof(int) * 8);
+	memcpy(gPlayer[data.index].ammo, data.ammo, sizeof(int) * 8);
+	memcpy(gPlayer[data.index].color, data.color, sizeof(unsigned char) * 4);
 
-	bsData.Read(gPlayer[index].angle);
-	bsData.Read(gPlayer[index].car_id);
-	bsData.Read(gPlayer[index].seat_id);
-	bsData.Read(gPlayer[index].score);
-	bsData.Read(gPlayer[index].health);
-	bsData.Read(gPlayer[index].armour);
-	bsData.Read(gPlayer[index].Room);
-
-	bsData.Read(gPlayer[index].gWeapons[0]);
-	bsData.Read(gPlayer[index].gAmmo[0]);
-	bsData.Read(gPlayer[index].gWeapons[1]);
-	bsData.Read(gPlayer[index].gAmmo[1]);
-	bsData.Read(gPlayer[index].gWeapons[2]);
-	bsData.Read(gPlayer[index].gAmmo[2]);
-	bsData.Read(gPlayer[index].gWeapons[3]);
-	bsData.Read(gPlayer[index].gAmmo[3]);
-	bsData.Read(gPlayer[index].gWeapons[4]);
-	bsData.Read(gPlayer[index].gAmmo[4]);
-	bsData.Read(gPlayer[index].gWeapons[5]);
-	bsData.Read(gPlayer[index].gAmmo[5]);
-	bsData.Read(gPlayer[index].gWeapons[6]);
-	bsData.Read(gPlayer[index].gAmmo[6]);
-	bsData.Read(gPlayer[index].gWeapons[7]);
-	bsData.Read(gPlayer[index].gAmmo[7]);
-
-	bsData.Read(gPlayer[index].color, 4);
-
-	name[size] = '\0';
-	Log("ConnectPlayer Center %s", name);
-	HOOK.PlayerConnect(name, index, gPlayer[index].model, gPlayer[index].x, gPlayer[index].y, gPlayer[index].z);
+	Log("ConnectPlayer Center %s", data.name);
+	HOOK.PlayerConnect(data.name, data.index, gPlayer[data.index].model, gPlayer[data.index].position[0], gPlayer[data.index].position[1], gPlayer[data.index].position[2]);
 	Log("ConnectPlayer End");
 }
 
@@ -128,17 +113,17 @@ void MovePlayer(RPCParameters *rpcParameters)
 	bsData.Read(a);
 	bsData.Read(s);
 
-	if(gPlayer[playerid].car_id != -1)
+	if(gPlayer[playerid].vehicleindex != -1)
 	{
-		gCar[gPlayer[playerid].car_id].x = x;
-		gCar[gPlayer[playerid].car_id].y = y;
-		gCar[gPlayer[playerid].car_id].z = z;
-		gCar[gPlayer[playerid].car_id].angle = a;
+		gCar[gPlayer[playerid].vehicleindex].position[0] = x;
+		gCar[gPlayer[playerid].vehicleindex].position[1] = y;
+		gCar[gPlayer[playerid].vehicleindex].position[2] = z;
+		gCar[gPlayer[playerid].vehicleindex].angle = a;
 	}
 
-	gPlayer[playerid].x = x;
-	gPlayer[playerid].y = y;
-	gPlayer[playerid].z = z;
+	gPlayer[playerid].position[0] = x;
+	gPlayer[playerid].position[1] = y;
+	gPlayer[playerid].position[2] = z;
 	gPlayer[playerid].angle = a;
 
 	Log("MovePlayer Center (%d,%f,%f,%f)", playerid, x, y, z);
@@ -188,7 +173,7 @@ void Check(RPCParameters *rpcParameters)
 	
 	RakNet::BitStream bsSend;
 	bsSend.Write(MyID);
-	net->RPC("Check",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+	net->RPC("RPC_Check",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 		
 	Log("Check End");
 }
@@ -216,20 +201,12 @@ void CreateVehicle(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int car, model, c1, c2;
-	float x,y,z,r;
+	NetworkVehicleFullUpdateData data;
 
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(car);
-	bsData.Read(model);
-	bsData.Read(x);
-	bsData.Read(y);
-	bsData.Read(z);
-	bsData.Read(r);
-	bsData.Read(c1);
-	bsData.Read(c2);
-	Log("CreateVehicle Center (%d,%f,%f,%f)\r\n", car, x, y, z);
-	HOOK.CreateCar(car, model, x, y, z, r, c1, c2);
+	bsData.Read(data);
+	Log("CreateVehicle Center (%d,%f,%f,%f)\r\n", data.index, data.position[0], data.position[1], data.position[2]);
+	HOOK.CreateCar(data.index, data.model, data.position[0], data.position[1], data.position[2], data.angle, data.color[0], data.color[2]);
 	Log("CreateVehicle End\r\n");
 }
 

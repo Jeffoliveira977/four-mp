@@ -20,29 +20,29 @@ struct FPlayer
 
 	Ped iPedID;
 	bool connected;
-	char ip[32];
-	int port;
+	char ip[16];
+	unsigned short port;
 	char name[32];
 	int model;
-	float x,y,z;
+	float position[3];
 	float angle;
 	int last_active;
 	int sync_state;
-	int gun;
-	int gWeapons[8];
-	int gAmmo[8];
+	int currentweapon;
+	int weapons[8];
+	int ammo[8];
 	char animation[128];
-	int car_id;
+	short vehicleindex;
 	int seat_id;
 	int score;
 	int health, armour;
 	int wanted_level;
 	bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
 	bool Aim;
-	bool duck;
-	int Room;
-	char color[4];
-	int CompT[11], CompD[11];
+	bool isducking;
+	int room;
+	unsigned char color[4];
+	int compT[11], compD[11];
 };
 
 struct PlayerDamage
@@ -74,12 +74,12 @@ struct FVehicle
 	Vehicle CarID;
 	bool exist;
 	int model;
-	float x,y,z;
+	float position[3];
 	float angle;
-	int Health, engHealth;
+	short Health, engHealth;
 	int DoorState[6];
 	int DoorLock[6];
-	int color[2];
+	unsigned char color[2];
 };
 
 struct FConfig

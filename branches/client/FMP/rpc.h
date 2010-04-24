@@ -4,7 +4,7 @@
 *	Last Modifed:		-
 */
 #pragma once
-#include "net\RakPeerInterface.h"
+#include "..\..\Shared\RakNet\RakPeerInterface.h"
 
 void Check(RPCParameters *rpcParameters);
 void ErrorConnect(RPCParameters *rpcParameters);

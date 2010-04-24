@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="RakNetDebug.lib ws2_32.lib guid.lib"
+				AdditionalDependencies="RakNetDebug.lib ws2_32.lib guid.lib ..\..\Shared\Console\ConsoleDebug.lib"
 				OutputFile="$(OutDir)\xlive.dll"
 				LinkIncremental="2"
 				GenerateManifest="false"
@@ -140,7 +140,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="RakNet.lib ws2_32.lib Gui.lib"
+				AdditionalDependencies="RakNet.lib ws2_32.lib Gui.lib ..\..\Shared\Console\Console.lib"
 				OutputFile="$(OutDir)\xlive.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="$(ProjectDir)\xlive.def"
@@ -183,6 +183,10 @@
 			>
 			<File
 				RelativePath=".\chat.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ConsoleWindow.cpp"
 				>
 			</File>
 			<File
@@ -387,6 +391,14 @@
 			</File>
 			<File
 				RelativePath=".\Project.txt"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Shared"
+			>
+			<File
+				RelativePath="..\..\Shared\Network\NetworkProtocol.h"
 				>
 			</File>
 		</Filter>

@@ -89,7 +89,7 @@ int _GetClosestCar(float x, float y, float z, float r)
 	{
 		if(gCar[i].exist == 1)
 		{
-			float d = GetDist(x, y, z, gCar[i].x, gCar[i].y, gCar[i].z);
+			float d = GetDist(x, y, z, gCar[i].position[0], gCar[i].position[1], gCar[i].position[2]);
 			if(d < min)
 			{
 				min = d;

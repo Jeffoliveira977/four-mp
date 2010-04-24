@@ -10,6 +10,7 @@ extern LPD3DXFONT fFMP;
 extern LPD3DXFONT fChat;
 //extern LPDIRECT3DTEXTURE9 g_Texture;
 //extern ID3DXSprite *g_Sprite;
+extern FMPGUI Gui;
 
 HRESULT CreateD3DXFont( LPDIRECT3DDEVICE9 dDev, LPD3DXFONT* ppd3dxFont, TCHAR* pstrFont, DWORD dwSize, bool bold, bool Italic )
 {

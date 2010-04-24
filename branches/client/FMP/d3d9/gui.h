@@ -8,6 +8,7 @@ class FMPGUI
 {
 	CGUI *m_Gui;
 	bool g_Mouse[3];
+	friend class ConsoleWindow;
 public:
 	FMPGUI();
 
@@ -16,5 +17,3 @@ public:
 	void MoveMouse(int x, int y);
 	void Draw();
 };
-
-extern FMPGUI Gui;

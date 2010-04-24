@@ -10,15 +10,30 @@
 #include <windows.h>
 
 #include "log.h"
+#include "ConsoleWindow.h"
+
+extern ConsoleWindow conwindow;
 
 bool FileExists(const char *fname)
 {
 	return _access(fname, 0) != -1;
 }
 
+void PrintToConsole(const char *string, ...)
+{
+	va_list arglist; 
+    va_start(arglist, string);
+	char *tempstring = (char *)calloc(_vscprintf(string, arglist) + 1, sizeof(char));
+	vsprintf(tempstring, string, arglist); 
+	conwindow.Print(tempstring);
+	free(tempstring);
+	va_end(arglist); 
+}
+
 void debug(const char* string)
 {
 	#if defined DEBUG_ON
+	conwindow.Print(string);
 	FILE* temp;
 	temp = fopen("FMP_debug.txt","a");
 	SYSTEMTIME time;
@@ -40,6 +55,7 @@ void debug_clear()
 void log(const char* string)
 {
 	#if defined LOGGING_ON
+	conwindow.Print(string);
 	FILE* temp;
 	temp = fopen("FMP_log.txt","a");
 	SYSTEMTIME time;
@@ -65,6 +81,7 @@ void Debug(const char *string, ...)
 	va_list arglist; 
     va_start(arglist, string); 
 	vsprintf_s(buff,512,string,arglist);
+	conwindow.Print(buff);
 	FILE* temp;
 	temp = fopen("FMP_debug.txt","a");
 	SYSTEMTIME time;
@@ -84,6 +101,7 @@ void DebugEx(const char *file, const char *string, ...)
 	va_list arglist; 
     va_start(arglist, string); 
 	vsprintf_s(buff,512,string,arglist);
+	conwindow.Print(buff);
 	FILE* temp;
 	temp = fopen(file,"a");
 	SYSTEMTIME time;
@@ -103,6 +121,7 @@ void Log(const char *string, ...)
 	va_list arglist; 
     va_start(arglist, string); 
 	vsprintf_s(buff,512,string,arglist);
+	conwindow.Print(buff);
 	FILE* temp;
 	temp = fopen("FMP_log.txt","a");
 	SYSTEMTIME time;

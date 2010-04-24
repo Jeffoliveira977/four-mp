@@ -8,9 +8,9 @@
 #include "structs.h"
 #include "main.h"
 // RakNet
-#include "net\RakNetworkFactory.h"
-#include "net\RakPeerInterface.h"
-#include "net\BitStream.h"
+#include "..\..\Shared\RakNet\RakNetworkFactory.h"
+#include "..\..\Shared\RakNet\RakPeerInterface.h"
+#include "..\..\Shared\RakNet\BitStream.h"
 
 using namespace Natives;
 
@@ -53,16 +53,16 @@ void FMPHook::PlayerConnect(char *name, int index, int model, float x, float y, 
 	AddArmourToChar(gPlayer[index].PedID(), gPlayer[index].armour);
 
 
-	if(gPlayer[index].car_id != -1)
+	if(gPlayer[index].vehicleindex != -1)
 	{
-		if(gPlayer[index].seat_id == -1) TaskEnterCarAsDriver(gPlayer[index].PedID(), gCar[gPlayer[index].car_id].CarID, 0);
-		else TaskEnterCarAsPassenger(gPlayer[index].PedID(), gCar[gPlayer[index].car_id].CarID, 0, gPlayer[index].seat_id);
+		if(gPlayer[index].seat_id == -1) TaskEnterCarAsDriver(gPlayer[index].PedID(), gCar[gPlayer[index].vehicleindex].CarID, 0);
+		else TaskEnterCarAsPassenger(gPlayer[index].PedID(), gCar[gPlayer[index].vehicleindex].CarID, 0, gPlayer[index].seat_id);
 	}
 
 	for(int i = 0; i < 8; i++)
 	{
-		if(gPlayer[index].gWeapons[i] != 0 && gPlayer[index].gAmmo[i] > 0)
-			GiveWeaponToChar(gPlayer[index].PedID(), (eWeapon)gPlayer[index].gWeapons[i], gPlayer[index].gAmmo[i], 0);
+		if(gPlayer[index].weapons[i] != 0 && gPlayer[index].ammo[i] > 0)
+			GiveWeaponToChar(gPlayer[index].PedID(), (eWeapon)gPlayer[index].weapons[i], gPlayer[index].ammo[i], 0);
 	}
 
 	strcpy(gPlayer[index].name, name);
@@ -77,7 +77,7 @@ void FMPHook::ReCreatePlayer(int player)
 	Log("REPlayerConnect: %s", "RequestModel");
 	while(!HasModelLoaded((eModel)gPlayer[player].model)) wait(1);
 	Log("REPlayerConnect: %s", "ModelLoaded");
-	CreateChar(1, (eModel)gPlayer[player].model, gPlayer[player].x, gPlayer[player].y, gPlayer[player].z, &gPlayer[player].iPedID, 1);
+	CreateChar(1, (eModel)gPlayer[player].model, gPlayer[player].position[0], gPlayer[player].position[1], gPlayer[player].position[2], &gPlayer[player].iPedID, 1);
 	wait(1);
 	Log("REMovePlayer %d(%d) = %d", player,DoesCharExist(gPlayer[player].PedID()),gPlayer[player].PedID());
 	Log("REPlayerConnect: %s", "CreateChar");
@@ -97,7 +97,7 @@ void FMPHook::Duck(int player, bool duck)
 	Log("Duck %d(%d) = %d", player,DoesCharExist(gPlayer[player].PedID()),gPlayer[player].PedID());
 	TaskToggleDuck(gPlayer[player].PedID(), duck);
 	gPlayer[player].last_active = GetTickCount();
-	gPlayer[player].duck = duck;
+	gPlayer[player].isducking = duck;
 }
 
 void FMPHook::PlayerMove(int player, float x, float y, float z, float speed)
@@ -109,7 +109,7 @@ void FMPHook::PlayerMove(int player, float x, float y, float z, float speed)
 	GetCharCoordinates(gPlayer[player].PedID(), &lx, &ly, &lz);
 	Log("GETCOORD");
 	float d = GetDist(lx, ly, lz, x, y, z);
-	if(gPlayer[player].car_id == -1) // Если пешком
+	if(gPlayer[player].vehicleindex == -1) // Если пешком
 	{
 		Log("MovePlayer (HOOK) %s", "Start");
 		int ms = 4;
@@ -150,9 +150,9 @@ void FMPHook::PlayerMove(int player, float x, float y, float z, float speed)
 		Log("MOVE %f=(%f) %d", speed, d, ms);
 		TaskGoStraightToCoord(gPlayer[player].PedID(), x, y, z, ms, 45000);
 		wait(1);
-		gPlayer[player].x = x;
-		gPlayer[player].y = y;
-		gPlayer[player].z = z;
+		gPlayer[player].position[0] = x;
+		gPlayer[player].position[1] = y;
+		gPlayer[player].position[2] = z;
 		Log("MovePlayer %d(%d) = %d", player,DoesCharExist(gPlayer[player].PedID()),gPlayer[player].PedID());
 	}
 	else // Если на машине
@@ -162,10 +162,10 @@ void FMPHook::PlayerMove(int player, float x, float y, float z, float speed)
 		if(speed * 3 < d)
 		{
 			SetCharCoordinates(gPlayer[player].PedID(), x, y, z);
-			SetCarHeading(gCar[gPlayer[player].car_id].CarID, gCar[gPlayer[player].car_id].angle);
+			SetCarHeading(gCar[gPlayer[player].vehicleindex].CarID, gCar[gPlayer[player].vehicleindex].angle);
 		}
 
-		TaskCarDriveToCoord(gPlayer[player].PedID(), gCar[gPlayer[player].car_id].CarID, x, y, z, speed, vect, 2, 3, 2, 45000000);
+		TaskCarDriveToCoord(gPlayer[player].PedID(), gCar[gPlayer[player].vehicleindex].CarID, x, y, z, speed, vect, 2, 3, 2, 45000000);
 	}
 	gPlayer[player].last_active = GetTickCount();
 }
@@ -181,14 +181,14 @@ void FMPHook::CancelEnterInVehicle(int id)
 {
 	Log("CancelEnterInVehicle %d", id);
 	ClearCharTasks(gPlayer[id].PedID());
-	gPlayer[id].car_id = -1;
+	gPlayer[id].vehicleindex = -1;
 }
 
 void FMPHook::ExitFromVehicle(int id)
 {
 	Log("ExitFromVehicle %d", id);
 	TaskLeaveAnyCar(gPlayer[id].PedID());
-	gPlayer[id].car_id = -1;
+	gPlayer[id].vehicleindex = -1;
 }
 
 void FMPHook::EnterInVehicle(int id, int car, int seat)
@@ -196,7 +196,7 @@ void FMPHook::EnterInVehicle(int id, int car, int seat)
 	Log("EnterInVehicle %d, %d, %d", id, car, seat);
 	if(seat == -1) TaskEnterCarAsDriver(gPlayer[id].PedID(), gCar[car].CarID, -1);
 	else TaskEnterCarAsPassenger(gPlayer[id].PedID(), gCar[car].CarID, -1, seat);
-	gPlayer[id].car_id = car;
+	gPlayer[id].vehicleindex = car;
 	gPlayer[id].seat_id = seat;
 }
 

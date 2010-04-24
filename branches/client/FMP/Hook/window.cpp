@@ -7,6 +7,7 @@
 
 
 extern FMPHook HOOK;
+extern FMPGUI Gui;
 WNDPROC gameProc;
 
 LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)

@@ -5,10 +5,11 @@
 */
 #pragma once
 
-#define DEBUG_ON
+//#define DEBUG_ON
 #define LOGGING_ON
 
 bool FileExists(const char *fname);
+void PrintToConsole(const char *string, ...);
 void debug(const char* string);
 void DebugEx(const char *file, const char *string, ...);
 void debug_clear();

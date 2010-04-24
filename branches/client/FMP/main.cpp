@@ -22,24 +22,32 @@
 #include "functions.h"
 #include "main.h"
 // RakNet
-#include "net\RakNetworkFactory.h"
-#include "net\RakPeerInterface.h"
-#include "net\MessageIdentifiers.h"
-#include "net\BitStream.h"
-#include "net\NetworkIDObject.h"
-#include "net\NetworkIDManager.h"
+#include "..\..\Shared\RakNet\RakNetworkFactory.h"
+#include "..\..\Shared\RakNet\RakPeerInterface.h"
+#include "..\..\Shared\RakNet\MessageIdentifiers.h"
+#include "..\..\Shared\RakNet\BitStream.h"
+#include "..\..\Shared\RakNet\NetworkIDObject.h"
+#include "..\..\Shared\RakNet\NetworkIDManager.h"
 
+#include "..\..\Shared\Network\NetworkProtocol.h"
 #include "Check\check.h"
+#include "..\..\Shared\Console\ConsoleCore.h"
 #include "d3d9\d3d9hook.h"
 #include "d3d9\gui.h"
+#include "ConsoleWindow.h"
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                     Потоки для работы с игрой                                         */
 /* ----------------------------------------------------------------------------------------------------- */
 FMPHook HOOK;
 HANDLE ThreadHandle;
 
+ConsoleCore concore;
+
 RakPeerInterface *net;
 SystemAddress servAddr;
+
+FMPGUI Gui;
+ConsoleWindow conwindow;
 
 ClientState clientstate;
 int MyID = 0;
@@ -75,9 +83,9 @@ void player_dump()
 		if(gPlayer[i].connected == 1)
 		{
 			fprintf(f, "%s:%d\n%s\n%d\n", gPlayer[i].ip, gPlayer[i].port, gPlayer[i].name, gPlayer[i].model);
-			fprintf(f, "%f %f %f %f\n", gPlayer[i].x, gPlayer[i].y, gPlayer[i].z, gPlayer[i].angle); 
+			fprintf(f, "%f %f %f %f\n", gPlayer[i].position[0], gPlayer[i].position[1], gPlayer[i].position[2], gPlayer[i].angle); 
 			fprintf(f, "%d %d\n", gPlayer[i].last_active, gPlayer[i].sync_state);
-			fprintf(f, "%d %d\n", gPlayer[i].car_id, gPlayer[i].seat_id);
+			fprintf(f, "%d %d\n", gPlayer[i].vehicleindex, gPlayer[i].seat_id);
 			fprintf(f, "---------------------------\n");
 		}
 	}
@@ -95,7 +103,7 @@ void car_dump()
 
 
 			fprintf(f, "%d %d %d\n", gCar[i].model, gCar[i].color[0], gCar[i].color[1]);
-			fprintf(f, "%f %f %f %f\n", gCar[i].x, gCar[i].y, gCar[i].z, gCar[i].angle); 
+			fprintf(f, "%f %f %f %f\n", gCar[i].position[0], gCar[i].position[1], gCar[i].position[2], gCar[i].angle); 
 			fprintf(f, "---------------------------\n");
 		}
 	}
@@ -125,7 +133,6 @@ void trim(char *a)
 
 void LoadConfig()
 {
-	Log("LoadConfig");
 	FILE *f = fopen("fmp.ini", "r");
 	char buff[32];
 	fgets(buff, 32, f);
@@ -154,9 +161,9 @@ void FMPHook::CreateCar(int id, int model, float x, float y, float z, float r, i
 	SetCarHeading(gCar[id].CarID, r);
 	gCar[id].exist = 1;
 	gCar[id].model = model;
-	gCar[id].x = x;
-	gCar[id].y = y;
-	gCar[id].z = z;
+	gCar[id].position[0] = x;
+	gCar[id].position[1] = y;
+	gCar[id].position[2] = z;
 	gCar[id].angle = r;
 	gCar[id].color[0] = color1;
 	gCar[id].color[1] = color2;
@@ -191,13 +198,13 @@ void FMPHook::InputFreeze(bool e)
 void FMPHook::RunMP()
 {
 	LastUpdate = GetTickCount();
-	Log("RunMP");
-	//AllowEmergencyServices(0);Log("RUN %d", 1);
-	SetPedDensityMultiplier(0);Log("RUN %d", 2);
-	SetCarDensityMultiplier(0);Log("RUN %d", 3);
-	DisableCarGenerators(1);Log("RUN %d", 4);
-	//DisableCarGeneratorsWithHeli(1);Log("RUN %d", 5);
-	SetNoResprays(1);Log("RUN %d", 6);
+	Log("Starting up multiplayer mode.");
+	//AllowEmergencyServices(0);
+	SetPedDensityMultiplier(0);
+	SetCarDensityMultiplier(0);
+	DisableCarGenerators(1);
+	//DisableCarGeneratorsWithHeli(1);
+	SetNoResprays(1);
 	SwitchAmbientPlanes(0);
 	SwitchArrowAboveBlippedPickups(0);
 	SwitchRandomBoats(0);
@@ -205,7 +212,6 @@ void FMPHook::RunMP()
 	SwitchGarbageTrucks(0);
 
 	//SetSleepModeActive(1);
-	Log("RunMP: SetStat");
 	
 	SetIntStat(STAT_ISLANDS_UNLOCKED, 100);
 	SetIntStat(STAT_ACTIVITIES_WITH_BRUCIE, 0);
@@ -226,7 +232,6 @@ void FMPHook::RunMP()
 	SetIntStat(STAT_PROGRESS_WITH_KATIE, 0);
 	SetIntStat(STAT_PROGRESS_WITH_MILLIE, 0);
 	
-	Log("RunMP FloatStat");
 	SetFloatStat(STAT_TOTAL_PROGRESS, 100);
 	SetFloatStat(STAT_ROMAN_LIKE, 100);
 	SetFloatStat(STAT_ROMAN_RESPECT, 100);
@@ -266,7 +271,6 @@ void FMPHook::RunMP()
 	SetFloatStat(STAT_KATE_TRUST, 100);
 	SetFloatStat(STAT_GAME_PROGRESS, 100);
 	
-	Log("RunMP: Terminate");
 	TerminateAllScriptsWithThisName("initial");
 	TerminateAllScriptsWithThisName("main");
 	TerminateAllScriptsWithThisName("spcellphone");
@@ -325,24 +329,22 @@ void FMPHook::RunMP()
 	
 	ClearAreaOfChars(0,0,0, 2000);
 	//ClearAreaOfCops(0,0,0, 2000);
-	
-	Log("RunMP: Ped");
 
 	Ped Player;
-	GetPlayerChar(ConvertIntToPlayerIndex(GetPlayerId()), &Player);Log("RUN 1%d", 1);
-	RemoveAllCharWeapons(Player);Log("RUN 1%d", 2);
-	AddArmourToChar(Player, -1000);Log("RUN 1%d", 3);
-	SetCharMoney(Player, 0);Log("RUN 1%d", 4);
+	GetPlayerChar(ConvertIntToPlayerIndex(GetPlayerId()), &Player);
+	RemoveAllCharWeapons(Player);
+	AddArmourToChar(Player, -1000);
+	SetCharMoney(Player, 0);
 	SetTimeOfDay(12,0);
 	SetMaxWantedLevel(0);
 
-	Log("RunMP End");
+	Log("Multiplayer mode started.");
 }
 
 void FMPHook::GameThread()
 {
 	Debug("GameThread");
-
+	concore.SetOutputFunction(PrintToConsole);
 	LoadConfig();
 	// Мутим RakNet
 	Log("MainThread");
@@ -351,7 +353,6 @@ void FMPHook::GameThread()
 	SocketDescriptor s(0, 0);
 	net->Startup(8, 1, &s, 1);
 	// Регим RPC
-	Log("MainThread RPC");
 
 	REGISTER_STATIC_RPC(net, ::ConnectPlayer);
 	REGISTER_STATIC_RPC(net, ::Disconnect);
@@ -397,7 +398,7 @@ void FMPHook::GameThread()
 				LastUpdate = GetTickCount();
 
 				// Коннект
-				Log("MainThread Connect");
+				Log("Connecting to server...");
 				net->Connect(Conf.server, Conf.port, 0, 0, 0);
 				servAddr.SetBinaryAddress(Conf.server);
 				servAddr.port = Conf.port;
@@ -412,6 +413,60 @@ void FMPHook::GameThread()
 					net->Connect(Conf.server, Conf.port, 0, 0, 0);
 					LastUpdate = GetTickCount();
 				}
+				Debug("PACKIFPACK");
+				pack = net->Receive();
+				Debug("PACKPACKPACK");
+				if(pack)
+				{
+					Debug("Pack: %s[%d], %s", pack->data, pack->data[0], pack->systemAddress.ToString());
+					if(pack->data[0] == ID_CONNECTION_REQUEST_ACCEPTED)
+					{
+						Log("Connection accepted. Sending client info...");
+						NetworkPlayerConnectionRequestData data;
+						strcpy(data.name, Conf.Name);
+						//unsigned char namelength = strlen(Conf.Name);
+						RakNet::BitStream bsSend;
+						bsSend.Write(data);
+						//bsSend.Write(namelength);
+						//bsSend.Write(Conf.Name, namelength);
+						net->RPC("RPC_ClientConnect",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+						Log("Client info has been sent.");
+					}
+					else if(pack->data[0] == ID_CONNECTION_ATTEMPT_FAILED)
+					{
+						Log("Can't connect to server");
+					}
+					else if(pack->data[0] == ID_RPC_REMOTE_ERROR)
+					{
+						switch (pack->data[1])
+						{
+						case RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
+							Log("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
+							break;
+						case RPC_ERROR_OBJECT_DOES_NOT_EXIST:
+							Log("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
+							break;
+						case RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
+							Log("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
+							break;
+						case RPC_ERROR_FUNCTION_NOT_REGISTERED:
+							Log("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
+							break;
+						case RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
+							Log("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
+							break;
+						case RPC_ERROR_CALLING_CPP_AS_C:
+							Log("RPC_ERROR_CALLING_CPP_AS_C\n");
+							break;
+						case RPC_ERROR_CALLING_C_AS_CPP:
+							Log("RPC_ERROR_CALLING_C_AS_CPP\n");
+							break;
+						}
+					}
+				}
+				Debug("KILLPACK");
+				net->DeallocatePacket(pack);
+				Debug("PACKWAITPACK");
 				break;
 			}
 		case GameStateSkinSelect:
@@ -428,7 +483,7 @@ void FMPHook::GameThread()
 					{
 						RakNet::BitStream bsSend;
 						bsSend.Write(sel_cl);
-						net->RPC("PlayerSpawn",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+						net->RPC("RPC_PlayerSpawn",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 						Log("Player Spawn");
 					}
 				}
@@ -441,7 +496,7 @@ void FMPHook::GameThread()
 
 					RakNet::BitStream bsSend;
 					bsSend.Write(gPlayer[MyID].model);
-					net->RPC("Select_ModelChanged",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+					net->RPC("RPC_Select_ModelChanged",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 					Log("Select ModelChanged");
 					
 					RequestModel((eModel)gPlayer[MyID].model);
@@ -449,7 +504,7 @@ void FMPHook::GameThread()
 					ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
 					SetCharDefaultComponentVariation(_GetPlayerPed());
 
-					sprintf(model_select_text, "Sellected model id %d", sel_cl);
+					sprintf(model_select_text, "Selected model id %d", sel_cl);
 				}
 				else if(GetAsyncKeyState(VK_LEFT) != 0)
 				{
@@ -460,7 +515,7 @@ void FMPHook::GameThread()
 
 					RakNet::BitStream bsSend;
 					bsSend.Write(gPlayer[MyID].model);
-					net->RPC("Select_ModelChanged",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+					net->RPC("RPC_Select_ModelChanged",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 					Log("Select Model Changed");
 					
 					RequestModel((eModel)gPlayer[MyID].model);
@@ -468,7 +523,7 @@ void FMPHook::GameThread()
 					ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
 					SetCharDefaultComponentVariation(_GetPlayerPed());
 
-					sprintf(model_select_text, "Sellected model id %d", sel_cl);
+					sprintf(model_select_text, "Selected model id %d", sel_cl);
 				}
 				break;
 			}
@@ -482,18 +537,18 @@ void FMPHook::GameThread()
 
 					for(int i = 0; i < 11; i++)
 					{
-						gPlayer[MyID].CompD[i] = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)i);
-						gPlayer[MyID].CompT[i] = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)i);
+						gPlayer[MyID].compD[i] = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)i);
+						gPlayer[MyID].compT[i] = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)i);
 					}
 
 					RakNet::BitStream bsSend;
-					bsSend.Write(gPlayer[MyID].CompD);
-					bsSend.Write(gPlayer[MyID].CompT);
-					net->RPC("SyncSkinVariation",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+					bsSend.Write(gPlayer[MyID].compD);
+					bsSend.Write(gPlayer[MyID].compT);
+					net->RPC("RPC_SyncSkinVariation",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 					Log("SEND SyncSkinVariation");
 
 					RakNet::BitStream bsSend2;
-					net->RPC("PlayerSpawn",&bsSend2,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+					net->RPC("RPC_PlayerSpawn",&bsSend2,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 					Log("Player Spawn");
 				}
 				else if(GetAsyncKeyState(VK_RIGHT) != 0)
@@ -548,60 +603,6 @@ void FMPHook::GameThread()
 				break;
 			}
 		}
-		if(clientstate.game == GameStateInGame)
-		{
-			Debug("PACKIFPACK");
-			pack = net->Receive();
-			Debug("PACKPACKPACK");
-			if(pack)
-			{
-				Debug("Pack: %s[%d], %s", pack->data, pack->data[0], pack->systemAddress.ToString());
-				if(pack->data[0] == ID_CONNECTION_REQUEST_ACCEPTED)
-				{
-					Log("Connect accepted");
-					RakNet::BitStream bsSend;
-					bsSend.Write(strlen(Conf.Name));
-					bsSend.Write(Conf.Name,strlen(Conf.Name));
-					net->RPC("ClientConnect",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
-					Log("Connect SENDed");
-				}
-				else if(pack->data[0] == ID_CONNECTION_ATTEMPT_FAILED)
-				{
-					Log("Can't connect to server");
-				}
-				else if(pack->data[0] == ID_RPC_REMOTE_ERROR)
-				{
-					switch (pack->data[1])
-					{
-					case RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
-						Log("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
-						break;
-					case RPC_ERROR_OBJECT_DOES_NOT_EXIST:
-						Log("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
-						break;
-					case RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
-						Log("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
-						break;
-					case RPC_ERROR_FUNCTION_NOT_REGISTERED:
-						Log("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
-						break;
-					case RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
-						Log("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
-						break;
-					case RPC_ERROR_CALLING_CPP_AS_C:
-						Log("RPC_ERROR_CALLING_CPP_AS_C\n");
-						break;
-					case RPC_ERROR_CALLING_C_AS_CPP:
-						Log("RPC_ERROR_CALLING_C_AS_CPP\n");
-						break;
-					}
-				}
-			}
-			Debug("KILLPACK");
-			net->DeallocatePacket(pack);
-			Debug("PACKWAITPACK");
-		}
-		
 		wait(500);
 		Debug("WAITWAITWAIT");
 	}
