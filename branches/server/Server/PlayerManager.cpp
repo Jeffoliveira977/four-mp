@@ -22,7 +22,7 @@ PlayerManager::~PlayerManager(void)
 {
 }
 
-unsigned char PlayerManager::GetMaxPlayers(void)
+short PlayerManager::GetMaxPlayers(void)
 {
 	return maxplayerbuffersize;
 }
@@ -43,96 +43,9 @@ bool PlayerManager::IsServerFull(void)
 	return true;
 }
 
-bool PlayerManager::RegisterNewPlayer(const unsigned char index, char *name)
+bool PlayerManager::IsPlayerConnected(const short index)
 {
-	if (index >= playerbuffersize)
-	{
-		if (playerbuffersize == maxplayerbuffersize)
-		{
-			nm.SendConnectionError(index, ConnectionErrorAllocationError);
-			nm.RemoveClient(index);
-			return false;
-		}
-		if (!this->ResizePlayerBuffer(playerbuffer, index + 1))
-		{
-			nm.SendConnectionError(index, ConnectionErrorAllocationError);
-			nm.RemoveClient(index);
-			return false;
-		}
-		playerbuffer[index] = NULL;
-		playerbuffersize = index + 1;
-	}
-	if (playerbuffer[index] != NULL)
-	{
-		nm.SendConnectionError(index, ConnectionErrorAllocationError);
-		nm.RemoveClient(index);
-		return false;
-	}
-	if (vmm.OnPlayerConnect(index, name) == 0)
-	{
-		nm.SendConnectionError(index, ConnectionErrorScriptLock);
-		nm.RemoveClient(index);
-		return false;
-	}
-	playerbuffer[index] = new Player;
-	playerbuffer[index]->name = (char *)calloc(strlen(name) + 1, sizeof(char));
-	strcpy(playerbuffer[index]->name, name);
-	playerbuffer[index]->model = 0x98E29920;
-	playerbuffer[index]->position[0] = 0;
-	playerbuffer[index]->position[1] = 0;
-	playerbuffer[index]->position[2] = 0;
-	playerbuffer[index]->angle = 0;
-	playerbuffer[index]->last_active = 0;
-	playerbuffer[index]->sync_state = 0;
-	for(unsigned char i = 0; i < 8; i++)
-	{
-		playerbuffer[index]->weapons[i] = 0;
-		playerbuffer[index]->ammo[i] = 0;
-	}
-	playerbuffer[index]->animation[0] = 0;
-	playerbuffer[index]->vehicleindex = -1;
-	playerbuffer[index]->seat_id = 99;
-	playerbuffer[index]->score = 0;
-	playerbuffer[index]->health = 200;
-	playerbuffer[index]->armour = 0;
-	playerbuffer[index]->wanted_level = 0;
-	playerbuffer[index]->edSprint = 1;
-	playerbuffer[index]->edLockon = 1;
-	playerbuffer[index]->edDoDriveBy = 1;
-	playerbuffer[index]->edUseCover = 1;
-	playerbuffer[index]->edConrol = 1;
-	playerbuffer[index]->edFreeze = 0;
-	playerbuffer[index]->isducking = 0;
-	playerbuffer[index]->room = 0;
-	playerbuffer[index]->car_enter = 0;
-	playerbuffer[index]->color[0] = 0xFF;
-	playerbuffer[index]->color[1] = 0xFF;
-	playerbuffer[index]->color[2] = 0x00;
-	playerbuffer[index]->color[3] = 0x00;
-	playerbuffer[index]->currentweapon = 0;
-	nm.SendNewPlayerInfoToAll(index, name, playerbuffer[index]->model, playerbuffer[index]->position, playerbuffer[index]->angle, playerbuffer[index]->vehicleindex, playerbuffer[index]->seat_id, playerbuffer[index]->score, playerbuffer[index]->health, playerbuffer[index]->armour, playerbuffer[index]->room, playerbuffer[index]->weapons, playerbuffer[index]->ammo, playerbuffer[index]->color);
-	for (unsigned char i = 0; i < playerbuffersize; i++)
-	{
-		if (playerbuffer[i] != NULL)
-		{
-			nm.SendNewPlayerInfo(index, i, playerbuffer[i]->name, playerbuffer[i]->model, playerbuffer[i]->position, playerbuffer[i]->angle, playerbuffer[i]->vehicleindex, playerbuffer[i]->seat_id, playerbuffer[i]->score, playerbuffer[i]->health, playerbuffer[i]->armour, playerbuffer[i]->room, playerbuffer[i]->weapons, playerbuffer[i]->ammo, playerbuffer[i]->color);
-		}
-	}
-	unsigned char maxvehicles = vm.GetVehicleBufferSize();
-	for(unsigned char i = 0; i < maxvehicles; i++)
-	{
-		if(vm.IsVehicleExists(i))
-		{
-			vm.SendVehicleInfo(index, i);
-		}
-	}
-	nm.SendClassInfo(index);
-	return true;
-}
-
-bool PlayerManager::IsPlayerConnected(const unsigned char index)
-{
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -143,9 +56,9 @@ bool PlayerManager::IsPlayerConnected(const unsigned char index)
 	return true;
 }
 
-char *PlayerManager::GetPlayerName(const unsigned char index)
+char *PlayerManager::GetPlayerName(const short index)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return NULL;
 	}
@@ -156,9 +69,9 @@ char *PlayerManager::GetPlayerName(const unsigned char index)
 	return playerbuffer[index]->name;
 }
 
-bool PlayerManager::GetPlayerColor(const unsigned char index, unsigned char (&color)[4])
+bool PlayerManager::GetPlayerColor(const short index, unsigned char (&color)[4])
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -173,44 +86,44 @@ bool PlayerManager::GetPlayerColor(const unsigned char index, unsigned char (&co
 	return true;
 }
 
-SpawnInfo *PlayerManager::GetPlayerSpawnInfo(const unsigned char index, const unsigned char classindex)
-{
-	if (index >= playerbuffersize)
-	{
-		return NULL;
-	}
-	if (playerbuffer[index] == NULL)
-	{
-		return NULL;
-	}
-	if (classindex >= classbuffersize)
-	{
-		return NULL;
-	}
-	if (classbuffer[classindex] == NULL)
-	{
-		return NULL;
-	}
-	SpawnInfo *spawninfo = new SpawnInfo;
-	spawninfo->armour = 0;
-	spawninfo->health = 200;
-	spawninfo->model = classbuffer[classindex]->model;
-	spawninfo->angle = classbuffer[classindex]->angle;
-	spawninfo->room = 0;
-	spawninfo->position[0] = classbuffer[classindex]->position[0];
-	spawninfo->position[1] = classbuffer[classindex]->position[1];
-	spawninfo->position[2] = classbuffer[classindex]->position[2];
-	for (unsigned char i = 0; i < 11; i++)
-	{
-		spawninfo->CompD[i] = playerbuffer[index]->compD[i];
-		spawninfo->CompT[i] = playerbuffer[index]->compT[i];
-	}
-	return spawninfo;
-}
+//SpawnInfo *PlayerManager::GetPlayerSpawnInfo(const short index, const unsigned char classindex)
+//{
+//	if ((index < 0) || (index >= playerbuffersize))
+//	{
+//		return NULL;
+//	}
+//	if (playerbuffer[index] == NULL)
+//	{
+//		return NULL;
+//	}
+//	if (classindex >= classbuffersize)
+//	{
+//		return NULL;
+//	}
+//	if (classbuffer[classindex] == NULL)
+//	{
+//		return NULL;
+//	}
+//	SpawnInfo *spawninfo = new SpawnInfo;
+//	spawninfo->armour = 0;
+//	spawninfo->health = 200;
+//	spawninfo->model = classbuffer[classindex]->model;
+//	spawninfo->angle = classbuffer[classindex]->angle;
+//	spawninfo->room = 0;
+//	spawninfo->position[0] = classbuffer[classindex]->position[0];
+//	spawninfo->position[1] = classbuffer[classindex]->position[1];
+//	spawninfo->position[2] = classbuffer[classindex]->position[2];
+//	for (unsigned char i = 0; i < 11; i++)
+//	{
+//		spawninfo->CompD[i] = playerbuffer[index]->compD[i];
+//		spawninfo->CompT[i] = playerbuffer[index]->compT[i];
+//	}
+//	return spawninfo;
+//}
 
-void PlayerManager::DisconnectPlayer(const unsigned char index)
+void PlayerManager::DisconnectPlayer(const short index)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return;
 	}
@@ -225,9 +138,9 @@ void PlayerManager::DisconnectPlayer(const unsigned char index)
 	nm.DisconnectClient(index);
 }
 
-bool PlayerManager::MovePlayer(const unsigned char index, const float position[], const float angle, const float speed)
+bool PlayerManager::MovePlayer(const short index, const float position[3], const float angle, const float speed)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;;
 	}
@@ -235,12 +148,6 @@ bool PlayerManager::MovePlayer(const unsigned char index, const float position[]
 	{
 		return false;
 	}
-	if (playerbuffer[index]->vehicleindex != -1)
-	{
-		vm.SetVehiclePosition(playerbuffer[index]->vehicleindex, position);
-		vm.SetVehicleAngle(playerbuffer[index]->vehicleindex, angle);
-	}
-
 	playerbuffer[index]->position[0] = position[0];
 	playerbuffer[index]->position[1] = position[1];
 	playerbuffer[index]->position[2] = position[2];
@@ -253,9 +160,9 @@ bool PlayerManager::MovePlayer(const unsigned char index, const float position[]
 	return true;
 }
 
-bool PlayerManager::DuckPlayer(const unsigned char index, const bool shouldduck)
+bool PlayerManager::DuckPlayer(const short index, const bool shouldduck)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -267,9 +174,9 @@ bool PlayerManager::DuckPlayer(const unsigned char index, const bool shouldduck)
 	return true;
 }
 
-bool PlayerManager::PlayerEnterInVehicle(const unsigned char index, const unsigned char vehicleindex, const int seat)
+bool PlayerManager::PlayerEnterInVehicle(const short index, const unsigned char vehicleindex, const int seat)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -287,9 +194,9 @@ bool PlayerManager::PlayerEnterInVehicle(const unsigned char index, const unsign
 	return true;
 }
 
-bool PlayerManager::PlayerExitFromVehicle(const unsigned char index)
+bool PlayerManager::PlayerExitFromVehicle(const short index)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -302,9 +209,9 @@ bool PlayerManager::PlayerExitFromVehicle(const unsigned char index)
 	return true;
 }
 
-bool PlayerManager::FirePlayer(const unsigned char index, const int weapon, const unsigned char target, const int health, const int armour)
+bool PlayerManager::FirePlayer(const short index, const int weapon, const short target, const int health, const int armour)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -312,7 +219,7 @@ bool PlayerManager::FirePlayer(const unsigned char index, const int weapon, cons
 	{
 		return false;
 	}
-	if (target >= playerbuffersize)
+	if ((target < 0) || (target >= playerbuffersize))
 	{
 		return false;
 	}
@@ -329,9 +236,9 @@ bool PlayerManager::FirePlayer(const unsigned char index, const int weapon, cons
 	return true;
 }
 
-bool PlayerManager::ChangePlayerWeapon(const unsigned char index, const int weapon)
+bool PlayerManager::ChangePlayerWeapon(const short index, const int weapon)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -343,9 +250,9 @@ bool PlayerManager::ChangePlayerWeapon(const unsigned char index, const int weap
 	return true;
 }
 
-bool PlayerManager::SetPlayerHealth(const unsigned char index, const int health)
+bool PlayerManager::SetPlayerHealth(const short index, const int health)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -357,9 +264,9 @@ bool PlayerManager::SetPlayerHealth(const unsigned char index, const int health)
 	return true;
 }
 
-bool PlayerManager::SetPlayerArmour(const unsigned char index, const int armour)
+bool PlayerManager::SetPlayerArmour(const short index, const int armour)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -371,9 +278,9 @@ bool PlayerManager::SetPlayerArmour(const unsigned char index, const int armour)
 	return true;
 }
 
-bool PlayerManager::SetPlayerModel(const unsigned char index, const int model)
+bool PlayerManager::SetPlayerModel(const short index, const int model)
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -385,9 +292,9 @@ bool PlayerManager::SetPlayerModel(const unsigned char index, const int model)
 	return true;
 }
 
-bool PlayerManager::SetPlayerComponents(const unsigned char index, const int compD[11], const int compT[11])
+bool PlayerManager::SetPlayerComponents(const short index, const int compD[11], const int compT[11])
 {
-	if (index >= playerbuffersize)
+	if ((index < 0) || (index >= playerbuffersize))
 	{
 		return false;
 	}
@@ -496,23 +403,86 @@ bool PlayerManager::GetPlayerClassData(const unsigned char index, int &model, fl
 	return true;
 }
 
-bool PlayerManager::GetPlayerFreeSlot(unsigned char &index)
+bool PlayerManager::RegisterNewPlayer(const short index, const char *name)
 {
+	if ((index < 0) || (index >= maxplayerbuffersize))
+	{
+		return false;
+	}
+	if (index >= playerbuffersize)
+	{
+		if (playerbuffersize == maxplayerbuffersize)
+		{
+			return false;
+		}
+		if (!this->ResizePlayerBuffer(playerbuffer, index + 1))
+		{
+			return false;
+		}
+		playerbuffer[index] = NULL;
+		playerbuffersize = index + 1;
+	}
+	if (playerbuffer[index] != NULL)
+	{
+		return false;
+	}
+	playerbuffer[index] = new Player;
+	//playerbuffer[index]->name = (char *)calloc(strlen(name) + 1, sizeof(char));
+	strcpy(playerbuffer[index]->name, name);
+	playerbuffer[index]->model = 0x98E29920;
+	playerbuffer[index]->position[0] = 0;
+	playerbuffer[index]->position[1] = 0;
+	playerbuffer[index]->position[2] = 0;
+	playerbuffer[index]->angle = 0;
+	playerbuffer[index]->last_active = 0;
+	playerbuffer[index]->sync_state = 0;
+	for(unsigned char i = 0; i < 8; i++)
+	{
+		playerbuffer[index]->weapons[i] = 0;
+		playerbuffer[index]->ammo[i] = 0;
+	}
+	playerbuffer[index]->animation[0] = 0;
+	playerbuffer[index]->vehicleindex = -1;
+	playerbuffer[index]->seat_id = 99;
+	playerbuffer[index]->score = 0;
+	playerbuffer[index]->health = 200;
+	playerbuffer[index]->armour = 0;
+	playerbuffer[index]->wanted_level = 0;
+	playerbuffer[index]->edSprint = 1;
+	playerbuffer[index]->edLockon = 1;
+	playerbuffer[index]->edDoDriveBy = 1;
+	playerbuffer[index]->edUseCover = 1;
+	playerbuffer[index]->edConrol = 1;
+	playerbuffer[index]->edFreeze = 0;
+	playerbuffer[index]->isducking = 0;
+	playerbuffer[index]->room = 0;
+	playerbuffer[index]->car_enter = 0;
+	playerbuffer[index]->color[0] = 0xFF;
+	playerbuffer[index]->color[1] = 0xFF;
+	playerbuffer[index]->color[2] = 0x00;
+	playerbuffer[index]->color[3] = 0x00;
+	playerbuffer[index]->currentweapon = 0;
+	return true;
+}
+
+short PlayerManager::GetPlayerFreeSlot(void)
+{
+	short index;
 	for (index = 0; index < playerbuffersize; index++)
 	{
 		if (playerbuffer[index] == NULL)
 		{
-			return true;
+			return index;
 		}
 	}
 	if (playerbuffersize == maxplayerbuffersize)
 	{
-		return false;
+		return INVALID_PLAYER_INDEX;
 	}
-	return true;
+	return index;
 }
 
-bool PlayerManager::ResizePlayerBuffer(Player **&buffer, const unsigned char size)
+bool PlayerManager::ResizePlayerBuffer(Player **&buffer, const short size)
 {
 	Player **tempbuffer = (Player **)realloc(*&buffer, size * sizeof(Player *));
 	if ((tempbuffer == NULL) && (size != 0))

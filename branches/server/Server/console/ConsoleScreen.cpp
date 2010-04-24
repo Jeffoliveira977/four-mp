@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "common.h"
+#include "..\..\..\Shared\Console\common.h"
 #include "ConsoleScreen.h"
 
 ConsoleScreen::ConsoleScreen(ConsoleCore *core)

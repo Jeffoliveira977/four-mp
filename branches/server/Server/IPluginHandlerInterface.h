@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "console\ConVar.h"
+#include "..\..\Shared\Console\ConVar.h"
 #include "IPluginInterface.h"
 
 /// \brief A plugin handler interface.

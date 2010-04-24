@@ -3,9 +3,6 @@
 *	Created by:			WNeZRoS
 *	Last Modifed:		-
 */
-#include <windows.h>
-
-#include "logging.h"
 #include "NetworkManager.h"
 
 extern NetworkManager nm;

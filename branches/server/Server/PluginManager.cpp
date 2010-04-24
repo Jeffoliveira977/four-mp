@@ -11,7 +11,7 @@
 #include "logging.h"
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
-#include "console\ConsoleCore.h"
+#include "..\..\Shared\Console\ConsoleCore.h"
 #include "VirtualMachineManager.h"
 
 extern HandleManager hm;

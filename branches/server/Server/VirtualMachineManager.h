@@ -6,7 +6,7 @@
 #pragma once
 
 #include "sq\squirrel.h"
-#include "console\ConsoleCore.h"
+#include "..\..\Shared\Console\ConsoleCore.h"
 
 /// \brief A virtual machine manager. It handles all I/O between scripting languages and
 /// other modules.
@@ -246,19 +246,19 @@ public:
 	/// \brief Called when a player connects the server.
 	/// \param[in] index Index of the player.
 	/// \param[in] name Name of the player.
-	/// \return TODO:
-	int OnPlayerConnect(const unsigned char index, char *name);
+	/// \return True if we let the player to connect, false otherwise.
+	bool OnPlayerConnect(const short index, const char *name);
 
 	/// \brief Called when a player is disconnecting from the server.
 	/// \param[in] index Index of the player.
 	/// \return No return.
-	void OnPlayerDisconnect(const unsigned char index);
+	void OnPlayerDisconnect(const short index);
 
 	/// \brief Called when a player is spawning.
 	/// \param[in] playerindex Index of the player.
 	/// \param[in] classindex Index of the class.
 	/// \return No return.
-	void OnPlayerSpawn(const unsigned char playerindex, const unsigned char classindex);
+	void OnPlayerSpawn(const short playerindex, const unsigned char classindex);
 
 	/// \brief Fires a dynamic command callback.
 	/// \param[in] index Index of the virtual machine.

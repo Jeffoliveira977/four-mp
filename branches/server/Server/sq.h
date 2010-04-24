@@ -35,19 +35,19 @@ void sc_OnFilterScriptExit(HSQUIRRELVM v);
 /// \brief Called when a player connects the server.
 /// \param[in] index Index of the player.
 /// \param[in] name Name of the player.
-/// \return TODO:
-int sc_OnPlayerConnect(HSQUIRRELVM v, unsigned char index, char *name);
+/// \return True if we let the player to connect, false otherwise.
+bool sc_OnPlayerConnect(HSQUIRRELVM v, const short index, const char *name);
 
 /// \brief Called when a player is disconnecting from the server.
 /// \param[in] index Index of the player.
 /// \return No return.
-void sc_OnPlayerDisconnect(HSQUIRRELVM v, unsigned char index);
+void sc_OnPlayerDisconnect(HSQUIRRELVM v, const short index);
 
 /// \brief Called when a player is spawning.
 /// \param[in] playerindex Index of the player.
 /// \param[in] classindex Index of the class.
 /// \return No return.
-void sc_OnPlayerSpawn(HSQUIRRELVM v, const unsigned char playerindex, const unsigned char classindex);
+void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex, const unsigned char classindex);
 
 /// \brief Fires a dynamic command callback.
 /// \param[in] callback Name of the callback to call.

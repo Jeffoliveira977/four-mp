@@ -5,14 +5,9 @@
 
 #pragma once
 
-#include "net\RakPeerInterface.h"
+#include "..\..\Shared\RakNet\RakPeerInterface.h"
 
-enum ConnectionError
-{
-	ConnectionErrorServerFull,
-	ConnectionErrorAllocationError,
-	ConnectionErrorScriptLock
-};
+#include "..\..\Shared\Network\NetworkProtocol.h"
 
 /// \brief A network manager. It handles all network traffic.
 /// \details TODO:
@@ -23,13 +18,11 @@ class NetworkManager
 public:
 	NetworkManager(void);
 	~NetworkManager(void);
-	void Init(unsigned char maxclients, unsigned short port);
+	void Init(short maxclients, unsigned short port);
 	void Tick(void);
 	void CheckClients(void);
-	void RemoveClient(const unsigned char index);
-	void SendNewPlayerInfoToAll(const unsigned char index, const char *name, const int model, const float position[3], const float angle, const short vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4]);
-	void SendNewPlayerInfo(const unsigned char client, const unsigned char index, const char *name, const int model, const float position[3], const float angle, const short vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4]);
-	void DisconnectClient(const unsigned char index);
+	void RemoveClient(const short index);
+	void DisconnectClient(const short index);
 	void RecieveClientConnection(const RPCParameters *rpcParameters);
 	void RecievePlayerMove(const RPCParameters *rpcParameters);
 	void RecievePlayerJump(const RPCParameters *rpcParameters);
@@ -45,22 +38,23 @@ public:
 	void RecievePlayerModelChange(const RPCParameters *rpcParameters);
 	void RecievePlayerComponentsChange(const RPCParameters *rpcParameters);
 	void RecievePlayerChat(const RPCParameters *rpcParameters);
-	void SendConnectionError(const unsigned char index, const ConnectionError error);
-	void SendVehicleInfo(const unsigned char client, const unsigned char index, const int model, const float position[3], const float angle, const int color[2]);
-	void SendClassInfo(const unsigned char client);
-	void SendNewVehicleToAll(const unsigned char index, const int model, const float position[3], const float angle, const int color[2]);
+	bool SendNewVehicleInfoToAll(const short index);
 private:
 	unsigned short serverport;
 	RakPeerInterface *net;
-	unsigned char maxaddressbuffersize;
-	unsigned char addressbuffersize;
+	short maxaddressbuffersize;
+	short addressbuffersize;
 	SystemAddress **addressbuffer;
-	bool RegisterNewClient(const SystemAddress address, unsigned char &index);
-	bool GetClientIndex(const SystemAddress address, unsigned char &index);
-	bool GetAddressFreeSlot(unsigned char &index);
-	bool ResizeAddressBuffer(SystemAddress **&buffer, const unsigned char size);
-	RakNet::BitStream *TranslateMessage(const RPCParameters *rpcParameters, unsigned char &index);
-	void SendConnectionError(const SystemAddress address, const ConnectionError error);
-	void SendUpdateToAll(const char *RPC, const unsigned char index, const RakNet::BitStream *bsSend);
-	void SendChatMessageToAll(const unsigned char client, const char *message, const unsigned char color[4]);
+	short RegisterNewClient(const SystemAddress address);
+	short GetClientIndex(const SystemAddress address);
+	short GetAddressFreeSlot(void);
+	bool ResizeAddressBuffer(SystemAddress **&buffer, const short size);
+	RakNet::BitStream *TranslateMessage(const RPCParameters *rpcParameters, short &index);
+	void SendConnectionError(const SystemAddress address, const NetworkPlayerConnectionError error);
+	NetworkPlayerFullUpdateData *GetPlayerFullUpdateData(const short index);
+	NetworkVehicleFullUpdateData *GetVehicleFullUpdateData(const short index);
+	void SendDataToAll(const char *RPC, const RakNet::BitStream *bsSend);
+	void SendDataToAllExceptOne(const char *RPC, const short index, const RakNet::BitStream *bsSend);
+	void SendClassInfo(const short client);
+	void SendChatMessageToAll(const short client, const char *message, const unsigned char color[4]);
 };

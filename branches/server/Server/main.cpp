@@ -7,13 +7,10 @@
 #pragma comment (lib ,"squirrel.lib")
 #pragma comment (lib ,"sqstdlib.lib")
 
-///////////////////////////////////////////////
-//             I N C L U D E S               //
-///////////////////////////////////////////////
 #include "ServerCore.h"
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
-#include "console\ConsoleCore.h"
+#include "..\..\Shared\Console\ConsoleCore.h"
 #include "console\ConsoleScreen.h"
 #include "NetworkManager.h"
 #include "PluginManager.h"
@@ -21,9 +18,6 @@
 #include "PlayerManager.h"
 #include "VehicleManager.h"
 
-///////////////////////////////////////////////
-//                V  A  R  S                 //
-///////////////////////////////////////////////
 ServerCore server;
 CoreHandleTypesManager chtm;
 ConsoleCore concore;

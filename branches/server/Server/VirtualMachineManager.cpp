@@ -18,7 +18,7 @@
 #include "sq\sqstdstring.h"
 #include "sq\sqstdsystem.h"
 
-#include "console\common.h"
+#include "..\..\Shared\Console\common.h"
 #include "sq.h"
 #include "sq_consolenatives.h"
 
@@ -499,7 +499,7 @@ void VirtualMachineManager::RegServerCmd(const HSQUIRRELVM *v, const char *callb
 	chtm.AddDynamicCommand(index + 1, callback, ptr);
 }
 
-int VirtualMachineManager::OnPlayerConnect(const unsigned char index, char *name)
+bool VirtualMachineManager::OnPlayerConnect(const short index, const char *name)
 {
 	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
@@ -509,16 +509,19 @@ int VirtualMachineManager::OnPlayerConnect(const unsigned char index, char *name
 			{
 			case VMLanguageSquirrel:
 				{
-					sc_OnPlayerConnect(*vmbuffer[i]->ptr.squirrel, index, name);
+					if (!sc_OnPlayerConnect(*vmbuffer[i]->ptr.squirrel, index, name))
+					{
+						return false;
+					}
 					break;
 				}
 			}
 		}
 	}
-	return 1; //Temp
+	return true;
 }
 
-void VirtualMachineManager::OnPlayerDisconnect(const unsigned char index)
+void VirtualMachineManager::OnPlayerDisconnect(const short index)
 {
 	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
@@ -536,7 +539,7 @@ void VirtualMachineManager::OnPlayerDisconnect(const unsigned char index)
 	}
 }
 
-void VirtualMachineManager::OnPlayerSpawn(const unsigned char playerindex, const unsigned char classindex)
+void VirtualMachineManager::OnPlayerSpawn(const short playerindex, const unsigned char classindex)
 {
 	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{

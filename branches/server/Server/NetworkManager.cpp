@@ -1,6 +1,6 @@
-#include "net\RakNetworkFactory.h"
-#include "net\MessageIdentifiers.h"
-#include "net\BitStream.h"
+#include "..\..\Shared\RakNet\RakNetworkFactory.h"
+#include "..\..\Shared\RakNet\MessageIdentifiers.h"
+#include "..\..\Shared\RakNet\BitStream.h"
 
 #include "NetworkManager.h"
 #include "logging.h"
@@ -8,10 +8,12 @@
 #include "ServerCore.h"
 #include "VirtualMachineManager.h"
 #include "PlayerManager.h"
+#include "VehicleManager.h"
 
 extern ServerCore server;
 extern VirtualMachineManager vmm;
 extern PlayerManager playm;
+extern VehicleManager vm;
 
 NetworkManager::NetworkManager(void)
 {
@@ -23,7 +25,7 @@ NetworkManager::~NetworkManager(void)
 {
 }
 
-void NetworkManager::Init(unsigned char maxclients, unsigned short port)
+void NetworkManager::Init(const short maxclients, const unsigned short port)
 {
 	net = RakNetworkFactory::GetRakPeerInterface();
 	SocketDescriptor s(port, 0);
@@ -72,8 +74,8 @@ void NetworkManager::Tick(void)
 				}
 			case (ID_DISCONNECTION_NOTIFICATION || ID_CONNECTION_LOST):
 				{
-					unsigned char clientindex;
-					if (this->GetClientIndex(pack->systemAddress, clientindex));
+					unsigned char clientindex = this->GetClientIndex(pack->systemAddress);
+					if (clientindex != INVALID_PLAYER_INDEX)
 					{
 						playm.DisconnectPlayer(clientindex);
 					}
@@ -88,132 +90,10 @@ void NetworkManager::Tick(void)
 void NetworkManager::CheckClients(void)
 {
 	RakNet::BitStream bsSend;
-	for (unsigned char i = 0; i < addressbuffersize; i++)
-	{
-		if (addressbuffer[i] != NULL)
-		{
-			net->RPC("Check", &bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[i][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
-			debug("Check %d", i);
-		}
-	}
+	this->SendDataToAll("Check", &bsSend);
 }
 
-void NetworkManager::RemoveClient(const unsigned char index)
-{
-	if (index >= addressbuffersize)
-	{
-		return;
-	}
-	if (addressbuffer[index] == NULL)
-	{
-		return;
-	}
-	free(addressbuffer[index]);
-	addressbuffer[index] = NULL;
-}
-
-void NetworkManager::SendNewPlayerInfoToAll(const unsigned char index, const char *name, const int model, const float position[3], const float angle, const short vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4])
-{
-	if (index >= addressbuffersize)
-	{
-		return;
-	}
-	if (name == NULL)
-	{
-		return;
-	}
-	// TODO: Optimize so it will also check for number of active connections.
-	RakNet::BitStream bsSend;
-	bsSend.Write(strlen(name));
-	bsSend.Write(name, strlen(name));
-	bsSend.Write(index);
-	bsSend.Write(model);
-	bsSend.Write(position[0]);
-	bsSend.Write(position[1]);
-	bsSend.Write(position[2]);
-	bsSend.Write(angle);
-	bsSend.Write(vehicleindex);
-	bsSend.Write(seat_id);
-	bsSend.Write(score);
-	bsSend.Write(health);
-	bsSend.Write(armour);
-	bsSend.Write(room);
-	bsSend.Write(weapons[0]);
-	bsSend.Write(ammo[0]);
-	bsSend.Write(weapons[1]);
-	bsSend.Write(ammo[1]);
-	bsSend.Write(weapons[2]);
-	bsSend.Write(ammo[2]);
-	bsSend.Write(weapons[3]);
-	bsSend.Write(ammo[3]);
-	bsSend.Write(weapons[4]);
-	bsSend.Write(ammo[4]);
-	bsSend.Write(weapons[5]);
-	bsSend.Write(ammo[5]);
-	bsSend.Write(weapons[6]);
-	bsSend.Write(ammo[6]);
-	bsSend.Write(weapons[7]);
-	bsSend.Write(ammo[7]);
-	bsSend.Write(color);
-	for (unsigned char i = 0; i < addressbuffersize; i++)
-	{
-		if (addressbuffer[i] != NULL)
-		{
-			net->RPC("ConnectPlayer", &bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[index][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
-		}
-	}
-}
-
-void NetworkManager::SendNewPlayerInfo(const unsigned char client, const unsigned char index, const char *name, const int model, const float position[3], const float angle, const short vehicleindex, const int seat_id, const int score, const int health, const int armour, const int room, const int weapons[8], const int ammo[8], const unsigned char color[4])
-{
-	if (client >= addressbuffersize)
-	{
-		return;
-	}
-	if (addressbuffer[client] == NULL)
-	{
-		return;
-	}
-	if (name == NULL)
-	{
-		return;
-	}
-	RakNet::BitStream bsSend;
-	bsSend.Write(strlen(name));
-	bsSend.Write(name, strlen(name));
-	bsSend.Write(index);
-	bsSend.Write(model);
-	bsSend.Write(position[0]);
-	bsSend.Write(position[1]);
-	bsSend.Write(position[2]);
-	bsSend.Write(angle);
-	bsSend.Write(vehicleindex);
-	bsSend.Write(seat_id);
-	bsSend.Write(score);
-	bsSend.Write(health);
-	bsSend.Write(armour);
-	bsSend.Write(room);
-	bsSend.Write(weapons[0]);
-	bsSend.Write(ammo[0]);
-	bsSend.Write(weapons[1]);
-	bsSend.Write(ammo[1]);
-	bsSend.Write(weapons[2]);
-	bsSend.Write(ammo[2]);
-	bsSend.Write(weapons[3]);
-	bsSend.Write(ammo[3]);
-	bsSend.Write(weapons[4]);
-	bsSend.Write(ammo[4]);
-	bsSend.Write(weapons[5]);
-	bsSend.Write(ammo[5]);
-	bsSend.Write(weapons[6]);
-	bsSend.Write(ammo[6]);
-	bsSend.Write(weapons[7]);
-	bsSend.Write(ammo[7]);
-	bsSend.Write(color);
-	net->RPC("ConnectPlayer", &bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[client][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
-}
-
-void NetworkManager::DisconnectClient(const unsigned char index)
+void NetworkManager::DisconnectClient(const short index)
 {
 	if (index >= addressbuffersize)
 	{
@@ -240,30 +120,99 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 {
 	if (playm.IsServerFull())
 	{
-		this->SendConnectionError(rpcParameters->sender, ConnectionErrorServerFull);
+		this->SendConnectionError(rpcParameters->sender, NetworkPlayerConnectionErrorServerFull);
+		net->CloseConnection(rpcParameters->sender, true);
 		return;
 	}
-	unsigned char clientindex;
-	if (!this->RegisterNewClient(rpcParameters->sender, clientindex))
+	short clientindex = this->GetClientIndex(rpcParameters->sender);
+	if (clientindex != INVALID_PLAYER_INDEX)
 	{
-		this->SendConnectionError(rpcParameters->sender, ConnectionErrorAllocationError);
+		PrintToServer("Player %s has tried to connect twice.", playm.GetPlayerName(clientindex));
+		this->SendConnectionError(rpcParameters->sender, NetworkPlayerConnectionErrorAlreadyConnected);
+	}
+	clientindex = this->RegisterNewClient(rpcParameters->sender);
+	if (clientindex == INVALID_PLAYER_INDEX)
+	{
+		PrintToServer("Unable to register new client.");
+		this->SendConnectionError(rpcParameters->sender, NetworkPlayerConnectionErrorAllocationError);
+		net->CloseConnection(rpcParameters->sender, true);
 		return;
 	}
-	char *name;
-	unsigned char namesize = 0;
+	//char *name;
+	//unsigned char namelength = 0;
+	NetworkPlayerConnectionRequestData data;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, clientindex);
-	bsData->Read(namesize);
-	name = (char *)calloc(namesize + 1, sizeof(char));
-	bsData->Read(name, namesize);
+	bsData->Read(data);
+	//name = (char *)calloc(namelength + 1, sizeof(char));
+	//bsData->Read(name, namelength);
 	free(bsData);
-	name[namesize] = '\0';
-	PrintToServer("Player %s[%d] connected", name, clientindex);
-	playm.RegisterNewPlayer(clientindex, name);
+	//name[namelength] = '\0';
+	PrintToServer("Player %s[%d] connected", data.name, clientindex);
+	if (!vmm.OnPlayerConnect(clientindex, data.name))
+	{
+		this->SendConnectionError(rpcParameters->sender, NetworkPlayerConnectionErrorScriptLock);
+		net->CloseConnection(rpcParameters->sender, true);
+		free(addressbuffer[clientindex]);
+		addressbuffer[clientindex] = NULL;
+		return;
+	}
+	if (!playm.RegisterNewPlayer(clientindex, data.name))
+	{
+		this->SendConnectionError(rpcParameters->sender, NetworkPlayerConnectionErrorAllocationError);
+		net->CloseConnection(rpcParameters->sender, true);
+		free(addressbuffer[clientindex]);
+		addressbuffer[clientindex] = NULL;
+		return;
+	}
+	//TODO: Recieve all server data (other players, vehicles...) and then send new player data to all. More fair.
+	NetworkPlayerFullUpdateData *playerdata = this->GetPlayerFullUpdateData(clientindex);
+	if (playerdata == NULL)
+	{
+		this->SendConnectionError(rpcParameters->sender, NetworkPlayerConnectionErrorAllocationError);
+		net->CloseConnection(rpcParameters->sender, true);
+		free(addressbuffer[clientindex]);
+		addressbuffer[clientindex] = NULL;
+		return;
+	}
+	RakNet::BitStream *bsSend = new RakNet::BitStream;
+	bsSend->Write(playerdata);
+	free(playerdata);
+	this->SendDataToAll("ConnectPlayer", bsSend);
+	free(bsSend);
+	//TODO: Optimize using currently connected players, not buffer size.
+	for (short i = 0; i < addressbuffersize; i++)
+	{
+		if (i != clientindex)
+		{
+			playerdata = this->GetPlayerFullUpdateData(i);
+			if (playerdata != NULL)
+			{
+				bsSend = new RakNet::BitStream;
+				bsSend->Write(playerdata);
+				free(playerdata);
+				net->RPC("ConnectPlayer", bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[clientindex][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
+				free(bsSend);
+			}
+		}
+	}
+	NetworkVehicleFullUpdateData *vehicledata;
+	for (short i = 0; i < vm.vehiclebuffersize; i++)
+	{
+		vehicledata = this->GetVehicleFullUpdateData(i);
+		if (vehicledata != NULL)
+		{
+			bsSend = new RakNet::BitStream;
+			bsSend->Write(vehicledata);
+			free(vehicledata);
+			net->RPC("CreateVehicle", bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[clientindex][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
+			free(bsSend);
+		}
+	}
 }
 
 void NetworkManager::RecievePlayerMove(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -280,6 +229,12 @@ void NetworkManager::RecievePlayerMove(const RPCParameters *rpcParameters)
 	{
 		return;
 	}
+	if (playm.playerbuffer[client]->vehicleindex != -1)
+	{
+
+		vm.SetVehiclePosition(playm.playerbuffer[client]->vehicleindex, position);
+		vm.SetVehicleAngle(playm.playerbuffer[client]->vehicleindex, angle);
+	}
 	RakNet::BitStream bsSend;
 	bsSend.Write(client);
 	bsSend.Write(position[0]);
@@ -287,12 +242,12 @@ void NetworkManager::RecievePlayerMove(const RPCParameters *rpcParameters)
 	bsSend.Write(position[2]);
 	bsSend.Write(angle);
 	bsSend.Write(speed);
-	this->SendUpdateToAll("MovePlayer", client, &bsSend);
+	this->SendDataToAllExceptOne("MovePlayer", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerJump(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -300,12 +255,12 @@ void NetworkManager::RecievePlayerJump(const RPCParameters *rpcParameters)
 	}
 	RakNet::BitStream bsSend;
 	bsSend.Write(client);
-	this->SendUpdateToAll("JumpPlayer", client, &bsSend);
+	this->SendDataToAllExceptOne("JumpPlayer", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerDuck(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -321,18 +276,18 @@ void NetworkManager::RecievePlayerDuck(const RPCParameters *rpcParameters)
 	RakNet::BitStream bsSend;
 	bsSend.Write(client);
 	bsSend.Write(shouldduck);
-	this->SendUpdateToAll("DuckPlayer", client, &bsSend);
+	this->SendDataToAllExceptOne("DuckPlayer", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerEnterInVehicle(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
 		return;
 	}
-	unsigned char vehicleindex;
+	short vehicleindex;
 	int seat;
 	bsData->Read(vehicleindex);
 	bsData->Read(seat);
@@ -345,12 +300,12 @@ void NetworkManager::RecievePlayerEnterInVehicle(const RPCParameters *rpcParamet
 	bsSend.Write(client);
 	bsSend.Write(vehicleindex);
 	bsSend.Write(seat);
-	this->SendUpdateToAll("PlayerEnterInVehicle", client, &bsSend);
+	this->SendDataToAllExceptOne("PlayerEnterInVehicle", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerCancelEnterInVehicle(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -363,12 +318,12 @@ void NetworkManager::RecievePlayerCancelEnterInVehicle(const RPCParameters *rpcP
 	}
 	RakNet::BitStream bsSend;
 	bsSend.Write(client);
-	this->SendUpdateToAll("PlayerCancelEnterInVehicle", client, &bsSend);
+	this->SendDataToAllExceptOne("PlayerCancelEnterInVehicle", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerExitFromVehicle(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -381,12 +336,12 @@ void NetworkManager::RecievePlayerExitFromVehicle(const RPCParameters *rpcParame
 	}
 	RakNet::BitStream bsSend;
 	bsSend.Write(client);
-	this->SendUpdateToAll("PlayerExitFromVehicle", client, &bsSend);
+	this->SendDataToAllExceptOne("PlayerExitFromVehicle", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerFire(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -416,12 +371,12 @@ void NetworkManager::RecievePlayerFire(const RPCParameters *rpcParameters)
 	bsSend.Write(z);
 	bsSend.Write(weapon);
 	bsSend.Write(time);
-	this->SendUpdateToAll("PlayerFire", client, &bsSend);
+	this->SendDataToAllExceptOne("PlayerFire", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerAim(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -446,12 +401,12 @@ void NetworkManager::RecievePlayerAim(const RPCParameters *rpcParameters)
 	bsSend.Write(z);
 	bsSend.Write(weapon);
 	bsSend.Write(time);
-	this->SendUpdateToAll("PlayerAim", client, &bsSend);
+	this->SendDataToAllExceptOne("PlayerAim", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerWeaponChange(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -467,12 +422,12 @@ void NetworkManager::RecievePlayerWeaponChange(const RPCParameters *rpcParameter
 	RakNet::BitStream bsSend;
 	bsSend.Write(client);
 	bsSend.Write(weapon);
-	this->SendUpdateToAll("SwapGun", client, &bsSend);
+	this->SendDataToAllExceptOne("SwapGun", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerHealthAndArmourChange(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -493,12 +448,12 @@ void NetworkManager::RecievePlayerHealthAndArmourChange(const RPCParameters *rpc
 	bsSend.Write(client);
 	bsSend.Write(health);
 	bsSend.Write(armour);
-	this->SendUpdateToAll("PlayerParams", client, &bsSend);
+	this->SendDataToAllExceptOne("PlayerParams", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerSpawnRequest(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -507,25 +462,25 @@ void NetworkManager::RecievePlayerSpawnRequest(const RPCParameters *rpcParameter
 	unsigned char playerclassindex;
 	bsData->Read(playerclassindex);
 	free(bsData);
-	SpawnInfo *spawn = playm.GetPlayerSpawnInfo(client, playerclassindex);
-	vmm.OnPlayerSpawn(client, playerclassindex);
-	RakNet::BitStream bsSend;
-	bsSend.Write(client);
-	bsSend.Write(spawn);
-	free(spawn);
-	//TODO: Optimize using currently connected players, not buffer size.
-	for (unsigned char i = 0; i < addressbuffersize; i++)
-	{
-		if (addressbuffer[i] != NULL)
-		{
-			net->RPC("PlayerSpawn", &bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[i][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
-		}
-	}
+	//SpawnInfo *spawn = playm.GetPlayerSpawnInfo(client, playerclassindex);
+	//vmm.OnPlayerSpawn(client, playerclassindex);
+	//RakNet::BitStream bsSend;
+	//bsSend.Write(client);
+	//bsSend.Write(spawn);
+	//free(spawn);
+	////TODO: Optimize using currently connected players, not buffer size.
+	//for (unsigned char i = 0; i < addressbuffersize; i++)
+	//{
+	//	if (addressbuffer[i] != NULL)
+	//	{
+	//		net->RPC("PlayerSpawn", &bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[i][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
+	//	}
+	//}
 }
 
 void NetworkManager::RecievePlayerModelChange(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -541,12 +496,12 @@ void NetworkManager::RecievePlayerModelChange(const RPCParameters *rpcParameters
 	RakNet::BitStream bsSend;
 	bsSend.Write(client);
 	bsSend.Write(model);
-	this->SendUpdateToAll("SyncSkin", client, &bsSend);
+	this->SendDataToAllExceptOne("SyncSkin", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerComponentsChange(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -564,12 +519,12 @@ void NetworkManager::RecievePlayerComponentsChange(const RPCParameters *rpcParam
 	bsSend.Write(client);
 	bsSend.Write(compD);
 	bsSend.Write(compT);
-	this->SendUpdateToAll("SyncSkinVariation", client, &bsSend);
+	this->SendDataToAllExceptOne("SyncSkinVariation", client, &bsSend);
 }
 
 void NetworkManager::RecievePlayerChat(const RPCParameters *rpcParameters)
 {
-	unsigned char client;
+	short client;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, client);
 	if (bsData == NULL)
 	{
@@ -586,46 +541,202 @@ void NetworkManager::RecievePlayerChat(const RPCParameters *rpcParameters)
 	}
 	this->SendChatMessageToAll(client, msg, color);
 }
-void NetworkManager::SendConnectionError(const unsigned char index, const ConnectionError error)
+
+bool NetworkManager::SendNewVehicleInfoToAll(const short index)
 {
+	if ((index < 0) || (index >= vm.vehiclebuffersize))
+	{
+		return false;
+	}
+	if (vm.vehiclebuffer[index] == NULL)
+	{
+		return false;
+	}
+	NetworkVehicleFullUpdateData data;
+	data.index = index;
+	data.model = vm.vehiclebuffer[index]->model;
+	data.position[0] = vm.vehiclebuffer[index]->position[0];
+	data.position[1] = vm.vehiclebuffer[index]->position[1];
+	data.position[2] = vm.vehiclebuffer[index]->position[2];
+	data.angle = vm.vehiclebuffer[index]->angle;
+	data.color[0] = vm.vehiclebuffer[index]->color[0];
+	data.color[1] = vm.vehiclebuffer[index]->color[2];
+	RakNet::BitStream bsSend;
+	bsSend.Write(data);
+	this->SendDataToAll("CreateVehicle", &bsSend);
+	return true;
+}
+
+short NetworkManager::RegisterNewClient(const SystemAddress address)
+{
+	short index = this->GetAddressFreeSlot();
+	if (index == INVALID_PLAYER_INDEX)
+	{
+		return INVALID_PLAYER_INDEX;
+	}
 	if (index >= addressbuffersize)
 	{
-		return;
+		if (addressbuffersize == maxaddressbuffersize)
+		{
+			return INVALID_PLAYER_INDEX;
+		}
+		if (!this->ResizeAddressBuffer(addressbuffer, index + 1))
+		{
+			return INVALID_PLAYER_INDEX;
+		}
+		addressbuffer[index] = NULL;
+		addressbuffersize = index + 1;
+	}
+	addressbuffer[index] = new SystemAddress;
+	addressbuffer[index][0] = address;
+	return index;
+}
+
+short NetworkManager::GetClientIndex(const SystemAddress address)
+{
+	//TODO: Optimize using currently connected players, not buffer size.
+	for (short index = 0; index < addressbuffersize; index++)
+	{
+		if ((addressbuffer[index] != NULL) && (addressbuffer[index][0] == address))
+		{
+			return index;
+		}
+	}
+	return INVALID_PLAYER_INDEX;
+}
+
+short NetworkManager::GetAddressFreeSlot(void)
+{
+	short index;
+	for (index = 0; index < addressbuffersize; index++)
+	{
+		if (addressbuffer[index] == NULL)
+		{
+			return index;
+		}
+	}
+	if (addressbuffersize == maxaddressbuffersize)
+	{
+		return INVALID_PLAYER_INDEX;
+	}
+	return index;
+}
+
+bool NetworkManager::ResizeAddressBuffer(SystemAddress **&buffer, const short size)
+{
+	SystemAddress **tempbuffer = (SystemAddress **)realloc(*&buffer, size * sizeof(SystemAddress *));
+	if ((tempbuffer == NULL) && (size != 0))
+	{
+		return false;
+	}
+	buffer = tempbuffer;
+	return true;
+}
+
+RakNet::BitStream *NetworkManager::TranslateMessage(const RPCParameters *rpcParameters, short &index)
+{
+	if (rpcParameters == NULL)
+	{
+		return NULL;
+	}
+	index = this->GetClientIndex(rpcParameters->sender);
+	if (index == INVALID_PLAYER_INDEX)
+	{
+		return NULL;
+	}
+	RakNet::BitStream *bs = new RakNet::BitStream(rpcParameters->input,((rpcParameters->numberOfBitsOfData)/8)+1, false);
+	return bs;
+}
+
+void NetworkManager::SendConnectionError(const SystemAddress address, const NetworkPlayerConnectionError error)
+{
+	RakNet::BitStream bsSend;
+	bsSend.Write(error);
+	net->RPC("ErrorConnect", &bsSend, HIGH_PRIORITY,RELIABLE, 0, address, false, 0, UNASSIGNED_NETWORK_ID, 0);
+}
+
+NetworkPlayerFullUpdateData *NetworkManager::GetPlayerFullUpdateData(const short index)
+{
+	if ((index < 0) || (index >= addressbuffersize))
+	{
+		return NULL;
 	}
 	if (addressbuffer[index] == NULL)
 	{
-		return;
+		return NULL;
 	}
-	RakNet::BitStream bsSend;
-	bsSend.Write(error);
-	net->RPC("ErrorConnect", &bsSend, HIGH_PRIORITY,RELIABLE, 0, addressbuffer[index][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
+	if ((index < 0) || (index >= playm.playerbuffersize))
+	{
+		return NULL;
+	}
+	if (playm.playerbuffer[index] == NULL)
+	{
+		return NULL;
+	}
+	NetworkPlayerFullUpdateData *data = new NetworkPlayerFullUpdateData;
+	data->index = index;
+	strcpy(data->name, playm.playerbuffer[index]->name);
+	data->model = playm.playerbuffer[index]->model;
+	memcpy(data->position, playm.playerbuffer[index]->position, sizeof(float) * 3);
+	data->angle = playm.playerbuffer[index]->angle;
+	data->vehicleindex = playm.playerbuffer[index]->vehicleindex;
+	data->seat_id = playm.playerbuffer[index]->seat_id;
+	data->score = playm.playerbuffer[index]->score;
+	data->health = playm.playerbuffer[index]->health;
+	data->armour = playm.playerbuffer[index]->armour;
+	data->room = playm.playerbuffer[index]->room;
+	memcpy(data->weapons, playm.playerbuffer[index]->weapons, sizeof(int) * 8);
+	memcpy(data->ammo, playm.playerbuffer[index]->ammo, sizeof(int) * 8);
+	memcpy(data->color, playm.playerbuffer[index]->color, sizeof(unsigned char) * 4);
+	return data;
 }
 
-void NetworkManager::SendVehicleInfo(const unsigned char client, const unsigned char index, const int model, const float position[3], const float angle, const int color[2])
+NetworkVehicleFullUpdateData *NetworkManager::GetVehicleFullUpdateData(const short index)
 {
-	if (client >= addressbuffersize)
+	if ((index < 0) || (index >= vm.vehiclebuffersize))
 	{
-		return;
+		return NULL;
 	}
-	if (addressbuffer[client] == NULL)
+	if (vm.vehiclebuffer[index] == NULL)
 	{
-		return;
+		return NULL;
 	}
-	RakNet::BitStream bsSend;
-	bsSend.Write(index);
-	bsSend.Write(model);
-	bsSend.Write(position[0]);
-	bsSend.Write(position[1]);
-	bsSend.Write(position[2]);
-	bsSend.Write(angle);
-	bsSend.Write(color[0]);
-	bsSend.Write(color[1]);
-	net->RPC("CreateVehicle", &bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[client][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
+	NetworkVehicleFullUpdateData *data = new NetworkVehicleFullUpdateData;
+	data->index = index;
+	data->model = vm.vehiclebuffer[index]->model;
+	memcpy(data->position, vm.vehiclebuffer[index]->position, sizeof(float) * 3);
+	data->angle = vm.vehiclebuffer[index]->angle;
+	memcpy(data->color, vm.vehiclebuffer[index]->color, sizeof(unsigned char) * 2);
+	return data;
 }
 
-void NetworkManager::SendClassInfo(const unsigned char client)
+void NetworkManager::SendDataToAll(const char *RPC, const RakNet::BitStream *bsSend)
 {
-	if (client >= addressbuffersize)
+	//TODO: Optimize using currently connected players, not buffer size.
+	for (short i = 0; i < addressbuffersize; i++)
+	{
+		if (addressbuffer[i] != NULL)
+		{
+			net->RPC(RPC, bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[i][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
+		}
+	}
+}
+
+void NetworkManager::SendDataToAllExceptOne(const char *RPC, const short index, const RakNet::BitStream *bsSend)
+{
+	//TODO: Optimize using currently connected players, not buffer size.
+	for (unsigned char i = 0; i < addressbuffersize; i++)
+	{
+		if ((i != index) && (addressbuffer[i] != NULL))
+		{
+			net->RPC(RPC, bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[i][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
+		}
+	}
+}
+
+void NetworkManager::SendClassInfo(const short client)
+{
+	if ((client < 0) || (client >= addressbuffersize))
 	{
 		return;
 	}
@@ -660,125 +771,9 @@ void NetworkManager::SendClassInfo(const unsigned char client)
 	net->RPC("ClassSync", &bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[client][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
 }
 
-void NetworkManager::SendNewVehicleToAll(const unsigned char index, const int model, const float position[3], const float angle, const int color[2])
+void NetworkManager::SendChatMessageToAll(const short client, const char *message, const unsigned char color[4])
 {
-	RakNet::BitStream bsSend;
-	bsSend.Write(index);
-	bsSend.Write(model);
-	bsSend.Write(position[0]);
-	bsSend.Write(position[1]);
-	bsSend.Write(position[2]);
-	bsSend.Write(angle);
-	bsSend.Write(color[0]);
-	bsSend.Write(color[1]);
-	for(unsigned char i = 0; i < addressbuffersize; i++)
-	{
-		if(addressbuffer[i] != NULL)
-		{
-			net->RPC("CreateVehicle", &bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[i][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
-		}
-	}
-}
-
-bool NetworkManager::RegisterNewClient(const SystemAddress address, unsigned char &index)
-{
-	if (!this->GetAddressFreeSlot(index))
-	{
-		return false;
-	}
-	if (index >= addressbuffersize)
-	{
-		if (addressbuffersize == maxaddressbuffersize)
-		{
-			return false;
-		}
-		if (!this->ResizeAddressBuffer(addressbuffer, index + 1))
-		{
-			return false;
-		}
-		addressbuffer[index] = NULL;
-		addressbuffersize = index + 1;
-	}
-	addressbuffer[index] = new SystemAddress;
-	addressbuffer[index][0] = address;
-	return true;
-}
-
-bool NetworkManager::GetClientIndex(const SystemAddress address, unsigned char &index)
-{
-	for (index = 0; index < addressbuffersize; index++)
-	{
-		if ((addressbuffer[index] != NULL) && (addressbuffer[index][0] == address))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-bool NetworkManager::GetAddressFreeSlot(unsigned char &index)
-{
-	for (index = 0; index < addressbuffersize; index++)
-	{
-		if (addressbuffer[index] == NULL)
-		{
-			return true;
-		}
-	}
-	if (addressbuffersize == maxaddressbuffersize)
-	{
-		return false;
-	}
-	return true;
-}
-
-bool NetworkManager::ResizeAddressBuffer(SystemAddress **&buffer, const unsigned char size)
-{
-	SystemAddress **tempbuffer = (SystemAddress **)realloc(*&buffer, size * sizeof(SystemAddress *));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
-	return true;
-}
-
-RakNet::BitStream *NetworkManager::TranslateMessage(const RPCParameters *rpcParameters, unsigned char &index)
-{
-	if (rpcParameters == NULL)
-	{
-		return NULL;
-	}
-	if (!this->GetClientIndex(rpcParameters->sender, index))
-	{
-		return NULL;
-	}
-	RakNet::BitStream *bs = new RakNet::BitStream(rpcParameters->input,((rpcParameters->numberOfBitsOfData)/8)+1, false);
-	return bs;
-}
-
-void NetworkManager::SendConnectionError(const SystemAddress address, const ConnectionError error)
-{
-	RakNet::BitStream bsSend;
-	bsSend.Write(error);
-	net->RPC("ErrorConnect", &bsSend, HIGH_PRIORITY,RELIABLE, 0, address, false, 0, UNASSIGNED_NETWORK_ID, 0);
-}
-
-void NetworkManager::SendUpdateToAll(const char *RPC, const unsigned char index, const RakNet::BitStream *bsSend)
-{
-	//TODO: Optimize using currently connected players, not buffer size.
-	for (unsigned char i = 0; i < addressbuffersize; i++)
-	{
-		if ((i != index) && (addressbuffer[i] != NULL))
-		{
-			net->RPC(RPC, bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[i][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
-		}
-	}
-}
-
-void NetworkManager::SendChatMessageToAll(const unsigned char client, const char *message, const unsigned char color[4])
-{
-	if (client >= addressbuffersize)
+	if ((client < 0) || (client >= addressbuffersize))
 	{
 		return;
 	}

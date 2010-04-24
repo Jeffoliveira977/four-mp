@@ -17,25 +17,26 @@ extern VehicleManager vm;
 
 void sq_CreateCar(HSQUIRRELVM v) 
 { 
-	unsigned char index = 0;
 	int model = 0;
 	float position[3], angle;
-	int color[2];
-
+	int tempcolor[2];
+	
 	sq_getinteger(v, 2, &model);
 	sq_getfloat(v, 3, &position[0]);
 	sq_getfloat(v, 4, &position[1]);
 	sq_getfloat(v, 5, &position[2]);
 	sq_getfloat(v, 6, &angle);
-	sq_getinteger(v, 7, &color[0]);
-	sq_getinteger(v, 8, &color[1]);
-	if (!vm.CreateVehicle(model, position, angle, color, index))
+	sq_getinteger(v, 7, &tempcolor[0]);
+	sq_getinteger(v, 8, &tempcolor[1]);
+	unsigned char color[] = {tempcolor[0], tempcolor[1]};
+	short index = vm.CreateVehicle(model, position, angle, color);
+	if (index == INVALID_VEHICLE_INDEX)
 	{
 		sq_pushnull(v);
 		return;
 	}
 	sq_pushinteger(v, index);
-} 
+}
 
 void sq_GiveWeapon(HSQUIRRELVM v) 
 { 

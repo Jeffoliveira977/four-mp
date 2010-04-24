@@ -55,7 +55,7 @@ void sc_OnFilterScriptExit(HSQUIRRELVM v)
 	sq_settop(v,top); 
 }
 
-int sc_OnPlayerConnect(HSQUIRRELVM v, const unsigned char index, char *name)
+bool sc_OnPlayerConnect(HSQUIRRELVM v, const short index, const char *name)
 {
 	int result = 1;
 	int top = sq_gettop(v); 
@@ -67,7 +67,7 @@ int sc_OnPlayerConnect(HSQUIRRELVM v, const unsigned char index, char *name)
 		sq_pushstring(v,name,-1);
 		if (SQ_FAILED(sq_call(v,3,1,0)))
 		{
-			return 1;
+			return true;
 		}
 		sq_getinteger(v, sq_gettop(v), &result);
 	}
@@ -75,7 +75,7 @@ int sc_OnPlayerConnect(HSQUIRRELVM v, const unsigned char index, char *name)
 	return result;
 }
 
-void sc_OnPlayerDisconnect(HSQUIRRELVM v, const unsigned char index)
+void sc_OnPlayerDisconnect(HSQUIRRELVM v, const short index)
 {
 	int result;
 	int top = sq_gettop(v); 
@@ -89,7 +89,7 @@ void sc_OnPlayerDisconnect(HSQUIRRELVM v, const unsigned char index)
 	sq_settop(v,top); 
 }
 
-void sc_OnPlayerSpawn(HSQUIRRELVM v, const unsigned char playerindex, const unsigned char classindex)
+void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex, const unsigned char classindex)
 {
 	int result;
 	int top = sq_gettop(v); 

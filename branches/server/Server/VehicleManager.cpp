@@ -13,7 +13,7 @@ VehicleManager::VehicleManager(void)
 
 VehicleManager::~VehicleManager(void)
 {
-	for (unsigned char i = 0; i < vehiclebuffersize; i++)
+	for (short i = 0; i < vehiclebuffersize; i++)
 	{
 		if (vehiclebuffer[i] != NULL)
 		{
@@ -23,19 +23,19 @@ VehicleManager::~VehicleManager(void)
 	free(vehiclebuffer);
 }
 
-unsigned char VehicleManager::GetMaxVehicleBufferSize(void)
+short VehicleManager::GetMaxVehicleBufferSize(void)
 {
 	return maxvehiclebuffersize;
 }
 
-unsigned char VehicleManager::GetVehicleBufferSize(void)
+short VehicleManager::GetVehicleBufferSize(void)
 {
 	return vehiclebuffersize;
 }
 
-bool VehicleManager::IsVehicleExists(const unsigned char index)
+bool VehicleManager::IsVehicleExists(const short index)
 {
-	if (index >= vehiclebuffersize)
+	if ((index < 0) || (index >= vehiclebuffersize))
 	{
 		return false;
 	}
@@ -46,21 +46,22 @@ bool VehicleManager::IsVehicleExists(const unsigned char index)
 	return true;
 }
 
-bool VehicleManager::CreateVehicle(const int model, const float position[3], const float angle, const int color[2], unsigned char &index)
+short VehicleManager::CreateVehicle(const int model, const float position[3], const float angle, const unsigned char color[2])
 {
-	if (!this->GetVehicleFreeSlot(index))
+	short index = this->GetVehicleFreeSlot();
+	if (index == INVALID_VEHICLE_INDEX)
 	{
-		return false;
+		return INVALID_VEHICLE_INDEX;
 	}
 	if (index >= vehiclebuffersize)
 	{
 		if (vehiclebuffersize == maxvehiclebuffersize)
 		{
-			return false;
+			return INVALID_VEHICLE_INDEX;
 		}
 		if (!this->ResizeVehicleBuffer(vehiclebuffer, index + 1))
 		{
-			return false;
+			return INVALID_VEHICLE_INDEX;
 		}
 		vehiclebuffer[index] = NULL;
 		vehiclebuffersize = index + 1;
@@ -81,39 +82,29 @@ bool VehicleManager::CreateVehicle(const int model, const float position[3], con
 	vehiclebuffer[index]->DoorLock[3] = 0;
 	vehiclebuffer[index]->DoorLock[4] = 0;
 	vehiclebuffer[index]->DoorLock[5] = 0;
-	nm.SendNewVehicleToAll(index, model, position, angle, color);
-	return true;
+	if (!nm.SendNewVehicleInfoToAll(index))
+	{
+		return INVALID_VEHICLE_INDEX;
+	}
+	return index;
 }
 
-void VehicleManager::SendVehicleInfo(const unsigned char client, const unsigned char index)
+int VehicleManager::GetVehicleModel(const short index)
 {
-	if (index >= vehiclebuffersize)
+	if ((index < 0) || (index >= vehiclebuffersize))
 	{
-		return;
+		return INVALID_VEHICLE_MODEL;
 	}
 	if (vehiclebuffer[index] == NULL)
 	{
-		return;
-	}
-	nm.SendVehicleInfo(client, index, vehiclebuffer[index]->model, vehiclebuffer[index]->position, vehiclebuffer[index]->angle, vehiclebuffer[index]->color);
-}
-
-int VehicleManager::GetVehicleModel(const unsigned char index)
-{
-	if (index >= vehiclebuffersize)
-	{
-		return 0;
-	}
-	if (vehiclebuffer[index] == NULL)
-	{
-		return 0;
+		return INVALID_VEHICLE_MODEL;
 	}
 	return vehiclebuffer[index]->model;
 }
 
-bool VehicleManager::GetVehiclePosition(const unsigned char index, float (&position)[3])
+bool VehicleManager::GetVehiclePosition(const short index, float (&position)[3])
 {
-	if (index >= vehiclebuffersize)
+	if ((index < 0) || (index >= vehiclebuffersize))
 	{
 		return false;
 	}
@@ -127,9 +118,9 @@ bool VehicleManager::GetVehiclePosition(const unsigned char index, float (&posit
 	return true;
 }
 
-bool VehicleManager::GetVehicleAngle(const unsigned char index, float &angle)
+bool VehicleManager::GetVehicleAngle(const short index, float &angle)
 {
-	if (index >= vehiclebuffersize)
+	if ((index < 0) || (index >= vehiclebuffersize))
 	{
 		return false;
 	}
@@ -141,9 +132,9 @@ bool VehicleManager::GetVehicleAngle(const unsigned char index, float &angle)
 	return true;
 }
 
-bool VehicleManager::GetVehicleColor(const unsigned char index, int (&color)[2])
+bool VehicleManager::GetVehicleColor(const short index, unsigned char (&color)[2])
 {
-	if (index >= vehiclebuffersize)
+	if ((index < 0) || (index >= vehiclebuffersize))
 	{
 		return false;
 	}
@@ -156,9 +147,9 @@ bool VehicleManager::GetVehicleColor(const unsigned char index, int (&color)[2])
 	return true;
 }
 
-bool VehicleManager::SetVehiclePosition(const unsigned char index, const float position[3])
+bool VehicleManager::SetVehiclePosition(const short index, const float position[3])
 {
-	if (index >= vehiclebuffersize)
+	if ((index < 0) || (index >= vehiclebuffersize))
 	{
 		return false;
 	}
@@ -169,13 +160,13 @@ bool VehicleManager::SetVehiclePosition(const unsigned char index, const float p
 	vehiclebuffer[index]->position[0] = position[0];
 	vehiclebuffer[index]->position[1] = position[1];
 	vehiclebuffer[index]->position[2] = position[2];
-	//TODO: sync it?
+	//TODO: sync it.
 	return true;
 }
 
-bool VehicleManager::SetVehicleAngle(const unsigned char index, const float angle)
+bool VehicleManager::SetVehicleAngle(const short index, const float angle)
 {
-	if (index >= vehiclebuffersize)
+	if ((index < 0) || (index >= vehiclebuffersize))
 	{
 		return false;
 	}
@@ -184,27 +175,28 @@ bool VehicleManager::SetVehicleAngle(const unsigned char index, const float angl
 		return false;
 	}
 	vehiclebuffer[index]->angle = angle;
-	//TODO: sync it?
+	//TODO: sync it.
 	return true;
 }
 
-bool VehicleManager::GetVehicleFreeSlot(unsigned char &index)
+short VehicleManager::GetVehicleFreeSlot(void)
 {
+	short index;
 	for (index = 0; index < vehiclebuffersize; index++)
 	{
 		if (vehiclebuffer[index] == NULL)
 		{
-			return true;
+			return index;
 		}
 	}
 	if (vehiclebuffersize == maxvehiclebuffersize)
 	{
-		return false;
+		return INVALID_VEHICLE_INDEX;
 	}
-	return true;
+	return index;
 }
 
-bool VehicleManager::ResizeVehicleBuffer(Vehicle **&buffer, const unsigned char size)
+bool VehicleManager::ResizeVehicleBuffer(Vehicle **&buffer, const short size)
 {
 	Vehicle **tempbuffer = (Vehicle **)realloc(*&buffer, size * sizeof(Vehicle *));
 	if ((tempbuffer == NULL) && (size != 0))
