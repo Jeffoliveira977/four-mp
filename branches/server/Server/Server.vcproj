@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="RakNetDebug.lib ws2_32.lib ..\..\Shared\Console\ConsoleDebug.lib"
+				AdditionalDependencies="..\..\Shared\RakNet\RakNetDebug.lib ws2_32.lib ..\..\Shared\Console\ConsoleDebug.lib"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="1"
@@ -133,7 +133,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="RakNet.lib ws2_32.lib ..\..\Shared\Console\Console.lib"
+				AdditionalDependencies="..\..\Shared\RakNet\RakNet.lib ws2_32.lib ..\..\Shared\Console\Console.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"
