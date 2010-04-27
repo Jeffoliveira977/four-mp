@@ -6,7 +6,7 @@
 #pragma once
 
 #include <windows.h>
-#include "GUI\CGUI.h"
+#include "..\GUI\CGUI.h"
 
 class ConsoleWindow
 {
