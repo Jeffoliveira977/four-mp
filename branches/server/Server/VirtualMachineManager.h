@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include "sq\squirrel.h"
-#include "..\..\Shared\Console\ConsoleCore.h"
+#include "sq/squirrel.h"
+#include "../../Shared/Console/ConsoleCore.h"
 
 /// \brief A virtual machine manager. It handles all I/O between scripting languages and
 /// other modules.

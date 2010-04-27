@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\..\Shared\RakNet\RakString.h"
+#include "../../Shared/RakNet/RakString.h"
 
 class TCPInterface;
 class HTTPConnection;

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "sq\squirrel.h"
+#include "sq/squirrel.h"
 
 /// \brief Prints a string of text to the server console.
 void sq_PrintToServer(HSQUIRRELVM v, const SQChar *s, ...);

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "..\..\Shared\Console\ConsoleCore.h"
+#include "../../Shared/Console/ConsoleCore.h"
 
 /// \brief Indicates a type of the handle.
 enum CoreHandleType

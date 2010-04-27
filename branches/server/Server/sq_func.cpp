@@ -4,7 +4,7 @@
 *	Last Modifed:		-
 */
 
-#include "sq\squirrel.h"
+#include "sq/squirrel.h"
 #include "VirtualMachineManager.h"
 
 extern VirtualMachineManager vmm;

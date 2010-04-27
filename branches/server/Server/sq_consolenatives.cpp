@@ -13,7 +13,7 @@
 #include "sq_consolenatives.h"
 #include "logging.h"
 #include "HandleManager.h"
-#include "..\..\Shared\Console\ConsoleCore.h"
+#include "../../Shared/Console/ConsoleCore.h"
 #include "console\fmpconcommands.h"
 #include "VirtualMachineManager.h"
 

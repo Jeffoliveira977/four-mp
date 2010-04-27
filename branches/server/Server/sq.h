@@ -4,8 +4,8 @@
 *	Last Modifed:		-
 */
 
-#include "sq\squirrel.h"
-#include "sq\sqstdsystem.h"
+#include "sq/squirrel.h"
+#include "sq/sqstdsystem.h"
 
 // SQ Functions
 SQInteger register_global_func(HSQUIRRELVM v,SQFUNCTION f,const char *fname);

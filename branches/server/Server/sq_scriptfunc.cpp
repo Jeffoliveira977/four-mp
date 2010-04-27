@@ -4,8 +4,8 @@
 *	Last Modifed:		-
 */
 
-#include "sq\squirrel.h"
-#include "sq\sqstdsystem.h"
+#include "sq/squirrel.h"
+#include "sq/sqstdsystem.h"
 
 #include "ServerCore.h"
 #include "PlayerManager.h"

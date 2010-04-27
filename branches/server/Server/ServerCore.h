@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\..\Shared\Console\ConVar.h"
+#include "../../Shared/Console/ConVar.h"
 
 class ServerCore
 {

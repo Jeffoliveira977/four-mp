@@ -5,9 +5,9 @@
 
 #pragma once
 
-#include "..\..\Shared\RakNet\RakPeerInterface.h"
+#include "../../Shared/RakNet/RakPeerInterface.h"
 
-#include "..\..\Shared\Network\NetworkProtocol.h"
+#include "../../Shared/Network/NetworkProtocol.h"
 
 /// \brief A network manager. It handles all network traffic.
 /// \details TODO:

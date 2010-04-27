@@ -1,6 +1,6 @@
-#include "..\..\Shared\RakNet\RakNetworkFactory.h"
-#include "..\..\Shared\RakNet\MessageIdentifiers.h"
-#include "..\..\Shared\RakNet\BitStream.h"
+#include "../../Shared/RakNet/RakNetworkFactory.h"
+#include "../../Shared/RakNet/MessageIdentifiers.h"
+#include "../../Shared/RakNet/BitStream.h"
 
 #include "NetworkManager.h"
 #include "logging.h"
