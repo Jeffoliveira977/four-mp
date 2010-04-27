@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MasterServerManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\NetworkManager.cpp"
 				>
 			</File>
@@ -276,6 +280,10 @@
 			</File>
 			<File
 				RelativePath=".\logging.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MasterServerManager.h"
 				>
 			</File>
 			<File

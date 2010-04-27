@@ -41,6 +41,10 @@ public:
 	/// \return True on success, false otherwise.
 	bool UnloadGameMode(void);
 
+	/// \brief Returns the game mode name.
+	/// \return Game mode name on success, NULL otherwise.
+	char *GetGameModeName(void);
+
 	/// \brief Returns the maximum virtual machine buffer size.
 	/// \return Maximum virtual machine buffer size.
 	unsigned char GetMaxVirtualMachineBufferSize(void);

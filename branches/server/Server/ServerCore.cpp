@@ -7,6 +7,7 @@
 #include "console\ConsoleScreen.h"
 #include "..\..\Shared\Console\coreconcommands.h"
 #include "console\fmpconcommands.h"
+#include "MasterServerManager.h"
 #include "NetworkManager.h"
 #include "PluginManager.h"
 #include "VirtualMachineManager.h"
@@ -15,6 +16,7 @@
 extern HandleManager hm;
 extern ConsoleCore concore;
 extern ConsoleScreen conscreen;
+extern MasterServerManager msm;
 extern NetworkManager nm;
 extern PluginManager plugm;
 extern VirtualMachineManager vmm;
@@ -90,6 +92,8 @@ bool ServerCore::Load(void)
 		PrintToServer("Can't load gamemode");
 		return false;
 	}
+	gamemodename = vmm.GetGameModeName();
+	msm.RegisterServer(config->GetVari("Port"), config->GetVara("Name"), gamemodename, "World", playm.GetMaxPlayers(), false);
 	running = true;
 	debug("Started");
 	return true;

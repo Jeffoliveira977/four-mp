@@ -84,6 +84,17 @@ bool VirtualMachineManager::UnloadGameMode(void)
 	return true;
 }
 
+char *VirtualMachineManager::GetGameModeName(void)
+{
+	if (!this->IsGameModeLoaded())
+	{
+		return NULL;
+	}
+	char *name = (char *)calloc(strlen(vmbuffer[0]->name) + 1, sizeof(char));
+	strcpy(name, vmbuffer[0]->name);
+	return name;
+}
+
 unsigned char VirtualMachineManager::GetMaxVirtualMachineBufferSize(void)
 {
 	return maxvmbuffersize;

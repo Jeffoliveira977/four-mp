@@ -11,6 +11,7 @@
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 #include "..\..\Shared\Console\ConsoleCore.h"
+#include "MasterServerManager.h"
 #include "console\ConsoleScreen.h"
 #include "NetworkManager.h"
 #include "PluginManager.h"
@@ -23,6 +24,7 @@ CoreHandleTypesManager chtm;
 ConsoleCore concore;
 ConsoleScreen conscreen(&concore);
 PlayerManager playm;
+MasterServerManager msm;
 NetworkManager nm;
 VirtualMachineManager vmm;
 PluginManager plugm;
