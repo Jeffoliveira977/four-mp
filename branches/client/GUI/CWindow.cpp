@@ -86,18 +86,6 @@ void CWindow::Draw()
 		for(int i = 0; i < (int)m_eImage[0].size(); i++)
 			m_eImage[0][i]->Draw();
 
-		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
-			if(m_vElements[iIndex]) m_vElements[iIndex]->Draw();
-
-		for(int i = 0; i < (int)m_eLine[1].size(); i++)
-			m_eLine[1][i]->Draw();
-
-		for(int i = 0; i < (int)m_eBox[1].size(); i++)
-			m_eBox[1][i]->Draw();
-
-		for(int i = 0; i < (int)m_eImage[1].size(); i++)
-			m_eImage[1][i]->Draw();
-
 		if(m_bTitleVisible)
 		{
 			CPos *pos = GetAbsPos();
@@ -115,6 +103,18 @@ void CWindow::Draw()
 			tBorder[6]->Draw( xx-hwBorder[2]+hwBorder[0], yy-hwBorder[2], width+2*hwBorder[2]-2*hwBorder[1], hwBorder[1] );
 			tBorder[7]->Draw( xx-hwBorder[2]+hwBorder[0], yy+height-hwBorder[1]+hwBorder[2]-1, width+2*hwBorder[2]-2*hwBorder[1], hwBorder[1] );
 		}
+
+		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
+			if(m_vElements[iIndex]) m_vElements[iIndex]->Draw();
+
+		for(int i = 0; i < (int)m_eLine[1].size(); i++)
+			m_eLine[1][i]->Draw();
+
+		for(int i = 0; i < (int)m_eBox[1].size(); i++)
+			m_eBox[1][i]->Draw();
+
+		for(int i = 0; i < (int)m_eImage[1].size(); i++)
+			m_eImage[1][i]->Draw();
 	}
 	else
 	{
@@ -330,19 +330,15 @@ void CWindow::UpdateTheme( int iIndex )
 	{
 		pTitle = pState->GetColor( "Title" );
 		pTitlebar = pState->GetTexture( "Titlebar" );
-		if(hTitleBar == 0)
-			hTitleBar = pState->GetInt("Height");
+		hTitleBar = pState->GetInt("Height");
 	}
 	else if(iIndex == 1)
 	{
 		pButton = pState->GetTexture( "Button" );
-		if(mButton[0] == 0 && mButton[1] == 0 && sButton[0] == 0 && sButton[1] == 0)
-		{
-			mButton[0] = pState->GetInt("RightMargin");
-			mButton[1] = pState->GetInt("TopMargin");
-			sButton[0] = pState->GetInt("Width");
-			sButton[1] = pState->GetInt("Height");
-		}
+		mButton[0] = pState->GetInt("RightMargin");
+		mButton[1] = pState->GetInt("TopMargin");
+		sButton[0] = pState->GetInt("Width");
+		sButton[1] = pState->GetInt("Height");
 	}
 	else
 	{

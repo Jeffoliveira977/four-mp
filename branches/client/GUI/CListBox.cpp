@@ -18,7 +18,8 @@ CListBox::CListBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 
 void CListBox::Draw()
 {
-	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
+	CPos Pos = *GetRelPos();
+	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 
 	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
@@ -35,8 +36,8 @@ void CListBox::Draw()
 
 			if(m_iMouseSelect == i)	
 			{
-				pGui->DrawOutlinedBox( Pos.GetX() + 2, Pos.GetY() + iHeight, GetWidth() -  pSlider->GetSliderWidth(), iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
-				pColor = pInner;
+				pGui->DrawOutlinedBox( Pos.GetX() + 2, Pos.GetY() + iHeight, GetWidth() -  pSlider->GetSliderWidth(), iAddHeight, pSelInner->GetD3DCOLOR(), pSelInner->GetD3DCOLOR() );
+				pColor = pSelString;
 			}
 
 			GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pColor, m_vRows[ i ].c_str(), GetWidth() -  pSlider->GetSliderWidth() );
@@ -131,6 +132,8 @@ void CListBox::UpdateTheme( int iIndex )
 	pBorder = pState->GetColor( "Border" );
 	pString = pState->GetColor( "String" );
 	pMouseOverString = pState->GetColor( "MouseOverString" );
+	pSelInner = pState->GetColor( "SelectInner");
+	pSelString = pState->GetColor( "SelectString");
 }
 
 void CListBox::ShowSlider( bool bShow )

@@ -87,7 +87,7 @@ public:
 	virtual bool KeyEvent( SKey sKey );
 
 	CFont * GetFont();
-	void SetFont(int size, char *name);
+	void SetFont(int size, char *name, bool bold, bool italic);
 	void SetFont(CFont *font);
 
 	void SetEnabled(bool on = 1);

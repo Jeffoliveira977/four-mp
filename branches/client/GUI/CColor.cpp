@@ -140,5 +140,9 @@ CTexture * SElementState::GetTexture( std::string sString )
 int SElementState::GetInt( std::string sString )
 {
 	int pRet = mInts[ sString ];
+
+	if(!pRet)
+		pRet = pParent->m_mStates[ pParent->sDefaultState ]->mInts [ sString ];
+
 	return pRet;
 }

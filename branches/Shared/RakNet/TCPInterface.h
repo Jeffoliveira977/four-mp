@@ -40,7 +40,8 @@ public:
 	virtual ~TCPInterface();
 
 	/// Starts the TCP server on the indicated port
-	bool Start(unsigned short port, unsigned short maxIncomingConnections, unsigned short maxConnections=0);
+	/// \param[in] threadPriority Passed to thread creation routine. Use THREAD_PRIORITY_NORMAL for Windows. WARNING!!! On Linux, 0 means highest priority! You MUST set this to something valid based on the values used by your other threads
+	bool Start(unsigned short port, unsigned short maxIncomingConnections, unsigned short maxConnections=0, int _threadPriority=-99999);
 
 	/// Stops the TCP server
 	void Stop(void);
@@ -78,6 +79,9 @@ public:
 	/// \param[out] remoteSystems An array of SystemAddress structures to be filled with the SystemAddresss of the systems we are connected to. Pass 0 to remoteSystems to only get the number of systems we are connected to
 	/// \param[in, out] numberOfSystems As input, the size of remoteSystems array.  As output, the number of elements put into the array 
 	void GetConnectionList( SystemAddress *remoteSystems, unsigned short *numberOfSystems ) const;
+
+	/// Returns just the number of connections we have
+	unsigned short GetConnectionCount(void) const;
 
 	/// Has a previous call to connect succeeded?
 	/// \return UNASSIGNED_SYSTEM_ADDRESS = no. Anything else means yes.
@@ -133,6 +137,8 @@ protected:
 	SimpleMutex completedConnectionAttemptMutex, failedConnectionAttemptMutex;
 	DataStructures::Queue<SystemAddress> completedConnectionAttempts, failedConnectionAttempts;
 
+	int threadPriority;
+
 	DataStructures::List<SOCKET> blockingSocketList;
 	SimpleMutex blockingSocketListMutex;
 
@@ -153,7 +159,7 @@ protected:
 #if defined(OPEN_SSL_CLIENT_SUPPORT)
 	SSL_CTX* ctx;
 	SSL_METHOD *meth;
-	DataStructures::SingleProducerConsumer<SystemAddress> startSSL;
+	DataStructures::ThreadsafeAllocatingQueue<SystemAddress> startSSL;
 	DataStructures::List<SystemAddress> activeSSLConnections;
 #endif
 };

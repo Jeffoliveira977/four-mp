@@ -1,7 +1,9 @@
+#include "../masterserver.h"
 #include <windows.h>
 #include "gui.h"
 #include "../log.h"
-#include "..\ConsoleWindow.h"
+#include "../ConsoleWindow.h"
+
 
 extern ConsoleWindow conwindow;
 
@@ -9,43 +11,243 @@ extern ConsoleWindow conwindow;
 CWindow * fServBrowser;
 CWindow * fChat;
 CWindow * fOption;
+CWindow * fUserRegister;
+CWindow * fUserLogin;
+CWindow * fInfo;
 // Chat elements
 CTextBox * cc_tChat;
 CEditBox * cc_tEnter;
 CButton * cc_bEnter;
 // Server Browser elemenets
 CListView *sbServList, *sbPlayerList;
-CButton *sbTabInet, *sbTabLAN, *sbTabVIP, *sbTabFav;
+CButton *sbTab[4];
 CEditBox *sbEnterIP, *sbEnterPort;
 CButton *sbConnect, *sbRefresh, *sbAddToFav;
 CDropDown *sbFltPing; 
 CCheckBox *sbFltNotFull, *sbFltNoPassword, *sbFltNotEmpty;
 CEditBox *sbFltLocation, *sbFltMode;
+// Register elements
+CEditBox *urLogin, *urPass, *urConfirm, *urEmail, *urNick;
+CText *urLoginText, *urPassText, *urConfirmText, *urEmailText, *urNickText, *urInfoText;
+CButton *urSendReg, *urCancelReg;
+// Login elements
+CText *upLoginInfo, *upStrLogin, *upStrPass;
+CEditBox *upLogin, *upPassword;
+CButton *upSendLogin, *upShowRegister;
+CCheckBox *upRemeberMe;
 
+int tab = 3;
 
-void ServerBrCallBack(CElement *pElement, CMSG msg, int Param)
+MasterServer fmpms;
+
+namespace CALLBACKS
 {
-	//Debug("SB callback");
-	if((pElement == sbEnterIP || pElement == sbEnterPort) && msg == GOT_FOCUS)
-		pElement->SetString("");
-
-	//Debug("SB callback end");
-}
-
-void ChatCallBack(CElement *pElement, CMSG msg, int Param)
-{
-	//Debug("Chat callback");
-	if(pElement == cc_tChat && msg == SELECT)
+	void Refresh( CElement * pElement, CMSG msg, int param )
 	{
-		// Select chat string
+		if(msg != CLICK) return;
+
+		sbServList->Clear();
+
+		if(tab == 0 || tab == 2)
+		{
+			fmpms.ClearServerList();
+			bool r = fmpms.QueryServerList(0, tab == 2, sbFltNotEmpty->GetChecked(), sbFltNotFull->GetChecked(), 
+				sbFltNoPassword->GetChecked(),	0, 0, sbFltMode->GetString().size()>0?(char*)sbFltMode->GetString().c_str():0, sbFltLocation->GetString().size()?(char*)sbFltLocation->GetString().c_str():0);
+			
+			if(!r) { fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Load server list failed"); fInfo->SetVisible(1); }
+			else
+			{
+				char tmp[16];
+				MasterServerInfo *msi;
+				
+				for(int i = 0; i < fmpms.GetNumServers(); i++)
+				{
+					msi = fmpms.GetServerInfo(i);
+					sprintf(tmp, "%s:%d", msi->ip, msi->port);
+					sbServList->PutStr((msi->password?"1":"0"), 0);
+					sbServList->PutStr(msi->name, 1, -1, tmp);
+					sprintf(tmp, "%d/%d", msi->players, msi->maxplayers);
+					sbServList->PutStr(tmp, 2);
+					sprintf(tmp, "%d", 9999);
+					sbServList->PutStr(tmp, 3);
+					sbServList->PutStr(msi->mode, 4);
+					sbServList->PutStr(msi->loc, 5);
+				}
+			}
+		}
 	}
-	else if((pElement == cc_tEnter && msg == END) || (pElement == cc_bEnter && msg == CLICK))
+	void GetLAN( CElement * pElement, CMSG msg, int param )
 	{
-		// Send message
-		cc_tChat->AddString(cc_tEnter->GetString());
+		if(msg != CLICK) return;
+
+		sbServList->Clear();
+
+		sbTab[tab]->SetEnabled(1);
+		tab = 1;
+		sbTab[tab]->SetEnabled(0);
 	}
-	//Debug("Chat callback end");
-}
+	void GetInet( CElement * pElement, CMSG msg, int param )
+	{
+		if(msg != CLICK) return;
+
+		sbTab[tab]->SetEnabled(1);
+		tab = 0;
+		sbTab[tab]->SetEnabled(0);
+
+		if(fmpms.GetNumServers() > 0)
+		{
+			char tmp[64];
+			MasterServerInfo *msi;
+			sbServList->Clear();
+			for(int i = 0; i < fmpms.GetNumServers(); i++)
+			{
+				msi = fmpms.GetServerInfo(i);
+				sprintf(tmp, "%s:%d", msi->ip, msi->port);
+				sbServList->PutStr((msi->password?"1":"0"), 0);
+				sbServList->PutStr(msi->name, 1, -1, tmp);
+				sprintf(tmp, "%d/%d", msi->players, msi->maxplayers);
+				sbServList->PutStr(tmp, 2);
+				sprintf(tmp, "%d", 9999);
+				sbServList->PutStr(tmp, 3);
+				sbServList->PutStr(msi->mode, 4);
+				sbServList->PutStr(msi->loc, 5);
+			}
+		}
+	}
+	void GetVIP( CElement * pElement, CMSG msg, int param )
+	{
+		if(msg != CLICK) return;
+
+		sbTab[tab]->SetEnabled(1);
+		tab = 2;
+		sbTab[tab]->SetEnabled(0);
+
+		if(fmpms.GetNumServers() > 0)
+		{
+			char tmp[64];
+			MasterServerInfo *msi;
+			sbServList->Clear();
+			for(int i = 0; i < fmpms.GetNumServers(); i++)
+			{
+				msi = fmpms.GetServerInfo(i);
+				if(msi->vip == 1)
+				{
+					sprintf(tmp, "%s:%d", msi->ip, msi->port);
+					sbServList->PutStr((msi->password?"1":"0"), 0);
+					sbServList->PutStr(msi->name, 1, -1, tmp);
+					sprintf(tmp, "%d/%d", msi->players, msi->maxplayers);
+					sbServList->PutStr(tmp, 2);
+					sprintf(tmp, "%d", 9999);
+					sbServList->PutStr(tmp, 3);
+					sbServList->PutStr(msi->mode, 4);
+					sbServList->PutStr(msi->loc, 5);
+				}
+			}
+		}
+	}
+	void GetFavourite( CElement * pElement, CMSG msg, int param )
+	{
+		if(msg != CLICK) return;
+
+		sbServList->Clear();
+
+		sbTab[tab]->SetEnabled(1);
+		tab = 3;
+		sbTab[tab]->SetEnabled(0);
+	}
+	void Login( CElement * pElement, CMSG msg, int param )
+	{
+		if(msg != CLICK) return;
+		string login = upLogin->GetString();
+		string pass = upPassword->GetString();
+
+		bool r = fmpms.QueryUserLogin((char*)login.c_str(), (char*)pass.c_str());
+		if(!r) fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Autorization failed");
+		else 
+		{
+			fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Autorization ok");
+			fUserLogin->SetVisible(0);
+		}
+
+		fInfo->SetVisible(1);
+	}
+	void ShowRegister( CElement * pElement, CMSG msg, int param )
+	{
+		if(msg != CLICK) return;
+
+		fUserRegister->SetVisible(1);
+		fUserLogin->SetVisible(0);
+	}
+	void HideRegister( CElement * pElement, CMSG msg, int param )
+	{
+		if(msg != CLICK) return;
+
+		fUserRegister->SetVisible(0);
+		fUserLogin->SetVisible(1);
+	}
+	void Register( CElement * pElement, CMSG msg, int param )
+	{
+		if(msg != CLICK) return;
+
+		string login = urLogin->GetString();
+		string pass = urPass->GetString();
+		string confirm = urConfirm->GetString();
+		string email = urEmail->GetString();
+		string nick = urNick->GetString();
+
+		if(strcmp(pass.c_str(), confirm.c_str()) == 0)
+		{
+			bool r = fmpms.QueryUserRegister(login.c_str(), nick.c_str(), pass.c_str(), email.c_str());
+			if(!r) fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Registration failed");
+			else
+			{
+				fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Registration ok");
+				fUserRegister->SetVisible(0);
+				fUserLogin->SetVisible(1);
+			}
+		}
+		else
+			fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Password != confirm password");
+
+		fInfo->SetVisible(1);
+	}
+	void InfoOK( CElement * pElement, CMSG msg, int param )
+	{
+		if(msg != CLICK) return;
+		fInfo->SetVisible(0);
+	}
+	void Logout( CElement * pElement, CMSG msg, int param )
+	{
+		if(msg != CLICK) return;
+		
+		bool r = fmpms.QueryUserLogout();
+		if(!r) fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Logout failed");
+		else 
+		{
+			fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Logout ok");
+			fUserLogin->SetVisible(1);
+		}
+		fInfo->SetVisible(1);
+	}
+	void Chat(CElement *pElement, CMSG msg, int Param)
+	{
+		//Debug("Chat callback");
+		if(pElement == cc_tChat && msg == SELECT)
+		{
+			// Select chat string
+		}
+		else if((pElement == cc_tEnter && msg == END) || (pElement == cc_bEnter && msg == CLICK))
+		{
+			// Send message
+			cc_tChat->AddString(cc_tEnter->GetString());
+		}
+		//Debug("Chat callback end");
+	}
+	void ServerList(CElement *pElement, CMSG msg, int Param)
+	{
+
+	}
+};
 
 FMPGUI::FMPGUI()
 {
@@ -72,10 +274,10 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	m_Gui->SetFontColors(9, 0, 0, 128, 255); // <!--dark blue-->
 
 	// Create Servers Brouser
-	fServBrowser = new CWindow(m_Gui, 20, 20, 750, 500, "SERVER BROWSER", "SERVER_BROWSER", ServerBrCallBack);
+	fServBrowser = new CWindow(m_Gui, 20, 20, 750, 500, "SERVER BROWSER", "SERVER_BROWSER");
 	
 	int ServerWidth[6] = {16, 210, 60, 60, 100, 100};
-	sbServList = new CListView(m_Gui, 0, 29, ServerWidth, 350, 6, NULL, "SERVER_LIST", ServerBrCallBack);
+	sbServList = new CListView(m_Gui, 0, 29, ServerWidth, 350, 6, NULL, "SERVER_LIST", CALLBACKS::ServerList);
 
 	sbServList->SetTitle("P");
 	sbServList->SetTitle("Server Name");
@@ -84,40 +286,33 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	sbServList->SetTitle("Mode");
 	sbServList->SetTitle("Location");
 
-	sbServList->PutStr("*", 0);
-	sbServList->PutStr("FOUR-MP Official server", 1);
-	sbServList->PutStr("3/32", 2);
-	sbServList->PutStr("4", 3);
-	sbServList->PutStr("FreeDM", 4);
-	sbServList->PutStr("Russia", 5);
-
 	int PlayerWidth[2] = {128, 76};
-	sbPlayerList = new CListView(m_Gui, 546, 49, PlayerWidth, 200, 2, NULL, "PLAYER_LIST", ServerBrCallBack);
+	sbPlayerList = new CListView(m_Gui, 546, 49, PlayerWidth, 200, 2, NULL, "PLAYER_LIST");
 
 	sbPlayerList->SetTitle("Player");
 	sbPlayerList->SetTitle("Score");
 
-	sbTabInet = new CButton(m_Gui, 20, 0, 200, 0, "Internet", "TAB_INTERNET", ServerBrCallBack);
-	sbTabLAN = new CButton(m_Gui, 169, 0, 200, 0, "LAN", "TAB_LAN", ServerBrCallBack);
-	sbTabVIP = new CButton(m_Gui, 318, 0, 200, 0, "VIP", "TAB_VIP", ServerBrCallBack);
-	sbTabFav = new CButton(m_Gui, 467, 0, 200, 0, "Favourite", "TAB_FAVOURITE", ServerBrCallBack);
+	sbTab[0] = new CButton(m_Gui, 20, 0, 200, 0, "Internet", "TAB_INTERNET", CALLBACKS::GetInet);
+	sbTab[1] = new CButton(m_Gui, 169, 0, 200, 0, "LAN", "TAB_LAN", CALLBACKS::GetLAN);
+	sbTab[2] = new CButton(m_Gui, 318, 0, 200, 0, "VIP", "TAB_VIP", CALLBACKS::GetVIP);
+	sbTab[3] = new CButton(m_Gui, 467, 0, 200, 0, "Favourite", "TAB_FAVOURITE", CALLBACKS::GetFavourite);
 
-	sbEnterIP = new CEditBox(m_Gui, 600, 290, 120, 0, "127.0.0.1", "EDIT_IP", ServerBrCallBack);
-	sbEnterPort = new CEditBox(m_Gui, 625, 330, 60, 0, "7777", "EDIT_PORT", ServerBrCallBack);
+	sbEnterIP = new CEditBox(m_Gui, 600, 290, 120, 0, "127.0.0.1", "EDIT_IP");
+	sbEnterPort = new CEditBox(m_Gui, 625, 330, 60, 0, "7777", "EDIT_PORT");
 
 	CText *sbTextIP = new CText(m_Gui, 560, 295, 100, 20, "IP", "TEXT_IP", NULL);
 	CText *sbTextPort = new CText(m_Gui, 560, 335, 100, 20, "Port", "TEXT_PORT", NULL);
 
-	sbConnect = new CButton(m_Gui, 560, 380, 80, 0, "Connect", "MAN_CONNECT", ServerBrCallBack);
-	sbRefresh = new CButton(m_Gui, 660, 380, 80, 0, "Refresh", "MAN_REFRESH", ServerBrCallBack);
-	sbAddToFav = new CButton(m_Gui, 600, 405, 120, 0, "Add to favourites", "MAN_ADDFAV", ServerBrCallBack);
+	sbConnect = new CButton(m_Gui, 560, 380, 80, 0, "Connect", "MAN_CONNECT");
+	sbRefresh = new CButton(m_Gui, 660, 380, 80, 0, "Refresh", "MAN_REFRESH", CALLBACKS::Refresh);
+	sbAddToFav = new CButton(m_Gui, 600, 405, 120, 0, "Add to favourites", "MAN_ADDFAV");
 
-	sbFltPing = new CDropDown(m_Gui, 150, 380, 80, 20, "Ping", "FILTER_PING", ServerBrCallBack);
-	sbFltNotFull = new CCheckBox(m_Gui, 150, 410, 0, 0, 0, "", "FILTER_NOT_FULL", ServerBrCallBack);
-	sbFltLocation = new CEditBox(m_Gui, 305, 380, 80, 20, "", "FILTER_LOCATION", ServerBrCallBack);
-	sbFltMode = new CEditBox(m_Gui, 305, 410, 80, 20, "", "FILTER_Mode", ServerBrCallBack);
-	sbFltNotEmpty = new CCheckBox(m_Gui, 480, 385, 0, 0, 0, "", "FILTER_NOT_EMPTY", ServerBrCallBack);
-	sbFltNoPassword = new CCheckBox(m_Gui, 480, 410, 0, 0, 1, "", "FILTER_NO_PASSWORD", ServerBrCallBack);
+	sbFltPing = new CDropDown(m_Gui, 150, 380, 80, 20, "Ping", "FILTER_PING");
+	sbFltNotFull = new CCheckBox(m_Gui, 150, 410, 0, 0, 0, "", "FILTER_NOT_FULL");
+	sbFltLocation = new CEditBox(m_Gui, 305, 380, 80, 20, "", "FILTER_LOCATION");
+	sbFltMode = new CEditBox(m_Gui, 305, 410, 80, 20, "", "FILTER_Mode");
+	sbFltNotEmpty = new CCheckBox(m_Gui, 480, 385, 0, 0, 0, "", "FILTER_NOT_EMPTY");
+	sbFltNoPassword = new CCheckBox(m_Gui, 480, 410, 0, 0, 1, "", "FILTER_NO_PASSWORD");
 
 	sbFltPing->AddElement("< 50", "50");
 	sbFltPing->AddElement("50 - 100", "50100");
@@ -127,10 +322,10 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	fServBrowser->AddElement(sbServList);
 	fServBrowser->AddElement(sbPlayerList);
-	fServBrowser->AddElement(sbTabInet);
-	fServBrowser->AddElement(sbTabLAN);
-	fServBrowser->AddElement(sbTabVIP);
-	fServBrowser->AddElement(sbTabFav);
+	fServBrowser->AddElement(sbTab[0]);
+	fServBrowser->AddElement(sbTab[1]);
+	fServBrowser->AddElement(sbTab[2]);
+	fServBrowser->AddElement(sbTab[3]);
 	fServBrowser->AddElement(sbEnterPort);
 	fServBrowser->AddElement(sbEnterIP);
 	fServBrowser->AddElement(sbTextIP);
@@ -147,9 +342,9 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	// Create Chat
 	fChat = new CWindow(m_Gui, 10, 10, 200, 300, "FOUR-MP CHAT");
-	cc_tChat = new CTextBox(m_Gui, 0, 0, 200, 258, NULL, NULL, ChatCallBack);
-	cc_tEnter = new CEditBox(m_Gui, 0, 257, 160, 0, NULL, NULL, ChatCallBack);
-	cc_bEnter = new CButton(m_Gui, 160, 257, 40, 0, "SEND", NULL, ChatCallBack);
+	cc_tChat = new CTextBox(m_Gui, 0, 0, 200, 258, NULL, NULL, CALLBACKS::Chat);
+	cc_tEnter = new CEditBox(m_Gui, 0, 257, 160, 0, NULL, NULL, CALLBACKS::Chat);
+	cc_bEnter = new CButton(m_Gui, 160, 257, 40, 0, "SEND", NULL, CALLBACKS::Chat);
 	fChat->AddElement(cc_tChat);
 	fChat->AddElement(cc_tEnter);
 	fChat->AddElement(cc_bEnter);
@@ -161,10 +356,77 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	fOption->AddElement(tInfo);
 	fOption->SetVisible( 0 );
 
+	// Create login window
+	fUserLogin = new CWindow(m_Gui, 10, 10, 300, 200, "USER LOGIN", "WND_USER_LOGIN");
+	upLoginInfo = new CText(m_Gui, 20, 15, 280, 40, "Please login or Regsiter", "UP_INFO");
+	upLogin = new CEditBox(m_Gui, 100, 45, 180, 0, "", "UP_LOGIN");
+	upPassword = new CEditBox(m_Gui, 100, 75, 180, 0, "", "UP_PASSWORD");
+	upPassword->HideContent(1);
+	upStrLogin = new CText(m_Gui, 20, 50, 100, 20, "Login", "UP_STR_LOGIN");
+	upStrPass = new CText(m_Gui, 20, 80, 100, 20, "Password", "UP_STR_PASSWORD");
+	upSendLogin = new CButton(m_Gui, 10, 140, 135, 0, "Login", "UP_BTN_LOGIN", CALLBACKS::Login);
+	upShowRegister = new CButton(m_Gui, 150, 140, 135, 0, "Register", "UP_BTN_REGISTER", CALLBACKS::ShowRegister);
+	upRemeberMe = new CCheckBox(m_Gui, 70, 110, 0, 0, 0, "    Remember me", "UP_CB_REMEBER"); 
+
+	fUserLogin->AddElement(upLoginInfo);
+	fUserLogin->AddElement(upLogin);
+	fUserLogin->AddElement(upPassword);
+	fUserLogin->AddElement(upStrLogin);
+	fUserLogin->AddElement(upStrPass);
+	fUserLogin->AddElement(upSendLogin);
+	fUserLogin->AddElement(upShowRegister);
+	fUserLogin->AddElement(upRemeberMe);
+	fUserLogin->SetCloseButton(0);
+
+	// Create register window
+	fUserRegister = new CWindow(m_Gui, 10, 220, 300, 280, "USER REGISTER", "WND_USER_REG");
+	urLogin = new CEditBox(m_Gui, 100, 50, 180, 0, "", "REG_LOGIN");
+	urPass = new CEditBox(m_Gui, 100, 80, 180, 0, "", "REG_PASSWORD");
+	urConfirm = new CEditBox(m_Gui, 100, 110, 180, 0, "", "REG_CONFIRM");
+	urEmail = new CEditBox(m_Gui, 100, 140, 180, 0, "", "REG_EMAIL");
+	urNick = new CEditBox(m_Gui, 100, 170, 180, 0, "", "REG_NICK");
+	urLoginText = new CText(m_Gui, 10, 55, 100, 20, "Login", "REG_LOGIN_TEXT");
+	urPassText = new CText(m_Gui, 10, 85, 100, 20, "Password", "REG_PASSWORD_TEXT");
+	urConfirmText = new CText(m_Gui, 10, 115, 100, 20, "Confirm", "REG_CONFIRM_TEXT");
+	urEmailText = new CText(m_Gui, 10, 145, 100, 20, "Email", "REG_EMAIL_TEXT");
+	urNickText = new CText(m_Gui, 10, 175, 100, 20, "Nick", "REG_NICK_TEXT");
+	urInfoText = new CText(m_Gui, 20, 15, 280, 20, "Please register to play", "UR_INFO");
+	urSendReg = new CButton(m_Gui, 10, 220, 135, 0, "Register", "UR_BTN_REG", CALLBACKS::Register);
+	urCancelReg = new CButton(m_Gui, 150, 220, 135, 0, "Cancel", "UR_BTN_CANCEL", CALLBACKS::HideRegister);
+
+	urPass->HideContent(1);
+	urConfirm->HideContent(1);
+
+	fUserRegister->AddElement(urLogin);
+	fUserRegister->AddElement(urPass);
+	fUserRegister->AddElement(urConfirm);
+	fUserRegister->AddElement(urEmail);
+	fUserRegister->AddElement(urNick);
+	fUserRegister->AddElement(urLoginText);
+	fUserRegister->AddElement(urPassText);
+	fUserRegister->AddElement(urConfirmText);
+	fUserRegister->AddElement(urEmailText);
+	fUserRegister->AddElement(urNickText);
+	fUserRegister->AddElement(urInfoText);
+	fUserRegister->AddElement(urSendReg);
+	fUserRegister->AddElement(urCancelReg);
+	fUserRegister->SetVisible(0);
+	fUserRegister->SetCloseButton(0);
+
+	// Create messages window
+	fInfo = new CWindow(m_Gui, 300, 250, 200, 100, "Information", "WND_INFO");
+	CText *iTxt = new CText(m_Gui, 10, 10, 180, 60, "INFO", "INFO_TEXT");
+	CButton *iBt = new CButton(m_Gui, 50, 45, 100, 0, "OK", "INFO_OK", CALLBACKS::InfoOK);
+	fInfo->AddElement(iTxt);
+	fInfo->AddElement(iBt);
+	fInfo->SetVisible(0);
+
 	conwindow.Load();
 
 	m_Gui->SetVisible( true );
 	m_Gui->UpdateFromFile("GUIStyle.xml");
+
+	sbTab[tab]->SetEnabled(0);
 }
 
 void FMPGUI::HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam)

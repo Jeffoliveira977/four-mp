@@ -13,9 +13,7 @@ CTexture::CTexture( ID3DXSprite * pSprite, const char * szPath )
 
 	if( !m_pTexture )
 	{
-		std::stringstream sStream;
-		sStream << "Failed to load texture: " << szPath;
-		MessageBoxA( 0, sStream.str().c_str(), "CTexture::CTexture( ... )", 0 );
+		MessageBoxA( 0, "Can't create texture", "CTexture::CTexture( ... )", 0 );
 		return;
 	}
 
@@ -27,17 +25,12 @@ CTexture::CTexture( ID3DXSprite * pSprite, const char * szPath )
 CTexture::CTexture( ID3DXSprite * pSprite, const char * szPath, CColor *color )
 {
 	pSprite->GetDevice( &m_pDevice );
-
 	D3DXCreateTextureFromFileA( m_pDevice, szPath, &m_pTexture );
-
 	if( !m_pTexture )
 	{
-		std::stringstream sStream;
-		sStream << "Failed to load texture: " << szPath;
-		MessageBoxA( 0, sStream.str().c_str(), "CTexture::CTexture( ... )", 0 );
+		MessageBoxA( 0, "Can't create texture", "CTexture::CTexture( ... )", 0 );
 		return;
 	}
-
 	m_pColor = color;
 	m_pTexture->GetLevelDesc( 0, &m_TexDesc );
 	m_pSprite = pSprite;

@@ -23,8 +23,9 @@ class NetworkIDManager;
 #pragma warning( push )
 #endif
 
+/// \deprecated
 /// \defgroup AUTO_RPC_GROUP AutoRPC
-/// \brief Depreciated. Uses Assembly to do RPC
+/// \brief Deprecated. Uses Assembly to do RPC
 /// \details
 /// \ingroup PLUGINS_GROUP
 
@@ -206,9 +207,9 @@ public:
 
 	/// Set system to send to for all following calls to Call()
 	/// Defaults to UNASSIGNED_SYSTEM_ADDRESS, broadcast=true
-	/// \param[in] systemAddress See RakPeer::Send()
+	/// \param[in] systemIdentifier See RakPeer::Send()
 	/// \param[in] broadcast See RakPeer::Send()
-	void SetRecipientAddress(SystemAddress systemAddress, bool broadcast);
+	void SetRecipientAddress(AddressOrGUID systemIdentifier, bool broadcast);
 
 	/// Set the NetworkID to pass for all following calls to Call()
 	/// Defaults to UNASSIGNED_NETWORK_ID (none)
@@ -375,10 +376,10 @@ public:
 	/// \param[in] broadcast See SetRecipientAddress()
 	/// \param[in] networkID See SetRecipientObject()
 	/// \return True on success, false on uniqueIdentifier already used.
-	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast, NetworkID networkID){
+	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, NetworkID networkID){
 		SetTimestamp(timeStamp);
 		SetSendParams(priority, reliability, orderingChannel);
-		SetRecipientAddress(systemAddress, broadcast);
+		SetRecipientAddress(systemIdentifier, broadcast);
 		SetRecipientObject(networkID);		
 		char stack[ARPC_MAX_STACK_SIZE];
 		unsigned int bytesOnStack = GenRPC::BuildStack(stack);
@@ -399,10 +400,10 @@ public:
 	/// \param[in] networkID See SetRecipientObject()
 	/// \return True on success, false on uniqueIdentifier already used.
 	template <class P1>
-	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast, NetworkID networkID, P1 p1)	{
+	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, NetworkID networkID, P1 p1)	{
 		SetTimestamp(timeStamp);
 		SetSendParams(priority, reliability, orderingChannel);
-		SetRecipientAddress(systemAddress, broadcast);
+		SetRecipientAddress(systemIdentifier, broadcast);
 		SetRecipientObject(networkID);
 		char stack[ARPC_MAX_STACK_SIZE];
 		unsigned int bytesOnStack = GenRPC::BuildStack(stack, p1, true);
@@ -423,10 +424,10 @@ public:
 	/// \param[in] networkID See SetRecipientObject()
 	/// \return True on success, false on uniqueIdentifier already used.
 	template <class P1, class P2>
-	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast, NetworkID networkID, P1 p1, P2 p2)	{
+	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, NetworkID networkID, P1 p1, P2 p2)	{
 		SetTimestamp(timeStamp);
 		SetSendParams(priority, reliability, orderingChannel);
-		SetRecipientAddress(systemAddress, broadcast);
+		SetRecipientAddress(systemIdentifier, broadcast);
 		SetRecipientObject(networkID);
 		char stack[ARPC_MAX_STACK_SIZE];
 		unsigned int bytesOnStack = GenRPC::BuildStack(stack, p1, p2, true, true);
@@ -447,10 +448,10 @@ public:
 	/// \param[in] networkID See SetRecipientObject()
 	/// \return True on success, false on uniqueIdentifier already used.
 	template <class P1, class P2, class P3>
-	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3 )	{
+	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3 )	{
 		SetTimestamp(timeStamp);
 		SetSendParams(priority, reliability, orderingChannel);
-		SetRecipientAddress(systemAddress, broadcast);
+		SetRecipientAddress(systemIdentifier, broadcast);
 		SetRecipientObject(networkID);
 		char stack[ARPC_MAX_STACK_SIZE];
 		unsigned int bytesOnStack = GenRPC::BuildStack(stack, p1, p2, p3, true, true, true);
@@ -471,10 +472,10 @@ public:
 	/// \param[in] networkID See SetRecipientObject()
 	/// \return True on success, false on uniqueIdentifier already used.
 	template <class P1, class P2, class P3, class P4>
-	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3, P4 p4 )	{
+	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3, P4 p4 )	{
 		SetTimestamp(timeStamp);
 		SetSendParams(priority, reliability, orderingChannel);
-		SetRecipientAddress(systemAddress, broadcast);
+		SetRecipientAddress(systemIdentifier, broadcast);
 		SetRecipientObject(networkID);
 		char stack[ARPC_MAX_STACK_SIZE];
 		unsigned int bytesOnStack = GenRPC::BuildStack(stack, p1, p2, p3, p4, true, true, true, true);
@@ -495,10 +496,10 @@ public:
 	/// \param[in] networkID See SetRecipientObject()
 	/// \return True on success, false on uniqueIdentifier already used.
 	template <class P1, class P2, class P3, class P4, class P5>
-	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5 )	{
+	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5 )	{
 		SetTimestamp(timeStamp);
 		SetSendParams(priority, reliability, orderingChannel);
-		SetRecipientAddress(systemAddress, broadcast);
+		SetRecipientAddress(systemIdentifier, broadcast);
 		SetRecipientObject(networkID);
 		char stack[ARPC_MAX_STACK_SIZE];
 		unsigned int bytesOnStack = GenRPC::BuildStack(stack, p1, p2, p3, p4, p5, true, true, true, true, true);
@@ -519,10 +520,10 @@ public:
 	/// \param[in] networkID See SetRecipientObject()
 	/// \return True on success, false on uniqueIdentifier already used.
 	template <class P1, class P2, class P3, class P4, class P5, class P6>
-	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6 )	{
+	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6 )	{
 		SetTimestamp(timeStamp);
 		SetSendParams(priority, reliability, orderingChannel);
-		SetRecipientAddress(systemAddress, broadcast);
+		SetRecipientAddress(systemIdentifier, broadcast);
 		SetRecipientObject(networkID);
 		char stack[ARPC_MAX_STACK_SIZE];
 		unsigned int bytesOnStack = GenRPC::BuildStack(stack, p1, p2, p3, p4, p5, p6, true, true, true, true, true, true);
@@ -543,10 +544,10 @@ public:
 	/// \param[in] networkID See SetRecipientObject()
 	/// \return True on success, false on uniqueIdentifier already used.
 	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7>
-	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7 )	{
+	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7 )	{
 		SetTimestamp(timeStamp);
 		SetSendParams(priority, reliability, orderingChannel);
-		SetRecipientAddress(systemAddress, broadcast);
+		SetRecipientAddress(systemIdentifier, broadcast);
 		SetRecipientObject(networkID);
 		char stack[ARPC_MAX_STACK_SIZE];
 		unsigned int bytesOnStack = GenRPC::BuildStack(stack, p1, p2, p3, p4, p5, p6, p7, true, true, true, true, true, true, true);
@@ -567,10 +568,10 @@ public:
 	/// \param[in] networkID See SetRecipientObject()
 	/// \return True on success, false on uniqueIdentifier already used.
 	template <class P1, class P2, class P3, class P4, class P5, class P6, class P7, class P8>
-	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8 ) {
+	bool CallExplicit(const char *uniqueIdentifier, RakNetTime timeStamp, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, NetworkID networkID, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8 ) {
 		SetTimestamp(timeStamp);
 		SetSendParams(priority, reliability, orderingChannel);
-		SetRecipientAddress(systemAddress, broadcast);
+		SetRecipientAddress(systemIdentifier, broadcast);
 		SetRecipientObject(networkID);
 		char stack[ARPC_MAX_STACK_SIZE];
 		unsigned int bytesOnStack = GenRPC::BuildStack(stack, p1, p2, p3, p4, p5, p6, p7, p8, true, true, true, true, true, true, true, true);
@@ -625,7 +626,7 @@ protected:
 	virtual void OnRPCRemoteIndex(SystemAddress systemAddress, unsigned char *data, unsigned int lengthInBytes);
 	virtual void OnRPCUnknownRemoteIndex(SystemAddress systemAddress, unsigned char *data, unsigned int lengthInBytes, RakNetTime timestamp);
 	virtual void OnClosedConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
-	virtual void OnShutdown(void);
+	virtual void OnRakPeerShutdown(void);
 
 	void Clear(void);
 
@@ -641,7 +642,7 @@ protected:
 	PacketPriority outgoingPriority;
 	PacketReliability outgoingReliability;
 	char outgoingOrderingChannel;
-	SystemAddress outgoingSystemAddress;
+	AddressOrGUID outgoingSystemIdentifier;
 	bool outgoingBroadcast;
 	NetworkID outgoingNetworkID;
 	RakNet::BitStream outgoingExtraData;

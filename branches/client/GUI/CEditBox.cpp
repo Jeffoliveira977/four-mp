@@ -1,4 +1,4 @@
-#include "CGUI.h"
+﻿#include "CGUI.h"
 
 CEditBox::CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
 {
@@ -9,6 +9,7 @@ CEditBox::CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 
 	m_iStart = 0;
 	CenterAlign = 0;
+	Hide = 0;
 	SetIndex( 0 );
 	m_bCursorState = false;
 	SetAction( 0 );
@@ -25,30 +26,57 @@ CEditBox::CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 
 void CEditBox::Draw()
 {
-	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
+	CPos Pos = *GetRelPos();
+	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 
 	SElementState * pState = GetElementState();
+	std::string DataString;
+	if(!Hide) DataString = GetString();
+	else for(int i = 0; i < GetString().size(); i++) DataString.push_back('*');
+
 	if( pState )
 	{
 		pEdit[0]->Draw( Pos, SizeEdge, GetHeight() );
 		pEdit[2]->Draw( Pos.GetX()+GetWidth()-SizeEdge, Pos.GetY(), SizeEdge, GetHeight() );
 		pEdit[1]->Draw( Pos.GetX()+SizeEdge-1, Pos.GetY(), GetWidth()-2*SizeEdge+2, GetHeight() );
 
-		if(CenterAlign)
-			GetFont()->DrawString( Pos.GetX() + GetWidth() / 2, Pos.GetY() + GetHeight() / 2, FT_VCENTER|FT_CENTER, pString, &GetString()[ GetStart() ], GetWidth() );
+		if(!CenterAlign) GetFont()->DrawString( Pos.GetX() + iPadding, Pos.GetY() + GetHeight() / 2, FT_VCENTER, 
+			pString, DataString, GetWidth() - 2*iPadding );
 		else
-			GetFont()->DrawString( Pos.GetX() + 4, Pos.GetY() + GetHeight() / 2, FT_VCENTER, pString, &GetString()[ GetStart() ], GetWidth() );
+			GetFont()->DrawString( Pos.GetX() + GetWidth()/2, Pos.GetY() + GetHeight() / 2, FT_VCENTER|FT_CENTER, 
+				pString, DataString );
 
 		int hgt = (GetHeight()-GetFont()->GetStringHeight())/2;
 
-		if( m_bCursorState && HasFocus() && GetEnabled() )
-			pGui->FillArea( Pos.GetX() + 2 + m_iCursorX, Pos.GetY() + hgt, 2, GetHeight() - 2*hgt, pCursor->GetD3DCOLOR() );
+		if( m_bCursorState && HasFocus() && GetEnabled())
+		{
+			int fSize = GetFont()->GetStringWidth( DataString.c_str() );
+			DataString[m_iIndex] = 0;
+			m_iCursorX = GetFont()->GetStringWidth( DataString.c_str() );
+			if(m_iCursorX > GetWidth()-2*iPadding) m_iCursorX = GetWidth()-2*iPadding;
+			if(!CenterAlign)
+				pGui->FillArea( Pos.GetX() + 2 + m_iCursorX+iPadding, Pos.GetY() + hgt, 2, GetHeight() - 2*hgt, pCursor->GetD3DCOLOR() );
+			else
+			{
+				pGui->FillArea( Pos.GetX() + 2 + (GetWidth()/2) - (fSize/2) + m_iCursorX, Pos.GetY() + hgt, 2, GetHeight() - 2*hgt, pCursor->GetD3DCOLOR() );
+			}
+		}
 	}
 }
 
-void CEditBox::SetAlignCenter(bool al)
+bool CEditBox::GetTextAlign()
 {
-	CenterAlign = al;
+	return CenterAlign;
+}
+
+void CEditBox::SetTextAlign(bool center)
+{
+	CenterAlign = center;
+}
+
+void CEditBox::HideContent(bool hide)
+{
+	Hide = hide;
 }
 
 void CEditBox::PreDraw()
@@ -281,13 +309,12 @@ void CEditBox::UpdateTheme( int iIndex )
 	pString = pState->GetColor( "String" );
 	pCursor = pState->GetColor( "Cursor" );
 
-	if(SizeEdge == 0 || pState->GetInt("Height"))
-	{
-		SizeEdge = pState->GetInt("SizeEdge");
-		SetHeight( pState->GetInt("Height") );
-	}
+	SizeEdge = pState->GetInt("SizeEdge");
+	SetHeight( pState->GetInt("Height") );
 
 	pEdit[0] = pState->GetTexture( "Left" );
 	pEdit[1] = pState->GetTexture( "Middle" );
 	pEdit[2] = pState->GetTexture( "Right" );
+
+	iPadding = pState->GetInt("Padding");
 }

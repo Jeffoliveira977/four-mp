@@ -29,6 +29,9 @@ class UDPProxyServer;
 /// \ingroup UDP_PROXY_GROUP
 struct UDPProxyServerResultHandler
 {
+	UDPProxyServerResultHandler() {}
+	virtual ~UDPProxyServerResultHandler() {}
+
 	/// Called when our login succeeds
 	/// \param[out] usedPassword The password we passed to UDPProxyServer::LoginToCoordinator()
 	/// \param[out] proxyServer The plugin calling this callback
@@ -78,12 +81,15 @@ public:
 	/// UDPForwarder::Startup(), UDPForwarder::Shutdown(), and UDPForwarder::Update() are called automatically by the plugin
 	UDPForwarder udpForwarder;
 
+	virtual void OnAttach(void);
+	virtual void OnDetach(void);
+
 	/// \internal
 	virtual void Update(void);
 	virtual PluginReceiveResult OnReceive(Packet *packet);
 	virtual void OnClosedConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
-	virtual void OnStartup(void);
-	virtual void OnShutdown(void);
+	virtual void OnRakPeerStartup(void);
+	virtual void OnRakPeerShutdown(void);
 
 protected:
 	void OnForwardingRequestFromCoordinatorToServer(Packet *packet);

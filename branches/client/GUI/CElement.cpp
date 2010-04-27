@@ -30,6 +30,7 @@ void CElement::SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const
 
 	pFont = pGui->GetFont();
 	m_bEnabled = 1;
+	m_pParent = NULL;
 	SetMouseOver( false );
 }
 
@@ -235,9 +236,9 @@ bool CElement::KeyEvent( SKey )
 	return 0;
 }
 
-void CElement::SetFont(int size, char *name)
+void CElement::SetFont(int size, char *name, bool bold, bool italic)
 {
-	pFont = new CFont(pGui, pGui->GetDevice(), size, name);
+	pFont = new CFont(pGui, pGui->GetDevice(), size, name, bold, italic);
 }
 
 void CElement::SetFont(CFont *font)
@@ -253,6 +254,8 @@ CFont * CElement::GetFont()
 void CElement::SetEnabled(bool on)
 {
 	m_bEnabled = on;
+	SetMouseOver(0);
+
 	if(on)
 		SetElementState( "Norm" );
 	else

@@ -11,7 +11,7 @@ class CListBox : public CElement
 
 	std::vector<std::string> m_vRows;
 
-	CColor * pInner, * pBorder, * pString, * pMouseOverString;
+	CColor * pInner, * pBorder, * pString, * pMouseOverString, * pSelInner, * pSelString;
 public:
 	CListBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
 

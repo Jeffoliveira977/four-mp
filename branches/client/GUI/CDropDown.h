@@ -21,7 +21,7 @@ class CDropDown : public CElement
 
 	CColor * pInner, * pBorder, * pString, * pSelectedInner, * pSelectedString;
 	CTexture * pButton, *pLeft, *pMiddle;
-	int iEdge, iButton;
+	int iEdge, iButton, iPadding;
 
 public:
 	CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );

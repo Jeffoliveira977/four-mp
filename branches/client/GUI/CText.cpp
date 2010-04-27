@@ -27,7 +27,8 @@ void CText::PreDraw()
 
 bool CText::MouseMove( CMouse * pMouse, bool )
 {
-	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
+	CPos Pos = *GetRelPos();
+	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 
 	SetElementState( SetMouseOver( pMouse->InArea( Pos.GetX(), Pos.GetY(), GetFont()->GetStringWidth( GetFormatted().c_str() ), GetFont()->GetStringHeight() ) )?"MouseOver":"Norm" );
 	return 0;

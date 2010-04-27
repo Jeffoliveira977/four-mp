@@ -189,13 +189,18 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 					else if(strcmp(name, "name") == 0) Element->SetString(value);
 					else if(strcmp(name, "x") == 0) Element->SetRelPos(atoi(value), -1);
 					else if(strcmp(name, "y") == 0) Element->SetRelPos(-1, atoi(value));
-					else if(strcmp(name, "style") == 0) Element->SetThemeElement( GetThemeElement( value ) );
+					else if(strcmp(name, "style") == 0) 
+					{
+						Element->SetThemeElement( GetThemeElement( value ), atoi(pElem->Attribute("number")));
+						Element->SetElementState("Norm", atoi(pElem->Attribute("number")));
+					}
 				}
 
 				TiXmlElement * pElem = pElementElement->FirstChildElement( "Font" );
 				if(pElem)
 				{
-					Element->SetFont(atoi(pElem->Attribute("size")), (char*)pElem->Attribute("name"));
+					Element->SetFont(atoi(pElem->Attribute("size")), (char*)pElem->Attribute("name"), 
+						pElem->Attribute("bold")[0]=='1', pElem->Attribute("italic")[0]=='1');
 				}
 			}
 			else if(strcmp(Element, "Line") == 0)
@@ -385,6 +390,7 @@ void CGUI::MouseMove( CMouse * pMouse )
 			{
 				m_vWindows[ iIndex ]->MouseMove( pMouse );
 				bGotWindow = true;
+				break;
 			}
 			else
 			{
@@ -427,6 +433,7 @@ bool CGUI::KeyEvent( SKey sKey )
 				{
 					m_vWindows[ iIndex ]->KeyEvent( sKey );
 					bTop = true;
+					break;
 				}
 				else
 					vRepeat.push_back( m_vWindows[ iIndex ] );

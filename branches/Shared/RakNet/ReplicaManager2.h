@@ -27,7 +27,7 @@ class Connection_RM2;
 class Connection_RM2Factory;
 
 /// \defgroup REPLICA_MANAGER_2_GROUP ReplicaManager2
-/// \brief Depreciated. Second implementation of object replication
+/// \brief Deprecated. Second implementation of object replication
 /// \details
 /// \ingroup REPLICA_MANAGER_GROUP
 
@@ -336,7 +336,7 @@ protected:
 	void OnAttach(void);
 	PluginReceiveResult OnReceive(Packet *packet);
 	void OnClosedConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
-	void OnShutdown(void);
+	void OnRakPeerShutdown(void);
 	void Update(void);
 	virtual void OnNewConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
 

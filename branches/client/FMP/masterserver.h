@@ -1,0 +1,93 @@
+#include <stdio.h>
+#include "../../Shared/RakNet/TCPInterface.h"
+#include "../../Shared/RakNet/HTTPConnection.h"
+#include "../../Shared/RakNet/RakString.h"
+#include "../../Shared/RakNet/GetTime.h"
+#include <vector>
+
+using namespace std;
+using namespace RakNet;
+
+#define MASTER_HOST "master.four-mp.com"
+#define MASTER_PATH "/"
+
+struct MasterServerInfo
+{
+	char name[128];			// Server's name
+	char ip[64];			// Server's IP
+	unsigned short port;				// Server's port
+	char loc[64];			// Server's location
+	char mode[64];			// Server's game mode
+	short players;			// Count players on server
+	short maxplayers;			// Count slots on server
+	bool password;			// Server have a password?
+	char clan[64];			// Clan's server
+	bool ban;				// Server in black list?
+	bool vip;				// Server is VIP?
+};
+
+// Information of player
+struct MasterUserInfo
+{
+	int fmpid;				// FOUR-MP ID
+	char name[32];			// Player nick
+	char login[32];			// Player login
+	char status[128];		// Player status
+	char seskey[32];		// Session key hash
+	string friends;			// Player's friends
+};
+
+// Query states
+enum MasterServerStates
+{
+	MSS_NONE,
+	MSS_ERROR,
+	MSS_WAIT_SERVER_LIST,
+	MSS_WAIT_USER_LOGIN,
+	MSS_WAIT_USER_UPDATE,
+	MSS_WAIT_USER_REGISTER,
+	MSS_WAIT_USER_LOGOUT,
+	MSS_WAIT_CHECK,
+	MSS_WAIT_CLAN
+};
+
+// Class for four-mp master server
+class MasterServer
+{
+	TCPInterface *tcp;
+	HTTPConnection *http;
+
+	vector<MasterServerInfo> list;
+	MasterUserInfo *user;
+
+	MasterServerStates state;
+protected:
+	void Process();
+	void ReadPacket(RakString data);
+
+	void ReadServerList(RakString data);
+	void ReadUserInfo(RakString data);
+	void ReadClanInfo(RakString data);
+public:
+	MasterServer();
+	~MasterServer();
+
+	void ClearServerList();
+
+	bool QueryServerList(bool ban = 0, bool vip = 0, bool empty = 0, bool full = 0, bool password = 1, const char *clan = 0, const char *name = 0, const char *mode = 0, const char *loc = 0);
+	bool QueryUserLogin(const char *login, const char *password);
+	bool QueryUserUpdate(const char *status);
+	bool QueryUserRegister(const char *login, const char *nick, const char *password, const char *email);
+	bool QueryUserLogout();
+	bool QueryClan();
+
+	vector<MasterServerInfo> *GetServerList();
+	MasterServerInfo *GetServerInfo(int Index);
+	int GetNumServers();
+	int GetServerPing(char *ip, int port);
+
+	bool IsUserInfo();
+	MasterUserInfo *GetUserInfo();
+	int GetUserId();
+	char *GetUserName();
+};

@@ -24,8 +24,8 @@ void CCheckBox::SetChecked( bool bChecked )
 
 void CCheckBox::Draw()
 {
-	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
-
+	CPos Pos = *GetRelPos();
+	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 
 	GetFont()->DrawString( Pos.GetX() + 20, Pos.GetY(), 0, pString, GetFormatted() );
 

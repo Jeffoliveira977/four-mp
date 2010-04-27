@@ -18,6 +18,11 @@ enum OutOfBandIdentifiers
 	ID_NAT_ESTABLISH_UNIDIRECTIONAL,
 	ID_NAT_ESTABLISH_BIDIRECTIONAL,
 	ID_NAT_TYPE_DETECT,
+	ID_ROUTER_2_REPLY_TO_SENDER_PORT,
+	ID_ROUTER_2_REPLY_TO_SPECIFIED_PORT,
+	ID_ROUTER_2_MINI_PUNCH_REPLY,
+	ID_ROUTER_2_MINI_PUNCH_REPLY_BOUNCE,
+	ID_ROUTER_2_REROUTE,
 };
 
 /// You should not edit the file MessageIdentifiers.h as it is a part of RakNet static library
@@ -94,6 +99,12 @@ enum DefaultMessageIDTypes
 	ID_CONNECTION_BANNED,
 	/// RakPeer - The remote system is using a password and has refused our connection because we did not set the correct password.
 	ID_INVALID_PASSWORD,
+	// RAKNET_PROTOCOL_VERSION in RakNetVersion.h does not match on the remote system what we have on our system
+	// This means the two systems cannot communicate.
+	// The 2nd byte of the message contains the value of RAKNET_PROTOCOL_VERSION for the remote system
+	ID_INCOMPATIBLE_PROTOCOL_VERSION,
+	// Means that this IP address connected recently, and can't connect again as a security measure. See RakPeer::SetLimitIPConnectionFrequency()
+	ID_IP_RECENTLY_CONNECTED,
 	/// RakPeer - A packet has been tampered with in transit.  The sender is contained in Packet::systemAddress.
 	ID_MODIFIED_PACKET,
 	/// RakPeer - The four bytes following this byte represent an unsigned int which is automatically modified by the difference in system times between the sender and the recipient. Requires that you call SetOccasionalPing.
@@ -260,17 +271,13 @@ enum DefaultMessageIDTypes
 	ID_LOBBY2_SEND_MESSAGE,
 	ID_LOBBY2_SERVER_ERROR,
 
-	// RAKNET_PROTOCOL_VERSION in RakNetVersion.h does not match on the remote system what we have on our system
-	// This means the two systems cannot communicate.
-	// The 2nd byte of the message contains the value of RAKNET_PROTOCOL_VERSION for the remote system
-	ID_INCOMPATIBLE_PROTOCOL_VERSION,
 
-	/// \internal For FullyConnectedMesh2 plugin
+	/// Informs user of a new host GUID. Packet::Guid contains this RakNetGuid
 	ID_FCM2_NEW_HOST,
 	/// \internal For FullyConnectedMesh2 plugin
 	ID_FCM2_REQUEST_FCMGUID,
 	/// \internal For FullyConnectedMesh2 plugin
-	ID_FCM2_RESPOND_FCMGUID,
+	ID_FCM2_RESPOND_CONNECTION_COUNT,
 	/// \internal For FullyConnectedMesh2 plugin
 	ID_FCM2_INFORM_FCMGUID,
 
@@ -295,6 +302,49 @@ enum DefaultMessageIDTypes
 
 	/// Events happening with SQLiteClientLoggerPlugin
 	ID_SQLLITE_LOGGER,
+
+	/// Used by the router2 plugin
+	ID_ROUTER_2_INTERNAL,
+	/// No path is available or can be established to the remote system
+	ID_ROUTER_2_FORWARDING_NO_PATH,
+	/// \brief You can now call connect, ping, or other operations to the destination system.
+	///
+	/// Connect as follows:
+	///
+	/// RakNet::BitStream bs(packet->data, packet->length, false);
+	/// bs.IgnoreBytes(sizeof(MessageID));
+	/// RakNetGUID endpointGuid;
+	/// bs.Read(endpointGuid);
+	/// unsigned short sourceToDestPort;
+	/// bs.Read(sourceToDestPort);
+	/// char ipAddressString[32];
+	/// packet->systemAddress.ToString(false, ipAddressString);
+	/// rakPeerInterface->Connect(ipAddressString, sourceToDestPort, 0,0);
+	ID_ROUTER_2_FORWARDING_ESTABLISHED,
+	/// The IP address for a forwarded connection has changed
+	/// Read endpointGuid and port as per ID_ROUTER_2_FORWARDING_ESTABLISHED
+	ID_ROUTER_2_REROUTED,
+
+	/// \internal Used by the team balancer plugin
+	ID_TEAM_BALANCER_INTERNAL,
+	/// Cannot switch to the desired team because it is full. However, if someone on that team leaves, you will get ID_TEAM_BALANCER_SET_TEAM later. Byte 1 contains the team you requested to join.
+	ID_TEAM_BALANCER_REQUESTED_TEAM_CHANGE_PENDING,
+	/// Cannot switch to the desired team because all teams are locked. However, if someone on that team leaves, you will get ID_TEAM_BALANCER_SET_TEAM later. Byte 1 contains the team you requested to join.
+	ID_TEAM_BALANCER_TEAMS_LOCKED,
+	/// Team balancer plugin informing you of your team. Byte 1 contains the team you requested to join.
+	ID_TEAM_BALANCER_TEAM_ASSIGNED,
+	/// Gamebryo Lightspeed
+	ID_LIGHTSPEED_INTEGRATION,
+
+	// So I can add more without changing user enumerations
+	ID_RESERVED_2,
+	ID_RESERVED_3,
+	ID_RESERVED_4,
+	ID_RESERVED_5,
+	ID_RESERVED_6,
+	ID_RESERVED_7,
+	ID_RESERVED_8,
+	ID_RESERVED_9,
 
 	// For the user to use.  Start your first enumeration at this value.
 	ID_USER_PACKET_ENUM,

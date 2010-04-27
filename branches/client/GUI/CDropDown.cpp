@@ -18,7 +18,8 @@ CDropDown::CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const char
 
 void CDropDown::Draw()
 {
-	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
+	CPos Pos = *GetRelPos();
+	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 
 	SElementState * pState = GetElementState();
 
@@ -28,21 +29,42 @@ void CDropDown::Draw()
 		pButton->Draw( Pos.GetX()+GetWidth()-iButton, Pos.GetY(), iButton, GetHeight() );
 		pMiddle->Draw( Pos.GetX()+iEdge-1, Pos.GetY(), GetWidth()-iEdge-iButton+2, GetHeight() );
 
-		GetFont()->DrawString( Pos.GetX() + (int)floor((float)iEdge/2), Pos.GetY() + GetHeight() / 2, FT_VCENTER, pString, m_vEntrys[ m_iSelected ].m_sString.c_str() );
+		GetFont()->DrawString( Pos.GetX() + iPadding, Pos.GetY() + GetHeight() / 2, FT_VCENTER, pString, m_vEntrys[ m_iSelected ].m_sString.c_str() );
 		
 		if( m_bDropped && m_vEntrys.size() )
 		{
-			pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY() + GetHeight(), GetWidth(), GetHeight() * m_vEntrys.size(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
-
-			for( int iIndex = 0; iIndex < static_cast<int>( m_vEntrys.size() ); iIndex++ )
+			D3DVIEWPORT9 vp;
+			pGui->GetDevice()->GetViewport(&vp);
+			if(vp.Height < Pos.GetY()+GetHeight()+18*m_vEntrys.size())
 			{
-				if( iIndex == m_iMouseOverIndex )
+				int up = 18 * m_vEntrys.size();
+				pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY()-up, GetWidth(), up, pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+
+				for( int iIndex = 0; iIndex < static_cast<int>( m_vEntrys.size() ); iIndex++ )
 				{
-					pGui->FillArea( Pos.GetX() + 1, Pos.GetY() + GetHeight() * ( iIndex + 1 ), GetWidth() - 2, GetHeight(),pSelectedInner->GetD3DCOLOR() );
-					GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + GetHeight() * ( iIndex + 1 ) + GetHeight() / 2, FT_VCENTER, pSelectedString, m_vEntrys[ iIndex ].m_sString.c_str() );
+					if( iIndex == m_iMouseOverIndex )
+					{
+						pGui->FillArea( Pos.GetX() + 1, Pos.GetY() - up + ( iIndex * 18 ), GetWidth() - 2, 18,pSelectedInner->GetD3DCOLOR() );
+						GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() - up + ( iIndex * 18 ) + 8, FT_VCENTER, pSelectedString, m_vEntrys[ iIndex ].m_sString.c_str() );
+					}
+					else
+						GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() - up + ( iIndex * 18 ) + 8, FT_VCENTER, pString, m_vEntrys[ iIndex ].m_sString.c_str() );
 				}
-				else
-					GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + GetHeight() * ( iIndex + 1 ) + GetHeight() / 2, FT_VCENTER, pString, m_vEntrys[ iIndex ].m_sString.c_str() );
+			}
+			else
+			{
+				pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY() + GetHeight(), GetWidth(), 18 * m_vEntrys.size(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
+
+				for( int iIndex = 0; iIndex < static_cast<int>( m_vEntrys.size() ); iIndex++ )
+				{
+					if( iIndex == m_iMouseOverIndex )
+					{
+						pGui->FillArea( Pos.GetX() + 1, Pos.GetY() + GetHeight() + ( iIndex * 18 ), GetWidth() - 2, 18,pSelectedInner->GetD3DCOLOR() );
+						GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + GetHeight() + ( iIndex * 18 ) + 8, FT_VCENTER, pSelectedString, m_vEntrys[ iIndex ].m_sString.c_str() );
+					}
+					else
+						GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + GetHeight() + ( iIndex * 18 ) + 8, FT_VCENTER, pString, m_vEntrys[ iIndex ].m_sString.c_str() );
+				}
 			}
 		}
 	}
@@ -52,27 +74,49 @@ bool CDropDown::MouseMove( CMouse * pMouse, bool over )
 {
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos(), mPos = pGui->GetMouse()->GetPos();
 
-	int iHeight = 0;
+	D3DVIEWPORT9 vp;
+	pGui->GetDevice()->GetViewport(&vp);
+	int iHeight = 18 * m_vEntrys.size();
+
 	if( m_bDropped )
 	{
-		iHeight = GetHeight() * ( m_vEntrys.size() + 1 );
-
 		if( mPos.GetX() == -1 && mPos.GetY() == -1 )
 			pMouse->LoadPos();
 	}
-	else
-		iHeight = GetHeight();
+	else iHeight = 0;
 
-	bool inArea = pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), iHeight ) && over;
+	bool inArea = over;
+	if(vp.Height < Pos.GetY()+GetHeight()+iHeight && m_bDropped)
+		inArea &= pMouse->InArea( Pos.GetX(), Pos.GetY()-iHeight, GetWidth(), iHeight + GetHeight() );
+	else
+		inArea &= pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), iHeight + GetHeight() );
 	SetElementState( SetMouseOver( inArea )?"MouseOver":"Norm" );
 
 	if( GetMouseOver() )
-		for( int iIndex = 0; iIndex < static_cast<int>( m_vEntrys.size() ); iIndex++ )
-			if( pGui->GetMouse()->InArea( Pos.GetX(), Pos.GetY() + GetHeight() * ( iIndex + 1 ), GetWidth(), GetHeight() ) )
+	{
+		if(vp.Height < Pos.GetY()+GetHeight()+iHeight)
+		{
+			for( int iIndex = 0; iIndex < static_cast<int>( m_vEntrys.size() ); iIndex++ )
 			{
-				m_iMouseOverIndex = iIndex;
-				break;
+				if( pGui->GetMouse()->InArea( Pos.GetX(), Pos.GetY() - iHeight + ( iIndex * 18 ), GetWidth(), 18 ) )
+				{
+					m_iMouseOverIndex = iIndex;
+					break;
+				}
 			}
+		}
+		else
+		{
+			for( int iIndex = 0; iIndex < static_cast<int>( m_vEntrys.size() ); iIndex++ )
+			{
+				if( pGui->GetMouse()->InArea( Pos.GetX(), Pos.GetY() + GetHeight() + ( iIndex * 18 ), GetWidth(), 18 ) )
+				{
+					m_iMouseOverIndex = iIndex;
+					break;
+				}
+			}
+		}
+	}
 
 	pMouse->SetPos( mPos );
 	return inArea;
@@ -136,10 +180,8 @@ void CDropDown::UpdateTheme( int iIndex )
 	pLeft = pState->GetTexture( "Left" );
 	pMiddle = pState->GetTexture( "Middle" );
 
-	if(iButton == 0 || pState->GetInt("Height"))
-	{
-		SetHeight(pState->GetInt("Height"));
-		iEdge = pState->GetInt("SizeEdge");
-		iButton = pState->GetInt("SizeButton");
-	}
+	SetHeight(pState->GetInt("Height"));
+	iEdge = pState->GetInt("SizeEdge");
+	iButton = pState->GetInt("SizeButton");
+	iPadding = pState->GetInt("Padding");
 }

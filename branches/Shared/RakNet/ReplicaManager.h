@@ -31,7 +31,7 @@ class ReplicaManager;
 /// \ingroup PLUGINS_GROUP
 
 /// \defgroup REPLICA_MANAGER_GROUP1 ReplicaManager
-/// \brief Depreciated. First implementation of object replication
+/// \brief Deprecated. First implementation of object replication
 /// \details
 /// \ingroup REPLICA_MANAGER_GROUP
 
@@ -430,7 +430,7 @@ protected:
 	// Plugin interface functions
 	PluginReceiveResult OnReceive(Packet *packet);
 	void OnClosedConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, PI2_LostConnectionReason lostConnectionReason );
-	void OnShutdown(void);
+	void OnRakPeerShutdown(void);
 	void OnNewConnection(SystemAddress systemAddress, RakNetGUID rakNetGUID, bool isIncoming);
 
 	/// List of objects replicated in the Replicate function.

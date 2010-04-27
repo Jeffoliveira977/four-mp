@@ -4,9 +4,11 @@
 #include "NativeTypes.h"
 #include "RakNetTime.h"
 #include "RakNetTypes.h"
+#include "DS_Queue.h"
 
 /// Set to 4 if you are using the iPod Touch TG. See http://www.jenkinssoftware.com/forum/index.php?topic=2717.0
 #define CC_TIME_TYPE_BYTES 8
+
 
 #if CC_TIME_TYPE_BYTES==8
 typedef RakNetTimeUS CCTimeType;
@@ -20,6 +22,7 @@ typedef double MicrosecondsPerByte;
 
 /// CC_RAKNET_UDT_PACKET_HISTORY_LENGTH should be a power of 2 for the writeIndex variables to wrap properly
 #define CC_RAKNET_UDT_PACKET_HISTORY_LENGTH 64
+#define RTT_HISTORY_LENGTH 64
 
 /// Sizeof an UDP header in byte
 #define UDP_HEADER_SIZE 28
@@ -79,15 +82,8 @@ class CCRakNetUDT
 	/// Update over time
 	void Update(CCTimeType curTime, bool hasDataToSendOrResend);
 
-	/// How many bytes can we send, pursuant to congestion control
-	/// Retransmissions do not take into account reducing the window due to packets in flight, since you don't know if the message actually arrived or not
-	uint32_t GetRetransmissionBandwidth(CCTimeType curTime, CCTimeType estimatedTimeToNextTick);
-
-	/// How many bytes can we send, pursuant to congestion control
-	/// New transmissions take into account the number of packets in flight, and stays under this level
-	/// You can send more than this amount to fill out a datagram, or to send two messages as a packet pair
-	/// Retransmissions affect the bandwidth for new transmissions, so call OnSendBytes() from retransmissions before calling GetNewTransmissionBandwidth
-	uint32_t GetNewTransmissionBandwidth(CCTimeType curTime, CCTimeType estimatedTimeToNextTick, CCTimeType timeSinceLastContinualSend, uint32_t unacknowledgedBytes);
+	int GetRetransmissionBandwidth(CCTimeType curTime, CCTimeType timeSinceLastTick, uint32_t unacknowledgedBytes, bool isContinuousSend);
+	int GetTransmissionBandwidth(CCTimeType curTime, CCTimeType timeSinceLastTick, uint32_t unacknowledgedBytes, bool isContinuousSend);
 
 	/// Acks do not have to be sent immediately. Instead, they can be buffered up such that groups of acks are sent at a time
 	/// This reduces overall bandwidth usage
@@ -116,13 +112,14 @@ class CCRakNetUDT
 
 	/// Call when you get a NAK, with the sequence number of the lost message
 	/// Affects the congestion control
+	void OnResend(CCTimeType curTime);
 	void OnNAK(CCTimeType curTime, DatagramSequenceNumberType nakSequenceNumber);
 
 	/// Call this when an ACK arrives.
 	/// hasBAndAS are possibly written with the ack, see OnSendAck()
 	/// B and AS are used in the calculations in UpdateWindowSizeAndAckOnAckPerSyn
 	/// B and AS are updated at most once per SYN 
-	void OnAck(CCTimeType curTime, CCTimeType rtt, bool hasBAndAS, BytesPerMicrosecond _B, BytesPerMicrosecond _AS, double totalUserDataBytesAcked );
+	void OnAck(CCTimeType curTime, CCTimeType rtt, bool hasBAndAS, BytesPerMicrosecond _B, BytesPerMicrosecond _AS, double totalUserDataBytesAcked, bool isContinuousSend, DatagramSequenceNumberType sequenceNumber );
 	
 	/// Call when you send an ack, to see if the ack should have the B and AS parameters transmitted
 	/// Call before calling OnSendAck()
@@ -148,33 +145,31 @@ class CCRakNetUDT
 
 	/// Set the maximum amount of data that can be sent in one datagram
 	/// Default to MAXIMUM_MTU_SIZE-UDP_HEADER_SIZE
-	void SetMaxDatagramPayload(uint32_t bytes);
-	
-	/// Return what was set by SetMaxDatagramPayload()
-	uint32_t GetMaxDatagramPayload(void) const;
+	void SetMTU(uint32_t bytes);
+
+	/// Return what was set by SetMTU()
+	uint32_t GetMTU(void) const;
 
 	/// Query for statistics
 	BytesPerMicrosecond GetLocalSendRate(void) const {return 1.0 / SND;}
 	BytesPerMicrosecond GetLocalReceiveRate(CCTimeType currentTime) const;
 	BytesPerMicrosecond GetRemoveReceiveRate(void) const {return AS;}
-	BytesPerMicrosecond GetEstimatedBandwidth(void) const {return B;}
+	//BytesPerMicrosecond GetEstimatedBandwidth(void) const {return B;}
+	BytesPerMicrosecond GetEstimatedBandwidth(void) const {return GetLinkCapacityBytesPerSecond()*1000000.0;}
+	double GetLinkCapacityBytesPerSecond(void) const {return estimatedLinkCapacityBytesPerSecond;};
 
 	/// Query for statistics
 	double GetRTT(void) const;
 
 	bool GetIsInSlowStart(void) const {return isInSlowStart;}
-	uint32_t GetCWNDLimit(void) const {return (uint32_t) (CWND*MAXIMUM_DATAGRAM_SIZE);}
-	CCTimeType GetNextAllowedSend(void) const {return nextAllowedSend;}
-
-	// --------------------------- UNIT TESTING ---------------------------
-	static bool UnitTest(void);
-	static bool TestReceiverCalculateLinkCapacityMedian(void);
+	uint32_t GetCWNDLimit(void) const {return (uint32_t) (CWND*MAXIMUM_MTU_INCLUDING_UDP_HEADER);}
 
 
 	/// Is a > b, accounting for variable overflow?
 	static bool GreaterThan(DatagramSequenceNumberType a, DatagramSequenceNumberType b);
 	/// Is a < b, accounting for variable overflow?
 	static bool LessThan(DatagramSequenceNumberType a, DatagramSequenceNumberType b);
+	void SetTimeBetweenSendsLimit(unsigned int bitsPerSecond);
 
 
 	protected:
@@ -198,18 +193,6 @@ class CCRakNetUDT
 	/// However, if this would result in an immediate update yet again, it is set to SYN microseconds past the current time (in case the thread did not update for a long time)
 	CCTimeType nextSYNUpdate;
 		
-	/// Tracks PacketPairHistoryNode
-	/// History is initialized with 1 second intervals for all packets (slow start)
-	/// All values greater than 8x of the median or less than 1/8 of the median should be ignored when calculating the average
-	/// Used to calculate link capacity (via ReceiverCalculateLinkCapacity())
-	/// B = averageAmongElements(numBytes/intervalBetweenPair)
-	/// B is calculated on the receiver, and send to the sender back in acks
-	/// B is only sent to the sender every 10 acks, to avoid unnecessary calculation
-	/// Each node represents numBytes in one of the packets in the pair / intervalBetweenPair
-	/// Value is in bytes per microsecond
-	BytesPerMicrosecond packetPairRecieptHistory[CC_RAKNET_UDT_PACKET_HISTORY_LENGTH];
-	BytesPerMicrosecond packetPairRecieptHistoryGaps[CC_RAKNET_UDT_PACKET_HISTORY_LENGTH];
-	unsigned char packetPairRecipetHistoryGapsIndex;
 		
 	/// Index into packetPairRecieptHistory where we will next write
 	/// The history is always full (starting with default values) so no read index is needed
@@ -217,7 +200,7 @@ class CCRakNetUDT
 
 	/// Sent to the sender by the receiver from packetPairRecieptHistory whenever a back to back packet arrives on the receiver
 	/// Updated by B = B * .875 + incomingB * .125
-	BytesPerMicrosecond B;
+	//BytesPerMicrosecond B;
 	
 	/// Running round trip time (ping*2)
 	/// Only sender needs to know this
@@ -230,8 +213,9 @@ class CCRakNetUDT
 	/// Only sender needs to know this
 	/// Initialized to UNSET
 	/// Set to rtt on first calculation
-	/// Updated gradually by RTTVar = RTTVar * 0.875 + abs(RTT - rtt)) * 0.125
-	double RTTVar;	
+	// double RTTVar;	
+	/// Update: Use min/max, RTTVar follows current variance too closely resulting in packetloss
+	double minRTT, maxRTT;
 		
 	/// Used to calculate packet arrival rate (in UDT) but data arrival rate (in RakNet, where not all datagrams are the same size)
 	/// Filter is used to cull lowest half of values for bytesPerMicrosecond, to discount spikes and inactivity
@@ -244,6 +228,7 @@ class CCRakNetUDT
 	unsigned char packetArrivalHistoryContinuousGapsIndex;
 	uint64_t continuousBytesReceived;
 	CCTimeType continuousBytesReceivedStartTime;
+	unsigned int packetArrivalHistoryWriteCount;
 
 	/// Index into packetArrivalHistory where we will next write
 	/// The history is always full (starting with default values) so no read index is needed
@@ -265,11 +250,6 @@ class CCRakNetUDT
 	/// Slow start ends when we get a NAK, or the maximum size of CWND is reached
 	/// SND is initialized to the inverse of the receiver's packet arrival rate when slow start ends
 	bool isInSlowStart;
-	
-	/// Largest sequence number sent so far when a NAK arrives
-	/// Initialized to 0
-	/// If a NAK arrives with a sequence number larger than LastDecSeq, then this is defined as a new congestion period, in which case we do various things to slow our send rate.
-	DatagramSequenceNumberType LastDecSeq;
 	
 	/// How many NAKs arrived this congestion period
 	/// Initialized to 1 when the congestion period starts
@@ -303,23 +283,10 @@ class CCRakNetUDT
 	/// This is to prevent speeding up faster than congestion control can compensate for
 	CCTimeType lastUpdateWindowSizeAndAck;
 
-	/// If you send, and get no data at all from that time to RTO, then halve send rate
-	/// Used to backoff for low-bandwidth networks (as in UDT 4.5)
-	/// Set to:
-	/// 0 initially
-	/// curTime+RTO when elapsed during per-update tick, and data is waiting to be sent, or resent. (And halves send rate at that point)
-	/// curTime+RTO when data is sent if already elapsed
-	CCTimeType halveSNDOnNoDataTime;
-
 	/// Every time SND is halved due to timeout, the RTO is increased
 	/// This is to prevent massive retransmissions to an unresponsive system
 	/// Reset on any data arriving
 	double ExpCount;
-
-	/// Every time we send, nextAllowedSend is set to curTime + the number of bytes sent * SND
-	/// We can then not send again until that time elapses
-	/// The best amount of time to wait before sending again is exactly up until that time
-	CCTimeType nextAllowedSend;
 
 	/// Total number of user data bytes sent
 	/// Used to adjust the window size, on ACK, during slow start
@@ -330,7 +297,7 @@ class CCRakNetUDT
 	CCTimeType oldestUnsentAck;
 	
 	// Maximum amount of bytes that the user can send, e.g. the size of one full datagram
-	uint32_t MAXIMUM_DATAGRAM_SIZE;
+	uint32_t MAXIMUM_MTU_INCLUDING_UDP_HEADER;
 	
 	// Max window size
 	double CWND_MAX_THRESHOLD;
@@ -349,15 +316,17 @@ class CCRakNetUDT
 
 	bool hasWrittenToPacketPairReceiptHistory;
 
+//	uint32_t rttHistory[RTT_HISTORY_LENGTH];
+//	uint32_t rttHistoryIndex;
+//	uint32_t rttHistoryWriteCount;
+//	uint32_t rttSum, rttLow;
+//	CCTimeType lastSndUpdateTime;
+	double estimatedLinkCapacityBytesPerSecond;
+
 	// --------------------------- PROTECTED METHODS ---------------------------
 	/// Update nextSYNUpdate by SYN, or the same amount past the current time if no updates have occurred for a long time
 	void SetNextSYNUpdate(CCTimeType currentTime);
 	
-	/// Returns the average link capacity as based on the packet pair technique, after doing median filtering
-	BytesPerMicrosecond ReceiverCalculateLinkCapacity(void) const;
-	/// Returns the median of the link capacity
-	BytesPerMicrosecond ReceiverCalculateLinkCapacityMedian(void) const;
-
 	/// Returns the rate of data arrival, based on packets arriving on the sender.
 	BytesPerMicrosecond ReceiverCalculateDataArrivalRate(CCTimeType curTime) const;
 	/// Returns the median of the data arrival rate
@@ -365,8 +334,8 @@ class CCRakNetUDT
 
 	/// Calculates the median an array of BytesPerMicrosecond
 	static BytesPerMicrosecond CalculateListMedianRecursive(const BytesPerMicrosecond inputList[CC_RAKNET_UDT_PACKET_HISTORY_LENGTH], int inputListLength, int lessThanSum, int greaterThanSum);
-	
-	
+//	static uint32_t CalculateListMedianRecursive(const uint32_t inputList[RTT_HISTORY_LENGTH], int inputListLength, int lessThanSum, int greaterThanSum);
+		
 	/// Same as GetRTOForRetransmission, but does not factor in ExpCount
 	/// This is because the receiver does not know ExpCount for the sender, and even if it did, acks shouldn't be delayed for this reason
 	CCTimeType GetSenderRTOForACK(void) const;
@@ -378,29 +347,18 @@ class CCRakNetUDT
 	inline double BytesPerMicrosecondToPacketsPerMillisecond(BytesPerMicrosecond in);
 
 	/// Update the round trip time, from ACK or ACK2
-	void UpdateRTT(CCTimeType rtt);
+	//void UpdateRTT(CCTimeType rtt);
 
 	/// Update the corresponding variables pre-slow start
 	void UpdateWindowSizeAndAckOnAckPreSlowStart(double totalUserDataBytesAcked);
 
 	/// Update the corresponding variables post-slow start
-	void UpdateWindowSizeAndAckOnAckPerSyn(CCTimeType curTime);
+	void UpdateWindowSizeAndAckOnAckPerSyn(CCTimeType curTime, CCTimeType rtt, bool isContinuousSend, DatagramSequenceNumberType sequenceNumber);
 
-	/// Returns true on elapsed, false otherwise
-	bool HasHalveSNDOnNoDataTimeElapsed(CCTimeType curTime);
-
-	/// Sets halveSNDOnNoDataTime to the future, unless we don't know the RTO (ping*2) yet
-	void UpdateHalveSNDOnNoDataTime(CCTimeType curTime);
 
 	/// Sets halveSNDOnNoDataTime to the future, and also resets ExpCount, which is used to multiple the RTO on no data arriving at all
 	void ResetOnDataArrivalHalveSNDOnNoDataTime(CCTimeType curTime);
 	
-	// Update SND when data is sent
-	void UpdateNextAllowedSend(CCTimeType curTime, uint32_t numBytes);
-
-	// Init array
-	void InitPacketPairRecieptHistory(void);
-
 	// Init array
 	void InitPacketArrivalHistory(void);
 
@@ -409,6 +367,41 @@ class CCRakNetUDT
 
 	// Bug: SND can sometimes get super high - have seen 11693
 	void CapMinSnd(const char *file, int line);
+
+	void DecreaseTimeBetweenSends(void);
+	void IncreaseTimeBetweenSends(void);
+
+	// Algorithm to track ping trends more accurately than a fixed length buffer
+	// Every congestion block
+	// Check last RTT * 2 messages for slope.
+	// If slope is steady, increase rate
+	// If slope is downward, do nothing
+	// If any point is ever higher than 9/8 * max, decrease rate, start new congestion block
+	//
+	// Steady: Take average of slope between each point pair. Absolute value of Slope * numPoints should not exceed 25% of max-min
+	// Downward: Take average of slope between each point pair. Slope * numPoints should be negative and exceed 25% of max-min
+	DataStructures::Queue<uint32_t> rttDeltaHistory;
+	uint32_t rttLow, rttHigh,lastRttHigh, lastRttLow;
+	int rttDelta;
+	DatagramSequenceNumberType historyEndDatagramNumber;
+	void StartNewRttHistory(void);
+	enum RttAnalysis
+	{
+		RTTA_STEADY,
+		RTTA_DOWNWARD,
+		RTTA_SPIKE,
+		RTTA_NEITHER
+	};
+	RttAnalysis PushToRttHistory(uint32_t rtt, DatagramSequenceNumberType ackSequenceNumber);
+	RttAnalysis GetRTTAnalysis(uint32_t rtt);
+
+// 	uint32_t rttHistory[RTT_HISTORY_LENGTH];
+// 	uint32_t rttHistoryIndex;
+// 	uint32_t rttSum, rttLow;
+	void TrackRTT(CCTimeType curTime, CCTimeType rtt);
+	bool gotPacketlossThisUpdate;
+
+	int bytesCanSendThisTick;
 };
 
 }

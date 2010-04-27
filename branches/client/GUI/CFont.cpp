@@ -1,9 +1,9 @@
 #include "CGUI.h"
 
-CFont::CFont( CGUI *Gui, IDirect3DDevice9 * pDevice, int iHeight, char * pszFaceName )
+CFont::CFont( CGUI *Gui, IDirect3DDevice9 * pDevice, int iHeight, char * pszFaceName, bool bold, bool italic )
 {
 	pGui = Gui;
-	HRESULT hResult = D3DXCreateFontA( pDevice, -MulDiv( iHeight, GetDeviceCaps( GetDC( 0 ), LOGPIXELSY ), 72 ), 0, FW_NORMAL, 0, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, pszFaceName, &m_pFont );
+	HRESULT hResult = D3DXCreateFontA( pDevice, -MulDiv( iHeight, GetDeviceCaps( GetDC( 0 ), LOGPIXELSY ), 72 ), 0, bold?FW_BOLD:FW_NORMAL, 0, italic, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, pszFaceName, &m_pFont );
 
 	if( FAILED( hResult ) )
 		MessageBoxA( 0, /*DXGetErrorDescription9A( hResult )*/"Error", "D3DXCreateFontA failed", 0 );

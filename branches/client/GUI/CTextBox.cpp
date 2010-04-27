@@ -18,7 +18,8 @@ CTextBox::CTextBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 
 void CTextBox::Draw()
 {
-	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
+	CPos Pos = *GetRelPos();
+	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 
 	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 

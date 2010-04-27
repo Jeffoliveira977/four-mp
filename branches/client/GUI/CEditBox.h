@@ -12,8 +12,9 @@ class CEditBox : public CElement
 	CColor * pString, * pCursor;
 	CTexture *pEdit[3];
 
-	int SizeEdge;
+	int SizeEdge, iPadding;
 	bool CenterAlign;
+	bool Hide;
 
 public:
 	CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
@@ -29,7 +30,10 @@ public:
 
 	int GetStart();
 	void SetStart( int iStart );
-	void SetAlignCenter(bool);
+
+	bool GetTextAlign();
+	void SetTextAlign( bool Center );
+	void HideContent(bool hide);
 
 	void UpdateTheme( int iIndex );
 };

@@ -13,9 +13,8 @@ class CFont
 	CColor m_cColors[9];
 
 	ID3DXFont * m_pFont;
-
 public:
-	CFont( CGUI *Gui, IDirect3DDevice9 * pDevice, int iHeight, char * pszFaceName );
+	CFont( CGUI *Gui, IDirect3DDevice9 * pDevice, int iHeight, char * pszFaceName, bool bold = 0, bool italic = 0 );
 	~CFont();
 
 	void OnLostDevice();

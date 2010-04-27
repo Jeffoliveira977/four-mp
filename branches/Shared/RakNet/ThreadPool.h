@@ -15,6 +15,9 @@
 class ThreadDataInterface
 {
 public:
+	ThreadDataInterface() {}
+	virtual ~ThreadDataInterface() {}
+
 	virtual void* PerThreadFactory(void *context)=0;
 	virtual void PerThreadDestructor(void* factoryResult, void *context)=0;
 };
@@ -360,12 +363,12 @@ void ThreadPool<InputType, OutputType>::StopThreads(void)
 	runThreads=false;
 	runThreadsMutex.Unlock();
 
-	quitAndIncomingDataEvents.SetEvent();
-
 	// Wait for number of threads running to decrease to 0
 	bool done=false;
 	while (done==false)
 	{
+		quitAndIncomingDataEvents.SetEvent();
+
 		RakSleep(50);
 		numThreadsRunningMutex.Lock();
 		if (numThreadsRunning==0)

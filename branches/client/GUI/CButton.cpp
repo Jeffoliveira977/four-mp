@@ -17,7 +17,8 @@ CButton::CButton( CGUI *Gui, int X, int Y, int Width, int Height, const char * S
 
 void CButton::Draw()
 {
-	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
+	CPos Pos = *GetRelPos();
+	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 
 	if(m_bVisibleBack) 
 	{
@@ -30,7 +31,7 @@ void CButton::Draw()
 
 void CButton::PreDraw()
 {
-	if( !m_tPressed.Running() )
+	if( !m_tPressed.Running() && GetEnabled() )
 		SetElementState( GetMouseOver()?"MouseOver":"Norm" );
 }
 
@@ -87,9 +88,6 @@ void CButton::UpdateTheme( int iIndex )
 
 	pString = pState->GetColor( "String" );
 
-	if(SizeEdge == 0 || pState->GetInt("SizeEdge"))
-	{
-		SetHeight( pState->GetInt( "Height" ) );
-		SizeEdge = pState->GetInt("SizeEdge");
-	}
+	SetHeight( pState->GetInt( "Height" ) );
+	SizeEdge = pState->GetInt("SizeEdge");
 }

@@ -60,7 +60,9 @@ enum PI2_FailedConnectionAttemptReason
 	FCAR_NO_FREE_INCOMING_CONNECTIONS,
 	FCAR_RSA_PUBLIC_KEY_MISMATCH,
 	FCAR_CONNECTION_BANNED,
-	FCAR_INVALID_PASSWORD
+	FCAR_INVALID_PASSWORD,
+	FCAR_INCOMPATIBLE_PROTOCOL,
+	FCAR_IP_RECENTLY_CONNECTED
 };
 
 /// RakNet's plugin system. Each plugin processes the following events:
@@ -93,10 +95,10 @@ public:
 	virtual PluginReceiveResult OnReceive(Packet *packet) {(void) packet; return RR_CONTINUE_PROCESSING;}
 
 	/// Called when RakPeer is initialized
-	virtual void OnStartup(void) {}
+	virtual void OnRakPeerStartup(void) {}
 
 	/// Called when RakPeer is shutdown
-	virtual void OnShutdown(void) {}
+	virtual void OnRakPeerShutdown(void) {}
 
 	/// Called when a connection is dropped because the user called RakPeer::CloseConnection() for a particular system
 	/// \param[in] systemAddress The system whose connection was closed
@@ -126,6 +128,11 @@ public:
 	/// \param[in] bitsUsed How many bits long \a data is
 	/// \param[in] remoteSystemAddress Which system this message is being sent to
 	virtual void OnDirectSocketReceive(const char *data, const BitSize_t bitsUsed, SystemAddress remoteSystemAddress) {(void) data; (void) bitsUsed; (void) remoteSystemAddress;}
+
+	/// Called when the reliability layer rejects a send or receive
+	/// \param[in] bitsUsed How many bits long \a data is
+	/// \param[in] remoteSystemAddress Which system this message is being sent to
+	virtual void OnReliabilityLayerPacketError(const char *errorMessage, const BitSize_t bitsUsed, SystemAddress remoteSystemAddress)  {(void) errorMessage; (void) bitsUsed; (void) remoteSystemAddress;}
 	
 	/// Called on a send or receive of a message within the reliability layer
 	/// \param[in] internalPacket The user message, along with all send data.
@@ -133,7 +140,7 @@ public:
 	/// \param[in] remoteSystemAddress The player we sent or got this packet from
 	/// \param[in] time The current time as returned by RakNet::GetTime()
 	/// \param[in] isSend Is this callback representing a send event or receive event?
-	virtual void OnInternalPacket(InternalPacket *internalPacket, unsigned frameNumber, SystemAddress remoteSystemAddress, RakNetTime time, bool isSend) {(void) internalPacket; (void) frameNumber; (void) remoteSystemAddress; (void) time; (void) isSend;}
+	virtual void OnInternalPacket(InternalPacket *internalPacket, unsigned frameNumber, SystemAddress remoteSystemAddress, RakNetTime time, int isSend) {(void) internalPacket; (void) frameNumber; (void) remoteSystemAddress; (void) time; (void) isSend;}
 
 	/// Called when we get an ack for a message we reliabily sent
 	/// \param[in] messageNumber The numerical identifier for which message this is
@@ -155,8 +162,8 @@ public:
 	void SetPacketizedTCP( PacketizedTCP *ptr );
 protected:
 	// Send through either rakPeerInterface or packetizedTCP, whichever is available
-	void SendUnified( const RakNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast );
-	bool SendListUnified( const char **data, const int *lengths, const int numParameters, PacketPriority priority, PacketReliability reliability, char orderingChannel, SystemAddress systemAddress, bool broadcast );
+	void SendUnified( const RakNet::BitStream * bitStream, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast );
+	bool SendListUnified( const char **data, const int *lengths, const int numParameters, PacketPriority priority, PacketReliability reliability, char orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast );
 
 	Packet *AllocatePacketUnified(unsigned dataSize);
 	void PushBackPacketUnified(Packet *packet, bool pushAtHead);

@@ -17,6 +17,7 @@ void CLine::Draw()
 	CPos Pos = new CPos(0,0);
 	if(wParent)
 		Pos = wParent->GetAbsPos();
+
 	pGui->DrawLine(Pos.GetX()+sX, Pos.GetY()+sY, Pos.GetX()+eX, Pos.GetY()+eY, Size, color->GetD3DCOLOR());
 }
 
@@ -34,6 +35,7 @@ void CBox::Draw()
 	CPos Pos = new CPos(0,0);
 	if(wParent)
 		Pos = wParent->GetAbsPos();
+
 	pGui->DrawOutlinedBox(Pos.GetX()+X, Pos.GetY()+Y, Width, Height, pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR());
 }
 

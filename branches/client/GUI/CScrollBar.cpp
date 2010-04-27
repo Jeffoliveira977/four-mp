@@ -225,13 +225,10 @@ void CScrollBar::UpdateTheme( int iIndex )
 
 	if( iIndex == 1 )
 	{
-		if(ibHeight == 0)
-		{
-			ibHeight = pState->GetInt("bHeight");
-			ibWidth = pState->GetInt("bWidth");
-			isHeight = pState->GetInt("sHeight");
-			back = pState->GetColor( "BG" );
-		}
+		ibHeight = pState->GetInt("bHeight");
+		ibWidth = pState->GetInt("bWidth");
+		isHeight = pState->GetInt("sHeight");
+		back = pState->GetColor( "BG" );
 		pSlider = pState->GetTexture( "Scroll" );
 	}
 	else if( iIndex == 0 )

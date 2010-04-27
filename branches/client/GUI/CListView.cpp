@@ -5,6 +5,7 @@ CListView::CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Colum
 	Count = Columns;
 	Poss = new int[Count];
 	Widths = new int[Count];
+	imgColumn = new ImageColumn[Count];
 
 	int AllWidth = 0;
 	Poss[0] = 0;
@@ -14,6 +15,9 @@ CListView::CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Colum
 		AllWidth += Width[i];
 		if(i > 0)
 			Poss[i] = Poss[i-1]+Widths[i-1];
+
+		imgColumn[i].tFalse = imgColumn[i].tTitle = imgColumn[i].tTrue = 0;
+		imgColumn[i].Height = imgColumn[i].Width = 0;
 	}
 
 	SetElement( Gui, X, Y, AllWidth, Height, String, String2, Callback );
@@ -36,7 +40,8 @@ CListView::CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Colum
 
 void CListView::Draw()
 {
-	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
+	CPos Pos = *GetRelPos();
+	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 
 	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
 
@@ -47,7 +52,11 @@ void CListView::Draw()
 	{
 		if( static_cast<int>( mTitles.size() ) > j)
 		{
-			GetFont()->DrawString( Pos.GetX() + Widths[j]/2 + (Poss[j]?Poss[j]:0), Pos.GetY(), FT_CENTER, pTitleString, mTitles[j], Widths[j] );
+			if(imgColumn[j].tTitle)
+				imgColumn[j].tTitle->Draw(Pos.GetX() + (Poss[j]?Poss[j]:0)+1, 
+					Pos.GetY()+1, imgColumn[j].Width, imgColumn[j].Height);
+			else
+				GetFont()->DrawString( Pos.GetX() + Widths[j]/2 + (Poss[j]?Poss[j]:0), Pos.GetY(), FT_CENTER, pTitleString, mTitles[j], Widths[j] );
 			if(j != Count-1) pGui->DrawLine(Pos.GetX()+Widths[j]+(Poss[j]?Poss[j]:0), Pos.GetY()+2, Pos.GetX()+Widths[j]+Poss[j] , Pos.GetY()+iAddHeight-1, 1, pbTitle->GetD3DCOLOR());
 		}
 
@@ -69,11 +78,17 @@ void CListView::Draw()
 				if(m_iMouseSelect == i)	
 				{
 					if(j == 0)
-						pGui->DrawOutlinedBox( Pos.GetX() + 1, Pos.GetY() + iHeight, GetWidth()-2, iAddHeight, pString->GetD3DCOLOR(), pString->GetD3DCOLOR() );
-					pColor = pInner;
+						pGui->DrawOutlinedBox( Pos.GetX() + 1, Pos.GetY() + iHeight, GetWidth()-2, iAddHeight, pSelInner->GetD3DCOLOR(), pSelInner->GetD3DCOLOR() );
+					pColor = pSelString;
 				}
 
-				GetFont()->DrawString( Pos.GetX() + (Poss[j]?Poss[j]:0) + Widths[j]/2, Pos.GetY() + iHeight, FT_CENTER, pColor, m_vRows[j][i], Widths[j] );
+				if(imgColumn[j].tTrue && imgColumn[j].tFalse)
+					if(m_vRows[j][i][0] == '0')
+						imgColumn[j].tFalse->Draw(Pos.GetX() + (Poss[j]?Poss[j]:0)+1, Pos.GetY()+iHeight+1, imgColumn[j].Width, imgColumn[j].Height);
+					else
+						imgColumn[j].tTrue->Draw(Pos.GetX() + (Poss[j]?Poss[j]:0)+1, Pos.GetY()+iHeight+1, imgColumn[j].Width, imgColumn[j].Height);
+				else
+					GetFont()->DrawString( Pos.GetX() + (Poss[j]?Poss[j]:0) + Widths[j]/2, Pos.GetY() + iHeight, FT_CENTER, pColor, m_vRows[j][i], Widths[j] );
 
 				if(j == 0 && iHeight != iAddHeight + 5)
 					pGui->DrawLine(Pos.GetX()+2, Pos.GetY()+iHeight, Pos.GetX()+GetWidth()-4 , Pos.GetY()+iHeight, 1, pbInner->GetD3DCOLOR());
@@ -144,17 +159,19 @@ int CListView::GetSize(int Index)
 	return m_vRows[Index].size();
 }
 
-void CListView::PutStr( std::string sString, int Column, int Row )
+void CListView::PutStr( std::string sString, int Column, int Row, std::string sHelp )
 {
 	if(Column < 0 || Column >= Count) return;
 	if(Row >= static_cast<int>( m_vRows[Column].size() ) || Row == -1)
 	{
 		pSlider->SetMaxValue( m_vRows[Column].size() );
 		m_vRows[Column].push_back(sString);
+		m_vRowsHelp.push_back(sHelp);
 	}
 	else
 	{
 		m_vRows[Column][Row] = sString;
+		m_vRowsHelp[Row] = sHelp;
 	}
 }
 
@@ -182,7 +199,7 @@ void CListView::SetTitle( std::string sString, int Column )
 void CListView::Clear()
 {
 	for(int i = 0; i < Count; i++)
-		m_vRows[i].clear();
+		while(!m_vRows[i].empty()) m_vRows[i].clear();
 }
 
 void CListView::UpdateTheme( int iIndex )
@@ -198,6 +215,9 @@ void CListView::UpdateTheme( int iIndex )
 	pbTitle = pState->GetColor( "TitleDel" );
 	pbInner = pState->GetColor( "InnerDel" );
 	pTitleString = pState->GetColor( "TitleString" );
+
+	pSelInner = pState->GetColor( "SelectInner");
+	pSelString = pState->GetColor( "SelectString");
 }
 
 void CListView::ShowSlider( bool bShow )
@@ -213,4 +233,14 @@ int CListView::GetSelected()
 void CListView::SetSelect(int Item)
 {
 	m_iMouseSelect = Item;
+}
+
+void CListView::SetColumnImage(int Index, char *True, char *False, char *Title, int W, int H)
+{
+	if(Index >= Count) return;
+	imgColumn[Index].tTrue = new CTexture(pGui->GetSprite(), True);
+	imgColumn[Index].tFalse = new CTexture(pGui->GetSprite(), False);
+	imgColumn[Index].tTitle = new CTexture(pGui->GetSprite(), Title);
+	imgColumn[Index].Width = W;
+	imgColumn[Index].Height = H;
 }
