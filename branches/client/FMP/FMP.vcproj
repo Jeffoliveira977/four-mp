@@ -202,6 +202,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\masterserver.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MySync.cpp"
 				>
 			</File>
@@ -285,6 +289,10 @@
 			</File>
 			<File
 				RelativePath=".\main.h"
+				>
+			</File>
+			<File
+				RelativePath=".\masterserver.h"
 				>
 			</File>
 			<File
