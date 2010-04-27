@@ -1,10 +1,12 @@
-#include "MasterServerManager.h"
 #include "..\..\Shared\RakNet\RakNetworkFactory.h"
 #include "..\..\Shared\RakNet\RakPeerInterface.h"
 #include "..\..\Shared\RakNet\TCPInterface.h"
 #include "..\..\Shared\RakNet\HTTPConnection.h"
 #include "..\..\Shared\RakNet\MessageIdentifiers.h"
 #include "..\..\Shared\RakNet\GetTime.h"
+
+#include "MasterServerManager.h"
+#include "logging.h"
 
 using namespace std;
 using namespace RakNet;

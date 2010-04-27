@@ -344,7 +344,6 @@ void FMPHook::RunMP()
 void FMPHook::GameThread()
 {
 	Debug("GameThread");
-	concore.SetOutputFunction(PrintToConsole);
 	LoadConfig();
 	// Мутим RakNet
 	Log("MainThread");
@@ -624,6 +623,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 {
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
+		concore.RegisterStandardLibrary();
 		debug_clear();
 		log_clear();
 

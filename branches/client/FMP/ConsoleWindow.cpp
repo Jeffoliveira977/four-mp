@@ -4,6 +4,7 @@
 /// \author FaTony
 
 #include "ConsoleWindow.h"
+#include "log.h"
 #include "..\..\Shared\Console\ConsoleCore.h"
 #include "d3d9\gui.h"
 
@@ -37,6 +38,7 @@ void ConsoleWindow::Load(void)
 	mainwindow->AddElement(outputbox);
 	mainwindow->AddElement(inputbox);
 	mainwindow->AddElement(submitbutton);
+	concore.SetOutputFunction(PrintToConsole);
 	IsLoaded = true;
 }
 
@@ -70,5 +72,7 @@ void SubmitButtonCallback(CElement *pElement, CMSG msg, int Param)
 	{
 		return;
 	}
-	conwindow.outputbox->AddString(conwindow.inputbox->GetString());
+	conwindow.Print("> %s", conwindow.inputbox->GetString().c_str());
+	concore.InterpretLine(conwindow.inputbox->GetString().c_str());
+	conwindow.inputbox->SetString("");
 }

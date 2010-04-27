@@ -74,7 +74,6 @@ bool ServerCore::Load(void)
 	password = concore.AddConVar("sv_password", "", "Server password for entry into multiplayer games", 0);
 	hm.AddNewHandle(0, HandleTypeConVar, password);
 	PrintToServer("FOUR-MP. Copyright 2009-2010 Four-mp team.");
-	PrintToServer("Developer build. Loading...");
 	CFG *config = new CFG("server.cfg");
 	hostname->SetValue(config->GetVara("Name"));
 	gamemode->SetValue(config->GetVara("GameMode"));
@@ -93,7 +92,10 @@ bool ServerCore::Load(void)
 		return false;
 	}
 	gamemodename = vmm.GetGameModeName();
-	msm.RegisterServer(config->GetVari("Port"), config->GetVara("Name"), gamemodename, "World", playm.GetMaxPlayers(), false);
+	if (!msm.RegisterServer(config->GetVari("Port"), config->GetVara("Name"), gamemodename, "World", playm.GetMaxPlayers(), false))
+	{
+		PrintToServer("Unable to register server");
+	}
 	running = true;
 	debug("Started");
 	return true;
