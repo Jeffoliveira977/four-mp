@@ -40,6 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				PreprocessorDefinitions="WIN32"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -158,6 +159,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ConsoleScreen.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ConSymbolBase.cpp"
 				>
 			</File>
@@ -185,6 +190,10 @@
 			</File>
 			<File
 				RelativePath=".\ConsoleCore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ConsoleScreen.h"
 				>
 			</File>
 			<File

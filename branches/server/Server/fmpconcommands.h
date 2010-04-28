@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "..\..\..\Shared\Console\ConsoleCore.h"
+#include "..\..\Shared\Console\ConsoleCore.h"
 
 /// \brief Callback used by dynamic commands.
 void ConCmdDynamic(ConsoleCore *concore, unsigned char numargs);

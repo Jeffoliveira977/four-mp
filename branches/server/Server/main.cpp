@@ -11,7 +11,7 @@
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 #include "../../Shared/Console/ConsoleCore.h"
-#include "console/ConsoleScreen.h"
+#include "../../Shared/Console/ConsoleScreen.h"
 #include "MasterServerManager.h"
 #include "NetworkManager.h"
 #include "PluginManager.h"

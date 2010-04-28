@@ -14,7 +14,7 @@
 #include "logging.h"
 #include "HandleManager.h"
 #include "../../Shared/Console/ConsoleCore.h"
-#include "console\fmpconcommands.h"
+#include "fmpconcommands.h"
 #include "VirtualMachineManager.h"
 
 extern ConsoleCore concore;

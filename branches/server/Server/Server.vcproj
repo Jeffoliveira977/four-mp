@@ -181,6 +181,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\fmpconcommands.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\HandleManager.cpp"
 				>
 			</File>
@@ -240,18 +244,6 @@
 				RelativePath=".\VirtualMachineManager.cpp"
 				>
 			</File>
-			<Filter
-				Name="Console"
-				>
-				<File
-					RelativePath=".\console\ConsoleScreen.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\console\fmpconcommands.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -264,6 +256,10 @@
 			</File>
 			<File
 				RelativePath=".\CoreHandleTypesManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\fmpconcommands.h"
 				>
 			</File>
 			<File
@@ -322,18 +318,6 @@
 				RelativePath=".\VirtualMachineManager.h"
 				>
 			</File>
-			<Filter
-				Name="Console"
-				>
-				<File
-					RelativePath=".\console\ConsoleScreen.h"
-					>
-				</File>
-				<File
-					RelativePath=".\console\fmpconcommands.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"

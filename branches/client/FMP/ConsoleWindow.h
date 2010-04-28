@@ -14,6 +14,9 @@ public:
 	ConsoleWindow(void);
 	~ConsoleWindow(void);
 	void Load(void);
+	bool IsVisible(void);
+	void Show(void);
+	void Hide(void);
 	void Print(const char *string, ...);
 private:
 	bool IsLoaded;

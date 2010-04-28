@@ -42,6 +42,21 @@ void ConsoleWindow::Load(void)
 	IsLoaded = true;
 }
 
+bool ConsoleWindow::IsVisible(void)
+{
+	return mainwindow->IsVisible();
+}
+
+void ConsoleWindow::Show(void)
+{
+	mainwindow->SetVisible(true);
+}
+
+void ConsoleWindow::Hide(void)
+{
+	mainwindow->SetVisible(false);
+}
+
 void ConsoleWindow::Print(const char *string, ...)
 {
 	if (!IsLoaded)

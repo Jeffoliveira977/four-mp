@@ -3,7 +3,7 @@
 #include <stdarg.h>
 
 #include "logging.h"
-#include "console/ConsoleScreen.h"
+#include "../../Shared/Console/ConsoleScreen.h"
 
 extern ConsoleScreen conscreen;
 

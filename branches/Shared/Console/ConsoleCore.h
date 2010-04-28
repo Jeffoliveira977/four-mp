@@ -32,6 +32,11 @@ public:
 	/// \return No return.
 	void SetOutputFunction(void *function);
 
+	/// \brief Sets the path which is used to locate files for the exec command.
+	/// \param[in] string Path to use.
+	/// \return No return.
+	void SetExecPath(const char *string);
+
 	/// \brief Registers standard console variables and commands.
 	/// \return No return.
 	void RegisterStandardLibrary(void);
@@ -142,6 +147,7 @@ public:
 	void InterpretLine(const char *string);
 private:
 	void *outputfunction; ///< Holds pointer to the function which is used to output text
+	char *execpath; ///< Holds the path which is used to locate files for the exec command.
 
 	/// \brief Indicates the type of console symbol.
 	enum ConsoleSymbolType
@@ -239,4 +245,5 @@ private:
 	friend class ConVar; ///< See ConVar.h
 	friend class ConCmd; ///< See ConCmd.h
 	friend void ConCmdCvarlist(ConsoleCore *concore, unsigned char numargs); ///< See coreconcommands.h
+	friend void ConCmdExec(ConsoleCore *concore, unsigned char numargs); ///< See coreconcommands.h
 };

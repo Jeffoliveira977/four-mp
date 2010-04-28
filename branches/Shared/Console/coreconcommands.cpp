@@ -85,6 +85,36 @@ void ConCmdCvarlist(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("--------------\n%d total convars/concommands", numsymbols);
 }
 
+void ConCmdEcho(ConsoleCore *concore, unsigned char numargs)
+{
+	char *tempstring = concore->GetCmdArgString();
+	if (tempstring == NULL)
+	{
+		return;
+	}
+	concore->Output(tempstring);
+	free(tempstring);
+}
+
+void ConCmdExec(ConsoleCore *concore, unsigned char numargs)
+{
+	if (numargs == 0)
+	{
+		concore->Output("Usage: exec <filename>: execute a script file");
+		return;
+	}
+	char *tempstring = concore->GetCmdArgString();
+	if (tempstring == NULL)
+	{
+		concore->Output("Usage: exec <filename>: execute a script file");
+		return;
+	}
+	if (concore->execpath != NULL)
+	{
+
+	}
+}
+
 void ConCmdFind(ConsoleCore *concore, unsigned char numargs)
 {
 	if (numargs != 1)

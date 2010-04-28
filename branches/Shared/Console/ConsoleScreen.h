@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "..\..\..\Shared\Console\ConsoleCore.h"
+#include "ConsoleCore.h"
 
 #ifdef WIN32
 #include <windows.h>

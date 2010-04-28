@@ -9,8 +9,8 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "..\..\..\Shared\Console\common.h"
 #include "ConsoleScreen.h"
+#include "common.h"
 
 ConsoleScreen::ConsoleScreen(ConsoleCore *core)
 {
@@ -153,7 +153,7 @@ void ConsoleScreen::CheckUserInput(void)
 							this->MoveCursorRight();
 							break;
 						}
-					case 79: //Home
+					case 79: //End
 						{
 							
 							break;
@@ -541,7 +541,7 @@ void ConsoleScreen::MoveCursorLeft(void)
 	this->SetCursorPosition(inputbufferposition[1] + 2, this->GetInputLineScreenPosition());
 #else
 	unsigned int buffersize = strlen(inputbuffer[inputbuffersize-1]);
-	this->ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize + 2);
+	ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize + 2);
 	inputbuffer[inputbuffersize-1][buffersize] = 8;
 	inputbuffer[inputbuffersize-1][buffersize+1] = '\0';
 	this->PrintInputLine();
@@ -559,7 +559,7 @@ void ConsoleScreen::MoveCursorRight(void)
 #ifdef WIN32
 	this->SetCursorPosition(inputbufferposition[1] + 2, this->GetInputLineScreenPosition());
 #else
-	this->ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize);
+	ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize);
 	inputbuffer[inputbuffersize-1][buffersize-1] = '\0';
 	this->PrintInputLine();
 #endif
@@ -586,7 +586,10 @@ void ConsoleScreen::DeleteCharInInputBuffer(void)
 
 void ConsoleScreen::AcceptUserInput(void)
 {
-	this->ClearInputLine();
+	if (outputbuffersize >= pagesize)
+	{
+		this->ClearInputLine();
+	}
 	this->WriteToInputBuffer();
 	inputbufferposition[0] = inputbuffersize - 1;
 	inputbufferposition[1] = 0;

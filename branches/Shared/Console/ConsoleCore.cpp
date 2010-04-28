@@ -15,6 +15,7 @@
 ConsoleCore::ConsoleCore(void)
 {
 	outputfunction = NULL;
+	execpath = NULL;
 	maxsymbolbuffersize = 65535;
 	symbolbuffersize = 0;
 	maxcmdspersymbol = 255;
@@ -64,10 +65,27 @@ void ConsoleCore::SetOutputFunction(void *function)
 	outputfunction = function;
 }
 
+void ConsoleCore::SetExecPath(const char *string)
+{
+	if (string == NULL)
+	{
+		if (execpath != NULL)
+		{
+			free(execpath);
+			execpath = NULL;
+		}
+		return;
+	}
+	execpath = (char *)calloc(strlen(string) + 1, sizeof(char));
+	strcpy(execpath, string);
+}
+
 void ConsoleCore::RegisterStandardLibrary(void)
 {
 	this->AddConCmd("cvarlist", ConCmdCvarlist, "Show the list of convars/concommands.", 0);
 	this->AddConVar("developer", 0, "Show developer messages.", 0, true, 0, true, 2);
+	this->AddConCmd("echo", ConCmdEcho, "Echo text to console.", 0);
+	this->AddConCmd("exec", ConCmdExec, "Execute script file.", 0);
 	this->AddConCmd("find", ConCmdFind, "Find concommands with the specified string in their name/help text.", 0);
 	this->AddConCmd("help", ConCmdHelp, "Find help about a convar/concommand.", 0);
 }

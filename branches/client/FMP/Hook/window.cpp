@@ -4,10 +4,12 @@
 #include "../chat.h"
 #include "../Hook/classes.h"
 #include "../d3d9/Gui.h"
+#include "../ConsoleWindow.h"
 
 
 extern FMPHook HOOK;
 extern FMPGUI Gui;
+extern ConsoleWindow conwindow;
 WNDPROC gameProc;
 
 LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
@@ -18,9 +20,19 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (Msg == WM_KEYUP)
 			{
-				if (wParam == VK_F5)
+				switch (wParam)
 				{
-					clientstate.input = InputStateGui;
+				case VK_F5:
+					{
+						clientstate.input = InputStateGui;
+						break;
+					}
+				case 192:
+					{
+						clientstate.input = InputStateGui;
+						conwindow.Show();
+						break;
+					}
 				}
 			}
 			return CallWindowProc(gameProc, hWnd, Msg, wParam, lParam);
@@ -70,9 +82,19 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (Msg == WM_KEYUP)
 			{
-				if (wParam == VK_F5)
+				switch (wParam)
 				{
-					clientstate.input = InputStateGame;
+				case VK_F5:
+					{
+						clientstate.input = InputStateGame;
+						break;
+					}
+				case 192:
+					{
+						clientstate.input = InputStateGame;
+						conwindow.Hide();
+						break;
+					}
 				}
 			}
 			Gui.HandleMessage(Msg, wParam, lParam);
