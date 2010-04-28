@@ -71,6 +71,7 @@ protected:
 public:
 	MasterServer();
 	~MasterServer();
+	void Load();
 
 	void ClearServerList();
 

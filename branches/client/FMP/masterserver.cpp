@@ -2,6 +2,11 @@
 
 MasterServer::MasterServer()
 {
+	
+}
+
+void MasterServer::Load()
+{
 	tcp = RakNet::OP_NEW<TCPInterface>(__FILE__,__LINE__);
 	http = RakNet::OP_NEW<HTTPConnection>(__FILE__,__LINE__);
 

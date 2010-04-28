@@ -8,6 +8,9 @@ class FMPGUI
 {
 	CGUI *m_Gui;
 	bool g_Mouse[3];
+	bool GuiReady;
+	DWORD s_iWidth, s_iHeight;
+
 	friend class ConsoleWindow;
 public:
 	FMPGUI();

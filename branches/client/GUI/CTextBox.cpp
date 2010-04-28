@@ -20,18 +20,15 @@ void CTextBox::Draw()
 {
 	CPos Pos = *GetRelPos();
 	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
-
 	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
-
 	int iAddHeight = GetFont()->GetStringHeight();
 	int iMaxHeight = GetHeight() - iAddHeight;
 	if( m_vStrings.size() )
 		for( int i = pSlider->GetMaxValue(), iHeight = 0; i >= pSlider->GetValue() && iHeight < iMaxHeight; i-- )
 		{
-			GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pString, m_vStrings[ i ], GetWidth() - pSlider->GetSliderWidth() );
+			if(m_vStrings.at(i).c_str()) GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pString, m_vStrings.at(i), GetWidth() - pSlider->GetSliderWidth() );
 			iHeight += iAddHeight;
 		}
-
 	pSlider->Draw( Pos );
 }
 
@@ -59,7 +56,6 @@ bool CTextBox::KeyEvent( SKey sKey )
 
 	if( GetMouseOver() || ( !sKey.m_bDown && !pGui->GetMouse()->GetWheel() )  )
 		pSlider->KeyEvent( Pos, sKey );
-	
 	return 0;
 }
 
@@ -89,9 +85,9 @@ void CTextBox::AddString( std::string sString )
 		}
 	}
 
-	m_vStrings.insert( m_vStrings.begin(), sString.c_str() );
+	m_vStrings.insert( m_vStrings.begin(), sString );
 
-	if((int)m_vStrings.size() >= m_iLimit)
+	if((int)m_vStrings.size() >= m_iLimit) 
 		RemoveStrings(m_iLimit, 0);
 
 	pSlider->SetMaxValue( m_vStrings.size()-1 );
@@ -139,6 +135,7 @@ void CTextBox::ShowSlider(bool bShow)
 void CTextBox::SetMaxStrings(int limit)
 {
 	m_iLimit = limit;
+	m_vStrings.resize(limit);
 }
 
 int CTextBox::GetMaxStrings()

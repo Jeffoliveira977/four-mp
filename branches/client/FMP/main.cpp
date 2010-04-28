@@ -3,7 +3,6 @@
 *	Created by:			009 & WNeZRoS
 *	Last Modifed:		28.10.09
 */
-#define main_cpp
 // --------------------------------------------------
 // includes
 // --------------------------------------------------
@@ -610,6 +609,7 @@ void FMPHook::GameThread()
 void MainThread(void* dummy)
 {
 	Debug("START (0x%x)", dwLoadOffset);
+	clientstate.input = InputStateGui;
 
 	HOOK.AttachGtaThread("FOURMP");
 
@@ -621,11 +621,10 @@ void MainThread(void* dummy)
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) 
 {
-	Debug("DllMain with reason 0x%x", ul_reason_for_call);
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
-		//debug_clear();
-		//log_clear();
+		debug_clear();
+		log_clear();
 
 		Debug("DLL_PROCESS_ATTACH");
 		concore.RegisterStandardLibrary();
@@ -654,7 +653,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 			TerminateThread(ThreadHandle, 1);
 			CloseHandle(ThreadHandle);
 		}
-		Log("EXIT FMP");
+		Debug("EXIT FMP");
 	}
 	return TRUE;
 }

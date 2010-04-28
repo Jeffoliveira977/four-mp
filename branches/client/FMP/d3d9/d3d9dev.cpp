@@ -212,8 +212,8 @@ HRESULT APIENTRY hkIDirect3DDevice9::DrawTriPatch(UINT Handle, CONST float *pNum
 
 HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 {
-	MouseY = *(int*)(0x17DE968+dwLoadOffset); 
-	MouseX = *(int*)(0x17DE95C+dwLoadOffset);
+	MouseY = *(int*)(0x1889BC0+dwLoadOffset); 
+	MouseX = *(int*)(0x1889BB4+dwLoadOffset);
 
 	switch (clientstate.input)
 	{
