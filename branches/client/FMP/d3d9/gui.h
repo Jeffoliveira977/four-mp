@@ -19,4 +19,7 @@ public:
 	void HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
 	void MoveMouse(int x, int y);
 	void Draw();
+
+	DWORD GetWidth();
+	DWORD GetHeight();
 };

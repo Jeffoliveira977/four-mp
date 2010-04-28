@@ -9,8 +9,11 @@ int GetNativeAddressByHash(unsigned int a1)
 	if(a1 == -1) return 0;
 	Debug("# GetNativeAddress: 0x%x , natives count: %d",a1,*(DWORD*)(0x18DF6EC+dwLoadOffset));
 
-	DWORD pointer1 = *(DWORD*)(0x10890AC+dwLoadOffset);
-	DWORD pointer2 = *(DWORD*)(0x10890A8+dwLoadOffset);
+	//DWORD pointer1 = *(DWORD*)(0x10890AC+dwLoadOffset);
+	//DWORD pointer2 = *(DWORD*)(0x10890A8+dwLoadOffset);
+	DWORD pointer1 = *(DWORD*)(0x198233C+dwLoadOffset);
+	DWORD pointer2 = *(DWORD*)(0x1982338+dwLoadOffset);
+	
 	Debug("# pointers: [0x%x]:(%d),[0x%x]:(%d)",pointer1,pointer1,pointer2,pointer2);
 
 	unsigned int v2;

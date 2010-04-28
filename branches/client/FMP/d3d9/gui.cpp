@@ -532,3 +532,13 @@ void FMPGUI::Draw()
 {
 	if( GuiReady ) m_Gui->Draw();
 }
+
+DWORD FMPGUI::GetWidth()
+{
+	return s_iWidth;
+}
+
+DWORD FMPGUI::GetHeight()
+{
+	return s_iHeight;
+}
