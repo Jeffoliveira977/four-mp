@@ -5,7 +5,7 @@
 */
 #pragma once
 
-#define DEBUG_ON
+//#define DEBUG_ON
 #define LOGGING_ON
 
 bool FileExists(const char *fname);
