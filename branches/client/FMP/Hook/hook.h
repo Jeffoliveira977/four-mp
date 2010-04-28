@@ -7,13 +7,16 @@ extern DWORD dwLoadOffset;
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                            Адреса игры                                                */
 /* ----------------------------------------------------------------------------------------------------- */
-#define ADDRESS_HASH_GET (0x6CF530+dwLoadOffset)
-#define ADDRESS_THREAD_ID (0x17DF36C+dwLoadOffset)
-#define ADDRESS_SCRIPTS_COUNT (0x17DF364+dwLoadOffset)
+/* DirectX */
+#define ADDRESS_CREATE_DEVICE (0xD301E4+dwLoadOffset)
+/* Scripts */
+#define ADDRESS_HASH_GET (0x5A7FC0+dwLoadOffset) 
+#define ADDRESS_THREAD_ID (0x1848B00+dwLoadOffset)
+#define ADDRESS_SCRIPTS_COUNT (0x1848B1C+dwLoadOffset)
 /* Threads */
-#define ADDRESS_ACTIVE_THREAD (0x17DF370+dwLoadOffset)
-#define ADDRESS_THREADS_ARRAY (0x18DF6C8+dwLoadOffset)
-#define ADDRESS_THREAD_TICK (0xB4E1F0+dwLoadOffset)
+#define ADDRESS_ACTIVE_THREAD (0x1848B04+dwLoadOffset) 
+#define ADDRESS_THREADS_ARRAY (0x1982320+dwLoadOffset)
+#define ADDRESS_THREAD_TICK (0xBBCC40+dwLoadOffset)
 /* Pools */
 #define ADDRESS_PED_POOL (0x175B77C+dwLoadOffset)
 #define ADDRESS_PLAYER_POOL (0x1033058+dwLoadOffset)

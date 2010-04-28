@@ -35,7 +35,7 @@ void debug(const char* string)
 	#if defined DEBUG_ON
 	conwindow.Print(string);
 	FILE* temp;
-	temp = fopen("FMP_debug.txt","a");
+	temp = fopen("FMP\\debug.txt","a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);
 	fprintf(temp, "[%02d:%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
@@ -48,7 +48,7 @@ void debug(const char* string)
 void debug_clear()
 {
 	#if defined DEBUG_ON
-	if(FileExists("FMP_debug.txt")) DeleteFile("FMP_debug.txt");
+	if(FileExists("FMP\\debug.txt")) DeleteFile("FMP\\debug.txt");
 	#endif
 }
 
@@ -57,7 +57,7 @@ void log(const char* string)
 	#if defined LOGGING_ON
 	conwindow.Print(string);
 	FILE* temp;
-	temp = fopen("FMP_log.txt","a");
+	temp = fopen("FMP\\log.txt","a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);
 	fprintf(temp, "[%02d:%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
@@ -70,7 +70,7 @@ void log(const char* string)
 void log_clear()
 {
 	#if defined LOGGING_ON
-	if(FileExists("FMP_log.txt")) DeleteFile("FMP_log.txt");
+	if(FileExists("FMP\\log.txt")) DeleteFile("FMP\\_log.txt");
 	#endif
 }
 
@@ -83,7 +83,7 @@ void Debug(const char *string, ...)
 	vsprintf_s(buff,512,string,arglist);
 	conwindow.Print(buff);
 	FILE* temp;
-	temp = fopen("FMP_debug.txt","a");
+	temp = fopen("FMP\\debug.txt","a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);
 	fprintf(temp, "[%02d:%02d:%02d:%03d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
@@ -123,7 +123,7 @@ void Log(const char *string, ...)
 	vsprintf_s(buff,512,string,arglist);
 	conwindow.Print(buff);
 	FILE* temp;
-	temp = fopen("FMP_log.txt","a");
+	temp = fopen("FMP\\log.txt","a");
 	SYSTEMTIME time;
 	GetSystemTime(&time);
 	fprintf(temp, "[%02d:%02d:%02d:%03d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);

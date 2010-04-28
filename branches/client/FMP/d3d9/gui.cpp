@@ -259,7 +259,7 @@ FMPGUI::FMPGUI()
 void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 {
 	m_Gui = new CGUI( g_pDevice );
-	m_Gui->LoadInterfaceFromFile( "GUITheme.xml" );
+	m_Gui->LoadInterfaceFromFile( "FMP\\GUITheme.xml" );
 
 	m_Gui->LoadFont();
 	m_Gui->SetFontColors(0, 0, 0, 0, 255); // <!--black-->
@@ -424,7 +424,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	conwindow.Load();
 
 	m_Gui->SetVisible( true );
-	m_Gui->UpdateFromFile("GUIStyle.xml");
+	m_Gui->UpdateFromFile("FMP\\GUIStyle.xml");
 
 	sbTab[tab]->SetEnabled(0);
 }

@@ -1,5 +1,3 @@
-// XLiveLess - xlive.dll replacement with integrated ASI loader
-// This file donated to the public domain.
 #include <windows.h>
 #include <psapi.h>
 #include <stdlib.h>
@@ -9,7 +7,7 @@ extern DWORD dwLoadOffset;
 
 DWORD dwGameVersion = 0x0;
 
-extern "C" __declspec(dllexport) void injectFunction (DWORD dwAddress, DWORD pfnReplacement) {
+void injectFunction (DWORD dwAddress, DWORD pfnReplacement) {
 	dwAddress += dwLoadOffset;
 	BYTE * patch = (BYTE *)dwAddress;
 	*patch = 0xE9;	// JMP
@@ -221,14 +219,14 @@ extern "C"  DWORD __stdcall XNetQosRelease (DWORD) {
 
 // #73: XNetGetTitleXnAddr
 extern "C"  DWORD __stdcall XNetGetTitleXnAddr (DWORD * pAddr) {
-	// trace ("xlive_73: XNetGetTitleXnAddr");	// don't uncomment, unless you want to get very long trace log
+	// Debug ("xlive_73: XNetGetTitleXnAddr");	// don't uncomment, unless you want to get very long Debug log
 	*pAddr = 0x0100007F;	// 127.0.0.1
 	return 4; 
 }
 
 // #75: XNetGetEthernetLinkStatus
 extern "C"  DWORD __stdcall XNetGetEthernetLinkStatus () { 
-	// trace ("xlive_75 (XNetGetEthernetLinkStatus)");	// don't uncomment, unless you want to get very long trace log
+	// Debug ("xlive_75 (XNetGetEthernetLinkStatus)");	// don't uncomment, unless you want to get very long Debug log
 	return 1; 
 }
 
@@ -245,7 +243,7 @@ extern "C" int __stdcall XCustomGetLastActionPress (DWORD, DWORD, DWORD) {
 
 // #651: XNotifyGetNext
 extern "C"  int __stdcall XNotifyGetNext (HANDLE hNotification, DWORD dwMsgFilter, DWORD * pdwId, void * pParam) {
-//	trace ("XNotifyGetNext");	// too noisy
+//	Debug ("XNotifyGetNext");	// too noisy
 	return 0;
 }
 
@@ -276,7 +274,7 @@ extern "C"  int __stdcall XLiveInitialize (DWORD) {	// XLiveInitialize(struct _X
 
 // #5001: XLiveInput
 extern "C"  int __stdcall XLiveInput (DWORD * p) {
-	// trace ("XLiveInput");
+	// Debug ("XLiveInput");
 	p[5] = 0;
 	return 1;	// -1 ?
 }
@@ -284,7 +282,7 @@ extern "C"  int __stdcall XLiveInput (DWORD * p) {
 
 // #5002: XLiveRender
 extern "C"  int __stdcall XLiveRender () {
-//	trace ("XLiveRender");
+//	Debug ("XLiveRender");
 	return 0;
 }
 
@@ -394,7 +392,7 @@ extern "C"  int __stdcall XUserGetXUID (DWORD, DWORD * pXuid) {
 
 // #5262: XUserGetSigninState
 extern "C"  int __stdcall XUserGetSigninState (DWORD dwUserIndex) {
-	Debug ("xlive_5262: XUserGetSigninState (%d)", dwUserIndex);
+//	Debug ("xlive_5262: XUserGetSigninState (%d)", dwUserIndex);
 	return 1; // eXUserSigninState_SignedInLocally
 }
 
@@ -433,7 +431,7 @@ struct XUSER_SIGNIN_INFO {
 
 // #5267: XUserGetSigninInfo
 extern "C"  int __stdcall XUserGetSigninInfo (DWORD dwUser, DWORD dwFlags, XUSER_SIGNIN_INFO * pInfo) {  
-	Debug ("XUserGetSigninInfo (%d, %d, ...)", dwUser, dwFlags);
+//	Debug ("XUserGetSigninInfo (%d, %d, ...)", dwUser, dwFlags);
 	pInfo->xuidL = pInfo->xuidH = dwFlags != 1 ? (dwUser+1)*0x10001000 : 0; // some arbitrary id for offline user, INVALID_XUID for online user
 	if (dwFlags != 1) {
 		pInfo->dwInfoFlags = 1;
@@ -488,9 +486,11 @@ extern "C"  DWORD __stdcall XUserCreateAchievementEnumerator (DWORD, DWORD, DWOR
 
 // #5281: XUserReadStats
 extern "C"  DWORD __stdcall XUserReadStats (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD * pcbResults, DWORD * pResults, void *) { 
-	Debug ("XUserReadStats");	
-	*pcbResults = 4;
-	*pResults = 0;
+	Debug ("XUserReadStats");
+	if (pcbResults)	
+		*pcbResults = 4;
+	if (pResults)
+		*pResults = 0;
 	return 0;
 }
 
@@ -797,7 +797,7 @@ struct FakeProtectedBuffer {
 
 // #5016: XLivePBufferAllocate
 extern "C"  DWORD __stdcall XLivePBufferAllocate (int size, FakeProtectedBuffer ** pBuffer) {
-//	trace ("xlive_5016: XLivePBufferAllocate (%d)", size);
+//	Debug ("xlive_5016: XLivePBufferAllocate (%d)", size);
 	*pBuffer = (FakeProtectedBuffer *)malloc (size+16);
 	if (!*pBuffer) {
 		Debug ("ERROR: XLivePBufferAllocate unable to allocate %d bytes", size);
@@ -811,7 +811,7 @@ extern "C"  DWORD __stdcall XLivePBufferAllocate (int size, FakeProtectedBuffer 
 
 // #5017: XLivePBufferFree
 extern "C"  DWORD __stdcall XLivePBufferFree (FakeProtectedBuffer * pBuffer) {
-	// trace ("xlive_5017: XLivePBufferFree");
+	// Debug ("xlive_5017: XLivePBufferFree");
 	if (pBuffer && pBuffer->dwMagick == 0xDEADDEAD)
 		free (pBuffer);
 	return 0;
@@ -910,23 +910,37 @@ extern "C"  DWORD __stdcall XLiveProtectData (BYTE * pInBuffer, DWORD dwInDataSi
 		memcpy (pOutBuffer, pInBuffer, dwInDataSize);
 	return 0;
 }
+
+// #5367
+extern "C" DWORD __stdcall xlive_5367 (HANDLE, DWORD, DWORD, BYTE *, DWORD) {
+  return 1;
+}
+
+// #5372
+extern "C" DWORD __stdcall xlive_5372 (HANDLE, DWORD, DWORD, DWORD, BYTE *, HANDLE) {
+  return 1;
+}
+
 // === end of xlive functions ===
 
 // change savefile path to "%USERPROFILE%\Documents\Rockstar Games\GTA IV\savegames\"
-void getSavefilePath (int __unused, char * pBuffer, char * pszSaveName) {
-	char * pszPath = (char *)(0xFA0308+dwLoadOffset);	// char pszPathPersonal[128]; // "%USERPROFILE%\Documents\Rockstar Games\GTA IV\"
-	
-	if (dwGameVersion == 0x00010001)
-		pszPath = (char *)(0xFA7878+dwLoadOffset);	// char pszPathPersonal[128]; // "%USERPROFILE%\Documents\Rockstar Games\GTA IV\"
-    else if (dwGameVersion == 0x00010003)       
-		pszPath = (char *)(0xFBF860+dwLoadOffset);	// char pszPathPersonal[128]; // "%USERPROFILE%\Documents\Rockstar Games\GTA IV\"
-	else if (dwGameVersion == 0x00010004)
-		pszPath = (char *)(0xFC4B00+dwLoadOffset);	// char pszPathPersonal[128]; // "%USERPROFILE%\Documents\Rockstar Games\GTA IV\"
-	else if (dwGameVersion == 0x00010005)
-		pszPath = (char *)(0x12898B0+dwLoadOffset);	// char pszPathPersonal[128]; // "%USERPROFILE%\Documents\Rockstar Games\GTA IV\"
+void getSavefilePath (int __unused, char * pBuffer, char * pszSaveName) 
+{
+	char * pszPath = (char *)(0xF9FF08+dwLoadOffset);
+
+	if (dwGameVersion == 0x00010001)	
+		pszPath = (char *)(0xFA7778+dwLoadOffset);	
+    else if (dwGameVersion == 0x00010003)
+		pszPath = (char *)(0xFBF260+dwLoadOffset);
+    else if (dwGameVersion == 0x00010004)
+		pszPath = (char *)(0xFC4700+dwLoadOffset);
+    else if (dwGameVersion == 0x00010005)
+		pszPath = (char *)(0x12892B0+dwLoadOffset);
+	else if (dwGameVersion == 0x00010006)
+		pszPath = (char *)(0x10F0B00+dwLoadOffset);
 
 	strcpy_s (pBuffer, 256, pszPath);
-	strcat_s (pBuffer, 256, "savegames");
+	strcat_s (pBuffer, 256, "FMP\\savegames");
 
 	// check path and create directory if necessary
 	DWORD attrs = GetFileAttributes (pBuffer);
@@ -1131,6 +1145,52 @@ void patch105 () {
 	Debug ("Patching OK (1.0.0.4 - update 5)");
 }
 
+void patch106 () {
+	dwGameVersion = 0x00010006;	// GTA IV 1.0.6.0 (patch 6)
+
+	DWORD oldProtect;
+	// enable write access to code and rdata
+	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x094B000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
+		Debug ("ERROR: unable to unprotect code seg");
+		return;
+	}
+
+	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x094C000+0x400000), 0x01BF000, PAGE_READWRITE, &oldProtect)) {
+		Debug ("ERROR: unable to unprotect .rdata seg");
+		return;
+	}
+
+	// process patches
+	*(DWORD *)(0x401855+dwLoadOffset) = 1;		// disable sleep
+	*(BYTE  *)(0xD35310+dwLoadOffset) = 0xC3;	// RETN - enable debugger in error menu (don't load WER.dll)
+	*(DWORD *)(0x403F30+dwLoadOffset) = 0x900008C2;	// RETN 8 - certificates check
+	*(DWORD *)(0x40264D+dwLoadOffset) = 0x4AE9C033;	// xor eax, eax - address of the RGSC object
+	*(DWORD *)(0x402651+dwLoadOffset) = 0x90000002;	// jmp 40289E (skip RGSC connect and EFC checks)		
+	*(WORD *)(0x4028A3+dwLoadOffset) = 0xA390;	// NOP; MOV [g_rgsc], eax
+	memset ((BYTE *)(0x40290D+dwLoadOffset), 0x90, 0x2A);
+        *(DWORD *)(0x40293D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
+        *(WORD  *)(0x402941+dwLoadOffset) = 0x9090;	// NOP*2- last RGSC init check 
+
+
+
+	// skip missing tests...
+	memset ((BYTE *)(0x402B32+dwLoadOffset), 0x90, 14);
+	memset ((BYTE *)(0x402D37+dwLoadOffset), 0x90, 14);
+	*(DWORD *)(0x403890+dwLoadOffset) = 0x90CC033;	// xor eax, eax; retn
+	*(DWORD *)(0x404270+dwLoadOffset) = 0x90CC033;	// xor eax, eax; retn
+
+	// savegames
+	*(WORD *)(0x5B0505+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
+	injectFunction (0x5AFF30, (DWORD)getSavefilePath); // replace getSavefilePath
+
+	*(DWORD *)(0xBABFB0+dwLoadOffset) = 0x90C301B0;	// mov al, 1; retn
+	*(DWORD *)(0xBABFD0+dwLoadOffset) = 0x90C301B0;
+	*(DWORD *)(0xBABFE0+dwLoadOffset) = 0x90C301B0;
+	*(DWORD *)(0xBAC010+dwLoadOffset) = 0x90C301B0;
+
+	Debug ("Patching OK (1.0.6.0 - update 6)");
+}
+
 void patch102 () {
 	dwGameVersion = 0x00010002;	// GTA IV 1.0.2 (patch 2)
 
@@ -1202,6 +1262,8 @@ void patchCode () {
 		patch104 ();
 	else if (signature == 0xf3385058)
 		patch105 ();
+	else if (signature == 0x00a42494)
+		patch106 ();
 	else if (signature == 0x108b1874)
 		patchRFG ();
 	else 

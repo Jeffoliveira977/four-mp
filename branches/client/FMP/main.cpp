@@ -133,7 +133,7 @@ void trim(char *a)
 
 void LoadConfig()
 {
-	FILE *f = fopen("fmp.ini", "r");
+	FILE *f = fopen("FMP\\fmp.ini", "r");
 	char buff[32];
 	fgets(buff, 32, f);
 	strcpy(Conf.server, buff);
@@ -271,7 +271,7 @@ void FMPHook::RunMP()
 	SetFloatStat(STAT_KATE_TRUST, 100);
 	SetFloatStat(STAT_GAME_PROGRESS, 100);
 	
-	TerminateAllScriptsWithThisName("initial");
+	/*TerminateAllScriptsWithThisName("initial");
 	TerminateAllScriptsWithThisName("main");
 	TerminateAllScriptsWithThisName("spcellphone");
 	TerminateAllScriptsWithThisName("ambairpotarea");
@@ -324,7 +324,7 @@ void FMPHook::RunMP()
 	TerminateAllScriptsWithThisName("empiredown");
 	TerminateAllScriptsWithThisName("foodserver");
 	TerminateAllScriptsWithThisName("garbage_trucks");
-	TerminateAllScriptsWithThisName("stunt");
+	TerminateAllScriptsWithThisName("stunt");*/
 	
 	
 	ClearAreaOfChars(0,0,0, 2000);
@@ -611,7 +611,7 @@ void MainThread(void* dummy)
 {
 	Debug("START (0x%x)", dwLoadOffset);
 
-	HOOK.AttachGtaThread("FMP");
+	HOOK.AttachGtaThread("FOURMP");
 
 	Debug("Atached");
 
@@ -621,19 +621,26 @@ void MainThread(void* dummy)
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) 
 {
+	Debug("DllMain with reason 0x%x", ul_reason_for_call);
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
-		concore.RegisterStandardLibrary();
-		debug_clear();
-		log_clear();
+		//debug_clear();
+		//log_clear();
 
+		Debug("DLL_PROCESS_ATTACH");
+		concore.RegisterStandardLibrary();
+
+		Debug("Patching code");
 		patchCode();
 
-		if(dwGameVersion == 0x00010005)
+		Debug("Check game version");
+		if(dwGameVersion == 0x00010006)
 		{
+			Debug("Set DX9 Hook");
 			DisableThreadLibraryCalls(hModule);
-			DetourFunc((BYTE*)(0xCE32AC+dwLoadOffset),(BYTE*)hkDirect3DCreate9, 5);
+			DetourFunc((BYTE*)ADDRESS_CREATE_DEVICE,(BYTE*)hkDirect3DCreate9, 5);
 
+			Debug("Set script hook");
 			DWORD threadId = 0; 
 			ThreadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&MainThread, 0, 0, (LPDWORD)&threadId);
 		}

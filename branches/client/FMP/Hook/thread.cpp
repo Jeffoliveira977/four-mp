@@ -143,7 +143,7 @@ FMPThread::FMPThread()
 {
 	debug("FMPThread::FMPThread called");
 
-	strcpy(ThreadName, "FMP");
+	strcpy_s(ThreadName, "FMP");
 
 	m_pOriginalThread = NULL;
 	m_nThreadIndex = -1;
