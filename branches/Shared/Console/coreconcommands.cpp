@@ -113,6 +113,7 @@ void ConCmdExec(ConsoleCore *concore, unsigned char numargs)
 	{
 
 	}
+	free(tempstring);
 }
 
 void ConCmdFind(ConsoleCore *concore, unsigned char numargs)

@@ -4,9 +4,9 @@
 /// \author FaTony
 
 #include "fmpconcommands.h"
-#include "..\CoreHandleTypesManager.h"
-#include "..\PluginManager.h"
-#include "..\VirtualMachineManager.h"
+#include "CoreHandleTypesManager.h"
+#include "PluginManager.h"
+#include "VirtualMachineManager.h"
 
 extern CoreHandleTypesManager chtm;
 extern PluginManager plugm;
