@@ -13,10 +13,13 @@
 #include "sq_consolenatives.h"
 #include "logging.h"
 #include "HandleManager.h"
+#include "CoreHandleTypesManager.h"
 #include "../../Shared/Console/ConsoleCore.h"
 #include "fmpconcommands.h"
 #include "VirtualMachineManager.h"
 
+extern HandleManager hm;
+extern CoreHandleTypesManager chtm;
 extern ConsoleCore concore;
 extern VirtualMachineManager vmm;
 
@@ -51,75 +54,81 @@ void sq_printr(HSQUIRRELVM v)
 
 void sq_CreateConVar(HSQUIRRELVM v)
 {
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
+	{
+		sq_pushinteger(v, INVALID_HANDLE);
+		return;
+	}
 	int args = sq_gettop(v);
 	if (args < 2)
 	{
 		sq_pushinteger(v, INVALID_HANDLE);
 		return;
 	}
-	const char *cvarname;
-	const char *cvardesc;
-	int cvarflags = 0;
-	sq_getstring(v, 2, &cvarname);
+	const char *name;
+	const char *description;
+	int flags = 0;
+	sq_getstring(v, 2, &name);
 	if (args >= 3)
 	{
-		sq_getstring(v, 4, &cvardesc);
+		sq_getstring(v, 4, &description);
 	}
 	if (args >= 4)
 	{
-		sq_getinteger(v, 5, &cvarflags);
+		sq_getinteger(v, 5, &flags);
 	}
 	switch (sq_gettype(v, 2))
 	{
 	case OT_STRING:
 		{
-			const char *cvarvalue;
-			sq_getstring(v, 3, &cvarvalue);
-			sq_pushinteger(v, vmm.CreateConVar(&v, concore.AddConVar(cvarname, cvarvalue, cvardesc, cvarflags)));
+			const char *value;
+			sq_getstring(v, 3, &value);
+			sq_pushinteger(v, hm.AddNewHandle(index + 1, HandleTypeConVar, concore.AddConVar(name, value, description, flags)));
 			return;
 			break;
 		}
 	case OT_INTEGER:
 		{
-			int cvarvalue;
+			int value;
 			bool hasMin = false;
-			int cvarmin = 0;
+			int min = 0;
 			bool hasMax = false;
-			int cvarmax = 0;
-			sq_getinteger(v, 3, &cvarvalue);
+			int max = 0;
+			sq_getinteger(v, 3, &value);
 			if (args >= 6)
 			{
 				sq_getbool(v, 6, (SQBool *)&hasMin);
-				sq_getinteger(v, 7, &cvarmin);
+				sq_getinteger(v, 7, &min);
 			}
 			if (args >= 8)
 			{
 				sq_getbool(v, 6, (SQBool *)&hasMax);
-				sq_getinteger(v, 7, &cvarmax);
+				sq_getinteger(v, 7, &max);
 			}
-			sq_pushinteger(v, vmm.CreateConVar(&v, concore.AddConVar(cvarname, cvarvalue, cvardesc, cvarflags, hasMin, cvarmin, hasMax, cvarmax)));
+			sq_pushinteger(v, hm.AddNewHandle(index + 1, HandleTypeConVar, concore.AddConVar(name, value, description, flags, hasMin, min, hasMax, max)));
 			return;
 			break;
 		}
 	case OT_FLOAT:
 		{
-			float cvarvalue;
+			float value;
 			bool hasMin = false;
-			float cvarmin = 0;
+			float min = 0;
 			bool hasMax = false;
-			float cvarmax = 0;
-			sq_getfloat(v, 3, &cvarvalue);
+			float max = 0;
+			sq_getfloat(v, 3, &value);
 			if (args >= 6)
 			{
 				sq_getbool(v, 6, (SQBool *)&hasMin);
-				sq_getfloat(v, 7, &cvarmin);
+				sq_getfloat(v, 7, &min);
 			}
 			if (args >= 8)
 			{
 				sq_getbool(v, 6, (SQBool *)&hasMax);
-				sq_getfloat(v, 7, &cvarmax);
+				sq_getfloat(v, 7, &max);
 			}
-			sq_pushinteger(v, vmm.CreateConVar(&v, concore.AddConVar(cvarname, cvarvalue, cvardesc, cvarflags, hasMin, cvarmin, hasMax, cvarmax)));
+			sq_pushinteger(v, hm.AddNewHandle(index + 1, HandleTypeConVar, concore.AddConVar(name, value, description, flags, hasMin, min, hasMax, max)));
 			return;
 			break;
 		}
@@ -128,122 +137,182 @@ void sq_CreateConVar(HSQUIRRELVM v)
 
 void sq_FindConVar(HSQUIRRELVM v)
 {
-	const char *cvarname;
-	sq_getstring(v, 2, &cvarname);
-	sq_pushinteger(v, vmm.FindConVar(&v, cvarname));
+	const char *name;
+	sq_getstring(v, 2, &name);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
+	{
+		sq_pushinteger(v, INVALID_HANDLE);
+		return;
+	}
+	sq_pushinteger(v, chtm.FindConVar(index + 1, name));
 }
 
 void sq_ResetConVar(HSQUIRRELVM v)
 {
-	int cvarhandle;
-	sq_getinteger(v, 2, &cvarhandle);
-	sq_pushbool(v, vmm.ResetConVar(&v, cvarhandle));
+	int handle;
+	sq_getinteger(v, 2, &handle);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
+	{
+		sq_pushinteger(v, INVALID_HANDLE);
+		return;
+	}
+	sq_pushbool(v, chtm.ResetConVar(index + 1, handle));
 }
 
 void sq_GetConVarName(HSQUIRRELVM v)
 {
-	int cvarhandle;
-	sq_getinteger(v, 2, &cvarhandle);
-	char *cvarname = vmm.GetConVarName(&v, cvarhandle);
-	if (cvarname == NULL)
+	int handle;
+	sq_getinteger(v, 2, &handle);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
 	{
 		sq_pushnull(v);
 		return;
 	}
-	sq_pushstring(v, cvarname, -1);
-	free(cvarname);
+	char *name = chtm.GetConVarName(index + 1, handle);
+	if (name == NULL)
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushstring(v, name, -1);
+	free(name);
 }
 
 void sq_GetConVarFloat(HSQUIRRELVM v)
 {
-	int cvarhandle;
-	float cvarvalue;
-	sq_getinteger(v, 2, &cvarhandle);
-	if (!vmm.GetConVarValue(&v, cvarhandle, cvarvalue))
+	int handle;
+	float value;
+	sq_getinteger(v, 2, &handle);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
 	{
 		sq_pushnull(v);
 		return;
 	}
-	sq_pushfloat(v, cvarvalue);
+	if (!chtm.GetConVarValue(index + 1, handle, value))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushfloat(v, value);
 }
 
 void sq_GetConVarInt(HSQUIRRELVM v)
 {
-	int cvarhandle;
-	int cvarvalue;
-	sq_getinteger(v, 2, &cvarhandle);
-	if (!vmm.GetConVarValue(&v, cvarhandle, cvarvalue))
+	int handle;
+	int value;
+	sq_getinteger(v, 2, &handle);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
 	{
 		sq_pushnull(v);
 		return;
 	}
-	sq_pushinteger(v, cvarvalue);
+	if (!chtm.GetConVarValue(index + 1, handle, value))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushinteger(v, value);
 }
 
 void sq_GetConVarString(HSQUIRRELVM v)
 {
-	int cvarhandle;
-	char *cvarvalue;
-	sq_getinteger(v, 2, &cvarhandle);
-	if (!vmm.GetConVarValue(&v, cvarhandle, cvarvalue))
+	int handle;
+	char *value;
+	sq_getinteger(v, 2, &handle);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
 	{
 		sq_pushnull(v);
 		return;
 	}
-	sq_pushstring(v, cvarvalue, -1);
-	free(cvarvalue);
+	if (!chtm.GetConVarValue(index + 1, handle, value))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushstring(v, value, -1);
+	free(value);
 }
 
 void sq_GetConVarFlags(HSQUIRRELVM v)
 {
-	int cvarhandle;
-	int cvarflags;
-	sq_getinteger(v, 2, &cvarhandle);
-	if (!vmm.GetConVarFlags(&v, cvarhandle, cvarflags))
+	int handle;
+	int flags;
+	sq_getinteger(v, 2, &handle);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
 	{
 		sq_pushnull(v);
 		return;
 	}
-	sq_pushinteger(v, cvarflags);
+	if (!chtm.GetConVarFlags(index + 1, handle, flags))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushinteger(v, flags);
 }
 
 void sq_GetConVarBoundFloat(HSQUIRRELVM v)
 {
-	int cvarhandle;
+	int handle;
 	int type;
-	float cvarbound;
-	sq_getinteger(v, 2, &cvarhandle);
+	float bound;
+	sq_getinteger(v, 2, &handle);
 	sq_getinteger(v, 3, &type);
-	if (!vmm.GetConVarBound(&v, cvarhandle, (ConVarBoundType)type, cvarbound))
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
 	{
 		sq_pushnull(v);
 		return;
 	}
-	sq_pushfloat(v, cvarbound);
+	if (!chtm.GetConVarBound(index + 1, handle, (ConVarBoundType)type, bound))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushfloat(v, bound);
 }
 
 void sq_GetConVarBoundInt(HSQUIRRELVM v)
 {
-	int cvarhandle;
+	int handle;
 	int type;
-	int cvarbound;
-	sq_getinteger(v, 2, &cvarhandle);
+	int bound;
+	sq_getinteger(v, 2, &handle);
 	sq_getinteger(v, 3, &type);
-	if (!vmm.GetConVarBound(&v, cvarhandle, (ConVarBoundType)type, cvarbound))
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
 	{
 		sq_pushnull(v);
 		return;
 	}
-	sq_pushinteger(v, cvarbound);
+	if (!chtm.GetConVarBound(index + 1, handle, (ConVarBoundType)type, bound))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushinteger(v, bound);
 }
 
 void sq_SetConVarFloat(HSQUIRRELVM v)
 {
-	int cvarhandle;
-	float cvarvalue;
-	sq_getinteger(v, 2, &cvarhandle);
-	sq_getfloat(v, 3, &cvarvalue);
-	if (!vmm.SetConVarValue(&v, cvarhandle, cvarvalue))
+	int handle;
+	float value;
+	sq_getinteger(v, 2, &handle);
+	sq_getfloat(v, 3, &value);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
+	{
+		sq_pushbool(v, false);
+		return;
+	}
+	if (!chtm.SetConVarValue(index + 1, handle, value))
 	{
 		sq_pushbool(v, false);
 		return;
@@ -253,11 +322,17 @@ void sq_SetConVarFloat(HSQUIRRELVM v)
 
 void sq_SetConVarInt(HSQUIRRELVM v)
 {
-	int cvarhandle;
-	int cvarvalue;
-	sq_getinteger(v, 2, &cvarhandle);
-	sq_getinteger(v, 3, &cvarvalue);
-	if (!vmm.SetConVarValue(&v, cvarhandle, cvarvalue))
+	int handle;
+	int value;
+	sq_getinteger(v, 2, &handle);
+	sq_getinteger(v, 3, &value);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
+	{
+		sq_pushbool(v, false);
+		return;
+	}
+	if (!chtm.SetConVarValue(index + 1, handle, value))
 	{
 		sq_pushbool(v, false);
 		return;
@@ -267,11 +342,17 @@ void sq_SetConVarInt(HSQUIRRELVM v)
 
 void sq_SetConVarString(HSQUIRRELVM v)
 {
-	int cvarhandle;
-	const char *cvarvalue;
-	sq_getinteger(v, 2, &cvarhandle);
-	sq_getstring(v, 3, &cvarvalue);
-	if (!vmm.SetConVarValue(&v, cvarhandle, cvarvalue))
+	int handle;
+	const char *value;
+	sq_getinteger(v, 2, &handle);
+	sq_getstring(v, 3, &value);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
+	{
+		sq_pushbool(v, false);
+		return;
+	}
+	if (!chtm.SetConVarValue(index + 1, handle, value))
 	{
 		sq_pushbool(v, false);
 		return;
@@ -281,11 +362,17 @@ void sq_SetConVarString(HSQUIRRELVM v)
 
 void sq_SetConVarFlags(HSQUIRRELVM v)
 {
-	int cvarhandle;
-	int cvarflags;
-	sq_getinteger(v, 2, &cvarhandle);
-	sq_getinteger(v, 3, &cvarflags);
-	if (!vmm.SetConVarFlags(&v, cvarhandle, cvarflags))
+	int handle;
+	int flags;
+	sq_getinteger(v, 2, &handle);
+	sq_getinteger(v, 3, &flags);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
+	{
+		sq_pushbool(v, false);
+		return;
+	}
+	if (!chtm.SetConVarFlags(index + 1, handle, flags))
 	{
 		sq_pushbool(v, false);
 		return;
@@ -295,15 +382,21 @@ void sq_SetConVarFlags(HSQUIRRELVM v)
 
 void sq_SetConVarBoundFloat(HSQUIRRELVM v)
 {
-	int cvarhandle;
+	int handle;
 	int type;
 	unsigned int set;
-	float cvarbound;
-	sq_getinteger(v, 2, &cvarhandle);
+	float bound;
+	sq_getinteger(v, 2, &handle);
 	sq_getinteger(v, 3, &type);
 	sq_getbool(v, 4, &set);
-	sq_getfloat(v, 5, &cvarbound);
-	if (!vmm.SetConVarBound(&v, cvarhandle, (ConVarBoundType)type, (bool)set, cvarbound))
+	sq_getfloat(v, 5, &bound);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
+	{
+		sq_pushbool(v, false);
+		return;
+	}
+	if (!chtm.SetConVarBound(index + 1, handle, (ConVarBoundType)type, (bool)set, bound))
 	{
 		sq_pushbool(v, false);
 		return;
@@ -313,15 +406,21 @@ void sq_SetConVarBoundFloat(HSQUIRRELVM v)
 
 void sq_SetConVarBoundInt(HSQUIRRELVM v)
 {
-	int cvarhandle;
+	int handle;
 	int type;
 	unsigned int set;
-	int cvarbound;
-	sq_getinteger(v, 2, &cvarhandle);
+	int bound;
+	sq_getinteger(v, 2, &handle);
 	sq_getinteger(v, 3, &type);
 	sq_getbool(v, 4, &set);
-	sq_getinteger(v, 5, &cvarbound);
-	if (!vmm.SetConVarBound(&v, cvarhandle, (ConVarBoundType)type, (bool)set, cvarbound))
+	sq_getinteger(v, 5, &bound);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
+	{
+		sq_pushbool(v, false);
+		return;
+	}
+	if (!chtm.SetConVarBound(index + 1, handle, (ConVarBoundType)type, (bool)set, bound))
 	{
 		sq_pushbool(v, false);
 		return;
@@ -331,15 +430,20 @@ void sq_SetConVarBoundInt(HSQUIRRELVM v)
 
 void sq_RegServerCmd(HSQUIRRELVM v)
 {
-	const char *cmdname;
-	const char *cmdcallback;
-	const char *cmddesc;
-	int cmdflags;
-	sq_getstring(v, 2, &cmdname);
-	sq_getstring(v, 3, &cmdcallback);
-	sq_getstring(v, 4, &cmddesc);
-	sq_getinteger(v, 5, &cmdflags);
-	vmm.RegServerCmd(&v, cmdcallback, concore.AddConCmd(cmdname, ConCmdDynamic, cmddesc, cmdflags));
+	const char *name;
+	const char *callback;
+	const char *description;
+	int flags;
+	sq_getstring(v, 2, &name);
+	sq_getstring(v, 3, &callback);
+	sq_getstring(v, 4, &description);
+	sq_getinteger(v, 5, &flags);
+	unsigned char index;
+	if (!vmm.FindVirtualMachine(&v, index))
+	{
+		return;
+	}
+	chtm.AddDynamicCommand(index + 1, callback, concore.AddConCmd(name, ConCmdDynamic, description, flags));
 }
 
 void sq_GetCmdArgs(HSQUIRRELVM v)

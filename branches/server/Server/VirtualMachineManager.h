@@ -108,144 +108,37 @@ public:
 	/// \return Info string on success, NULL otherwise.
 	char *GetVirtualMachineInfoString(const unsigned char index);
 
+	/// \brief Retrieves the virtual machine index by the given pointer.
+	/// \param[in] v Pointer to the virtual machine.
+	/// \param[out] index Index of the virtual machine.
+	/// \return True on success, false otherwise.
+	bool FindVirtualMachine(const HSQUIRRELVM *v, unsigned char &index);
+
+	//------------------------------------------------------------------------------------
+	// Natives below this line
+	//------------------------------------------------------------------------------------
+
 	/// \brief Sets the virtual machine name.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
+	/// \param[in] index Index of the virtual machine.
 	/// \param[in] string Name to set.
 	/// \return No return.
-	void SetVirtualMachineName(const HSQUIRRELVM *v, const char *string);
+	void SetVirtualMachineName(const unsigned char index, const char *string);
 
 	/// \brief Sets the virtual machine version.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
+	/// \param[in] index Index of the virtual machine.
 	/// \param[in] string Version to set.
 	/// \return No return.
-	void SetVirtualMachineVersion(const HSQUIRRELVM *v, const char *string);
+	void SetVirtualMachineVersion(const unsigned char index, const char *string);
 
 	/// \brief Sets the virtual machine author.
 	/// \param[in] v Pointer to the virtual machine that calls this function.
 	/// \param[in] string Author to set.
 	/// \return No return.
-	void SetVirtualMachineAuthor(const HSQUIRRELVM *v, const char *string);
+	void SetVirtualMachineAuthor(const unsigned char index, const char *string);
 
-	/// \brief Creates a console variable and returns the handle to it.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] ptr Pointer to the console variable.
-	/// \return Handle to the console variable on success, INVALID_HANDLE otherwise.
-	int CreateConVar(const HSQUIRRELVM *v, const ConVar *ptr);
-
-	/// \brief Returns the handle to the console variable and reserves it by the plugin.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] name Name of the console variable to search for.
-	/// \return Handle index on success, INVALID_HANDLE otherwise.
-	int FindConVar(const HSQUIRRELVM *v, const char *name);
-
-	/// \brief Resets the console variable to its default value.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \return True on success, false otherwise.
-	bool ResetConVar(const HSQUIRRELVM *v, const int handle);
-
-	/// \brief Returns the name of a console variable.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \return Name on success, NULL otherwise.
-	char *GetConVarName(const HSQUIRRELVM *v, const int handle);
-
-	/// \brief Retrieves the value of a console variable.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[out] value Buffer to store the value in.
-	/// \return True on success, false otherwise.
-	bool GetConVarValue(const HSQUIRRELVM *v, const int handle, float &value);
-
-	/// \brief Retrieves the value of a console variable.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[out] value Buffer to store the value in.
-	/// \return True on success, false otherwise.
-	bool GetConVarValue(const HSQUIRRELVM *v, const int handle, int &value);
-
-	/// \brief Retrieves the value of a console variable.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[out] value Buffer to store the value in.
-	/// \return True on success, false otherwise.
-	bool GetConVarValue(const HSQUIRRELVM *v, const int handle, char *&value);
-
-	/// \brief Retrieves the bitstring of flags on a console variable. 
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[out] flags Buffer to store the flags in.
-	/// \return True on success, false otherwise.
-	bool GetConVarFlags(const HSQUIRRELVM *v, const int handle, int &flags);
-
-	/// \brief Retrieves the specified bound of a console variable. 
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[in] type Type of bound to retrieve.
-	/// \param[out] bound Buffer to store the bound value in.
-	/// \return True on success, false otherwise.
-	bool GetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, float &bound);
-
-	/// \brief Retrieves the specified bound of a console variable. 
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[in] type Type of bound to retrieve.
-	/// \param[out] bound Buffer to store the bound value in.
-	/// \return True on success, false otherwise.
-	bool GetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, int &bound);
-
-	/// \brief Sets the value of a console variable.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[in] value The value to set.
-	/// \return True on success, false otherwise.
-	bool SetConVarValue(const HSQUIRRELVM *v, const int handle, const float value);
-
-	/// \brief Sets the value of a console variable.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[in] value The value to set.
-	/// \return True on success, false otherwise.
-	bool SetConVarValue(const HSQUIRRELVM *v, const int handle, const int value);
-
-	/// \brief Sets the value of a console variable.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[in] value The value to set.
-	/// \return True on success, false otherwise.
-	bool SetConVarValue(const HSQUIRRELVM *v, const int handle, const char *value);
-
-	/// \brief Sets the bitstring of flags on a console variable.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[in] flags A bitstring containing the FCVAR_* flags to enable.
-	/// \return True on success, false otherwise.
-	bool SetConVarFlags(const HSQUIRRELVM *v, const int handle, const int flags);
-
-	/// \brief Sets the specified bound of a console variable.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[in] type Type of the bound to set.
-	/// \param[in] set True to set, false to remove.
-	/// \param[out] bound Value of the bound to set.
-	/// \return True on success, false otherwise.
-	bool SetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType, const bool set, const float bound);
-
-	/// \brief Sets the specified bound of a console variable.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] handle Handle to the console variable.
-	/// \param[in] type Type of the bound to set.
-	/// \param[in] set True to set, false to remove.
-	/// \param[out] bound Value of the bound to set.
-	/// \return True on success, false otherwise.
-	bool SetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType, const bool set, const int bound);
-
-	/// \brief Creates a server-only console command.
-	/// \param[in] v Pointer to the virtual machine that calls this function.
-	/// \param[in] callback Callback that will be associated with this command.
-	/// \param[in] ptr Pointer to the console command.
-	/// \return No return.
-	void RegServerCmd(const HSQUIRRELVM *v, const char *callback, const ConCmd *ptr);
+	//------------------------------------------------------------------------------------
+	// Callbacks below this line
+	//------------------------------------------------------------------------------------
 
 	/// \brief Called when a player connects the server.
 	/// \param[in] index Index of the player.
@@ -325,12 +218,6 @@ private:
 	/// \param[out] index Buffer to store the slot in.
 	/// \return True on success, false otherwise.
 	bool GetFilterScriptFreeSlot(unsigned char &index);
-
-	/// \brief Retrieves the virtual machine index by the given pointer.
-	/// \param[in] v Pointer to the virtual machine.
-	/// \param[out] index Index of the virtual machine.
-	/// \return True on success, false otherwise.
-	bool FindVirtualMachine(const HSQUIRRELVM *v, unsigned char &index);
 
 	/// \brief Wrapper for realloc.
 	/// \param[in,out] buffer Buffer to resize.

@@ -307,10 +307,25 @@ char *VirtualMachineManager::GetVirtualMachineInfoString(const unsigned char ind
 	return string;
 }
 
-void VirtualMachineManager::SetVirtualMachineName(const HSQUIRRELVM *v, const char *string)
+bool VirtualMachineManager::FindVirtualMachine(const HSQUIRRELVM *v, unsigned char &index)
 {
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
+	for (index = 0; index < vmbuffersize; index++)
+	{
+		if ((vmbuffer[index] != NULL) && (vmbuffer[index]->lang == VMLanguageSquirrel) && (*vmbuffer[index]->ptr.squirrel == *v))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void VirtualMachineManager::SetVirtualMachineName(const unsigned char index, const char *string)
+{
+	if (index >= vmbuffersize)
+	{
+		return;
+	}
+	if (vmbuffer[index] == NULL)
 	{
 		return;
 	}
@@ -318,10 +333,13 @@ void VirtualMachineManager::SetVirtualMachineName(const HSQUIRRELVM *v, const ch
 	strcpy(vmbuffer[index]->name, string);
 }
 
-void VirtualMachineManager::SetVirtualMachineVersion(const HSQUIRRELVM *v, const char *string)
+void VirtualMachineManager::SetVirtualMachineVersion(const unsigned char index, const char *string)
 {
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
+	if (index >= vmbuffersize)
+	{
+		return;
+	}
+	if (vmbuffer[index] == NULL)
 	{
 		return;
 	}
@@ -329,185 +347,18 @@ void VirtualMachineManager::SetVirtualMachineVersion(const HSQUIRRELVM *v, const
 	strcpy(vmbuffer[index]->version, string);
 }
 
-void VirtualMachineManager::SetVirtualMachineAuthor(const HSQUIRRELVM *v, const char *string)
+void VirtualMachineManager::SetVirtualMachineAuthor(const unsigned char index, const char *string)
 {
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
+	if (index >= vmbuffersize)
+	{
+		return;
+	}
+	if (vmbuffer[index] == NULL)
 	{
 		return;
 	}
 	ResizeStringBuffer(vmbuffer[index]->author, strlen(string) + 1);
 	strcpy(vmbuffer[index]->author, string);
-}
-
-int VirtualMachineManager::CreateConVar(const HSQUIRRELVM *v, const ConVar *ptr)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return INVALID_HANDLE;
-	}
-	return hm.AddNewHandle(index + 1, HandleTypeConVar, (void *)ptr);
-}
-
-int VirtualMachineManager::FindConVar(const HSQUIRRELVM *v, const char *name)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return INVALID_HANDLE;
-	}
-	return chtm.FindConVar(index + 1, name);
-}
-
-bool VirtualMachineManager::ResetConVar(const HSQUIRRELVM *v, const int handle)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.ResetConVar(index + 1, handle);
-}
-
-char *VirtualMachineManager::GetConVarName(const HSQUIRRELVM *v, const int handle)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return NULL;
-	}
-	return chtm.GetConVarName(index + 1, handle);
-}
-
-bool VirtualMachineManager::GetConVarValue(const HSQUIRRELVM *v, const int handle, float &value)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.GetConVarValue(index + 1, handle, value);
-}
-
-bool VirtualMachineManager::GetConVarValue(const HSQUIRRELVM *v, const int handle, int &value)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.GetConVarValue(index + 1, handle, value);
-}
-
-bool VirtualMachineManager::GetConVarValue(const HSQUIRRELVM *v, const int handle, char *&value)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.GetConVarValue(index + 1, handle, value);
-}
-
-bool VirtualMachineManager::GetConVarFlags(const HSQUIRRELVM *v, const int handle, int &flags)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.GetConVarFlags(index + 1, handle, flags);
-}
-
-bool VirtualMachineManager::GetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, float &bound)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.GetConVarBound(index + 1, handle, type, bound);
-}
-
-bool VirtualMachineManager::GetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, int &bound)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.GetConVarBound(index + 1, handle, type, bound);
-}
-
-bool VirtualMachineManager::SetConVarValue(const HSQUIRRELVM *v, const int handle, const float value)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.SetConVarValue(index + 1, handle, value);
-}
-
-bool VirtualMachineManager::SetConVarValue(const HSQUIRRELVM *v, const int handle, const int value)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.SetConVarValue(index + 1, handle, value);
-}
-
-bool VirtualMachineManager::SetConVarValue(const HSQUIRRELVM *v, const int handle, const char *value)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.SetConVarValue(index + 1, handle, value);
-}
-
-bool VirtualMachineManager::SetConVarFlags(const HSQUIRRELVM *v, const int handle, const int flags)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.SetConVarFlags(index + 1, handle, flags);
-}
-
-bool VirtualMachineManager::SetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, const bool set, const float bound)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.SetConVarBound(index + 1, handle, type, set, bound);
-}
-
-bool VirtualMachineManager::SetConVarBound(const HSQUIRRELVM *v, const int handle, const ConVarBoundType type, const bool set, const int bound)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return false;
-	}
-	return chtm.SetConVarBound(index + 1, handle, type, set, bound);
-}
-
-void VirtualMachineManager::RegServerCmd(const HSQUIRRELVM *v, const char *callback, const ConCmd *ptr)
-{
-	unsigned char index;
-	if (!this->FindVirtualMachine(v, index))
-	{
-		return;
-	}
-	chtm.AddDynamicCommand(index + 1, callback, ptr);
 }
 
 bool VirtualMachineManager::OnPlayerConnect(const short index, const char *name)
@@ -781,18 +632,6 @@ bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 		return false;
 	}
 	return true;
-}
-
-bool VirtualMachineManager::FindVirtualMachine(const HSQUIRRELVM *v, unsigned char &index)
-{
-	for (index = 0; index < vmbuffersize; index++)
-	{
-		if ((vmbuffer[index] != NULL) && (vmbuffer[index]->lang == VMLanguageSquirrel) && (*vmbuffer[index]->ptr.squirrel == *v))
-		{
-			return true;
-		}
-	}
-	return false;
 }
 
 bool VirtualMachineManager::ResizeVirtualMachineBuffer(VirtualMachine **&buffer, const unsigned char size)
