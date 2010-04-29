@@ -240,8 +240,8 @@ private:
 	char *GetCommand(const char *string, const unsigned int startindex);
 
 	/// \brief Interprets prepared command.
-	/// \return No return.
-	void InterpretCommand(void);
+	/// \return False if the command ends in a comment, true otherwise.
+	bool InterpretCommand(void);
 	friend class ConVar; ///< See ConVar.h
 	friend class ConCmd; ///< See ConCmd.h
 	friend void ConCmdCvarlist(ConsoleCore *concore, unsigned char numargs); ///< See coreconcommands.h

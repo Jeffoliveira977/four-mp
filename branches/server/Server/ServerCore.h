@@ -16,6 +16,7 @@ private:
 	bool running;
 	unsigned int lastcheck;
 	ConVar *hostname;
+	ConVar *port;
 	ConVar *gamemode;
 	ConVar *password;
 	ConVar *rconpassword;

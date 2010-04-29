@@ -403,13 +403,30 @@ void ConsoleCore::InterpretLine(const char *string)
 {
 	unsigned int length = strlen(string);
 	unsigned int i = 0;
+	while (((string[i] == ' ') || (string[i] == '"')) && (i < length))
+	{
+		i++;
+	}
+	if (i == length)
+	{
+		return;
+	}
+	if ((string[i] == '/') && (string[i+1] == '/'))
+	{
+		return;
+	}
+	bool comment;
 	while (i < length)
 	{
-	commandbuffer = this->GetCommand(string, i);
-	this->InterpretCommand();
-	i = i + strlen(commandbuffer) + 1;
-	free(commandbuffer);
-	commandbuffer = NULL;
+		commandbuffer = this->GetCommand(string, i);
+		i = i + strlen(commandbuffer) + 1;
+		comment = (!this->InterpretCommand());
+		free(commandbuffer);
+		commandbuffer = NULL;
+		if (comment)
+		{
+			return;
+		}
 	}
 }
 
@@ -701,7 +718,7 @@ char *ConsoleCore::GetCommand(const char *string, const unsigned int startindex)
 	return cmdstring;
 }
 
-void ConsoleCore::InterpretCommand(void)
+bool ConsoleCore::InterpretCommand(void)
 {
 	unsigned int length = strlen(commandbuffer);
 	unsigned int i = 0;
@@ -717,7 +734,7 @@ void ConsoleCore::InterpretCommand(void)
 	unsigned int templength = i - startindex;
 	if (templength == 0)
 	{
-		return;
+		return true;
 	}
 	char *symbolname = (char *)calloc(templength + 1, sizeof(char));
 	strncpy(symbolname, commandbuffer + startindex, templength);
@@ -727,7 +744,16 @@ void ConsoleCore::InterpretCommand(void)
 	{
 		this->Output("Unknown command \"%s\"", symbolname);
 		free(symbolname);
-		return;
+		return true;
+	}
+	if (commandargs != NULL)
+	{
+		for (unsigned char k = 0; k <= numargs; k++)
+		{
+			free(commandargs[k]);
+			commandargs[k] = NULL;
+		}
+		free(commandargs);
 	}
 	commandargs = (char **)calloc(1, sizeof(char *));
 	commandargs[0] = (char *)calloc(templength + 1, sizeof(char));
@@ -735,7 +761,8 @@ void ConsoleCore::InterpretCommand(void)
 	i++;
 	unsigned char j = 1;
 	unsigned int endindex = 0;
-	while (i < length)
+	bool comment = false;
+	while ((i < length) && (!comment))
 	{
 		if (commandbuffer[i] == ' ')
 		{
@@ -766,19 +793,29 @@ void ConsoleCore::InterpretCommand(void)
 			startindex = i;
 			if (j == 1)
 			{
-				argpos = startindex;
+				if ((commandbuffer[i] == '/') && (commandbuffer[i+1] == '/'))
+				{
+					comment = true;
+				}
+				else
+				{
+					argpos = startindex;
+				}
 			}
-			i++;
-			while ((commandbuffer[i] != ' ') && (i < length))
+			if (!comment)
 			{
 				i++;
+				while ((commandbuffer[i] != ' ') && (i < length))
+				{
+					i++;
+				}
+				templength = i - startindex;
+				ResizeArrayBuffer(commandargs, j + 1);
+				commandargs[j] = (char *)calloc(templength + 1, sizeof(char));
+				strncpy(commandargs[j], commandbuffer + startindex, templength);
+				commandargs[j][templength] = '\0';
+				j++;
 			}
-			templength = i - startindex;
-			ResizeArrayBuffer(commandargs, j + 1);
-			commandargs[j] = (char *)calloc(templength + 1, sizeof(char));
-			strncpy(commandargs[j], commandbuffer + startindex, templength);
-			commandargs[j][templength] = '\0';
-			j++;
 		}
 	}
 	numargs = j - 1;
@@ -837,13 +874,17 @@ void ConsoleCore::InterpretCommand(void)
 		}
 	}
 	free(symbolname);
-	for (i = 0; i <= numargs; i++)
+	if (commandargs != NULL)
 	{
-		free(commandargs[i]);
-		commandargs[i] = NULL;
+		for (i = 0; i <= numargs; i++)
+		{
+			free(commandargs[i]);
+			commandargs[i] = NULL;
+		}
+		free(commandargs);
 	}
-	free(commandargs);
 	commandargs = NULL;
 	argpos = 0;
 	numargs = 0;
+	return !comment;
 }

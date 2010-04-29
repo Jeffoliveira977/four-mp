@@ -1,5 +1,4 @@
 #include "ServerCore.h"
-#include "cfg.h"
 #include "logging.h"
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
@@ -34,10 +33,13 @@ ServerCore::~ServerCore(void)
 bool ServerCore::Load(void)
 {
 	concore.SetOutputFunction(PrintToServer);
+	concore.SetExecPath("cfg/");
 	conscreen.SetCaption("FOUR-MP");
 	//Core console functions
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("cvarlist", ConCmdCvarlist, "Show the list of convars/concommands.", 0));
 	hm.AddNewHandle(0, HandleTypeConVar, concore.AddConVar("developer", 0, "Show developer messages.", 0, true, 0, true, 2));
+	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("echo", ConCmdEcho, "Echo text to console.", 0));
+	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("exec", ConCmdExec, "Execute script file.", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("find", ConCmdFind, "Find concommands with the specified string in their name/help text.", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("help", ConCmdHelp, "Find help about a convar/concommand.", 0));
 	// FMP console functions
@@ -73,15 +75,15 @@ bool ServerCore::Load(void)
 	hm.AddNewHandle(0, HandleTypeConVar, componentselect);
 	password = concore.AddConVar("sv_password", "", "Server password for entry into multiplayer games", 0);
 	hm.AddNewHandle(0, HandleTypeConVar, password);
+	port = concore.AddConVar("sv_port", 7777, "Server port.", 0, true, 0, true, 65535);
+	hm.AddNewHandle(0, HandleTypeConVar, port);
 	PrintToServer("FOUR-MP. Copyright 2009-2010 Four-mp team.");
-	CFG *config = new CFG("server.cfg");
-	hostname->SetValue(config->GetVara("Name"));
-	gamemode->SetValue(config->GetVara("GameMode"));
+	concore.InterpretLine("exec server.cfg");
 	//strcpy(sConf.Lang, config->GetVara("Lang"));
-	password->SetValue(config->GetVara("Password"));
-	rconpassword->SetValue(config->GetVara("RconPassword"));
 	//strcpy(sConf.ServerURL, config->GetVara("ServerURL"));
-	nm.Init(playm.GetMaxPlayers(), config->GetVari("Port"));
+	int portvalue;
+	port->GetValue(portvalue);
+	nm.Init(playm.GetMaxPlayers(), portvalue);
 	plugm.LoadPlugins();
 	vmm.LoadFilterScripts();
 	char *gamemodename;
@@ -92,7 +94,9 @@ bool ServerCore::Load(void)
 		return false;
 	}
 	gamemodename = vmm.GetGameModeName();
-	if (!msm.RegisterServer(config->GetVari("Port"), config->GetVara("Name"), gamemodename, "World", playm.GetMaxPlayers(), false))
+	char *servername;
+	hostname->GetValue(servername);
+	if (!msm.RegisterServer(portvalue, servername, gamemodename, "World", playm.GetMaxPlayers(), false))
 	{
 		PrintToServer("Unable to register server");
 	}
