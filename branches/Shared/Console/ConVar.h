@@ -155,7 +155,7 @@ public:
 
 	/// \brief Hooks the console variable change.
 	/// \param[in] callback Pointer to the function to call on change.
-	/// \note Function must be void func(const ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);
+	/// \note Function must be void func(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);
 	/// \return True on success, false otherwise.
 	bool HookChange(void *callback);
 

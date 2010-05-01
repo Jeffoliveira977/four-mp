@@ -13,6 +13,24 @@ using namespace RakNet;
 
 MasterServerManager::MasterServerManager(void)
 {
+	isloaded = false;
+}
+
+MasterServerManager::~MasterServerManager(void)
+{
+	if (isloaded)
+	{
+		free(http);
+		free(tcp);
+	}
+}
+
+bool MasterServerManager::Init(void)
+{
+	if (isloaded)
+	{
+		return false;
+	}
 	tcp = RakNet::OP_NEW<TCPInterface>(__FILE__,__LINE__);
 	http = RakNet::OP_NEW<HTTPConnection>(__FILE__,__LINE__);
 
@@ -20,12 +38,8 @@ MasterServerManager::MasterServerManager(void)
 	http->Init(tcp, MASTER_HOST);
 
 	state = MSS_NONE;
-}
-
-MasterServerManager::~MasterServerManager(void)
-{
-	free(http);
-	free(tcp);
+	isloaded = true;
+	return true;
 }
 
 bool MasterServerManager::RegisterServer(const unsigned short port, const char *name, const char *mode, const char *loc, const short maxpl, const bool password)

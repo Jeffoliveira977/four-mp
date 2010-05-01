@@ -38,10 +38,22 @@ ServerCore::ServerCore(void)
 
 ServerCore::~ServerCore(void)
 {
-	free(hostname);
-	free(gamemode);
-	free(password);
-	free(rconpassword);
+	if (hostname)
+	{
+		free(hostname);
+	}
+	if (gamemode)
+	{
+		free(gamemode);
+	}
+	if (password)
+	{
+		free(password);
+	}
+	if (rconpassword)
+	{
+		free(rconpassword);
+	}
 }
 
 bool ServerCore::Load(void)
@@ -103,6 +115,7 @@ bool ServerCore::Load(void)
 	PrintToServer("FOUR-MP. Copyright 2009-2010 Four-mp team.");
 	concore.InterpretLine("exec server.cfg");
 	nm.Init(playm.GetMaxPlayers(), port);
+	maxplayers = playm.GetMaxPlayers();
 	plugm.LoadPlugins();
 	vmm.LoadFilterScripts();
 	if (!vmm.LoadGameMode(gamemode))
@@ -110,13 +123,15 @@ bool ServerCore::Load(void)
 		PrintToServer("Can't load gamemode.");
 		return false;
 	}
+	gamemodename = vmm.GetGameModeName();
 	if (!lan)
 	{
-		char *gamemodename = vmm.GetGameModeName();
-		if (!msm.RegisterServer(port, hostname, gamemodename, "World", playm.GetMaxPlayers(), false))
+		msm.Init();
+		if (!msm.RegisterServer(port, hostname, gamemodename, "World", maxplayers, password))
 		{
 			PrintToServer("Unable to register server.");
 		}
+		lastmasterservercheck = GetTickCount();
 	}
 	running = true;
 	debug("Started");
@@ -135,6 +150,17 @@ void ServerCore::Tick(void)
 	{
 		lastcheck = GetTickCount();
 		nm.CheckClients();
+	}
+	if (!lan)
+	{
+		if (GetTickCount() - lastmasterservercheck >= 3600000)
+		{
+			lastmasterservercheck = GetTickCount();
+			if (!msm.RegisterServer(port, hostname, gamemodename, "World", maxplayers, password))
+			{
+				PrintToServer("Unable to register server.");
+			}
+		}
 	}
 	Sleep(100);
 }

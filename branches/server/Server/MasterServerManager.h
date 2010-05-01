@@ -10,6 +10,9 @@ class HTTPConnection;
 
 class MasterServerManager
 {
+	bool isloaded;
+	TCPInterface *tcp;
+	HTTPConnection *http;
 	enum MasterServerStates
 	{
 		MSS_NONE,
@@ -18,8 +21,6 @@ class MasterServerManager
 		MSS_WAIT_USER_CHECK,
 		MSS_WAIT_CLAN_CHECK
 	};
-	TCPInterface *tcp;
-	HTTPConnection *http;
 	MasterServerStates state;
 protected:
 	void Process(void);
@@ -27,7 +28,7 @@ protected:
 public:
 	MasterServerManager(void);
 	~MasterServerManager(void);
-
+	bool Init(void);
 	bool RegisterServer(const unsigned short port, const char *name, const char *mode, const char *loc, const short maxplayers, const bool password);
 	bool QueryUserCheck(const int fmpid, const char *ip, const char *status);
 	bool QueryClanCheck(const int fmpid, const char *clan);

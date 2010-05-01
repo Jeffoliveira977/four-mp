@@ -16,10 +16,13 @@ public:
 private:
 	bool running;
 	unsigned int lastcheck;
+	unsigned int lastmasterservercheck;
 	char *hostname;
 	unsigned short port;
 	bool lan;
+	short maxplayers;
 	char *gamemode;
+	char *gamemodename;
 	char *password;
 	char *rconpassword;
 	bool componentselect;
