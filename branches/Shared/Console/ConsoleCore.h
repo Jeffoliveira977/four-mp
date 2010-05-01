@@ -146,7 +146,7 @@ public:
 	/// \return No return.
 	void InterpretLine(const char *string);
 private:
-	void *outputfunction; ///< Holds pointer to the function which is used to output text
+	void *outputfunction; ///< Holds the pointer to the function which is used to output text.
 	char *execpath; ///< Holds the path which is used to locate files for the exec command.
 
 	/// \brief Indicates the type of console symbol.
@@ -176,6 +176,7 @@ private:
 	unsigned short maxsymbolbuffersize; ///< Holds maximum size of the symbol buffer.
 	unsigned short symbolbuffersize; ///< Holds current size of the symbol buffer.
 	ConsoleSymbol *symbolbuffer; ///< Holds all registered console symbols.
+	unsigned char maxhookspercvar; ///< Holds maximum number of hooks per 1 console variable.
 	unsigned char maxcmdspersymbol; ///< Holds maximum number of commands per 1 console symbol.
 	char *commandbuffer; ///< Holds current command string.
 	char **commandargs; ///< Holds arguments of current command.
@@ -220,18 +221,6 @@ private:
 	/// \param[in] symbol Console symbol to work with.
 	/// \return Help string on success, NULL otherwise.
 	char *GetHelpString(const ConsoleSymbol *symbol);
-
-	/// \brief Wrapper for realloc.
-	/// \param[in,out] buffer Buffer to resize.
-	/// \param[in] size Size to which resize.
-	/// \return True on success, false otherwise.
-	bool ResizeSymbolBuffer(ConsoleSymbol *&buffer, const unsigned short size);
-
-	/// \brief Wrapper for realloc.
-	/// \param[in,out] buffer Buffer to resize.
-	/// \param[in] size Size to which resize.
-	/// \return True on success, false otherwise.
-	bool ResizeSymbolPtrBuffer(ConsoleSymbolPtr *&buffer, const unsigned char size);
 
 	/// \brief Gets command string from multicommand string starting from startindex.
 	/// \param[in] string Source input string to search in.

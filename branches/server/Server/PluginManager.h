@@ -361,12 +361,6 @@ private:
 	/// \return True on success, false otherwise.
 	bool FindPlugin(const IPluginInterface *plugin, unsigned char &index);
 
-	/// \brief Wrapper for realloc.
-	/// \param[in,out] buffer Buffer to resize.
-	/// \param[in] size Size to which resize.
-	/// \return True on success, false otherwise.
-	bool ResizePluginBuffer(Plugin **&buffer, const unsigned char size);
-
 	/// \brief Calls the OnPluginLoad callback in the plugin by the given index.
 	/// \param[in] index Index of the plugin.
 	/// \return No return.

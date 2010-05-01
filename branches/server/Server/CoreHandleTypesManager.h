@@ -179,12 +179,6 @@ private:
 	unsigned short maxcommandbuffersize; ///< Holds the maximum size of the dynamic commands buffer.
 	unsigned short commandbuffersize; ///< Holds the current size of the dynamic commands buffer.
 	
-	/// \brief Wrapper for realloc.
-	/// \param[in,out] buffer Buffer to resize.
-	/// \param[in] size Size to which resize.
-	/// \return True on success, false otherwise.
-	bool ResizeHandleIndexBuffer(int *&buffer, const unsigned char size);
-
 	/// \brief Checks if the given handle is a ConVar and owned by the given owner.
 	/// \param[in] owner Index of the owner.
 	/// \param[in] handle Index of the handle.
@@ -195,10 +189,4 @@ private:
 	/// \param[in] handle Index of the handle.
 	/// \return Callback string on success, NULL otherwise.
 	char *GetDynamicCommandCallback(const int handle);
-
-	/// \brief Wrapper for realloc.
-	/// \param[in,out] buffer Buffer to resize.
-	/// \param[in] size Size to which resize.
-	/// \return True on success, false otherwise.
-	bool ResizeCommandBuffer(DynamicCommand *&buffer, const unsigned short size);
 };

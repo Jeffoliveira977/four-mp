@@ -14,7 +14,7 @@
 
 using namespace std;
 
-void ConCmdCvarlist(ConsoleCore *concore, unsigned char numargs)
+void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 {
 	bool search = false;
 	char *searchstring;
@@ -53,30 +53,30 @@ void ConCmdCvarlist(ConsoleCore *concore, unsigned char numargs)
 			case ConsoleCore::ConsoleSymbolTypeConVar:
 				{
 					symbol->ptr->convar->GetValue(tempstring);
-					ResizeStringBuffer(symbolstring, _scprintf("%s %s	:", symbolstring, tempstring) + 1);
+					ResizeBuffer<char *, char, unsigned int>(symbolstring, _scprintf("%s %s	:", symbolstring, tempstring) + 1);
 					sprintf(symbolstring, "%s %s	:", symbolstring, tempstring);
 					//TODO: flags
-					ResizeStringBuffer(symbolstring, strlen(symbolstring) + 3);
+					ResizeBuffer<char *, char, unsigned int>(symbolstring, strlen(symbolstring) + 3);
 					sprintf(symbolstring, "%s	:", symbolstring);
 					//TODO: flags
 					free(tempstring);
 					tempstring = symbol->ptr->convar->GetDescription();
-					ResizeStringBuffer(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
+					ResizeBuffer<char *, char, unsigned int>(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
 					sprintf(symbolstring, "%s %s", symbolstring, tempstring);
 					free(tempstring);
 					break;
 				}
 			case ConsoleCore::ConsoleSymbolTypeConCmd:
 				{
-					ResizeStringBuffer(symbolstring, strlen(symbolstring) + 7);
+					ResizeBuffer<char *, char, unsigned int>(symbolstring, strlen(symbolstring) + 7);
 					sprintf(symbolstring, "%s cmd	:", symbolstring);
 					//TODO: flags
-					ResizeStringBuffer(symbolstring, strlen(symbolstring) + 3);
+					ResizeBuffer<char *, char, unsigned int>(symbolstring, strlen(symbolstring) + 3);
 					sprintf(symbolstring, "%s	:", symbolstring);
 					//TODO: flags
 					//free(tempstring);
 					tempstring = symbol->ptr[j].concmd->GetDescription();
-					ResizeStringBuffer(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
+					ResizeBuffer<char *, char, unsigned int>(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
 					sprintf(symbolstring, "%s %s", symbolstring, tempstring);
 					free(tempstring);
 					break;
@@ -89,7 +89,7 @@ void ConCmdCvarlist(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("--------------\n%d total convars/concommands", numsymbols);
 }
 
-void ConCmdEcho(ConsoleCore *concore, unsigned char numargs)
+void ConCmdEcho(ConsoleCore *concore, const unsigned char numargs)
 {
 	char *tempstring = concore->GetCmdArgString();
 	if (tempstring == NULL)
@@ -100,7 +100,7 @@ void ConCmdEcho(ConsoleCore *concore, unsigned char numargs)
 	free(tempstring);
 }
 
-void ConCmdExec(ConsoleCore *concore, unsigned char numargs)
+void ConCmdExec(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -160,7 +160,7 @@ void ConCmdExec(ConsoleCore *concore, unsigned char numargs)
 	free(tempstring);
 }
 
-void ConCmdFind(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFind(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs != 1)
 	{
@@ -187,7 +187,7 @@ void ConCmdFind(ConsoleCore *concore, unsigned char numargs)
 	}
 }
 
-void ConCmdHelp(ConsoleCore *concore, unsigned char numargs)
+void ConCmdHelp(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs != 1)
 	{

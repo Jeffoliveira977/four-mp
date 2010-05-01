@@ -123,12 +123,6 @@ private:
 	/// \return True on success, false otherwise.
 	bool GetHandleTypeFreeSlot(unsigned short &type);
 
-	/// \brief Wrapper for realloc.
-	/// \param[in,out] buffer Buffer to resize.
-	/// \param[in] size Size to which resize.
-	/// \return True on success, false otherwise.
-	bool ResizeHandleTypeBuffer(HandleType **&buffer, const unsigned short size);
-
 	/// \brief Returns the free slot in the handle buffer.
 	/// \return Handle index on success, INVALID_HANDLE otherwise.
 	int GetHandleFreeSlot(void);
@@ -156,18 +150,6 @@ private:
 	/// \return True on success, false otherwise.
 	bool DeleteHandleOwner(const int handle, const short owner);
 
-	/// \brief Wrapper for realloc.
-	/// \param[in,out] buffer Buffer to resize.
-	/// \param[in] size Size to which resize.
-	/// \return True on success, false otherwise.
-	bool ResizeHandleOwnerBuffer(short *&buffer, const short size);
-
-	/// \brief Wrapper for realloc.
-	/// \param[in,out] buffer Buffer to resize.
-	/// \param[in] size Size to which resize.
-	/// \return True on success, false otherwise.
-	bool ResizeHandleBuffer(Handle **&buffer, const int size);
-
 	/// \brief Increases the number of handles reserved by the given owner by one.
 	/// \param[in] owner Index of the owner.
 	/// \return True on success, false otherwise.
@@ -177,10 +159,4 @@ private:
 	/// \param[in] owner Index of the owner.
 	/// \return True on success, false otherwise.
 	bool DecreaseHandleCount(const short owner);
-
-	/// \brief Wrapper for realloc.
-	/// \param[in,out] buffer Buffer to resize.
-	/// \param[in] size Size to which resize.
-	/// \return True on success, false otherwise.
-	bool ResizeHandleCountBuffer(short **&buffer, const short size);
 };

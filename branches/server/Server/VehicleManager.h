@@ -33,6 +33,5 @@ private:
 	short vehiclebuffersize;
 	Vehicle **vehiclebuffer;
 	short GetVehicleFreeSlot(void);
-	bool ResizeVehicleBuffer(Vehicle **&buffer, const short size);
 	friend class NetworkManager;
 };

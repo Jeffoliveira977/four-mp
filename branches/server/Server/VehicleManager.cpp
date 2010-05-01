@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "VehicleManager.h"
+#include "../../Shared/Console/common.h"
 #include "NetworkManager.h"
 
 extern NetworkManager nm;
@@ -59,7 +60,7 @@ short VehicleManager::CreateVehicle(const int model, const float position[3], co
 		{
 			return INVALID_VEHICLE_INDEX;
 		}
-		if (!this->ResizeVehicleBuffer(vehiclebuffer, index + 1))
+		if (!ResizeBuffer<Vehicle **, Vehicle *, short>(vehiclebuffer, index + 1))
 		{
 			return INVALID_VEHICLE_INDEX;
 		}
@@ -194,15 +195,4 @@ short VehicleManager::GetVehicleFreeSlot(void)
 		return INVALID_VEHICLE_INDEX;
 	}
 	return index;
-}
-
-bool VehicleManager::ResizeVehicleBuffer(Vehicle **&buffer, const short size)
-{
-	Vehicle **tempbuffer = (Vehicle **)realloc(*&buffer, size * sizeof(Vehicle *));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
-	return true;
 }

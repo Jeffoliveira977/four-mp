@@ -37,6 +37,8 @@ ConVar::ConVar(ConsoleCore* core, const char *cvarname, const float defvalue, co
 	{
 		maximum.exist = false;
 	}
+	hookbuffersize = 0;
+	hookbuffer = NULL;
 }
 
 ConVar::ConVar(ConsoleCore* core, const char *cvarname, const int defvalue, const char *desc, const int cvarflags, const bool hasMin, const int min, const bool hasMax, const int max)
@@ -65,6 +67,8 @@ ConVar::ConVar(ConsoleCore* core, const char *cvarname, const int defvalue, cons
 	{
 		maximum.exist = false;
 	}
+	hookbuffersize = 0;
+	hookbuffer = NULL;
 }
 
 ConVar::ConVar(ConsoleCore* core, const char *cvarname, const char *defvalue, const char *desc, const int cvarflags)
@@ -77,6 +81,8 @@ ConVar::ConVar(ConsoleCore* core, const char *cvarname, const char *defvalue, co
 	value.type = ConVarTypeString;
 	value.value.s = (char *)calloc(length + 1, sizeof(char));
 	strcpy(value.value.s, defvalue);
+	hookbuffersize = 0;
+	hookbuffer = NULL;
 }
 
 ConVar::~ConVar(void)
@@ -91,6 +97,10 @@ ConVar::~ConVar(void)
 	{
 		free(value.value.s);
 	}
+	if (hookbuffer != NULL)
+	{
+		free(hookbuffer);
+	}
 }
 
 void ConVar::Reset(void)
@@ -99,7 +109,7 @@ void ConVar::Reset(void)
 	{
 		if (defaultvalue.type == ConVarTypeString)
 		{
-			if (!ResizeStringBuffer(value.value.s, strlen(defaultvalue.value.s) + 1))
+			if (!ResizeBuffer<char *, char, unsigned int>(value.value.s, strlen(defaultvalue.value.s) + 1))
 			{
 				return;
 			}
@@ -246,56 +256,160 @@ bool ConVar::GetDefaultValue(char *&val)
 
 bool ConVar::SetValue(const float val)
 {
+	if ((value.type == ConVarTypeFloat) && (value.value.f == val))
+	{
+		return true;
+	}
 	if (((minimum.exist == true) && (minimum.type == ConVarTypeInt)) || ((maximum.exist == true) && (maximum.type == ConVarTypeInt)))
 	{
 		return false;
 	}
-	if (value.type == ConVarTypeString)
+	switch (value.type)
 	{
-		free(value.value.s);
-	}
-	bool set = false;
-	if ((minimum.exist) && (val < minimum.value.f))
-	{
-		value.value.f = minimum.value.f;
-		set = true;
-	}
-	if ((maximum.exist) && (val > maximum.value.f))
-	{
-		value.value.f = maximum.value.f;
-		set = true;
-	}
-	if (!set)
-	{
-		value.value.f = val;
+	case ConVarTypeFloat:
+		{
+			float oldvalue = value.value.f;
+			bool set = false;
+			if ((minimum.exist) && (val < minimum.value.f))
+			{
+				value.value.f = minimum.value.f;
+				set = true;
+			}
+			if ((maximum.exist) && (val > maximum.value.f))
+			{
+				value.value.f = maximum.value.f;
+				set = true;
+			}
+			if (!set)
+			{
+				value.value.f = val;
+			}
+			this->FireChangeHook(oldvalue);
+			break;
+		}
+	case ConVarTypeInt:
+		{
+			int oldvalue = value.value.i;
+			bool set = false;
+			if ((minimum.exist) && (val < minimum.value.f))
+			{
+				value.value.f = minimum.value.f;
+				set = true;
+			}
+			if ((maximum.exist) && (val > maximum.value.f))
+			{
+				value.value.f = maximum.value.f;
+				set = true;
+			}
+			if (!set)
+			{
+				value.value.f = val;
+			}
+			this->FireChangeHook(oldvalue);
+			break;
+		}
+	case ConVarTypeString:
+		{
+			char *oldvalue = value.value.s;
+			bool set = false;
+			if ((minimum.exist) && (val < minimum.value.f))
+			{
+				value.value.f = minimum.value.f;
+				set = true;
+			}
+			if ((maximum.exist) && (val > maximum.value.f))
+			{
+				value.value.f = maximum.value.f;
+				set = true;
+			}
+			if (!set)
+			{
+				value.value.f = val;
+			}
+			this->FireChangeHook(oldvalue);
+			free(oldvalue);
+			break;
+		}
 	}
 	return true;
 }
 
 bool ConVar::SetValue(const int val)
 {
+	if ((value.type == ConVarTypeInt) && (value.value.i == val))
+	{
+		return true;
+	}
 	if (((minimum.exist == true) && (minimum.type == ConVarTypeFloat)) || ((maximum.exist == true) && (maximum.type == ConVarTypeFloat)))
 	{
 		return false;
 	}
-	if (value.type == ConVarTypeString)
+	switch (value.type)
 	{
-		free(value.value.s);
-	}
-	bool set = false;
-	if ((minimum.exist) && (val < minimum.value.i))
-	{
-		value.value.i = minimum.value.i;
-		set = true;
-	}
-	if ((maximum.exist) && (val > maximum.value.i))
-	{
-		value.value.i = maximum.value.i;
-		set = true;
-	}
-	if (!set)
-	{
-		value.value.i = val;
+	case ConVarTypeFloat:
+		{
+			float oldvalue = value.value.f;
+			bool set = false;
+			if ((minimum.exist) && (val < minimum.value.i))
+			{
+				value.value.i = minimum.value.i;
+				set = true;
+			}
+			if ((maximum.exist) && (val > maximum.value.i))
+			{
+				value.value.i = maximum.value.i;
+				set = true;
+			}
+			if (!set)
+			{
+				value.value.i = val;
+			}
+			this->FireChangeHook(oldvalue);
+			break;
+		}
+	case ConVarTypeInt:
+		{
+			int oldvalue = value.value.i;
+			bool set = false;
+			if ((minimum.exist) && (val < minimum.value.i))
+			{
+				value.value.i = minimum.value.i;
+				set = true;
+			}
+			if ((maximum.exist) && (val > maximum.value.i))
+			{
+				value.value.i = maximum.value.i;
+				set = true;
+			}
+			if (!set)
+			{
+				value.value.i = val;
+			}
+			this->FireChangeHook(oldvalue);
+			break;
+		}
+	case ConVarTypeString:
+		{
+			char *oldvalue = value.value.s;
+			bool set = false;
+			if ((minimum.exist) && (val < minimum.value.i))
+			{
+				value.value.i = minimum.value.i;
+				set = true;
+			}
+			if ((maximum.exist) && (val > maximum.value.i))
+			{
+				value.value.i = maximum.value.i;
+				set = true;
+			}
+			if (!set)
+			{
+				value.value.i = val;
+			}
+			this->FireChangeHook(oldvalue);
+			free(oldvalue);
+			break;
+		}
 	}
 	return true;
 }
@@ -306,19 +420,43 @@ bool ConVar::SetValue(const char *val)
 	{
 		return false;
 	}
-	unsigned int length = strlen(val);
-	if (value.type == ConVarTypeString)
+	if ((value.type == ConVarTypeString) && (strcmp(value.value.s, val) == 0))
 	{
-		if (!ResizeStringBuffer(value.value.s, length + 1))
-		{
-			return false;
-		}
-		strcpy(value.value.s, val);
+		return true;
 	}
-	else
+	unsigned int length = strlen(val);
+	switch (value.type)
 	{
-		value.value.s = (char *)calloc(length + 1, sizeof(char));
-		strcpy(value.value.s, val);
+	case ConVarTypeFloat:
+		{
+			float oldvalue = value.value.f;
+			value.value.s = (char *)calloc(length + 1, sizeof(char));
+			strcpy(value.value.s, val);
+			this->FireChangeHook(oldvalue);
+			break;
+		}
+	case ConVarTypeInt:
+		{
+			int oldvalue = value.value.i;
+			value.value.s = (char *)calloc(length + 1, sizeof(char));
+			strcpy(value.value.s, val);
+			this->FireChangeHook(oldvalue);
+			break;
+		}
+	case ConVarTypeString:
+		{
+			char *oldvalue = (char *)calloc(strlen(value.value.s) + 1, sizeof(char));
+			strcpy(oldvalue, value.value.s);
+			if (!ResizeBuffer<char *, char, unsigned int>(value.value.s, length + 1))
+			{
+				free(oldvalue);
+				return false;
+			}
+			strcpy(value.value.s, val);
+			this->FireChangeHook(oldvalue);
+			free(oldvalue);
+			break;
+		}
 	}
 	return true;
 }
@@ -469,4 +607,210 @@ bool ConVar::SetBound(ConVarBoundType type, const bool set, const int bound)
 		}
 	}
 	return true;
+}
+
+bool ConVar::HookChange(void *callback)
+{
+	if (callback == NULL)
+	{
+		return false;
+	}
+	if (hookbuffersize == concore->maxhookspercvar)
+	{
+		return false;
+	}
+	for (unsigned char i = 0; i < hookbuffersize; i++)
+	{
+		if (hookbuffer[i] == callback)
+		{
+			return true;
+		}
+	}
+	if (!ResizeBuffer<void **, void *, unsigned char>(hookbuffer, hookbuffersize + 1))
+	{
+		return false;
+	}
+	hookbuffer[hookbuffersize] = callback;
+	hookbuffersize++;
+	return true;
+}
+
+bool ConVar::UnhookChange(const void *callback)
+{
+	for (unsigned char i = 0; i < hookbuffersize; i++)
+	{
+		if (hookbuffer[i] == callback)
+		{
+			for (; i < (hookbuffersize - 1); i++)
+			{
+				hookbuffer[i] = hookbuffer[i+1];
+			}
+			if (!ResizeBuffer<void **, void *, unsigned char>(hookbuffer, hookbuffersize - 1))
+			{
+				return false;
+			}
+			hookbuffersize--;
+			return true;
+		}
+	}
+	return false;
+}
+
+void ConVar::FireChangeHook(const float val)
+{
+	if (hookbuffersize == 0)
+	{
+		return;
+	}
+	switch (value.type)
+	{
+	case ConVarTypeFloat:
+		{
+			float *oldvalue = new float;
+			*oldvalue = val;
+			float *newvalue = new float;
+			*newvalue = value.value.f;
+			for (unsigned char i = 0; i < hookbuffersize; i++)
+			{
+				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeFloat, oldvalue, ConVarTypeFloat, newvalue);
+			}
+			free(oldvalue);
+			free(newvalue);
+			break;
+		}
+	case ConVarTypeInt:
+		{
+			float *oldvalue = new float;
+			*oldvalue = val;
+			int *newvalue = new int;
+			*newvalue = value.value.i;
+			for (unsigned char i = 0; i < hookbuffersize; i++)
+			{
+				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeFloat, oldvalue, ConVarTypeInt, newvalue);
+			}
+			free(oldvalue);
+			free(newvalue);
+			break;
+		}
+	case ConVarTypeString:
+		{
+			float *oldvalue = new float;
+			*oldvalue = val;
+			char *newvalue = (char *)calloc(strlen(value.value.s) + 1, sizeof(char));
+			strcpy(newvalue, value.value.s);
+			for (unsigned char i = 0; i < hookbuffersize; i++)
+			{
+				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeFloat, oldvalue, ConVarTypeString, newvalue);
+			}
+			free(oldvalue);
+			free(newvalue);
+			break;
+		}
+	}
+}
+
+void ConVar::FireChangeHook(const int val)
+{
+	if (hookbuffersize == 0)
+	{
+		return;
+	}
+	switch (value.type)
+	{
+	case ConVarTypeFloat:
+		{
+			int *oldvalue = new int;
+			*oldvalue = val;
+			float *newvalue = new float;
+			*newvalue = value.value.f;
+			for (unsigned char i = 0; i < hookbuffersize; i++)
+			{
+				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeInt, oldvalue, ConVarTypeFloat, newvalue);
+			}
+			free(oldvalue);
+			free(newvalue);
+			break;
+		}
+	case ConVarTypeInt:
+		{
+			int *oldvalue = new int;
+			*oldvalue = val;
+			int *newvalue = new int;
+			*newvalue = value.value.i;
+			for (unsigned char i = 0; i < hookbuffersize; i++)
+			{
+				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeInt, oldvalue, ConVarTypeInt, newvalue);
+			}
+			free(oldvalue);
+			free(newvalue);
+			break;
+		}
+	case ConVarTypeString:
+		{
+			int *oldvalue = new int;
+			*oldvalue = val;
+			char *newvalue = (char *)calloc(strlen(value.value.s) + 1, sizeof(char));
+			strcpy(newvalue, value.value.s);
+			for (unsigned char i = 0; i < hookbuffersize; i++)
+			{
+				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeInt, oldvalue, ConVarTypeString, newvalue);
+			}
+			free(oldvalue);
+			free(newvalue);
+			break;
+		}
+	}
+}
+
+void ConVar::FireChangeHook(const char *val)
+{
+	if (hookbuffersize == 0)
+	{
+		return;
+	}
+	switch (value.type)
+	{
+	case ConVarTypeFloat:
+		{
+			char *oldvalue = (char *)calloc(strlen(val) + 1, sizeof(char));
+			strcpy(oldvalue, val);
+			float *newvalue = new float;
+			*newvalue = value.value.f;
+			for (unsigned char i = 0; i < hookbuffersize; i++)
+			{
+				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeString, oldvalue, ConVarTypeFloat, newvalue);
+			}
+			free(oldvalue);
+			free(newvalue);
+			break;
+		}
+	case ConVarTypeInt:
+		{
+			char *oldvalue = (char *)calloc(strlen(val) + 1, sizeof(char));
+			strcpy(oldvalue, val);
+			int *newvalue = new int;
+			*newvalue = value.value.i;
+			for (unsigned char i = 0; i < hookbuffersize; i++)
+			{
+				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeString, oldvalue, ConVarTypeInt, newvalue);
+			}
+			free(oldvalue);
+			free(newvalue);
+			break;
+		}
+	case ConVarTypeString:
+		{
+			char *oldvalue = (char *)calloc(strlen(val) + 1, sizeof(char));
+			strcpy(oldvalue, val);
+			char *newvalue = (char *)calloc(strlen(value.value.s) + 1, sizeof(char));
+			strcpy(newvalue, value.value.s);
+			for (unsigned char i = 0; i < hookbuffersize; i++)
+			{
+				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeString, oldvalue, ConVarTypeString, newvalue);
+			}
+			free(oldvalue);
+			free(newvalue);
+			break;
+		}
+	}
 }

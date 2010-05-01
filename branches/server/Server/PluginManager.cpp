@@ -8,6 +8,7 @@
 #include <io.h>
 
 #include "PluginManager.h"
+#include "../../Shared/Console/common.h"
 #include "logging.h"
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
@@ -266,7 +267,7 @@ bool PluginManager::LoadPluginInternal(const unsigned char index, const char *st
 		{
 			return false;
 		}
-		if (!this->ResizePluginBuffer(pluginbuffer, index + 1))
+		if (!ResizeBuffer<Plugin **, Plugin *, unsigned char>(pluginbuffer, index + 1))
 		{
 			return false;
 		}
@@ -350,17 +351,6 @@ bool PluginManager::FindPlugin(const IPluginInterface *plugin, unsigned char &in
 		}
 	}
 	return false;
-}
-
-bool PluginManager::ResizePluginBuffer(Plugin **&buffer, const unsigned char size)
-{
-	Plugin **tempbuffer = (Plugin **)realloc(*&buffer, size * sizeof(Plugin *));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
-	return true;
 }
 
 void PluginManager::OnPluginLoad(const unsigned char index)

@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 #include "HandleManager.h"
+#include "../../Shared/Console/common.h"
 #include "logging.h"
 #include "CoreHandleTypesManager.h"
 #include "PluginManager.h"
@@ -68,7 +69,7 @@ bool HandleManager::RequestNewHandleType(const unsigned char pluginindex, unsign
 	}
 	if (typeindex == typebuffersize)
 	{
-		if (!this->ResizeHandleTypeBuffer(typebuffer, typebuffersize + 1))
+		if (!ResizeBuffer<HandleType **, HandleType *, unsigned short>(typebuffer, typebuffersize + 1))
 		{
 			return false;
 		}
@@ -163,7 +164,7 @@ int HandleManager::AddNewHandle(const short owner, const unsigned short type, vo
 	}
 	if (handle == handlebuffersize)
 	{
-		if (!this->ResizeHandleBuffer(handlebuffer, handle + 1))
+		if (!ResizeBuffer<Handle **, Handle *, int>(handlebuffer, handle + 1))
 		{
 			return INVALID_HANDLE;
 		}
@@ -281,17 +282,6 @@ bool HandleManager::GetHandleTypeFreeSlot(unsigned short &type)
 	return true;
 }
 
-bool HandleManager::ResizeHandleTypeBuffer(HandleType **&buffer, const unsigned short size)
-{
-	HandleType **tempbuffer = (HandleType **)realloc(*&buffer, size * sizeof(HandleType *));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
-	return true;
-}
-
 int HandleManager::GetHandleFreeSlot(void)
 {
 	int handle;
@@ -363,7 +353,7 @@ bool HandleManager::AddHandleOwner(const int handle, const short owner)
 	{
 		return true;
 	}
-	if (!this->ResizeHandleOwnerBuffer(handlebuffer[handle]->owner, handlebuffer[handle]->numowners + 1))
+	if (!ResizeBuffer<short *, short, short>(handlebuffer[handle]->owner, handlebuffer[handle]->numowners + 1))
 	{
 		return false;
 	}
@@ -403,7 +393,7 @@ bool HandleManager::DeleteHandleOwner(const int handle, const short owner)
 	{
 		handlebuffer[handle]->owner[i] = handlebuffer[handle]->owner[i+1];
 	}
-	if (!this->ResizeHandleOwnerBuffer(handlebuffer[handle]->owner, handlebuffer[handle]->numowners - 1))
+	if (!ResizeBuffer<short *, short, short>(handlebuffer[handle]->owner, handlebuffer[handle]->numowners - 1))
 	{
 		return false;
 	}
@@ -427,28 +417,6 @@ bool HandleManager::DeleteHandleOwner(const int handle, const short owner)
 	return true;
 }
 
-bool HandleManager::ResizeHandleOwnerBuffer(short *&buffer, const short size)
-{
-	short *tempbuffer = (short *)realloc(buffer, size * sizeof(short));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
-	return true;
-}
-
-bool HandleManager::ResizeHandleBuffer(Handle **&buffer, const int size)
-{
-	Handle **tempbuffer = (Handle **)realloc(*&buffer, size * sizeof(Handle *));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
-	return true;
-}
-
 bool HandleManager::IncreaseHandleCount(const short owner)
 {
 	if ((owner < 0) || (owner >= maxcountbuffersize))
@@ -457,7 +425,7 @@ bool HandleManager::IncreaseHandleCount(const short owner)
 	}
 	if (owner >= countbuffersize)
 	{
-		if (!this->ResizeHandleCountBuffer(countbuffer, owner + 1))
+		if (!ResizeBuffer<short **, short *, short>(countbuffer, owner + 1))
 		{
 			return false;
 		}
@@ -498,16 +466,5 @@ bool HandleManager::DecreaseHandleCount(const short owner)
 		return false;
 	}
 	countbuffer[owner]--;
-	return true;
-}
-
-bool HandleManager::ResizeHandleCountBuffer(short **&buffer, const short size)
-{
-	short **tempbuffer = (short **)realloc(*&buffer, size * sizeof(short *));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
 	return true;
 }

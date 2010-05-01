@@ -329,7 +329,7 @@ void VirtualMachineManager::SetVirtualMachineName(const unsigned char index, con
 	{
 		return;
 	}
-	ResizeStringBuffer(vmbuffer[index]->name, strlen(string) + 1);
+	ResizeBuffer<char *, char, unsigned int>(vmbuffer[index]->name, strlen(string) + 1);
 	strcpy(vmbuffer[index]->name, string);
 }
 
@@ -343,7 +343,7 @@ void VirtualMachineManager::SetVirtualMachineVersion(const unsigned char index, 
 	{
 		return;
 	}
-	ResizeStringBuffer(vmbuffer[index]->version, strlen(string) + 1);
+	ResizeBuffer<char *, char, unsigned int>(vmbuffer[index]->version, strlen(string) + 1);
 	strcpy(vmbuffer[index]->version, string);
 }
 
@@ -357,7 +357,7 @@ void VirtualMachineManager::SetVirtualMachineAuthor(const unsigned char index, c
 	{
 		return;
 	}
-	ResizeStringBuffer(vmbuffer[index]->author, strlen(string) + 1);
+	ResizeBuffer<char *, char, unsigned int>(vmbuffer[index]->author, strlen(string) + 1);
 	strcpy(vmbuffer[index]->author, string);
 }
 
@@ -466,7 +466,7 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 		{
 			return false;
 		}
-		if (!this->ResizeVirtualMachineBuffer(vmbuffer, index + 1))
+		if (!ResizeBuffer<VirtualMachine **, VirtualMachine *, unsigned char>(vmbuffer, index + 1))
 		{
 			return false;
 		}
@@ -631,17 +631,6 @@ bool VirtualMachineManager::GetFilterScriptFreeSlot(unsigned char &index)
 	{
 		return false;
 	}
-	return true;
-}
-
-bool VirtualMachineManager::ResizeVirtualMachineBuffer(VirtualMachine **&buffer, const unsigned char size)
-{
-	VirtualMachine **tempbuffer = (VirtualMachine **)realloc(*&buffer, size * sizeof(VirtualMachine *));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
 	return true;
 }
 

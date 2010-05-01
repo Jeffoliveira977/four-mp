@@ -75,8 +75,6 @@ private:
 	};
 	bool RegisterNewPlayer(const short index, const char *name);
 	short GetPlayerFreeSlot(void);
-	bool ResizePlayerBuffer(Player **&buffer, const short size);
 	bool GetClassFreeSlot(unsigned char &index);
-	bool ResizeClassBuffer(PlayerClass **&buffer, const unsigned char size);
 	friend class NetworkManager;
 };

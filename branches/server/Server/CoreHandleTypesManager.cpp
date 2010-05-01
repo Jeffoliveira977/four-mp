@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "CoreHandleTypesManager.h"
+#include "../../Shared/Console/common.h"
 #include "HandleManager.h"
 #include "VirtualMachineManager.h"
 
@@ -250,7 +251,7 @@ bool CoreHandleTypesManager::AddDynamicCommand(const short owner, const char *ca
 	{
 		return false;
 	}
-	if (!this->ResizeCommandBuffer(commandbuffer, commandbuffersize + 1))
+	if (!ResizeBuffer<DynamicCommand *, DynamicCommand, unsigned short>(commandbuffer, commandbuffersize + 1))
 	{
 		return false;
 	}
@@ -275,7 +276,7 @@ int *CoreHandleTypesManager::GetDynamicCommandHandles(const char *name, unsigned
 		cmdname = ((ConCmd *)hm.handlebuffer[commandbuffer[i].index]->ptr)->GetName();
 		if (strcmp(cmdname, name) == 0)
 		{
-			if (!this->ResizeHandleIndexBuffer(handles, numcmds + 1))
+			if (!ResizeBuffer<int *, int, unsigned char>(handles, numcmds + 1))
 			{
 				return NULL;
 			}
@@ -334,17 +335,6 @@ bool CoreHandleTypesManager::ExecuteDynamicCommand(const int handle, const unsig
 	return true;
 }
 
-bool CoreHandleTypesManager::ResizeHandleIndexBuffer(int *&buffer, const unsigned char size)
-{
-	int *tempbuffer = (int *)realloc(buffer, size * sizeof(int));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
-	return true;
-}
-
 bool CoreHandleTypesManager::CheckConVar(const short owner, const int handle)
 {
 	if ((owner < 0) || (owner >= hm.countbuffersize))
@@ -386,15 +376,4 @@ char *CoreHandleTypesManager::GetDynamicCommandCallback(const int handle)
 		}
 	}
 	return NULL;
-}
-
-bool CoreHandleTypesManager::ResizeCommandBuffer(DynamicCommand *&buffer, const unsigned short size)
-{
-	DynamicCommand *tempbuffer = (DynamicCommand *)realloc(buffer, size * sizeof(DynamicCommand));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
-	return true;
 }

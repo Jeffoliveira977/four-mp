@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "PlayerManager.h"
+#include "../../Shared/Console/common.h"
 #include "logging.h"
 #include "NetworkManager.h"
 #include "VirtualMachineManager.h"
@@ -336,7 +337,7 @@ bool PlayerManager::AddPlayerClass(const int model, const float position[3], con
 		{
 			return false;
 		}
-		if (!this->ResizeClassBuffer(classbuffer, index + 1))
+		if (!ResizeBuffer<PlayerClass **, PlayerClass, unsigned char>(classbuffer, index + 1))
 		{
 			return false;
 		}
@@ -415,7 +416,7 @@ bool PlayerManager::RegisterNewPlayer(const short index, const char *name)
 		{
 			return false;
 		}
-		if (!this->ResizePlayerBuffer(playerbuffer, index + 1))
+		if (!ResizeBuffer<Player **, Player *, short>(playerbuffer, index + 1))
 		{
 			return false;
 		}
@@ -482,17 +483,6 @@ short PlayerManager::GetPlayerFreeSlot(void)
 	return index;
 }
 
-bool PlayerManager::ResizePlayerBuffer(Player **&buffer, const short size)
-{
-	Player **tempbuffer = (Player **)realloc(*&buffer, size * sizeof(Player *));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
-	return true;
-}
-
 bool PlayerManager::GetClassFreeSlot(unsigned char &index)
 {
 	for (index = 0; index < classbuffersize; index++)
@@ -506,16 +496,5 @@ bool PlayerManager::GetClassFreeSlot(unsigned char &index)
 	{
 		return false;
 	}
-	return true;
-}
-
-bool PlayerManager::ResizeClassBuffer(PlayerClass **&buffer, const unsigned char size)
-{
-	PlayerClass **tempbuffer = (PlayerClass **)realloc(*&buffer, size * sizeof(PlayerClass *));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
 	return true;
 }

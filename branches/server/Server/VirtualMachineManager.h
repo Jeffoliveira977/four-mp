@@ -111,6 +111,7 @@ public:
 	/// \brief Retrieves the virtual machine index by the given pointer.
 	/// \param[in] v Pointer to the virtual machine.
 	/// \param[out] index Index of the virtual machine.
+	/// \note Used only by squirrel natives.
 	/// \return True on success, false otherwise.
 	bool FindVirtualMachine(const HSQUIRRELVM *v, unsigned char &index);
 
@@ -218,12 +219,6 @@ private:
 	/// \param[out] index Buffer to store the slot in.
 	/// \return True on success, false otherwise.
 	bool GetFilterScriptFreeSlot(unsigned char &index);
-
-	/// \brief Wrapper for realloc.
-	/// \param[in,out] buffer Buffer to resize.
-	/// \param[in] size Size to which resize.
-	/// \return True on success, false otherwise.
-	bool ResizeVirtualMachineBuffer(VirtualMachine **&buffer, const unsigned char size);
 
 	/// \brief Called when the game mode starts.
 	/// \return No return.

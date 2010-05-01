@@ -152,6 +152,17 @@ public:
 	/// \param[in] bound Value of the bound.
 	/// \return True on success, false otherwise.
 	bool SetBound(ConVarBoundType type, const bool set, const int bound);
+
+	/// \brief Hooks the console variable change.
+	/// \param[in] callback Pointer to the function to call on change.
+	/// \note Function must be void func(const ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);
+	/// \return True on success, false otherwise.
+	bool HookChange(void *callback);
+
+	/// \brief Unhooks the console variable change.
+	/// \param[in] callback Pointer to the function to unhook.
+	/// \return True on success, false otherwise.
+	bool UnhookChange(const void *callback);
 private:
 	/// \brief Used to wisely work with console variable value.
 	union ConVarValueUnion
@@ -179,4 +190,21 @@ private:
 	ConVarValue defaultvalue; ///< Holds default value of the console variable.
 	ConVarBound minimum; ///< Holds minimum bound of the console variable.
 	ConVarBound maximum; ///< Holds maximum bound of the console variable.
+	unsigned char hookbuffersize; ///< Holds the current hook buffer size.
+	void **hookbuffer; ///< Holds the pointers to the functions which will be called when the console variable value changes.
+
+	/// \brief Fires all change hooks.
+	/// \param[in] val Old value of the console variable.
+	/// \return No return.
+	void FireChangeHook(const float val);
+
+	/// \brief Fires all change hooks.
+	/// \param[in] val Old value of the console variable.
+	/// \return No return.
+	void FireChangeHook(const int val);
+
+	/// \brief Fires all change hooks.
+	/// \param[in] val Old value of the console variable.
+	/// \return No return.
+	void FireChangeHook(const char *val);
 };

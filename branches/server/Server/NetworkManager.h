@@ -48,7 +48,6 @@ private:
 	short RegisterNewClient(const SystemAddress address);
 	short GetClientIndex(const SystemAddress address);
 	short GetAddressFreeSlot(void);
-	bool ResizeAddressBuffer(SystemAddress **&buffer, const short size);
 	RakNet::BitStream *TranslateMessage(const RPCParameters *rpcParameters, short &index);
 	void SendConnectionError(const SystemAddress address, const NetworkPlayerConnectionError error);
 	NetworkPlayerFullUpdateData *GetPlayerFullUpdateData(const short index);

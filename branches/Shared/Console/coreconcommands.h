@@ -9,16 +9,16 @@
 #include "ConsoleCore.h"
 
 /// \brief Show the list of convars/concommands.
-void ConCmdCvarlist(ConsoleCore *concore, unsigned char numargs);
+void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs);
 
 /// \brief Echo text to console.
-void ConCmdEcho(ConsoleCore *concore, unsigned char numargs);
+void ConCmdEcho(ConsoleCore *concore, const unsigned char numargs);
 
 /// \brief Execute script file.
-void ConCmdExec(ConsoleCore *concore, unsigned char numargs);
+void ConCmdExec(ConsoleCore *concore, const unsigned char numargs);
 
 /// \brief Find concommands with the specified string in their name/help text.
-void ConCmdFind(ConsoleCore *concore, unsigned char numargs);
+void ConCmdFind(ConsoleCore *concore, const unsigned char numargs);
 
 /// \brief Find help about a convar/concommand.
-void ConCmdHelp(ConsoleCore *concore, unsigned char numargs);
+void ConCmdHelp(ConsoleCore *concore, const unsigned char numargs);

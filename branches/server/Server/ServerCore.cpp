@@ -5,7 +5,8 @@
 #include "../../Shared/Console/ConsoleCore.h"
 #include "../../Shared/Console/ConsoleScreen.h"
 #include "../../Shared/Console/coreconcommands.h"
-#include "fmpconcommands.h"
+#include "con_fmpcvarhooks.h"
+#include "con_fmpcommands.h"
 #include "MasterServerManager.h"
 #include "NetworkManager.h"
 #include "PluginManager.h"
@@ -23,11 +24,24 @@ extern PlayerManager playm;
 
 ServerCore::ServerCore(void)
 {
+	running = false;
 	lastcheck = 0;
+	hostname = NULL;
+	port = 7777;
+	lan = 1;
+	gamemode = NULL;
+	password = NULL;
+	rconpassword = NULL;
+	componentselect = false;
+	componentselectcvar = NULL;
 }
 
 ServerCore::~ServerCore(void)
 {
+	free(hostname);
+	free(gamemode);
+	free(password);
+	free(rconpassword);
 }
 
 bool ServerCore::Load(void)
@@ -54,10 +68,12 @@ bool ServerCore::Load(void)
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("fs_unload_all", ConCmdFsUnloadAll, "Unloads all filterscripts", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("fs_unpause", ConCmdFsUnpause, "fs_unpause <index> : unpauses a loaded filterscript", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("fs_unpause_all", ConCmdFsUnpauseAll, "Unpauses all disabled filterscripts", 0));
-	gamemode = concore.AddConVar("host_gamemode", "", "Current gamemode name.", 0);
-	hm.AddNewHandle(0, HandleTypeConVar, gamemode);
-	hostname = concore.AddConVar("hostname", "", "Hostname for server.", 0);
-	hm.AddNewHandle(0, HandleTypeConVar, hostname);
+	ConVar *gamemodecvar = concore.AddConVar("host_gamemode", "", "Current gamemode name.", 0);
+	gamemodecvar->HookChange(ConVarHookHostGamemode);
+	hm.AddNewHandle(0, HandleTypeConVar, gamemodecvar);
+	ConVar *hostnamecvar = concore.AddConVar("hostname", "", "Hostname for server.", 0);
+	hostnamecvar->HookChange(ConVarHookHostname);
+	hm.AddNewHandle(0, HandleTypeConVar, hostnamecvar);
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_list", ConCmdPluginList, "Prints details about loaded plugins.", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_load", ConCmdPluginLoad, "plugin_load <filename> : loads a plugin", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_load_all", ConCmdPluginLoadAll, "Loads all plugins", 0));
@@ -69,36 +85,38 @@ bool ServerCore::Load(void)
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_unload_all", ConCmdPluginUnloadAll, "Unloads all plugins", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_unpause", ConCmdPluginUnpause, "fs_unpause <index> : unpauses a loaded plugin", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_unpause_all", ConCmdPluginUnpauseAll, "Unpauses all disabled plugins", 0));
-	rconpassword = concore.AddConVar("rcon_password", "", "Remote console password.", 0);
-	hm.AddNewHandle(0, HandleTypeConVar, rconpassword);
-	componentselect = concore.AddConVar("sv_componentselect", 0, "Enables component select", 0, true, 0, true, 1);
-	hm.AddNewHandle(0, HandleTypeConVar, componentselect);
-	password = concore.AddConVar("sv_password", "", "Server password for entry into multiplayer games", 0);
-	hm.AddNewHandle(0, HandleTypeConVar, password);
-	port = concore.AddConVar("sv_port", 7777, "Server port.", 0, true, 0, true, 65535);
-	hm.AddNewHandle(0, HandleTypeConVar, port);
+	ConVar *rconpasswordcvar = concore.AddConVar("rcon_password", "", "Remote console password.", 0);
+	rconpasswordcvar->HookChange(ConVarHookRconPassword);
+	hm.AddNewHandle(0, HandleTypeConVar, rconpasswordcvar);
+	componentselectcvar = concore.AddConVar("sv_componentselect", 0, "Enables component select", 0, true, 0, true, 1);
+	componentselectcvar->HookChange(ConVarHookSvComponentselect);
+	hm.AddNewHandle(0, HandleTypeConVar, componentselectcvar);
+	ConVar *lancvar = concore.AddConVar("sv_lan", 1, "Server is a lan server (no heartbeat, no authentication, no non-class C addresses).", 0, true, 0, true, 1);
+	lancvar->HookChange(ConVarHookSvLan);
+	hm.AddNewHandle(0, HandleTypeConVar, lancvar);
+	ConVar *passwordcvar = concore.AddConVar("sv_password", "", "Server password for entry into multiplayer games", 0);
+	passwordcvar->HookChange(ConVarHookSvPassword);
+	hm.AddNewHandle(0, HandleTypeConVar, passwordcvar);
+	ConVar *portcvar = concore.AddConVar("sv_port", 7777, "Server port.", 0, true, 0, true, 65535);
+	portcvar->HookChange(ConVarHookSvPort);
+	hm.AddNewHandle(0, HandleTypeConVar, portcvar);
 	PrintToServer("FOUR-MP. Copyright 2009-2010 Four-mp team.");
 	concore.InterpretLine("exec server.cfg");
-	//strcpy(sConf.Lang, config->GetVara("Lang"));
-	//strcpy(sConf.ServerURL, config->GetVara("ServerURL"));
-	int portvalue;
-	port->GetValue(portvalue);
-	nm.Init(playm.GetMaxPlayers(), portvalue);
+	nm.Init(playm.GetMaxPlayers(), port);
 	plugm.LoadPlugins();
 	vmm.LoadFilterScripts();
-	char *gamemodename;
-	gamemode->GetValue(gamemodename);
-	if (!vmm.LoadGameMode(gamemodename))
+	if (!vmm.LoadGameMode(gamemode))
 	{
-		PrintToServer("Can't load gamemode");
+		PrintToServer("Can't load gamemode.");
 		return false;
 	}
-	gamemodename = vmm.GetGameModeName();
-	char *servername;
-	hostname->GetValue(servername);
-	if (!msm.RegisterServer(portvalue, servername, gamemodename, "World", playm.GetMaxPlayers(), false))
+	if (!lan)
 	{
-		PrintToServer("Unable to register server");
+		char *gamemodename = vmm.GetGameModeName();
+		if (!msm.RegisterServer(port, hostname, gamemodename, "World", playm.GetMaxPlayers(), false))
+		{
+			PrintToServer("Unable to register server.");
+		}
 	}
 	running = true;
 	debug("Started");
@@ -121,17 +139,18 @@ void ServerCore::Tick(void)
 	Sleep(100);
 }
 
+bool ServerCore::IsLAN(void)
+{
+	return lan;
+}
+
 bool ServerCore::GetComponentSelectStatus(void)
 {
-	int status;
-	if (!componentselect->GetValue(status))
-	{
-		return false;
-	}
-	return (bool)status;
+	return componentselect;
 }
 
 void ServerCore::EnableComponentSelect(bool enable)
 {
-	componentselect->SetValue(enable);
+	componentselect = enable;
+	componentselectcvar->SetValue(enable);
 }

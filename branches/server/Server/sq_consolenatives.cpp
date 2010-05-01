@@ -15,7 +15,7 @@
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 #include "../../Shared/Console/ConsoleCore.h"
-#include "fmpconcommands.h"
+#include "con_fmpcommands.h"
 #include "VirtualMachineManager.h"
 
 extern HandleManager hm;

@@ -3,6 +3,7 @@
 #include "../../Shared/RakNet/BitStream.h"
 
 #include "NetworkManager.h"
+#include "../../Shared/Console/common.h"
 #include "logging.h"
 #include "rpc.h"
 #include "ServerCore.h"
@@ -580,7 +581,7 @@ short NetworkManager::RegisterNewClient(const SystemAddress address)
 		{
 			return INVALID_PLAYER_INDEX;
 		}
-		if (!this->ResizeAddressBuffer(addressbuffer, index + 1))
+		if (!ResizeBuffer<SystemAddress **, SystemAddress *, short>(addressbuffer, index + 1))
 		{
 			return INVALID_PLAYER_INDEX;
 		}
@@ -620,17 +621,6 @@ short NetworkManager::GetAddressFreeSlot(void)
 		return INVALID_PLAYER_INDEX;
 	}
 	return index;
-}
-
-bool NetworkManager::ResizeAddressBuffer(SystemAddress **&buffer, const short size)
-{
-	SystemAddress **tempbuffer = (SystemAddress **)realloc(*&buffer, size * sizeof(SystemAddress *));
-	if ((tempbuffer == NULL) && (size != 0))
-	{
-		return false;
-	}
-	buffer = tempbuffer;
-	return true;
 }
 
 RakNet::BitStream *NetworkManager::TranslateMessage(const RPCParameters *rpcParameters, short &index)

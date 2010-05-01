@@ -1,9 +1,9 @@
 /// \file
 /// \brief Source file that contains implementation of the four-mp console commands.
-/// \details See fmpconcommands.h.
+/// \details See con_fmpcommands.h.
 /// \author FaTony
 
-#include "fmpconcommands.h"
+#include "con_fmpcommands.h"
 #include "CoreHandleTypesManager.h"
 #include "PluginManager.h"
 #include "VirtualMachineManager.h"
@@ -12,7 +12,7 @@ extern CoreHandleTypesManager chtm;
 extern PluginManager plugm;
 extern VirtualMachineManager vmm;
 
-void ConCmdDynamic(ConsoleCore *concore, unsigned char numargs)
+void ConCmdDynamic(ConsoleCore *concore, const unsigned char numargs)
 {
 	char *cmdname;
 	if (!concore->GetCmdArg(0, cmdname))
@@ -37,7 +37,7 @@ void ConCmdDynamic(ConsoleCore *concore, unsigned char numargs)
 	free(cmdname);
 }
 
-void ConCmdFsList(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsList(ConsoleCore *concore, const unsigned char numargs)
 {
 	concore->Output("Loaded filterscripts:\n---------------------");
 	char *string;
@@ -53,7 +53,7 @@ void ConCmdFsList(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("---------------------");
 }
 
-void ConCmdFsLoad(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsLoad(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -75,13 +75,13 @@ void ConCmdFsLoad(ConsoleCore *concore, unsigned char numargs)
 	free(name);
 }
 
-void ConCmdFsLoadAll(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsLoadAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	vmm.LoadFilterScripts();
 	concore->Output("Loaded all filterscripts");
 }
 
-void ConCmdFsPause(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsPause(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -103,13 +103,13 @@ void ConCmdFsPause(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("Filterscript \"%d\" disabled", index);
 }
 
-void ConCmdFsPauseAll(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsPauseAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	vmm.PauseVirtualMachines();
 	concore->Output("Filterscripts disabled");
 }
 
-void ConCmdFsReload(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsReload(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -136,13 +136,13 @@ void ConCmdFsReload(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("Filterscript \"%d\" has been reloaded successfully", index);
 }
 
-void ConCmdFsReloadAll(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsReloadAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	vmm.ReloadFilterScripts();
 	concore->Output("Reloaded all filterscripts");
 }
 
-void ConCmdFsUnload(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsUnload(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -169,13 +169,13 @@ void ConCmdFsUnload(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("Filterscript \"%d\" has been unloaded successfully", index);
 }
 
-void ConCmdFsUnloadAll(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsUnloadAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	vmm.UnloadFilterScripts();
 	concore->Output("Unloaded all filterscripts");
 }
 
-void ConCmdFsUnpause(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsUnpause(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -197,13 +197,13 @@ void ConCmdFsUnpause(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("Filterscript \"%d\" enabled", index);
 }
 
-void ConCmdFsUnpauseAll(ConsoleCore *concore, unsigned char numargs)
+void ConCmdFsUnpauseAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	vmm.UnpauseVirtualMachines();
 	concore->Output("Filterscripts enabled");
 }
 
-void ConCmdPluginList(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginList(ConsoleCore *concore, const unsigned char numargs)
 {
 	concore->Output("Loaded plugins:\n---------------------");
 	char *string;
@@ -219,7 +219,7 @@ void ConCmdPluginList(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("---------------------");
 }
 
-void ConCmdPluginLoad(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginLoad(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -241,13 +241,13 @@ void ConCmdPluginLoad(ConsoleCore *concore, unsigned char numargs)
 	free(name);
 }
 
-void ConCmdPluginLoadAll(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginLoadAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	plugm.LoadPlugins();
 	concore->Output("Loaded all plugins");
 }
 
-void ConCmdPluginPause(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginPause(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -269,13 +269,13 @@ void ConCmdPluginPause(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("Plugin \"%d\" disabled", index);
 }
 
-void ConCmdPluginPauseAll(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginPauseAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	plugm.PausePlugins();
 	concore->Output("Plugins disabled");
 }
 
-void ConCmdPluginReload(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginReload(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -297,13 +297,13 @@ void ConCmdPluginReload(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("Plugin \"%d\" has been reloaded successfully", index);
 }
 
-void ConCmdPluginReloadAll(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginReloadAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	plugm.ReloadPlugins();
 	concore->Output("Reloaded all plugins");
 }
 
-void ConCmdPluginUnload(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginUnload(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -325,13 +325,13 @@ void ConCmdPluginUnload(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("Plugin \"%d\" has been unloaded successfully", index);
 }
 
-void ConCmdPluginUnloadAll(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginUnloadAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	plugm.UnloadPlugins();
 	concore->Output("Unloaded all plugins");
 }
 
-void ConCmdPluginUnpause(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginUnpause(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
@@ -353,7 +353,7 @@ void ConCmdPluginUnpause(ConsoleCore *concore, unsigned char numargs)
 	concore->Output("Plugin \"%d\" enabled", index);
 }
 
-void ConCmdPluginUnpauseAll(ConsoleCore *concore, unsigned char numargs)
+void ConCmdPluginUnpauseAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	plugm.UnpausePlugins();
 	concore->Output("Plugins enabled");

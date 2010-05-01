@@ -51,7 +51,7 @@ ConsoleScreen::~ConsoleScreen(void)
 
 void ConsoleScreen::SetCaption(const char *string)
 {
-	ResizeStringBuffer(caption, strlen(string) + 1);
+	ResizeBuffer<char *, char, unsigned int>(caption, strlen(string) + 1);
 	strcpy(caption, string);
 	this->PrintCaption();
 	this->SetFinalCursorPosition();
@@ -461,7 +461,7 @@ void ConsoleScreen::AppendToOutputBuffer(const char *string)
 {
 	if (outputbuffersize < maxoutputbuffersize)
 		{
-			ResizeArrayBuffer(outputbuffer, outputbuffersize + 1);
+			ResizeBuffer<char **, char *, unsigned short>(outputbuffer, outputbuffersize + 1);
 			outputbuffer[outputbuffersize] = (char *)calloc(81, sizeof(char));
 			strcpy(outputbuffer[outputbuffersize], string);
 			outputbuffersize++;
@@ -487,7 +487,7 @@ void ConsoleScreen::FillInputBufferFromHistory(void)
 	unsigned int length = strlen(inputbuffer[inputbufferposition[0]]);
 	if (strlen(inputbuffer[inputbuffersize-1]) != length)
 	{
-		ResizeStringBuffer(inputbuffer[inputbuffersize-1], length + 1);
+		ResizeBuffer<char *, char, unsigned int>(inputbuffer[inputbuffersize-1], length + 1);
 	}
 	strcpy(inputbuffer[inputbuffersize-1], inputbuffer[inputbufferposition[0]]);
 	inputbufferposition[1] = length;
@@ -497,7 +497,7 @@ void ConsoleScreen::AddCharToInputBuffer(const int ch)
 {
 	inputbufferposition[0] = inputbuffersize - 1;
 	unsigned int buffersize = strlen(inputbuffer[inputbuffersize-1]);
-	ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize + 2);
+	ResizeBuffer<char *, char, unsigned int>(inputbuffer[inputbuffersize-1], buffersize + 2);
 	char *tempstring = (char *)calloc((buffersize - inputbufferposition[1] + 1), sizeof(char));
 	strncpy(tempstring, inputbuffer[inputbuffersize-1] + inputbufferposition[1], buffersize - inputbufferposition[1] + 1);
 	inputbuffer[inputbuffersize-1][inputbufferposition[1]] = ch;
@@ -520,7 +520,7 @@ void ConsoleScreen::BackspaceCharInInputBuffer(void)
 	unsigned int buffersize = strlen(inputbuffer[inputbuffersize-1]);
 	char *tempstring = (char *)calloc((buffersize - inputbufferposition[1] + 1), sizeof(char));
 	strncpy(tempstring, inputbuffer[inputbuffersize-1] + inputbufferposition[1], buffersize - inputbufferposition[1] + 1);
-	ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize);
+	ResizeBuffer<char *, char, unsigned int>(inputbuffer[inputbuffersize-1], buffersize);
 	strncpy(inputbuffer[inputbuffersize-1] + inputbufferposition[1] - 1, tempstring, buffersize - inputbufferposition[1] + 1);
 	inputbufferposition[1]--;
 	unsigned char y = this->GetInputLineScreenPosition();
@@ -541,7 +541,7 @@ void ConsoleScreen::MoveCursorLeft(void)
 	this->SetCursorPosition(inputbufferposition[1] + 2, this->GetInputLineScreenPosition());
 #else
 	unsigned int buffersize = strlen(inputbuffer[inputbuffersize-1]);
-	ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize + 2);
+	ResizeBuffer<char *, char, unsigned int>(inputbuffer[inputbuffersize-1], buffersize + 2);
 	inputbuffer[inputbuffersize-1][buffersize] = 8;
 	inputbuffer[inputbuffersize-1][buffersize+1] = '\0';
 	this->PrintInputLine();
@@ -559,7 +559,7 @@ void ConsoleScreen::MoveCursorRight(void)
 #ifdef WIN32
 	this->SetCursorPosition(inputbufferposition[1] + 2, this->GetInputLineScreenPosition());
 #else
-	ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize);
+	ResizeBuffer<char *, char, unsigned int>(inputbuffer[inputbuffersize-1], buffersize);
 	inputbuffer[inputbuffersize-1][buffersize-1] = '\0';
 	this->PrintInputLine();
 #endif
@@ -575,7 +575,7 @@ void ConsoleScreen::DeleteCharInInputBuffer(void)
 	inputbufferposition[0] = inputbuffersize - 1;
 	char *tempstring = (char *)calloc((buffersize - inputbufferposition[1]), sizeof(char));
 	strncpy(tempstring, inputbuffer[inputbuffersize-1] + inputbufferposition[1] + 1, buffersize - inputbufferposition[1]);
-	ResizeStringBuffer(inputbuffer[inputbuffersize-1], buffersize);
+	ResizeBuffer<char *, char, unsigned int>(inputbuffer[inputbuffersize-1], buffersize);
 	strncpy(inputbuffer[inputbuffersize-1] + inputbufferposition[1], tempstring, buffersize - inputbufferposition[1]);
 	unsigned char y = this->GetInputLineScreenPosition();
 	this->SetCursorPosition(inputbufferposition[1] + 2, y);
@@ -609,14 +609,14 @@ void ConsoleScreen::WriteToInputBuffer(void)
 	{
 		if (inputbuffer[inputbuffersize-1][i] == 8)
 		{
-			ResizeStringBuffer(inputbuffer[inputbuffersize-1], i + 1);
+			ResizeBuffer<char *, char, unsigned int>(inputbuffer[inputbuffersize-1], i + 1);
 			inputbuffer[inputbuffersize-1][i] = '\0';
 		}
 		i++;
 	} while (inputbuffer[inputbuffersize-1][i-1] != '\0');
 	if (inputbuffersize < maxinputbuffersize)
 		{
-			ResizeArrayBuffer(inputbuffer, inputbuffersize + 1);
+			ResizeBuffer<char **, char *, unsigned short>(inputbuffer, inputbuffersize + 1);
 			inputbuffer[inputbuffersize] = (char *)calloc(1, sizeof(char));
 			inputbuffersize++;
 		}
