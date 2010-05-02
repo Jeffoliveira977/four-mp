@@ -27,10 +27,23 @@ extern DWORD dwLoadOffset;
 #define OFFSET_PLAYER_MAX_ARMOUR 0x53C
 #define OFFSET_PLAYER_COLOR 0x560
 #define OFFSET_PLAYER_PED 0x578
+/* Game */
+#define CGAME_PROCESS_SLEEP (0x402B5C + dwLoadOffset)
+#define CGAME_PROCESS_LOAD_MENU (0x402BEA + dwLoadOffset)
+#define CGAME_PROCESS_START_GAME (0x402C1D + dwLoadOffset)
+
+#define GAME_NAME (0xE9D13C+dwLoadOffset)
 
 sysArray<GtaThread>* GetThreadsArray();
 scrThread* GetActiveThread();
 void SetActiveThread(scrThread* thread);
+
+void JmpHook(DWORD from, DWORD to);
+void CallHook(DWORD from, DWORD to);
+void DataHook(DWORD from, DWORD to);
+void PushHook(DWORD from, DWORD to);
+void ChangeByte(DWORD from, BYTE b, int start = 0);
+void SetString(DWORD address, char* string);
 
 void InstallMethodHook(DWORD dwInstallAddress,DWORD dwHookFunction);
 void InstallHook(DWORD dwInstallAddress,DWORD dwHookFunction,DWORD dwHookStorage,BYTE* pbyteJmpCode,int iJmpCodeSize);

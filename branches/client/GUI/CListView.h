@@ -51,5 +51,7 @@ public:
 	int GetSelected();
 	void SetSelect(int Item = -1);
 
+	std::string GetHelpString(int row);
+
 	void SetColumnImage(int Index, char *True, char *False, char *Title, int W = 16, int H = 16);
 };

@@ -10,6 +10,8 @@
 extern FMPHook HOOK;
 extern FMPGUI Gui;
 extern ConsoleWindow conwindow;
+extern CWindow * fServBrowser;
+extern CWindow * fChat;
 WNDPROC gameProc;
 
 LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
@@ -18,18 +20,27 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 	case InputStateGame:
 		{
-			if (Msg == WM_KEYUP)
+			if (Msg == WM_KEYUP && clientstate.game != GameStateOffline)
 			{
 				switch (wParam)
 				{
 				case VK_F5:
 					{
 						clientstate.input = InputStateGui;
+						fServBrowser->SetVisible(1);
+						HOOK.InputFreeze(1);
+						break;
+					}
+				case VK_F6:
+					{
+						clientstate.input = InputStateChat;
+						HOOK.InputFreeze(1);
 						break;
 					}
 				case 192:
 					{
 						clientstate.input = InputStateGui;
+						HOOK.InputFreeze(1);
 						conwindow.Show();
 						break;
 					}
@@ -42,12 +53,21 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		{
 			if (Msg == WM_KEYUP)
 			{
-				if(enterChat == -1 && wParam == 192)
+				if(wParam == VK_F6)
 				{
-					enterChat = 0;
+					clientstate.input = InputStateGame; 
 					HOOK.InputFreeze(0);
+					break; 
 				}
-				else if(wParam == 13 && enterChat != -1)
+				else if(wParam == VK_F5)
+				{
+					clientstate.input = InputStateGui;
+					HOOK.InputFreeze(0);
+					fChat->SetVisible(1);
+					break;
+				}
+
+				if(wParam == 13 && enterChat != -1)
 				{
 					if(strlen(enterMsg) != 0)
 						SendChatMessage();
@@ -86,13 +106,43 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 				{
 				case VK_F5:
 					{
-						clientstate.input = InputStateGame;
+						fServBrowser->SetVisible(!fServBrowser->IsVisible() && Gui.IsLogged());
+						if(fChat->IsVisible()) fChat->SetVisible(0);
+
+						if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
+							if(!conwindow.IsVisible()) 
+							{
+								clientstate.input = InputStateGame;
+								HOOK.InputFreeze(0);
+							}
+						break;
+					}
+				case VK_F6:
+					{
+						if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
+						{
+							Log("Chat in GUI not working");
+							if(!fChat->IsVisible())
+								fChat->SetVisible(1);
+							else
+								fChat->SetVisible(0);
+						}
 						break;
 					}
 				case 192:
 					{
-						clientstate.input = InputStateGame;
-						conwindow.Hide();
+						if(conwindow.IsVisible())
+						{
+							if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
+								if(!fServBrowser->IsVisible() && !fChat->IsVisible()) 
+								{
+									clientstate.input = InputStateGame;
+									HOOK.InputFreeze(0);
+								}
+							conwindow.Hide();
+						}
+						else
+							conwindow.Show();
 						break;
 					}
 				}

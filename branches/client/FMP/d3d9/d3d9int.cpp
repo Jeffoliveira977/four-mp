@@ -80,7 +80,7 @@ HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 		SetWindowLong(hFocusWindow,GWL_WNDPROC,(LONG)DefWndProc);
 		Gui.Load(ret->m_pD3Ddev);
 		Debug("Save Device");
-		clientstate.input = InputStateGui;
+		//clientstate.input = InputStateGui;
 
 		if(fFMP == NULL)
 		{

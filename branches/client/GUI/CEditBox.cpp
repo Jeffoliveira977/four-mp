@@ -235,6 +235,8 @@ bool CEditBox::KeyEvent( SKey sKey )
 				ToAscii( sKey.m_vKey, HIWORD( sKey.m_lParam )&0xFF, bKeys, &wKey, 0 );
 				SendMsg(CHANGE, wKey);
 
+				if(wKey < 32) break;
+
 				char szKey[2] = { static_cast<char>( wKey ), 0 };
 				if( GetStart() + m_iIndex >= 0 && GetStart() + m_iIndex <= static_cast<int>( sString.length() ) )
 				{

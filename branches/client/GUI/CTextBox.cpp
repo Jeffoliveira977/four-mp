@@ -24,7 +24,7 @@ void CTextBox::Draw()
 	int iAddHeight = GetFont()->GetStringHeight();
 	int iMaxHeight = GetHeight() - iAddHeight;
 	if( m_vStrings.size() )
-		for( int i = pSlider->GetMaxValue(), iHeight = 0; i >= pSlider->GetValue() && iHeight < iMaxHeight; i-- )
+		for( int i = pSlider->GetMaxValue()-pSlider->GetValue(), iHeight = 0; i >= 0 && iHeight < iMaxHeight; i-- )
 		{
 			if(m_vStrings.at(i).c_str()) GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pString, m_vStrings.at(i), GetWidth() - pSlider->GetSliderWidth() );
 			iHeight += iAddHeight;

@@ -90,7 +90,7 @@ public:
 
 	void LoadFont(int size = 10, char *font = "Tahoma");
 	void SetFontColors(int Index, int r, int g, int b, int a);
-	void LoadInterfaceFromFile( const char * pszFilePath );
+	void LoadInterfaceFromFile( const char * pszFilePath, const char * dir = "" );
 	void UpdateFromFile( const char * pszFilePath );
 
 	void FillArea( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3dColor );

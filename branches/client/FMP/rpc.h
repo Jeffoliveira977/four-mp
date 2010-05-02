@@ -6,6 +6,8 @@
 #pragma once
 #include "..\..\Shared\RakNet\RakPeerInterface.h"
 
+void RegisterRPC();
+
 void Check(RPCParameters *rpcParameters);
 void ErrorConnect(RPCParameters *rpcParameters);
 void ConnectPlayer(RPCParameters *rpcParameters);

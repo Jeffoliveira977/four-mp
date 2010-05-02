@@ -15,6 +15,7 @@ CWindow::CWindow( CGUI *Gui, int X, int Y, int Width, int Height, const char * S
 	SetVisible( true );
 
 	hTitleBar = 0;
+	m_bTab = 0;
 	sButton[0] = sButton[1] = mButton[0] = mButton[1] = 0;
 
 	SetThemeElement( pGui->GetThemeElement( "Window" ) );
@@ -225,6 +226,15 @@ bool CWindow::KeyEvent( SKey sKey )
 		SetElementState( GetMaximized()?"Norm":"Minimized", 2 );
 	}
 
+	if(sKey.m_vKey == 9 && !m_bTab)
+	{
+		SetFocussedElement(m_vElements[0]);
+		m_bTab = 1;
+		return 0;
+	}
+	else
+		m_bTab = 0;
+
 	if( GetMaximized() )
 		for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
 			if(m_vElements[ iIndex ]) m_vElements[ iIndex ]->KeyEvent( sKey );
@@ -245,6 +255,7 @@ bool CWindow::GetMaximized()
 void CWindow::SetVisible( bool bVisible )
 {
 	m_bVisible = bVisible;
+	if(bVisible) pGui->BringToTop( this );
 }
 
 bool CWindow::IsVisible()

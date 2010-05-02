@@ -64,7 +64,7 @@ void CGUI::SetVarBool(const char *name, bool value)
 	Cvars[ name ] = new CVar( value );
 }
 
-void CGUI::LoadInterfaceFromFile( const char * pszFilePath )
+void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
 {
 	TiXmlDocument Document;
 
@@ -119,7 +119,7 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath )
 						{
 							std::stringstream sStream;
 
-							sStream << pThemeElement->Value() << "/" << pTextureElement->Attribute( "path" );
+							sStream << pThemeElement->Value() << "/" << dir << pTextureElement->Attribute( "path" );
 							
 							pState->mTextures[ pTextureElement->Attribute( "string" ) ] = new CTexture( GetSprite(), sStream.str().c_str(), new CColor(pTextureElement) );
 						}
@@ -306,7 +306,7 @@ void CGUI::BringToTop( CWindow * pWindow )
 	m_vWindows.insert(  m_vWindows.end(), pWindow );
 	m_wFocus = pWindow;
 }
-void Log(char*);
+
 void CGUI::Draw()
 {
 	if( !IsVisible() )
@@ -413,7 +413,7 @@ bool CGUI::KeyEvent( SKey sKey )
 	{
 		CMouse * pMouse = GetMouse();
 
-		std::vector<CWindow*> vRepeat;
+		//std::vector<CWindow*> vRepeat;
 
 		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
 		{
@@ -435,19 +435,19 @@ bool CGUI::KeyEvent( SKey sKey )
 					bTop = true;
 					break;
 				}
-				else
-					vRepeat.push_back( m_vWindows[ iIndex ] );
+				/*else
+					vRepeat.push_back( m_vWindows[ iIndex ] );*/
 			}
-			else
+			/*else
 			{
 				pMouse->SavePos();
 				pMouse->SetPos( CPos( -1, -1 ) );
 				m_vWindows[ iIndex ]->KeyEvent( sKey );
 				pMouse->LoadPos();
-			}
+			}*/
 		}
 
-		for( int iIndex = 0; iIndex < static_cast<int>( vRepeat.size() ); iIndex++ )
+		/*for( int iIndex = 0; iIndex < static_cast<int>( vRepeat.size() ); iIndex++ )
 		{
 			if(!vRepeat[ iIndex ]) continue;
 
@@ -455,23 +455,23 @@ bool CGUI::KeyEvent( SKey sKey )
 			pMouse->SetPos( CPos( -1, -1 ) );
 			vRepeat[ iIndex ]->KeyEvent( sKey );
 			pMouse->LoadPos();
-		}
+		}*/
 	}
 	else
 	{
 		bTop = false;
 
-		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
+		/*for( */int iIndex = static_cast<int>( m_vWindows.size() ) - 1; /*iIndex >= 0; iIndex-- )
 		{
-			if(!m_vWindows[ iIndex ]) continue;
+			if(!m_vWindows[ iIndex ]) continue;*/
 			if( m_vWindows[ iIndex ]->IsVisible() )
 			{
 				if( m_vWindows[ iIndex ]->GetFocussedElement() && m_vWindows[ iIndex ]->GetMaximized() )
 					bTop = true;
-
+				
 				m_vWindows[ iIndex ]->KeyEvent( sKey );
 			}
-		}
+		/*}*/
 
 		if( !sKey.m_bDown )
 			bTop = false;

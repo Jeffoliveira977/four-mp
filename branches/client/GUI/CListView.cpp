@@ -244,3 +244,8 @@ void CListView::SetColumnImage(int Index, char *True, char *False, char *Title, 
 	imgColumn[Index].Width = W;
 	imgColumn[Index].Height = H;
 }
+
+std::string CListView::GetHelpString(int row)
+{
+	return m_vRowsHelp[row];
+}

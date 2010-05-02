@@ -1,8 +1,10 @@
 #include "../masterserver.h"
 #include <windows.h>
 #include "gui.h"
+#include "../main.h"
 #include "../log.h"
 #include "../ConsoleWindow.h"
+#include "../Hook/classes.h"
 
 
 extern ConsoleWindow conwindow;
@@ -39,6 +41,8 @@ CCheckBox *upRemeberMe;
 int tab = 3;
 
 MasterServer fmpms;
+extern FMPHook HOOK;
+extern FMPGUI Gui;
 
 namespace CALLBACKS
 {
@@ -54,25 +58,33 @@ namespace CALLBACKS
 			fmpms.ClearServerList();
 			bool r = fmpms.QueryServerList(0, tab == 2, sbFltNotEmpty->GetChecked(), sbFltNotFull->GetChecked(), 
 				sbFltNoPassword->GetChecked(),	0, 0, sbFltMode->GetString().size()>0?(char*)sbFltMode->GetString().c_str():0, sbFltLocation->GetString().size()?(char*)sbFltLocation->GetString().c_str():0);
-			
+			Log("Sended");
 			if(!r) { fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Load server list failed"); fInfo->SetVisible(1); }
 			else
 			{
-				char tmp[128];
+				char *tmp = new char[128];
 				MasterServerInfo *msi;
-				
+				Log("MS %d", fmpms.GetNumServers());
 				for(int i = 0; i < fmpms.GetNumServers(); i++)
 				{
+					Log("Add %d", i);
 					msi = fmpms.GetServerInfo(i);
-					sprintf(tmp, "%s:%d", msi->ip, msi->port);
+					if(!msi || !sbServList) continue;
+
+					Log("Enter pass");
 					sbServList->PutStr((msi->password?"1":"0"), 0);
+					Log("Help %s %d 0x%x", msi->ip, msi->port, tmp);
+					sprintf_s(tmp, 128, "%s:%d", msi->ip, msi->port);
+					Log("HELP");
+					//Log("'%s' FROM `%s` & `%d`", tmp, msi->ip, msi->port);
 					sbServList->PutStr(msi->name, 1, -1, tmp);
 					sprintf(tmp, "%d/%d", msi->players, msi->maxplayers);
 					sbServList->PutStr(tmp, 2);
-					sprintf(tmp, "%d", 9999);
+					sprintf(tmp, "%d", 9999/*fmpms.GetServerPing(msi->ip, msi->port)*/);
 					sbServList->PutStr(tmp, 3);
 					sbServList->PutStr(msi->mode, 4);
 					sbServList->PutStr(msi->loc, 5);
+					Log("END");
 				}
 			}
 		}
@@ -179,6 +191,9 @@ namespace CALLBACKS
 		{
 			fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Autorization ok");
 			fUserLogin->SetVisible(0);
+			fServBrowser->SetVisible(1);
+			Gui.Logged();
+			strcpy_s(Conf.Name, 32, login.c_str());
 		}
 
 		fInfo->SetVisible(1);
@@ -276,18 +291,74 @@ namespace CALLBACKS
 	void ServerList(CElement *pElement, CMSG msg, int Param)
 	{
 	}
+	void FilterPing(CElement *pElement, CMSG msg, int Param)
+	{
+		if(msg != CLICK) return;
+
+	}
+	void Connect(CElement *pElement, CMSG msg, int Param)
+	{
+		if(msg != CLICK) return;
+
+		Log("Start connect");
+		int sel = sbServList->GetSelected();
+		if(sel >= 0)
+		{
+			// Connect sel server
+			std::string help = sbServList->GetHelpString(sel);
+			char *ip = (char*)help.c_str();
+			unsigned short port = 0;
+			int len = strlen(ip);
+			bool read_port = 0;
+			for(int i = 0; i < len; i++)
+			{
+				if(ip[i] == ':')
+				{
+					ip[i] = 0;
+					read_port = 1;
+				}
+				else if(read_port)
+				{
+					port = port*10 + ip[i]-48;
+					ip[i] = 0;
+				}
+			}
+			Log("FROM LIST - Server: %s %d (%s,%d,%d,%d)", ip, port, help.c_str(), len, read_port, sel);
+			HOOK.ConnectToServer(ip, port);
+		}
+		else if(sbEnterIP->GetString().length() > 0 && sbEnterPort->GetString().length() > 0)
+		{
+			// Connect entered server
+			Log("FROM EDIT - Server: %s & %s", sbEnterIP->GetString().c_str(), sbEnterPort->GetString().c_str());
+			HOOK.ConnectToServer((char*)sbEnterIP->GetString().c_str(), atoi(sbEnterPort->GetString().c_str()));
+		}
+	}
+	void AddFav(CElement *pElement, CMSG msg, int Param)
+	{
+		if(msg != CLICK) return;
+
+		int sel = 0;
+		if((sel = sbServList->GetSelected()) != -1)
+		{
+			// Add sel server
+		}
+		else if(sbEnterIP->GetString().length() > 0 && sbEnterPort->GetString().length() > 0)
+		{
+			// Add entered server
+			sbEnterIP->SetString("");
+			sbEnterPort->SetString("");
+		}
+	}
 };
 
 FMPGUI::FMPGUI()
 {
-	Debug("FMPGUI::FMPGUI called");
 	g_Mouse[0] = 0;
 	g_Mouse[1] = 0;
 	g_Mouse[2] = 0;
 	GuiReady = 0;
 	s_iWidth = 800;
 	s_iHeight = 600;
-	Debug("FMPGUI::FMPGUI complete");
 }
 
 void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
@@ -319,10 +390,11 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	Debug("FMPGUI::Load >> Create server browser");
 	// Create Servers Brouser
-	fServBrowser = new CWindow(m_Gui, 20, 20, 750, 500, "SERVER BROWSER", "SERVER_BROWSER");
+	fServBrowser = new CWindow(m_Gui, s_iWidth/2-375, s_iHeight/2-250, 750, 500, "SERVER BROWSER", "SERVER_BROWSER");
 	
 	int ServerWidth[6] = {16, 210, 60, 60, 100, 100};
 	sbServList = new CListView(m_Gui, 0, 29, ServerWidth, 350, 6, NULL, "SERVER_LIST", CALLBACKS::ServerList);
+	sbServList->SetColumnImage(0, "FMPGUI/Pass.png", "FMPGUI/noPass.png", "FMPGUI/Pass.png", 16, 16);
 
 	sbServList->SetTitle("P");
 	sbServList->SetTitle("Server Name");
@@ -348,11 +420,11 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	CText *sbTextIP = new CText(m_Gui, 560, 295, 100, 20, "IP", "TEXT_IP", NULL);
 	CText *sbTextPort = new CText(m_Gui, 560, 335, 100, 20, "Port", "TEXT_PORT", NULL);
 
-	sbConnect = new CButton(m_Gui, 560, 380, 80, 0, "Connect", "MAN_CONNECT");
+	sbConnect = new CButton(m_Gui, 560, 380, 80, 0, "Connect", "MAN_CONNECT", CALLBACKS::Connect);
 	sbRefresh = new CButton(m_Gui, 660, 380, 80, 0, "Refresh", "MAN_REFRESH", CALLBACKS::Refresh);
-	sbAddToFav = new CButton(m_Gui, 600, 405, 120, 0, "Add to favourites", "MAN_ADDFAV");
+	sbAddToFav = new CButton(m_Gui, 600, 405, 120, 0, "Add to favourites", "MAN_ADDFAV", CALLBACKS::AddFav);
 
-	sbFltPing = new CDropDown(m_Gui, 150, 380, 80, 20, "Ping", "FILTER_PING");
+	sbFltPing = new CDropDown(m_Gui, 150, 380, 80, 20, "Ping", "FILTER_PING", CALLBACKS::FilterPing);
 	sbFltNotFull = new CCheckBox(m_Gui, 150, 410, 0, 0, 0, "", "FILTER_NOT_FULL");
 	sbFltLocation = new CEditBox(m_Gui, 305, 380, 80, 20, "", "FILTER_LOCATION");
 	sbFltMode = new CEditBox(m_Gui, 305, 410, 80, 20, "", "FILTER_MODE");
@@ -384,17 +456,18 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	fServBrowser->AddElement(sbFltNotFull);
 	fServBrowser->AddElement(sbFltNotEmpty);
 	fServBrowser->AddElement(sbFltNoPassword);
+	fServBrowser->SetVisible(0);
 
 	// Create Chat
 	Debug("FMPGUI::Load >> Create chat");
-	fChat = new CWindow(m_Gui, 10, 10, 200, 300, "FOUR-MP CHAT");
-	cc_tChat = new CTextBox(m_Gui, 0, 0, 200, 258, NULL, NULL, CALLBACKS::Chat);
-	cc_tEnter = new CEditBox(m_Gui, 0, 257, 160, 0, NULL, NULL, CALLBACKS::Chat);
-	cc_bEnter = new CButton(m_Gui, 160, 257, 40, 0, "SEND", NULL, CALLBACKS::Chat);
+	fChat = new CWindow(m_Gui, 10, 10, 300, 400, "FOUR-MP CHAT");
+	cc_tChat = new CTextBox(m_Gui, 10, 10, 280, 320, NULL, NULL, CALLBACKS::Chat);
+	cc_tEnter = new CEditBox(m_Gui, 10, 330, 220, 0, NULL, NULL, CALLBACKS::Chat);
+	cc_bEnter = new CButton(m_Gui, 230, 330, 60, 0, "SEND", NULL, CALLBACKS::Chat);
 	fChat->AddElement(cc_tChat);
 	fChat->AddElement(cc_tEnter);
 	fChat->AddElement(cc_bEnter);
-	fChat->SetVisible( 1 );
+	fChat->SetVisible( 0 );
 
 	// Create Option
 	Debug("FMPGUI::Load >> Create options");
@@ -405,7 +478,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	// Create login window
 	Debug("FMPGUI::Load >> Create login");
-	fUserLogin = new CWindow(m_Gui, 10, 10, 300, 200, "USER LOGIN", "WND_USER_LOGIN");
+	fUserLogin = new CWindow(m_Gui, s_iWidth/2-150, s_iHeight/2-100, 300, 200, "USER LOGIN", "WND_USER_LOGIN");
 	upLoginInfo = new CText(m_Gui, 20, 15, 280, 40, "Please login or Regsiter", "UP_INFO");
 	upLogin = new CEditBox(m_Gui, 100, 45, 180, 0, "", "UP_LOGIN");
 	upPassword = new CEditBox(m_Gui, 100, 75, 180, 0, "", "UP_PASSWORD");
@@ -428,7 +501,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	// Create register window
 	Debug("FMPGUI::Load >> Create register");
-	fUserRegister = new CWindow(m_Gui, 10, 220, 300, 280, "USER REGISTER", "WND_USER_REG");
+	fUserRegister = new CWindow(m_Gui, s_iWidth/2-150, s_iHeight/2-140, 300, 280, "USER REGISTER", "WND_USER_REG");
 	urLogin = new CEditBox(m_Gui, 100, 50, 180, 0, "", "REG_LOGIN");
 	urPass = new CEditBox(m_Gui, 100, 80, 180, 0, "", "REG_PASSWORD");
 	urConfirm = new CEditBox(m_Gui, 100, 110, 180, 0, "", "REG_CONFIRM");
@@ -464,7 +537,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	// Create messages window
 	Debug("FMPGUI::Load >> Create messages window");
-	fInfo = new CWindow(m_Gui, 300, 250, 200, 100, "Information", "WND_INFO");
+	fInfo = new CWindow(m_Gui, s_iWidth/2-100, s_iHeight/2-50, 200, 100, "Information", "WND_INFO");
 	CText *iTxt = new CText(m_Gui, 10, 10, 180, 60, "INFO", "INFO_TEXT");
 	CButton *iBt = new CButton(m_Gui, 50, 45, 100, 0, "OK", "INFO_OK", CALLBACKS::InfoOK);
 	fInfo->AddElement(iTxt);
@@ -473,6 +546,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	Debug("FMPGUI::Load >> Load console");
 	conwindow.Load();
+	conwindow.Hide();
 
 	Debug("FMPGUI::Load >> Update GUI");
 	m_Gui->SetVisible( true );
@@ -541,4 +615,14 @@ DWORD FMPGUI::GetWidth()
 DWORD FMPGUI::GetHeight()
 {
 	return s_iHeight;
+}
+
+void FMPGUI::Logged()
+{
+	logged = 1;
+}
+
+bool FMPGUI::IsLogged()
+{
+	return logged;
 }

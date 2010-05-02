@@ -26,6 +26,12 @@ enum ThreadStates
 	ThreadState4
 };
 
+struct MemBack
+{
+	BYTE a;
+	DWORD b;
+};
+
 struct scrThreadContext
 {
 	DWORD nThreadId;
@@ -154,9 +160,12 @@ public:
 	Player _GetPlayer();
 	int GetCarDrive(Vehicle car);
 	void GetCamTargetedCoords(float *x, float *y, float *z);
+	void GetMyPos();
 
 	// -- Start mp
 	void RunMP();
+	void InitNetwork();
+	void ConnectToServer(char *ip = "\0", unsigned short port = 0);
 
 	// -- Car sync
 	void CreateCar(int, int, float, float, float, float, int, int);
@@ -178,7 +187,7 @@ public:
 	void PlayerSyncSkin(int, int);
 	void PlayerSyncSkinVariation(int, int*, int*);
 
-	void PlayerSpawn(int, SpawnInfo);
+	void xPlayerSpawn(int, SpawnInfo);
 
 	void InputFreeze(bool);
 

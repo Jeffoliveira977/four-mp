@@ -1,4 +1,9 @@
 #include "masterserver.h"
+#include "log.h"
+
+#include "..\..\Shared\RakNet\RakNetworkFactory.h"
+#include "..\..\Shared\RakNet\RakPeerInterface.h"
+extern RakPeerInterface *net;
 
 MasterServer::MasterServer()
 {
@@ -205,79 +210,83 @@ void MasterServer::ReadServerList(RakString data)
 	const char *dataCode = data.C_String();
 	// `ip`, `port`, `name`, `location`, `mode`, `password`, `players`, `maxplayers`, `clan`, `ban`, `vip`
 
-	MasterServerInfo tmp_info;
-	memset(&tmp_info, 0, sizeof(MasterServerInfo));
+	MasterServerInfo *tmp_info = new MasterServerInfo;
+	memset(tmp_info, 0, sizeof(MasterServerInfo));
 
 	unsigned char read_id = 0;
+	Log("%s", dataCode);
 
 	for(int i = 1; i < (int)strlen(dataCode); i++)
 	{
 		if(dataCode[i] == 1) 
 		{ 
 			read_id++; 
+			Log("Next read %d", read_id);
 			continue; 
 		}
 		else if(dataCode[i] == 2) 
 		{ 
 			read_id = 0;
-			list.push_back(tmp_info);
-			memset(&tmp_info, 0, sizeof(MasterServerInfo));
+			slist.push_back(tmp_info);
+			tmp_info = new MasterServerInfo;
+			memset(tmp_info, 0, sizeof(MasterServerInfo));
+			Log("Next server");
 			continue;
 		}
 		
 		if(read_id == 0)
 		{
-			int len = strlen(tmp_info.ip);
-			tmp_info.ip[len] = dataCode[i];
-			tmp_info.ip[len+1] = 0;
+			int len = strlen(tmp_info->ip);
+			tmp_info->ip[len] = dataCode[i];
+			tmp_info->ip[len+1] = 0;
 		}
 		else if(read_id == 1)
 		{
-			tmp_info.port = tmp_info.port*10 + dataCode[i]-48;
+			tmp_info->port = tmp_info->port*10 + dataCode[i]-48;
 		}
 		else if(read_id == 2)
 		{
-			int len = strlen(tmp_info.name);
-			tmp_info.name[len] = dataCode[i];
-			tmp_info.name[len+1] = 0;
+			int len = strlen(tmp_info->name);
+			tmp_info->name[len] = dataCode[i];
+			tmp_info->name[len+1] = 0;
 		}
 		else if(read_id == 3)
 		{
-			int len = strlen(tmp_info.loc);
-			tmp_info.loc[len] = dataCode[i];
-			tmp_info.loc[len+1] = 0;
+			int len = strlen(tmp_info->loc);
+			tmp_info->loc[len] = dataCode[i];
+			tmp_info->loc[len+1] = 0;
 		}
 		else if(read_id == 4)
 		{
-			int len = strlen(tmp_info.mode);
-			tmp_info.mode[len] = dataCode[i];
-			tmp_info.mode[len+1] = 0;
+			int len = strlen(tmp_info->mode);
+			tmp_info->mode[len] = dataCode[i];
+			tmp_info->mode[len+1] = 0;
 		}
 		else if(read_id == 5)
 		{
-			tmp_info.password = dataCode[i] != 48;
+			tmp_info->password = dataCode[i] != 48;
 		}
 		else if(read_id == 6)
 		{
-			tmp_info.players = tmp_info.players*10 + dataCode[i]-48;
+			tmp_info->players = tmp_info->players*10 + dataCode[i]-48;
 		}
 		else if(read_id == 7)
 		{
-			tmp_info.maxplayers = tmp_info.maxplayers*10 + dataCode[i]-48;
+			tmp_info->maxplayers = tmp_info->maxplayers*10 + dataCode[i]-48;
 		}
 		else if(read_id == 8)
 		{
-			int len = strlen(tmp_info.clan);
-			tmp_info.clan[len] = dataCode[i];
-			tmp_info.clan[len+1] = 0;
+			int len = strlen(tmp_info->clan);
+			tmp_info->clan[len] = dataCode[i];
+			tmp_info->clan[len+1] = 0;
 		}
 		else if(read_id == 9)
 		{
-			tmp_info.ban = dataCode[i] != 48;
+			tmp_info->ban = dataCode[i] != 48;
 		}
 		else if(read_id == 10)
 		{
-			tmp_info.vip = dataCode[i] != 48;
+			tmp_info->vip = dataCode[i] != 48;
 		}
 	}
 
@@ -384,28 +393,29 @@ void MasterServer::Process()
 
 void MasterServer::ClearServerList()
 {
-	list.clear();
+	slist.clear();
 }
 
-vector<MasterServerInfo> *MasterServer::GetServerList()
+vector<MasterServerInfo*> *MasterServer::GetServerList()
 {
-	return &list;
+	return &slist;
 }
 
 MasterServerInfo *MasterServer::GetServerInfo(int Index)
 {
-	if(Index >= (int)list.size()) return 0;
-	return &list[Index];
+	if(Index >= (int)slist.size()) return 0;
+	return slist[Index];
 }
 
 int MasterServer::GetNumServers()
 {
-	return (int)list.size();
+	return (int)slist.size();
 }
 
 int MasterServer::GetServerPing(char *ip, int port)
 {
-	return port;
+	//net->Ping(ip, port, 1);
+	return 9999;
 }
 
 bool MasterServer::IsUserInfo()

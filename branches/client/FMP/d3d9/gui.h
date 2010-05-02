@@ -10,6 +10,7 @@ class FMPGUI
 	bool g_Mouse[3];
 	bool GuiReady;
 	DWORD s_iWidth, s_iHeight;
+	bool logged;
 
 	friend class ConsoleWindow;
 public:
@@ -19,6 +20,9 @@ public:
 	void HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
 	void MoveMouse(int x, int y);
 	void Draw();
+
+	bool IsLogged();
+	void Logged();
 
 	DWORD GetWidth();
 	DWORD GetHeight();

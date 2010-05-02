@@ -3,17 +3,18 @@
 #include <stdlib.h>
 
 #include "log.h"
+#include "Hook/classes.h"
 extern DWORD dwLoadOffset;
 
 DWORD dwGameVersion = 0x0;
 
-void injectFunction (DWORD dwAddress, DWORD pfnReplacement) {
+void injectFunction (DWORD dwAddress, DWORD pfnReplacement) 
+{
 	dwAddress += dwLoadOffset;
 	BYTE * patch = (BYTE *)dwAddress;
 	*patch = 0xE9;	// JMP
 	*(DWORD *)(patch+1) = (pfnReplacement-(dwAddress+5));	
 }
-
 
 // === Start of xlive functions ===
 // #1: XWSAStartup

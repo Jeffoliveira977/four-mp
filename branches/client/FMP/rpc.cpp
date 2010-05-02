@@ -24,6 +24,37 @@ extern RakPeerInterface *net;
 extern FPlayer gPlayer[MAX_PLAYERS];
 extern FVehicle gCar[MAX_CARS];
 
+void RegisterRPC()
+{
+	Log("Register RPC");
+	REGISTER_STATIC_RPC(net, ConnectPlayer);
+	REGISTER_STATIC_RPC(net, Disconnect);
+
+	REGISTER_STATIC_RPC(net, Check);
+	REGISTER_STATIC_RPC(net, ErrorConnect);
+	REGISTER_STATIC_RPC(net, MovePlayer);
+	REGISTER_STATIC_RPC(net, JumpPlayer);
+	REGISTER_STATIC_RPC(net, DuckPlayer);
+
+	REGISTER_STATIC_RPC(net, CreateVehicle);
+
+	REGISTER_STATIC_RPC(net, PlayerCancelEnterInVehicle);
+	REGISTER_STATIC_RPC(net, PlayerExitFromVehicle);
+	REGISTER_STATIC_RPC(net, PlayerEnterInVehicle);
+
+	REGISTER_STATIC_RPC(net, SwapGun);
+	REGISTER_STATIC_RPC(net, PlayerFire);
+	REGISTER_STATIC_RPC(net, PlayerAim);
+
+	REGISTER_STATIC_RPC(net, PlayerParams);
+
+	REGISTER_STATIC_RPC(net, ClassSync);
+	REGISTER_STATIC_RPC(net, SyncSkin);
+	REGISTER_STATIC_RPC(net, SyncSkinVariation);
+	REGISTER_STATIC_RPC(net, PlayerSpawn);
+
+	REGISTER_STATIC_RPC(net, Chat);
+}
 
 void ErrorConnect(RPCParameters *rpcParameters)
 {
@@ -416,7 +447,7 @@ void PlayerSpawn(RPCParameters *rpcParameters)
 	bsData.Read(spawn);
 
 	Log("PlayerSpawn Center\r\n");
-	HOOK.PlayerSpawn(pid, spawn);
+	HOOK.xPlayerSpawn(pid, spawn);
 	Log("PlayerSpawn End\r\n");
 }
 

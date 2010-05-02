@@ -5,14 +5,10 @@
 
 FMPHook::FMPHook(): FMPThread()
 {
-	debug("FMPHook::FMPHook called");
-
 	m_pPrimaryFiber = NULL;
 	m_pScriptFiber = NULL;
 	m_bKillRequested = false;
 	m_nWaitTick = 0;
-
-	debug("FMPHook::FMPHook complete");
 }
 
 FMPHook::~FMPHook()
@@ -42,18 +38,14 @@ void FMPHook::FiberStart(void* parameter)
 {
 	debug("FMPHook::FiberStart called");
 	FMPHook* Thread = ptr_cast<FMPHook>(parameter);
-	debug("FMPHook::FiberStart call GameThread");
 	Thread->GameThread();
 	Thread->m_bKillRequested = true;
-	debug("FMPHook::FiberStart Swith");
 	SwitchToFiber(Thread->m_pPrimaryFiber);
 	debug("FMPHook::FiberStart complete");
 }
 
 ThreadStates FMPHook::Run(int i1)
 {
-	debug("FMPHook::run called");
-
 	if(m_pPrimaryFiber == NULL)
 	{
 		
@@ -84,16 +76,13 @@ ThreadStates FMPHook::Run(int i1)
 	if(m_bKillRequested) Kill();
 
 	SetActiveThread(old);
-	debug("FMPHook::run complete");
 	return m_context.eThreadState;
 }
 
 void FMPHook::wait(unsigned int timeMS)
 {
-	debug("FMPHook::wait called");
 	m_nWaitTick = GetTickCount() + timeMS;
 	SwitchToFiber(m_pPrimaryFiber);
-	debug("FMPHook::wait complete");
 }
 
 void FMPHook::Kill()
@@ -176,3 +165,53 @@ void Call(DWORD from, DWORD to)
 }
 
 //-----------------------------------------------------------
+
+void JmpHook(DWORD from, DWORD to) 
+{
+    DWORD oldp;
+    VirtualProtect((LPVOID)from, 5, PAGE_EXECUTE_READWRITE, &oldp);
+    BYTE *patch = (BYTE *)from;
+    *patch = 0xE9;    // JMP
+    *(DWORD *)(patch + 1) = (to - (from + 5));    
+}
+
+void CallHook(DWORD from, DWORD to) 
+{
+    DWORD oldp;
+    VirtualProtect((LPVOID)from, 5, PAGE_EXECUTE_READWRITE, &oldp);
+    BYTE *patch = (BYTE *)from;
+    *patch = 0xFF;    // CALL
+    *(DWORD *)(patch + 1) = (to - (from + 5));    
+}
+
+void PushHook(DWORD from, DWORD to) 
+{
+    DWORD oldp;
+    VirtualProtect((LPVOID)from, 5, PAGE_EXECUTE_READWRITE, &oldp);
+    BYTE *patch = (BYTE *)from;
+    *patch = 0x68;    // PUSH
+    *(DWORD *)(patch + 1) = (to - (from + 5));    
+}
+
+void DataHook(DWORD from, DWORD to) 
+{
+    DWORD oldp;
+    VirtualProtect((LPVOID)from, 5, PAGE_EXECUTE_READWRITE, &oldp);
+    BYTE *patch = (BYTE *)from;
+    *(DWORD *)(patch + 1) = to;   
+}
+
+void ChangeByte(DWORD from, BYTE b, int start)
+{
+	BYTE *patch = (BYTE *)from;
+	*(BYTE*)(patch+start) = b;
+}
+
+//-----------------------------------------------------------
+
+void SetString(DWORD address, char* string) 
+{
+    DWORD oldp;
+    VirtualProtect((PVOID)address,2,PAGE_EXECUTE_READWRITE,&oldp);
+    strcpy((PCHAR)address,string);
+}

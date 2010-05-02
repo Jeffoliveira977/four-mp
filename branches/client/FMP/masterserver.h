@@ -57,7 +57,7 @@ class MasterServer
 	TCPInterface *tcp;
 	HTTPConnection *http;
 
-	vector<MasterServerInfo> list;
+	vector<MasterServerInfo*> slist;
 	MasterUserInfo *user;
 
 	MasterServerStates state;
@@ -82,7 +82,7 @@ public:
 	bool QueryUserLogout();
 	bool QueryClan();
 
-	vector<MasterServerInfo> *GetServerList();
+	vector<MasterServerInfo*> *GetServerList();
 	MasterServerInfo *GetServerInfo(int Index);
 	int GetNumServers();
 	int GetServerPing(char *ip, int port);

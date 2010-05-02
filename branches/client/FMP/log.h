@@ -7,13 +7,19 @@
 
 //#define DEBUG_ON
 #define LOGGING_ON
+//#define PRINT_TO_CONSOLE
+
+void InitLogs();
+void CloseLogs();
 
 bool FileExists(const char *fname);
-void PrintToConsole(const char *string, ...);
-void debug(const char* string);
-void DebugEx(const char *file, const char *string, ...);
 void debug_clear();
-void log(const char* string);
 void log_clear();
+
+void PrintToConsole(const char *string, ...);
+
+void debug(const char* string);
+void log(const char* string);
+
 void Debug(const char *string, ...);
 void Log(const char *string, ...);

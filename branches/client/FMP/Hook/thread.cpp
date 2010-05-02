@@ -123,8 +123,6 @@ ThreadStates FMPThread::Run(int i1)
 
 ThreadStates FMPThread::Tick(unsigned int msec)
 {
-	debug("FMPThread::tick called");
-
 	ptr fn = ptr_cast(ADDRESS_THREAD_TICK);
 	scrThread *thread = this;
 	_asm
@@ -134,21 +132,16 @@ ThreadStates FMPThread::Tick(unsigned int msec)
 		call fn;
 	}
 
-	debug("FMPThread::tick complete");
 	return m_context.eThreadState;
 }
 
 
 FMPThread::FMPThread()
 {
-	debug("FMPThread::FMPThread called");
-
 	strcpy_s(ThreadName, "FMP");
 
 	m_pOriginalThread = NULL;
 	m_nThreadIndex = -1;
-
-	debug("FMPThread::FMPThread complete");
 }
 
 FMPThread::~FMPThread()

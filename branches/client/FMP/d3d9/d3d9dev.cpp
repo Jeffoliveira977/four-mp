@@ -240,7 +240,7 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 		{
 			Gui.MoveMouse(MouseX, MouseY);
 			Gui.Draw();
-		}
+		} break;
 	}
 	return m_pD3Ddev->EndScene();
 }

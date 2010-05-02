@@ -12,6 +12,7 @@ class CWindow : public CElement
 	bool m_bCloseButtonEnabled;
 	CTimer m_tCloseButtonPressed;
 	bool m_bTitleVisible;
+	bool m_bTab;
 
 	CColor * pTitle, * pBody;
 	CTexture * pTitlebar, * pButton;

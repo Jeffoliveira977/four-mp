@@ -144,7 +144,8 @@ namespace Natives
     static bool PlayerHasFlashingStarsAboutToDrop(Player playerIndex) { return NativeInvoke::Invoke<NATIVE_PLAYER_HAS_FLASHING_STARS_ABOUT_TO_DROP, bool>(playerIndex); }
     static bool PlayerHasGreyedOutStars(Player playerIndex) { return NativeInvoke::Invoke<NATIVE_PLAYER_HAS_GREYED_OUT_STARS, bool>(playerIndex); }
     static void RegisterPlayerRespawnCoords(Player playerIndex, float x, float y, float z) { NativeInvoke::Invoke<NATIVE_REGISTER_PLAYER_RESPAWN_COORDS, ScriptVoid>(playerIndex, x, y, z); }
-    static void SetEveryoneIgnorePlayer(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_EVERYONE_IGNORE_PLAYER, ScriptVoid>(playerIndex, value); }
+    static void FlushAllPlayerRespawnCoords(Player playerIndex) { NativeInvoke::Invoke<NATIVE_FLUSH_ALL_PLAYER_RESPAWN_COORDS, ScriptVoid>(playerIndex); }
+	static void SetEveryoneIgnorePlayer(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_EVERYONE_IGNORE_PLAYER, ScriptVoid>(playerIndex, value); }
     static void SetPlayerCanBeHassledByGangs(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_CAN_BE_HASSLED_BY_GANGS, ScriptVoid>(playerIndex, value); }
     static void SetPlayerCanDoDriveBy(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_CAN_DO_DRIVE_BY, ScriptVoid>(playerIndex, value); }
     static void SetPlayerCanUseCover(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_CAN_USE_COVER, ScriptVoid>(playerIndex, value); }
@@ -161,6 +162,7 @@ namespace Natives
     static void StoreScore(Player playerIndex, unsigned int* value) { NativeInvoke::Invoke<NATIVE_STORE_SCORE, ScriptVoid>(playerIndex, value); }
     static void StoreWantedLevel(Player playerIndex, unsigned int* value) { NativeInvoke::Invoke<NATIVE_STORE_WANTED_LEVEL, ScriptVoid>(playerIndex, value); }
     static void RemovePlayerHelmet(Player playerIndex, bool remove) { NativeInvoke::Invoke<NATIVE_REMOVE_PLAYER_HELMET, ScriptVoid>(playerIndex, remove); }
+    static void AddHospitalRestart(float x, float y, float z, float r, int num_x3) { NativeInvoke::Invoke<NATIVE_ADD_HOSPITAL_RESTART, ScriptVoid>(x, y, z, r, num_x3); }
 
     // Ped
     static void AddAmmoToChar(Ped ped, eWeapon weapon, unsigned int amount) { NativeInvoke::Invoke<NATIVE_ADD_AMMO_TO_CHAR, ScriptVoid>(ped, weapon, amount); }

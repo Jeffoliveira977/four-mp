@@ -5,7 +5,7 @@ CKeyboard::CKeyboard(CGUI *Gui)
 	pGui = Gui;
 }
 
-bool CKeyboard::HandleMessage( unsigned int uMsg, __w64 unsigned int wParam, _w64 long lParam )
+bool CKeyboard::HandleMessage( unsigned int uMsg, unsigned int wParam, long lParam )
 {
 	if( !pGui->IsVisible() || uMsg < WM_KEYFIRST || uMsg > WM_KEYLAST || pGui->GetMouse()->GetLeftButton() )
 		return false;
