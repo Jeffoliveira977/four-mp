@@ -1,3 +1,8 @@
+/// \file
+/// \brief Source file that contains implementation of the ConAlias class.
+/// \details See class description.
+/// \author FaTony
+
 #include <string.h>
 
 #include "ConAlias.h"

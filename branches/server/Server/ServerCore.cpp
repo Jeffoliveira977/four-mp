@@ -62,6 +62,7 @@ bool ServerCore::Load(void)
 	concore.SetExecPath("cfg/");
 	conscreen.SetCaption("FOUR-MP");
 	//Core console functions
+	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("alias", ConCmdAlias, "Alias a command.", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("cvarlist", ConCmdCvarlist, "Show the list of convars/concommands.", 0));
 	hm.AddNewHandle(0, HandleTypeConVar, concore.AddConVar("developer", 0, "Show developer messages.", 0, true, 0, true, 2));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("echo", ConCmdEcho, "Echo text to console.", 0));

@@ -189,7 +189,7 @@ private:
 	/// \brief Adds console alias into symbol buffer.
 	/// \param[in] name Name of the console alias.
 	/// \param[in] cmdstring A command string that will be interpreted when the alias is invoked.
-	/// \return True on success, false otherwise.
+	/// \return No return.
 	void AddConAlias(const char *name, const char *cmdstring = "");
 
 	/// \brief Deletes console symbol from symbol buffer by it's index.
