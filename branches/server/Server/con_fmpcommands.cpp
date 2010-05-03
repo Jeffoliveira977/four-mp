@@ -4,10 +4,12 @@
 /// \author FaTony
 
 #include "con_fmpcommands.h"
+#include "ServerCore.h"
 #include "CoreHandleTypesManager.h"
 #include "PluginManager.h"
 #include "VirtualMachineManager.h"
 
+extern ServerCore server;
 extern CoreHandleTypesManager chtm;
 extern PluginManager plugm;
 extern VirtualMachineManager vmm;
@@ -357,4 +359,9 @@ void ConCmdPluginUnpauseAll(ConsoleCore *concore, const unsigned char numargs)
 {
 	plugm.UnpausePlugins();
 	concore->Output("Plugins enabled");
+}
+
+void ConCmdQuit(ConsoleCore *concore, const unsigned char numargs)
+{
+	server.Shutdown();
 }

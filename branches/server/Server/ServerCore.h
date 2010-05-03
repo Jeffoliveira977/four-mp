@@ -10,6 +10,8 @@ public:
 	bool Load(void);
 	bool IsRunning(void);
 	void Tick(void);
+	void Unload(void);
+	void Shutdown(void);
 	bool IsLAN(void);
 	bool GetComponentSelectStatus(void);
 	void EnableComponentSelect(bool enable);

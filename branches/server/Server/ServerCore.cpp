@@ -70,6 +70,7 @@ bool ServerCore::Load(void)
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("find", ConCmdFind, "Find concommands with the specified string in their name/help text.", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("help", ConCmdHelp, "Find help about a convar/concommand.", 0));
 	// FMP console functions
+	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("exit", ConCmdQuit, "Exit the engine.", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("fs_list", ConCmdFsList, "Prints details about loaded gamemode/filterscripts.", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("fs_load", ConCmdFsLoad, "fs_load <filename> : loads a filterscript", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("fs_load_all", ConCmdFsLoadAll, "Loads all filterscripts", 0));
@@ -98,6 +99,7 @@ bool ServerCore::Load(void)
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_unload_all", ConCmdPluginUnloadAll, "Unloads all plugins", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_unpause", ConCmdPluginUnpause, "fs_unpause <index> : unpauses a loaded plugin", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("plugin_unpause_all", ConCmdPluginUnpauseAll, "Unpauses all disabled plugins", 0));
+	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("quit", ConCmdQuit, "Exit the engine.", 0));
 	ConVar *rconpasswordcvar = concore.AddConVar("rcon_password", "", "Remote console password.", 0);
 	rconpasswordcvar->HookChange(ConVarHookRconPassword);
 	hm.AddNewHandle(0, HandleTypeConVar, rconpasswordcvar);
@@ -164,6 +166,15 @@ void ServerCore::Tick(void)
 		}
 	}
 	Sleep(100);
+}
+
+void ServerCore::Unload(void)
+{
+}
+
+void ServerCore::Shutdown(void)
+{
+	running = false;
 }
 
 bool ServerCore::IsLAN(void)

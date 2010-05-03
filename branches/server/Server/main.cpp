@@ -37,9 +37,10 @@ int main()
 	{
 		return 1;
 	}
-	while(server.IsRunning())
+	while (server.IsRunning())
 	{
 		server.Tick();
 	}
+	server.Unload();
 	return 0;
 }

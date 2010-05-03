@@ -76,3 +76,6 @@ void ConCmdPluginUnpause(ConsoleCore *concore, const unsigned char numargs);
 
 /// \brief Unpauses all disabled plugins.
 void ConCmdPluginUnpauseAll(ConsoleCore *concore, const unsigned char numargs);
+
+/// \brief Exit the engine.
+void ConCmdQuit(ConsoleCore *concore, const unsigned char numargs);
