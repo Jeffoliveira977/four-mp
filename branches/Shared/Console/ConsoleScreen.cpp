@@ -459,6 +459,11 @@ void ConsoleScreen::WriteToOutputBuffer(const char *string)
 
 void ConsoleScreen::AppendToOutputBuffer(const char *string)
 {
+	if (strlen(string) > 80)
+	{
+		this->WriteToOutputBuffer(string);
+		return;
+	}
 	if (outputbuffersize < maxoutputbuffersize)
 		{
 			ResizeBuffer<char **, char *, unsigned short>(outputbuffer, outputbuffersize + 1);

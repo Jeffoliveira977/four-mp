@@ -7,6 +7,7 @@
 
 #include "ConVar.h"
 #include "ConCmd.h"
+#include "ConAlias.h"
 
 /// \brief The main class that handles all logic behind the console.
 /// \details Console Core is a system responsible for interpreting text commands. It takes
@@ -153,7 +154,8 @@ private:
 	enum ConsoleSymbolType
 	{
 		ConsoleSymbolTypeConVar, ///< Indicates a console variable.
-		ConsoleSymbolTypeConCmd ///< Indicates a console command.
+		ConsoleSymbolTypeConCmd, ///< Indicates a console command.
+		ConsoleSymbolTypeConAlias ///< Indicates a console alias.
 	};
 
 	/// \brief Used to wisely work with console symbol.
@@ -161,6 +163,7 @@ private:
 	{
 		ConVar *convar; ///< Used to work with console variable.
 		ConCmd *concmd; ///< Used to work with console command.
+		ConAlias *conalias; ///< Used to work with console alias.
 	};
 
 	/// \brief Describes a console symbol.
@@ -183,6 +186,12 @@ private:
 	unsigned int argpos; ///< Holds starting index of first argument in the current command.
 	unsigned char numargs; ///< Holds number of arguments in the current command.
 
+	/// \brief Adds console alias into symbol buffer.
+	/// \param[in] name Name of the console alias.
+	/// \param[in] cmdstring A command string that will be interpreted when the alias is invoked.
+	/// \return True on success, false otherwise.
+	void AddConAlias(const char *name, const char *cmdstring = "");
+
 	/// \brief Deletes console symbol from symbol buffer by it's index.
 	/// \param[in] index Index of the console symbol.
 	/// \return True on success, false otherwise.
@@ -200,16 +209,6 @@ private:
 	/// \note This function is used only by ConCmd's destructor.
 	/// \return No return.
 	void DeleteConCmd(const char *name, ConCmd *ptr);
-
-	/// \brief Returns console symbol by name.
-	/// \param[in] name Name of the console symbol.
-	/// \return Pointer to the console symbol on success, NULL otherwise.
-	ConsoleSymbol *GetConsoleSymbol(const char *name);
-
-	/// \brief Returns console symbol by it's index.
-	/// \param[in] index Index of the console symbol.
-	/// \return Pointer to the console symbol on success, NULL otherwise.
-	ConsoleSymbol *GetConsoleSymbolByIndex(unsigned short index);
 
 	/// \brief Retrieves symbol index by it's name.
 	/// \param[in] name Name of the console symbol.
@@ -233,6 +232,8 @@ private:
 	bool InterpretCommand(void);
 	friend class ConVar; ///< See ConVar.h
 	friend class ConCmd; ///< See ConCmd.h
-	friend void ConCmdCvarlist(ConsoleCore *concore, unsigned char numargs); ///< See coreconcommands.h
-	friend void ConCmdExec(ConsoleCore *concore, unsigned char numargs); ///< See coreconcommands.h
+	friend class ConAlias; ///< See ConAlias.h
+	friend void ConCmdAlias(ConsoleCore *concore, const unsigned char numargs); ///< See coreconcommands.h
+	friend void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs); ///< See coreconcommands.h
+	friend void ConCmdExec(ConsoleCore *concore, const unsigned char numargs); ///< See coreconcommands.h
 };

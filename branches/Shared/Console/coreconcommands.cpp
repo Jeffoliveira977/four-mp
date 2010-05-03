@@ -14,6 +14,44 @@
 
 using namespace std;
 
+void ConCmdAlias(ConsoleCore *concore, const unsigned char numargs)
+{
+	if (numargs == 0)
+	{
+		concore->Output("Current alias commands:");
+		char *aliasstring;
+		char *tempstring;
+		for (unsigned short i = 0; i < concore->symbolbuffersize; i++)
+		{
+			if (concore->symbolbuffer[i].type == ConsoleCore::ConsoleSymbolTypeConAlias)
+			{
+				tempstring = concore->symbolbuffer[i].ptr->conalias->GetName();
+				aliasstring = (char *)calloc(_scprintf("%s :", tempstring) + 1, sizeof(char));
+				sprintf(aliasstring, "%s :", tempstring);
+				free(tempstring);
+				tempstring = concore->symbolbuffer[i].ptr->conalias->GetDescription();
+				ResizeBuffer<char *, char, unsigned int>(aliasstring, _scprintf("%s %s", aliasstring, tempstring) + 1);
+				sprintf(aliasstring, "%s %s", aliasstring, tempstring);
+				free(tempstring);
+				concore->Output(aliasstring);
+				free(aliasstring);
+			}
+		}
+		return;
+	}
+	char *name;
+	if (!concore->GetCmdArg(1, name))
+	{
+		return;
+	}
+	char *commandstring;
+	if (!concore->GetCmdArg(2, commandstring))
+	{
+		concore->AddConAlias(name);
+	}
+	concore->AddConAlias(name, commandstring);
+}
+
 void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 {
 	bool search = false;
@@ -26,19 +64,16 @@ void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 		}
 	}
 	concore->Output("cvar list\n--------------");
-	unsigned short numsymbols = concore->GetNumberOfConsoleSymbols();
 	unsigned short numfound = 0;
-	ConsoleCore::ConsoleSymbol *symbol;
 	unsigned char numcmds;
 	char *symbolstring;
 	char *tempstring;
-	for (unsigned short i = 0; i < numsymbols; i++)
+	for (unsigned short i = 0; i < concore->symbolbuffersize; i++)
 	{
 		//TODO: Sort alphabetically
-		symbol = concore->GetConsoleSymbolByIndex(i);
-		if (symbol->type == ConsoleCore::ConsoleSymbolTypeConCmd)
+		if (concore->symbolbuffer[i].type == ConsoleCore::ConsoleSymbolTypeConCmd)
 		{
-			numcmds = symbol->numcmds;
+			numcmds = concore->symbolbuffer[i].numcmds;
 		}
 		else
 		{
@@ -46,13 +81,13 @@ void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 		}
 		for (unsigned char j = 0; j < numcmds; j++)
 		{
-			symbolstring = (char *)calloc(strlen(symbol->name) + 3, sizeof(char));
-			sprintf(symbolstring, "%s	:", symbol->name);
-			switch (symbol->type)
+			symbolstring = (char *)calloc(strlen(concore->symbolbuffer[i].name) + 3, sizeof(char));
+			sprintf(symbolstring, "%s	:", concore->symbolbuffer[i].name);
+			switch (concore->symbolbuffer[i].type)
 			{
 			case ConsoleCore::ConsoleSymbolTypeConVar:
 				{
-					symbol->ptr->convar->GetValue(tempstring);
+					concore->symbolbuffer[i].ptr->convar->GetValue(tempstring);
 					ResizeBuffer<char *, char, unsigned int>(symbolstring, _scprintf("%s %s	:", symbolstring, tempstring) + 1);
 					sprintf(symbolstring, "%s %s	:", symbolstring, tempstring);
 					//TODO: flags
@@ -60,10 +95,11 @@ void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 					sprintf(symbolstring, "%s	:", symbolstring);
 					//TODO: flags
 					free(tempstring);
-					tempstring = symbol->ptr->convar->GetDescription();
+					tempstring = concore->symbolbuffer[i].ptr->convar->GetDescription();
 					ResizeBuffer<char *, char, unsigned int>(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
 					sprintf(symbolstring, "%s %s", symbolstring, tempstring);
 					free(tempstring);
+					concore->Output(symbolstring);
 					break;
 				}
 			case ConsoleCore::ConsoleSymbolTypeConCmd:
@@ -75,18 +111,23 @@ void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 					sprintf(symbolstring, "%s	:", symbolstring);
 					//TODO: flags
 					//free(tempstring);
-					tempstring = symbol->ptr[j].concmd->GetDescription();
+					tempstring = concore->symbolbuffer[i].ptr[j].concmd->GetDescription();
 					ResizeBuffer<char *, char, unsigned int>(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
 					sprintf(symbolstring, "%s %s", symbolstring, tempstring);
 					free(tempstring);
+					concore->Output(symbolstring);
+					break;
+				}
+			case ConsoleCore::ConsoleSymbolTypeConAlias:
+				{
 					break;
 				}
 			}
-			concore->Output(symbolstring);
+			
 			free(symbolstring);
 		}
 	}
-	concore->Output("--------------\n%d total convars/concommands", numsymbols);
+	concore->Output("--------------\n%d total convars/concommands", concore->symbolbuffersize);
 }
 
 void ConCmdEcho(ConsoleCore *concore, const unsigned char numargs)

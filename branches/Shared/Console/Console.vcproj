@@ -152,6 +152,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ConAlias.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ConCmd.cpp"
 				>
 			</File>
@@ -183,6 +187,10 @@
 			>
 			<File
 				RelativePath=".\common.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ConAlias.h"
 				>
 			</File>
 			<File

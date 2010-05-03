@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <malloc.h>
+
 /// \brief Wrapper for realloc.
 /// \tparam BUFFERTYPE Type of the buffer.
 /// \tparam INTERNALTYPE Type that buffer points to.

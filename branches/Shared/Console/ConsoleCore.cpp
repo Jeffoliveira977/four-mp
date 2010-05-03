@@ -44,6 +44,11 @@ ConsoleCore::~ConsoleCore(void)
 				}
 				break;
 			}
+		case ConsoleSymbolTypeConAlias:
+			{
+				delete symbolbuffer[i].ptr->conalias;
+				break;
+			}
 		}
 	}
 	free(symbolbuffer);
@@ -83,6 +88,7 @@ void ConsoleCore::SetExecPath(const char *string)
 
 void ConsoleCore::RegisterStandardLibrary(void)
 {
+	this->AddConCmd("alias", ConCmdAlias, "Alias a command.", 0);
 	this->AddConCmd("cvarlist", ConCmdCvarlist, "Show the list of convars/concommands.", 0);
 	this->AddConVar("developer", 0, "Show developer messages.", 0, true, 0, true, 2);
 	this->AddConCmd("echo", ConCmdEcho, "Echo text to console.", 0);
@@ -231,20 +237,20 @@ ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *des
 	{
 		return NULL;
 	}
-	ConsoleSymbol *symbol = this->GetConsoleSymbol(name);
-	if (symbol != NULL)
+	unsigned short index;
+	if (this->GetConsoleSymbolIndex(name, index))
 	{
-		if (symbol->numcmds == maxcmdspersymbol)
+		if (symbolbuffer[index].numcmds == maxcmdspersymbol)
 		{
 			return NULL;
 		}
-		if (!ResizeBuffer<ConsoleSymbolPtr *, ConsoleSymbolPtr, unsigned char>(symbol->ptr, symbol->numcmds + 1))
+		if (!ResizeBuffer<ConsoleSymbolPtr *, ConsoleSymbolPtr, unsigned char>(symbolbuffer[index].ptr, symbolbuffer[index].numcmds + 1))
 		{
 			return NULL;
 		}
-		symbol->ptr[symbol->numcmds].concmd = new ConCmd(this, name, callback, description, flags);
-		symbol->numcmds++;
-		return symbol->ptr[symbol->numcmds-1].concmd;
+		symbolbuffer[index].ptr[symbolbuffer[index].numcmds].concmd = new ConCmd(this, name, callback, description, flags);
+		symbolbuffer[index].numcmds++;
+		return symbolbuffer[index].ptr[symbolbuffer[index].numcmds-1].concmd;
 	}
 	if (symbolbuffersize == maxsymbolbuffersize)
 	{
@@ -270,12 +276,12 @@ char *ConsoleCore::GetConsoleSymbolHelpString(const char *name)
 	{
 		return NULL;
 	}
-	ConsoleSymbol *symbol = this->GetConsoleSymbol(name);
-	if (symbol == NULL)
+	unsigned short index;
+	if (!this->GetConsoleSymbolIndex(name, index))
 	{
 		return NULL;
 	}
-	return this->GetHelpString(symbol);
+	return this->GetHelpString(&symbolbuffer[index]);
 }
 
 char *ConsoleCore::GetConsoleSymbolHelpStringByIndex(unsigned short index)
@@ -284,12 +290,7 @@ char *ConsoleCore::GetConsoleSymbolHelpStringByIndex(unsigned short index)
 	{
 		return NULL;
 	}
-	ConsoleSymbol *symbol = this->GetConsoleSymbolByIndex(index);
-	if (symbol == NULL)
-	{
-		return NULL;
-	}
-	return this->GetHelpString(symbol);
+	return this->GetHelpString(&symbolbuffer[index]);
 }
 
 unsigned char ConsoleCore::GetCmdArgs(void)
@@ -431,6 +432,45 @@ void ConsoleCore::InterpretLine(const char *string)
 	}
 }
 
+void ConsoleCore::AddConAlias(const char *name, const char *cmdstring)
+{
+	if (name == NULL)
+	{
+		return;
+	}
+	if (cmdstring == NULL)
+	{
+		return;
+	}
+	unsigned short index;
+	if (this->GetConsoleSymbolIndex(name, index))
+	{
+		if (symbolbuffer[index].type != ConsoleSymbolTypeConAlias)
+		{
+			this->Output("Cannot redefine registered convars/concommands.");
+			return;
+		}
+		symbolbuffer[index].ptr->conalias->SetCommandString(cmdstring);
+		return;
+	}
+	if (symbolbuffersize == maxsymbolbuffersize)
+	{
+		return;
+	}
+	if (!ResizeBuffer<ConsoleSymbol *, ConsoleSymbol, unsigned short>(symbolbuffer, symbolbuffersize + 1))
+	{
+		return;
+	}
+	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
+	strcpy(symbolbuffer[symbolbuffersize].name, name);
+	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConAlias;
+	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
+	symbolbuffer[symbolbuffersize].ptr->conalias = new ConAlias(this, name, cmdstring);
+	symbolbuffer[symbolbuffersize].numcmds = 0;
+	symbolbuffersize++;
+	return;
+}
+
 bool ConsoleCore::DeleteConsoleSymbolByIndex(const unsigned short index)
 {
 	if (index >= symbolbuffersize)
@@ -517,40 +557,12 @@ void ConsoleCore::DeleteConCmd(const char *name, ConCmd *ptr)
 	}
 }
 
-ConsoleCore::ConsoleSymbol *ConsoleCore::GetConsoleSymbol(const char *name)
-{
-	if (name == NULL)
-	{
-		return NULL;
-	}
-	for (unsigned short i = 0; i < symbolbuffersize; i++)
-	{
-		if ((strcmp(symbolbuffer[i].name, name)) == 0)
-		{
-			return &symbolbuffer[i];
-		}
-	}
-	return NULL;
-}
-
-ConsoleCore::ConsoleSymbol *ConsoleCore::GetConsoleSymbolByIndex(unsigned short index)
-{
-	if (index >= symbolbuffersize)
-	{
-		return NULL;
-	}
-	ConsoleSymbol *symbol = (ConsoleSymbol *)calloc(1, sizeof(ConsoleSymbol));
-	memcpy(symbol, &symbolbuffer[index], sizeof(ConsoleSymbol));
-	return symbol;
-}
-
 bool ConsoleCore::GetConsoleSymbolIndex(const char *name, unsigned short &index)
 {
-	for (unsigned short i = 0; i < symbolbuffersize; i++)
+	for (index = 0; index < symbolbuffersize; index++)
 	{
-		if ((strcmp(symbolbuffer[i].name, name)) == 0)
+		if ((strcmp(symbolbuffer[index].name, name)) == 0)
 		{
-			index = i;
 			return true;
 		}
 	}
@@ -673,6 +685,12 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 			}
 			break;
 		}
+	case ConsoleSymbolTypeConAlias:
+		{
+			ResizeBuffer<char *, char, unsigned int>(helpstring, 1);
+			helpstring[0] = '\0';
+			break;
+		}
 	}
 	return helpstring;
 }
@@ -718,8 +736,8 @@ bool ConsoleCore::InterpretCommand(void)
 	char *symbolname = (char *)calloc(templength + 1, sizeof(char));
 	strncpy(symbolname, commandbuffer + startindex, templength);
 	symbolname[templength] = '\0';
-	ConsoleSymbol *symbol = this->GetConsoleSymbol(symbolname);
-	if (symbol == NULL)
+	unsigned short index;
+	if (!this->GetConsoleSymbolIndex(symbolname, index))
 	{
 		this->Output("Unknown command \"%s\"", symbolname);
 		free(symbolname);
@@ -798,13 +816,13 @@ bool ConsoleCore::InterpretCommand(void)
 		}
 	}
 	numargs = j - 1;
-	switch (symbol->type)
+	switch (symbolbuffer[index].type)
 	{
 	case ConsoleSymbolTypeConVar:
 		{
 			if (numargs == 0)
 			{
-				this->Output(this->GetHelpString(symbol));
+				this->Output(this->GetHelpString(&symbolbuffer[index]));
 			}
 			else if (numargs == 1)
 			{
@@ -816,21 +834,21 @@ bool ConsoleCore::InterpretCommand(void)
 					{
 						float value;
 						this->GetCmdArg(1, value);
-						symbol->ptr->convar->SetValue(value);
+						symbolbuffer[index].ptr->convar->SetValue(value);
 						break;
 					}
 				case ConVarTypeInt:
 					{
 						int value;
 						this->GetCmdArg(1, value);
-						symbol->ptr->convar->SetValue(value);
+						symbolbuffer[index].ptr->convar->SetValue(value);
 						break;
 					}
 				case ConVarTypeString:
 					{
 						char *value;
 						this->GetCmdArg(1, value);
-						symbol->ptr->convar->SetValue(value);
+						symbolbuffer[index].ptr->convar->SetValue(value);
 						free(value);
 						break;
 					}
@@ -839,16 +857,21 @@ bool ConsoleCore::InterpretCommand(void)
 			else
 			{
 				char *arg = this->GetCmdArgString();
-				symbol->ptr->convar->SetValue(arg);
+				symbolbuffer[index].ptr->convar->SetValue(arg);
 			}
 			break;
 		}
 	case ConsoleSymbolTypeConCmd:
 		{
-			for (j = 0; j < symbol->numcmds; j++)
+			for (j = 0; j < symbolbuffer[index].numcmds; j++)
 			{
-				symbol->ptr[j].concmd->Execute();
+				symbolbuffer[index].ptr[j].concmd->Execute();
 			}
+			break;
+		}
+	case ConsoleSymbolTypeConAlias:
+		{
+			symbolbuffer[index].ptr->conalias->Execute();
 			break;
 		}
 	}

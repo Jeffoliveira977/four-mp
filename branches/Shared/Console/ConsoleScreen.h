@@ -116,13 +116,11 @@ private:
 
 	/// \brief Appends string to the output buffer.
 	/// \param[in] string String to append.
-	/// \note String can be any length. This is safe function.
 	/// \return No return.
 	void WriteToOutputBuffer(const char *string);
 
 	/// \brief Writes prepared string to the output buffer.
 	/// \param[in] string String to write.
-	/// \note String should be no longer than 80 characters and a result of WriteToOutputBuffer() function. This function is unsafe.
 	/// \return No return.
 	void AppendToOutputBuffer(const char *string);
 

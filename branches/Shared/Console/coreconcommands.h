@@ -8,6 +8,9 @@
 
 #include "ConsoleCore.h"
 
+/// \brief Alias a command.
+void ConCmdAlias(ConsoleCore *concore, const unsigned char numargs);
+
 /// \brief Show the list of convars/concommands.
 void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs);
 
