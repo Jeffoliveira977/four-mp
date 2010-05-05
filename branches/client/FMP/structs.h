@@ -28,7 +28,7 @@ struct FPlayer
 	short vehicleindex;
 	int seat_id;
 	int score;
-	int health, armour;
+	int health, armor;
 	int wanted_level;
 	bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
 	bool Aim;
@@ -42,7 +42,7 @@ struct PlayerDamage
 {
 	int pid;
 	int hp;
-	int armour;
+	int armor;
 };
 
 struct PlayerClass
@@ -51,15 +51,6 @@ struct PlayerClass
 	float x, y, z;
 	float angle;
 	int gun[3], ammo[3];
-};
-
-struct SpawnInfo
-{
-	int model;
-	float x, y, z, r;
-	int room;
-	int CompT[11], CompD[11];
-	int health, armour;
 };
 
 struct FVehicle

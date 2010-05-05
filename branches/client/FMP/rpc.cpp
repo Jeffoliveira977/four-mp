@@ -8,6 +8,7 @@
 #include "Hook\types.h"
 #include "Hook\classes.h"
 #include "structs.h"
+#include "rpc.h"
 #include "chat.h"
 #include "..\..\Shared\Network\NetworkProtocol.h"
 
@@ -18,7 +19,7 @@
 
 extern FMPHook HOOK;
 extern int LastUpdate;
-extern int MyID;
+extern short MyID;
 extern RakPeerInterface *net;
 
 extern FPlayer gPlayer[MAX_PLAYERS];
@@ -63,35 +64,34 @@ void ErrorConnect(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int error;
-
+	NetworkPlayerConnectionErrorData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(error);
+	bsData.Read(data);
 
-	switch(error)
+	switch (data.error)
 	{
 	case NetworkPlayerConnectionErrorServerFull:
 		{
 			// НЕТ МЕСТ
-			Log("ConnectError: %d. Server is full.", error);
+			Log("ConnectError: Server is full.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorAlreadyConnected:
 		{
 			// Уже присоединён
-			Log("ConnectError: %d. You are already connected.", error);
+			Log("ConnectError: You are already connected.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorAllocationError:
 		{
 			// Ошибка сервера
-			Log("ConnectError: %d. Server was unable to allocate player resources.", error);
+			Log("ConnectError: Server was unable to allocate player resources.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorScriptLock:
 		{
 			// Скипт не пускает
-			Log("ConnectError: %d Script lock connect", error);
+			Log("ConnectError: Script lock connect");
 			break;
 		}
 	}
@@ -115,7 +115,7 @@ void ConnectPlayer(RPCParameters *rpcParameters)
 	gPlayer[data.index].seat_id = data.seat_id;
 	gPlayer[data.index].score = data.score;
 	gPlayer[data.index].health = data.health;
-	gPlayer[data.index].armour = data.armour;
+	gPlayer[data.index].armor = data.armor;
 	gPlayer[data.index].room = data.room;
 	memcpy(gPlayer[data.index].weapons, data.weapons, sizeof(int) * 8);
 	memcpy(gPlayer[data.index].ammo, data.ammo, sizeof(int) * 8);
@@ -133,32 +133,19 @@ void MovePlayer(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid;
-	float x,y,z,a,s;
-
+	NetworkPlayerMoveData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
-	bsData.Read(x);
-	bsData.Read(y);
-	bsData.Read(z);
-	bsData.Read(a);
-	bsData.Read(s);
-
-	if(gPlayer[playerid].vehicleindex != -1)
+	bsData.Read(data);
+	if(gPlayer[data.client].vehicleindex != -1)
 	{
-		gCar[gPlayer[playerid].vehicleindex].position[0] = x;
-		gCar[gPlayer[playerid].vehicleindex].position[1] = y;
-		gCar[gPlayer[playerid].vehicleindex].position[2] = z;
-		gCar[gPlayer[playerid].vehicleindex].angle = a;
+		memcpy(gCar[gPlayer[data.client].vehicleindex].position, data.position, sizeof(float) * 3);
+		gCar[gPlayer[data.client].vehicleindex].angle = data.angle;
 	}
 
-	gPlayer[playerid].position[0] = x;
-	gPlayer[playerid].position[1] = y;
-	gPlayer[playerid].position[2] = z;
-	gPlayer[playerid].angle = a;
+	memcpy(gPlayer[data.client].position, data.position, sizeof(float) * 3);
+	gPlayer[data.client].angle = data.angle;
 
-	Log("MovePlayer Center (%d,%f,%f,%f)", playerid, x, y, z);
-	HOOK.PlayerMove(playerid, x, y, z, s);
+	HOOK.PlayerMove(data.client, data.position[0], data.position[1], data.position[2], data.speed);
 	Log("MovePlayer End");
 }
 
@@ -169,13 +156,12 @@ void JumpPlayer(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid;
-
+	NetworkPlayerJumpData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
+	bsData.Read(data);
 
-	Log("Jumplayer Center (%d)", playerid);
-	HOOK.Jump(playerid);
+	Log("Jumplayer Center (%d)", data.client);
+	HOOK.Jump(data.client);
 	Log("JumpPlayer End");
 }
 
@@ -186,14 +172,11 @@ void DuckPlayer(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid;
-	bool duck;
-
+	NetworkPlayerDuckData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
-	bsData.Read(duck);
-	Log("DuckPlayer Center (%d,%d)", playerid, duck);
-	HOOK.Duck(playerid, duck);
+	bsData.Read(data);
+	Log("DuckPlayer Center (%d,%d)", data.client, data.shouldduck);
+	HOOK.Duck(data.client, data.shouldduck);
 	Log("DuckPlayer End");
 }
 
@@ -202,8 +185,10 @@ void Check(RPCParameters *rpcParameters)
 	Log("Check Start");
 	LastUpdate = GetTickCount();
 	
+	NetworkPlayerCheckData data;
+	data.client = MyID;
 	RakNet::BitStream bsSend;
-	bsSend.Write(MyID);
+	bsSend.Write(data);
 	net->RPC("RPC_Check",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 		
 	Log("Check End");
@@ -216,11 +201,10 @@ void Disconnect(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int id;
-
+	NetworkPlayerDisconnectionData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(id);
-	HOOK.PlayerDisconnect(id);
+	bsData.Read(data);
+	HOOK.PlayerDisconnect(data.client);
 	Log("MovePlayer End");
 }
 
@@ -248,13 +232,12 @@ void PlayerCancelEnterInVehicle(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid;
-
+	NetworkPlayerCancelEntranceInVehicleData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
+	bsData.Read(data);
 
-	Log("PlayerCancelEnterInVehicle Center (%d)\r\n", playerid);
-	HOOK.CancelEnterInVehicle(playerid);
+	Log("PlayerCancelEnterInVehicle Center (%d)\r\n", data.client);
+	HOOK.CancelEnterInVehicle(data.client);
 	Log("PlayerCancelEnterInVehicle End\r\n");
 }
 
@@ -265,13 +248,12 @@ void PlayerExitFromVehicle(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid;
-
+	NetworkPlayerExitFromVehicleData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
+	bsData.Read(data);
 
-	Log("PlayerExitFromVehicle Center (%d)\r\n", playerid);
-	HOOK.ExitFromVehicle(playerid);
+	Log("PlayerExitFromVehicle Center (%d)\r\n", data.client);
+	HOOK.ExitFromVehicle(data.client);
 	Log("PlayerExitFromVehicle End\r\n");
 }
 
@@ -282,19 +264,14 @@ void PlayerEnterInVehicle(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid, car, seat;
-
+	NetworkPlayerEntranceInVehicleData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
-	bsData.Read(car);
-	bsData.Read(seat);
+	bsData.Read(data);
 
-	Log("PlayerEnterInVehicle Center (%d,%d)\r\n", playerid, car);
-	HOOK.EnterInVehicle(playerid, car, seat);
+	Log("PlayerEnterInVehicle Center (%d,%d)\r\n", data.client, data.vehicleindex);
+	HOOK.EnterInVehicle(data.client, data.vehicleindex, data.seat);
 	Log("PlayerEnterInVehicle End\r\n");
 }
-
-
 
 void PlayerFire(RPCParameters *rpcParameters)
 {
@@ -303,19 +280,12 @@ void PlayerFire(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid, gun, time;
-	float x, y, z;
-
+	NetworkPlayerFireData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
-	bsData.Read(x);
-	bsData.Read(y);
-	bsData.Read(z);
-	bsData.Read(gun);
-	bsData.Read(time);
+	bsData.Read(data);
 
-	Log("PlayerFire Center (%d,%d)\r\n", playerid, gun);
-	HOOK.PlayerFireAim(playerid, gun, time, x, y, z, 1);
+	Log("PlayerFire Center (%d,%d)\r\n", data.client, data.weapon);
+	HOOK.PlayerFireAim(data.client, data.weapon, data.time, data.position[0], data.position[1], data.position[2], 1);
 	Log("PlayerFire End\r\n");
 }
 
@@ -326,19 +296,12 @@ void PlayerAim(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid, gun, time;
-	float x, y, z;
-
+	NetworkPlayerAimData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
-	bsData.Read(x);
-	bsData.Read(y);
-	bsData.Read(z);
-	bsData.Read(gun);
-	bsData.Read(time);
-
-	Log("PlayerAim Center (%d,%d)\r\n", playerid, gun);
-	HOOK.PlayerFireAim(playerid, gun, time, x, y, z, 0);
+	bsData.Read(data);
+	
+	Log("PlayerAim Center (%d,%d)\r\n", data.client, data.weapon);
+	HOOK.PlayerFireAim(data.client, data.weapon, data.time, data.position[0], data.position[1], data.position[2], 0);
 	Log("PlayerAim End\r\n");
 }
 
@@ -349,14 +312,12 @@ void SwapGun(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid, gun;
-
+	NetworkPlayerWeaponChangeData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
-	bsData.Read(gun);
+	bsData.Read(data);
 
-	Log("SwapGun Center (%d,%d)\r\n", playerid, gun);
-	HOOK.PlayerSwapGun(playerid, gun);
+	Log("SwapGun Center (%d,%d)\r\n", data.client, data.weapon);
+	HOOK.PlayerSwapGun(data.client, data.weapon);
 	Log("SwapGun End\r\n");
 }
 
@@ -367,13 +328,10 @@ void PlayerParams(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid, hp, arm;
-
+	NetworkPlayerHealthAndArmorChangeData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
-	bsData.Read(hp);
-	bsData.Read(arm);
-
+	bsData.Read(data);
+	
 	// ... Do it ...
 	Log("PlayerParams End\r\n");
 }
@@ -385,14 +343,12 @@ void SyncSkin(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid, skin;
-
+	NetworkPlayerModelChangeData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
-	bsData.Read(skin);
+	bsData.Read(data);
 
-	Log("SyncSkin Center (%d,%d)\r\n", playerid, skin);
-	HOOK.PlayerSyncSkin(playerid, skin);
+	Log("SyncSkin Center (%d,%d)\r\n", data.client, data.model);
+	HOOK.PlayerSyncSkin(data.client, data.model);
 	Log("SyncSkin End\r\n");
 }
 
@@ -403,15 +359,11 @@ void SyncSkinVariation(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int playerid, sm[11], st[11];
-
+	NetworkPlayerComponentsChangeData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(playerid);
-	bsData.Read(sm);
-	bsData.Read(st);
+	bsData.Read(data);
 
-	Log("SyncSkinVariation Center (%d,%d)\r\n", playerid, sm[0]);
-	HOOK.PlayerSyncSkinVariation(playerid, sm, st);
+	HOOK.PlayerSyncSkinVariation(data.client, data.compD, data.compT);
 	Log("SyncSkinVariation End\r\n");
 }
 
@@ -439,15 +391,12 @@ void PlayerSpawn(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int pid;
-	SpawnInfo spawn;
-
+	NetworkPlayerSpawnData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(pid);
-	bsData.Read(spawn);
+	bsData.Read(data);
 
 	Log("PlayerSpawn Center\r\n");
-	HOOK.xPlayerSpawn(pid, spawn);
+	HOOK.xPlayerSpawn(data);
 	Log("PlayerSpawn End\r\n");
 }
 
@@ -458,21 +407,10 @@ void Chat(RPCParameters *rpcParameters)
 	unsigned char* Data = rpcParameters->input; 
 	int iBitLength = rpcParameters->numberOfBitsOfData;
 
-	int player, len;
-	int r, g, b;
-	char msg[128];
-
+	NetworkPlayerChatData data;
 	RakNet::BitStream bsData(Data,(iBitLength/8)+1,false);
-	bsData.Read(player);
-	bsData.Read(len);
-	bsData.Read(msg);
-	bsData.Read(r);
-	bsData.Read(g);
-	bsData.Read(b);
-
-	msg[len] = 0;
-
+	bsData.Read(data);
 	Log("Chat Center\r\n");
-	AddChatMessage(msg, COLOR(r, g, b), player);
+	AddChatMessage(data.msg, COLOR(data.color[0], data.color[1], data.color[2]), data.client);
 	Log("Chat End\r\n");
 }

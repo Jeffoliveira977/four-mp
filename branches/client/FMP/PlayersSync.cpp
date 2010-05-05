@@ -19,6 +19,7 @@ void SetActiveThread(scrThread* thread);
 
 using namespace Natives;
 extern FMPHook HOOK;
+extern short MyID;
 
 void FMPHook::PlayerConnect(char *name, int index, int model, float x, float y, float z)
 {
@@ -259,23 +260,23 @@ void FMPHook::PlayerSyncSkinVariation(int player, int sm[11], int st[11])
 	Log("Player Sync Skin Variantion END");
 }
 
-void FMPHook::xPlayerSpawn(int player, SpawnInfo spawn)
+void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 {
 	Log("Player Spawn START");
 	int model;
-	GetCharModel(gPlayer[player].PedID, (eModel*)&model);
+	GetCharModel(gPlayer[data.client].PedID, (eModel*)&model);
 	Log("Get Model");
-	if(spawn.model != model) PlayerSyncSkin(player, spawn.model);
+	if(data.model != model) PlayerSyncSkin(data.client, data.model);
 	Log("IF SPAWN MODEL");
 
-	PlayerSyncSkinVariation(player, spawn.CompD, spawn.CompT);
+	PlayerSyncSkinVariation(data.client, data.compD, data.compT);
 
 	Log("Set UP");
-	SetCharCoordinates(gPlayer[player].PedID, spawn.x, spawn.y, spawn.z);
-	SetCharHeading(gPlayer[player].PedID, spawn.r);
-	SetCharHealth(gPlayer[player].PedID, spawn.health);
-	AddArmourToChar(gPlayer[player].PedID, -1000);
-	AddArmourToChar(gPlayer[player].PedID, spawn.armour);
-	SetRoomForCharByKey(gPlayer[player].PedID, (eInteriorRoomKey)spawn.room);
+	SetCharCoordinates(gPlayer[data.client].PedID, data.position[0], data.position[1], data.position[2]);
+	SetCharHeading(gPlayer[data.client].PedID, data.angle);
+	SetCharHealth(gPlayer[data.client].PedID, data.health);
+	AddArmourToChar(gPlayer[data.client].PedID, -1000);
+	AddArmourToChar(gPlayer[data.client].PedID, data.armor);
+	SetRoomForCharByKey(gPlayer[data.client].PedID, (eInteriorRoomKey)data.room);
 	Log("Player SPAWN END");
 }

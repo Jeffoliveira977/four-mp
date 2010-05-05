@@ -9,7 +9,6 @@
 
 #ifndef main_cpp
 
-extern int MyID;
 extern ClientState clientstate;
 
 extern FPlayer gPlayer[MAX_PLAYERS];

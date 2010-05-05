@@ -150,32 +150,20 @@ bool VehicleManager::GetVehicleColor(const short index, unsigned char (&color)[2
 
 bool VehicleManager::SetVehiclePosition(const short index, const float position[3])
 {
-	if ((index < 0) || (index >= vehiclebuffersize))
+	if (!this->SetVehiclePositionInternal(index, position))
 	{
 		return false;
 	}
-	if (vehiclebuffer[index] == NULL)
-	{
-		return false;
-	}
-	vehiclebuffer[index]->position[0] = position[0];
-	vehiclebuffer[index]->position[1] = position[1];
-	vehiclebuffer[index]->position[2] = position[2];
 	//TODO: sync it.
 	return true;
 }
 
 bool VehicleManager::SetVehicleAngle(const short index, const float angle)
 {
-	if ((index < 0) || (index >= vehiclebuffersize))
+	if (!this->SetVehicleAngleInternal(index, angle))
 	{
 		return false;
 	}
-	if (vehiclebuffer[index] == NULL)
-	{
-		return false;
-	}
-	vehiclebuffer[index]->angle = angle;
 	//TODO: sync it.
 	return true;
 }
@@ -195,4 +183,32 @@ short VehicleManager::GetVehicleFreeSlot(void)
 		return INVALID_VEHICLE_INDEX;
 	}
 	return index;
+}
+
+bool VehicleManager::SetVehiclePositionInternal(const short index, const float position[3])
+{
+	if ((index < 0) || (index >= vehiclebuffersize))
+	{
+		return false;
+	}
+	if (vehiclebuffer[index] == NULL)
+	{
+		return false;
+	}
+	memcpy(vehiclebuffer[index]->position, position, sizeof(float) * 3);
+	return true;
+}
+
+bool VehicleManager::SetVehicleAngleInternal(const short index, const float angle)
+{
+	if ((index < 0) || (index >= vehiclebuffersize))
+	{
+		return false;
+	}
+	if (vehiclebuffer[index] == NULL)
+	{
+		return false;
+	}
+	vehiclebuffer[index]->angle = angle;
+	return true;
 }

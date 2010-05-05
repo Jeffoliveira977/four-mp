@@ -33,5 +33,7 @@ private:
 	short vehiclebuffersize;
 	Vehicle **vehiclebuffer;
 	short GetVehicleFreeSlot(void);
+	bool SetVehiclePositionInternal(const short index, const float position[3]);
+	bool SetVehicleAngleInternal(const short index, const float angle);
 	friend class NetworkManager;
 };

@@ -50,11 +50,11 @@ FMPGUI Gui;
 ConsoleWindow conwindow;
 
 ClientState clientstate;
-int MyID = -1;
+short MyID = -1;
 int LastUpdate = 0;
 bool myEnter = 0;
 bool cheats = 0;
-int sel_cl = 0;
+unsigned char selectedplayerclass = 0;
 
 char model_select_text[128];
 
@@ -459,28 +459,31 @@ void FMPHook::GameThread()
 				SetPlayerControl(_GetPlayer(), 0);
 				if(GetAsyncKeyState(VK_SHIFT) != 0)
 				{
-					gPlayer[MyID].model = pClass[sel_cl].model;	
+					gPlayer[MyID].model = pClass[selectedplayerclass].model;	
 					SetPlayerControl(_GetPlayer(), 1);
 					clientstate.game = GameStateInGame;
 					if(Conf.ComponentSelect == 1) clientstate.game = GameStateComponentSelect;
 
 					if(Conf.ComponentSelect == 0)
 					{
+						NetworkPlayerSpawnRequestData data;
+						data.playerclassindex = selectedplayerclass;
 						RakNet::BitStream bsSend;
-						bsSend.Write(sel_cl);
+						bsSend.Write(data);
 						net->RPC("RPC_PlayerSpawn",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 						Log("Player Spawn");
 					}
 				}
 				else if(GetAsyncKeyState(VK_RIGHT) != 0)
 				{
-					sel_cl++;
-					if(sel_cl == Conf.NumSkins)
-						sel_cl = 0;
-					gPlayer[MyID].model = pClass[sel_cl].model;
-
+					selectedplayerclass++;
+					if(selectedplayerclass == Conf.NumSkins)
+						selectedplayerclass = 0;
+					gPlayer[MyID].model = pClass[selectedplayerclass].model;
+					NetworkPlayerModelChangeData data;
+					data.model = gPlayer[MyID].model;
 					RakNet::BitStream bsSend;
-					bsSend.Write(gPlayer[MyID].model);
+					bsSend.Write(data);
 					net->RPC("RPC_Select_ModelChanged",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 					Log("Select ModelChanged");
 					
@@ -489,17 +492,23 @@ void FMPHook::GameThread()
 					ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
 					SetCharDefaultComponentVariation(_GetPlayerPed());
 
-					sprintf(model_select_text, "Selected model id %d", sel_cl);
+					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
 				}
 				else if(GetAsyncKeyState(VK_LEFT) != 0)
 				{
-					sel_cl--;
-					if(sel_cl == -1)
-						sel_cl = Conf.NumSkins - 1;
-					gPlayer[MyID].model = pClass[sel_cl].model;
-
+					if (selectedplayerclass == 0)
+					{
+						selectedplayerclass = Conf.NumSkins - 1;
+					}
+					else
+					{
+						selectedplayerclass--;
+					}
+					gPlayer[MyID].model = pClass[selectedplayerclass].model;
+					NetworkPlayerModelChangeData data;
+					data.model = gPlayer[MyID].model;
 					RakNet::BitStream bsSend;
-					bsSend.Write(gPlayer[MyID].model);
+					bsSend.Write(data);
 					net->RPC("RPC_Select_ModelChanged",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 					Log("Select Model Changed");
 					
@@ -508,7 +517,7 @@ void FMPHook::GameThread()
 					ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
 					SetCharDefaultComponentVariation(_GetPlayerPed());
 
-					sprintf(model_select_text, "Selected model id %d", sel_cl);
+					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
 				}
 				break;
 			}
@@ -525,10 +534,11 @@ void FMPHook::GameThread()
 						gPlayer[MyID].compD[i] = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)i);
 						gPlayer[MyID].compT[i] = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)i);
 					}
-
+					NetworkPlayerComponentsChangeData data;
+					memcpy(data.compD, gPlayer[MyID].compD, sizeof(int) * 11);
+					memcpy(data.compT, gPlayer[MyID].compT, sizeof(int) * 11);
 					RakNet::BitStream bsSend;
-					bsSend.Write(gPlayer[MyID].compD);
-					bsSend.Write(gPlayer[MyID].compT);
+					bsSend.Write(data);
 					net->RPC("RPC_SyncSkinVariation",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 					Log("SEND SyncSkinVariation");
 
@@ -538,36 +548,41 @@ void FMPHook::GameThread()
 				}
 				else if(GetAsyncKeyState(VK_RIGHT) != 0)
 				{
-					int t = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)sel_cl)+1;
-					int d = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)sel_cl)+1;
+					int t = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)+1;
+					int d = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)+1;
 
-					SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)sel_cl, t, d);
+					SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass, t, d);
 
-					sprintf(model_select_text, "Selected model id %d", sel_cl);
+					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
 				}
 				else if(GetAsyncKeyState(VK_LEFT) != 0)
 				{
-					int t = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)sel_cl)-1;
+					int t = GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)-1;
 					if(t == -1) t = 0;
-					int d = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)sel_cl)-1;
+					int d = GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)-1;
 					if(d == -1) t = 0;
 
-					SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)sel_cl, t, d);
-					sprintf(model_select_text, "Selected model id %d", sel_cl);
+					SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass, t, d);
+					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
 				}
 				else if(GetAsyncKeyState(VK_DOWN) != 0)
 				{
-					sel_cl++;
-					if(sel_cl == 11)
-						sel_cl = 0;
-					sprintf(model_select_text, "Selected model id %d", sel_cl);
+					selectedplayerclass++;
+					if(selectedplayerclass == 11)
+						selectedplayerclass = 0;
+					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
 				}
 				else if(GetAsyncKeyState(VK_UP) != 0)
 				{
-					sel_cl--;
-					if(sel_cl == -1)
-						sel_cl = 10;
-					sprintf(model_select_text, "Selected model id %d", sel_cl);
+					if (selectedplayerclass == 0)
+					{
+						selectedplayerclass = 10;
+					}
+					else
+					{
+						selectedplayerclass--;
+					}
+					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
 				}
 				break;
 			}
@@ -600,7 +615,7 @@ void FMPHook::GetMyPos()
 	Log("MY POS (%f; %f; %f)", x, y, z);
 }
 
-void GetMyPos(ConsoleCore *concore, unsigned char numargs)
+void GetMyPos(ConsoleCore *concore, const unsigned char numargs)
 {
 	HOOK.GetMyPos();
 }
@@ -650,11 +665,8 @@ void NetworkThread(void *dummy)
 				Log("Connection accepted. Sending client info...");
 				NetworkPlayerConnectionRequestData data;
 				strcpy(data.name, Conf.Name);
-				//unsigned char namelength = strlen(Conf.Name);
 				RakNet::BitStream bsSend;
 				bsSend.Write(data);
-				//bsSend.Write(namelength);
-				//bsSend.Write(Conf.Name, namelength);
 				net->RPC("RPC_ClientConnect",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 				Log("Client info has been sent.");
 			}

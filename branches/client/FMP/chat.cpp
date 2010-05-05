@@ -3,6 +3,7 @@
 
 #include "log.h"
 #include "main.h"
+#include "..\..\Shared\Network\NetworkProtocol.h"
 // RakNet
 #include "..\..\Shared\RakNet\RakNetworkFactory.h"
 #include "..\..\Shared\RakNet\RakPeerInterface.h"
@@ -32,9 +33,10 @@ void AddChatMessage(char *msg, COLOR clr, int playerid = -1)
 
 void SendChatMessage()
 {
+	NetworkPlayerChatData data;
+	strcpy(data.msg, enterMsg);
 	RakNet::BitStream bsSend;
-	bsSend.Write(enterChat);
-	bsSend.Write(enterMsg);
+	bsSend.Write(data);
 	net->RPC("RPC_Chat",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 
 	enterChat = -1;

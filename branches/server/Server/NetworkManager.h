@@ -27,13 +27,13 @@ public:
 	void RecievePlayerMove(const RPCParameters *rpcParameters);
 	void RecievePlayerJump(const RPCParameters *rpcParameters);
 	void RecievePlayerDuck(const RPCParameters *rpcParameters);
-	void RecievePlayerEnterInVehicle(const RPCParameters *rpcParameters);
-	void RecievePlayerCancelEnterInVehicle(const RPCParameters *rpcParameters);
+	void RecievePlayerEntranceInVehicle(const RPCParameters *rpcParameters);
+	void RecievePlayerCancelEntranceInVehicle(const RPCParameters *rpcParameters);
 	void RecievePlayerExitFromVehicle(const RPCParameters *rpcParameters);
 	void RecievePlayerFire(const RPCParameters *rpcParameters);
 	void RecievePlayerAim(const RPCParameters *rpcParameters);
 	void RecievePlayerWeaponChange(const RPCParameters *rpcParameters);
-	void RecievePlayerHealthAndArmourChange(const RPCParameters *rpcParameters);
+	void RecievePlayerHealthAndArmorChange(const RPCParameters *rpcParameters);
 	void RecievePlayerSpawnRequest(const RPCParameters *rpcParameters);
 	void RecievePlayerModelChange(const RPCParameters *rpcParameters);
 	void RecievePlayerComponentsChange(const RPCParameters *rpcParameters);

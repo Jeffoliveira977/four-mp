@@ -35,12 +35,12 @@ void RPC_DuckPlayer(RPCParameters *rpcParameters)
 
 void RPC_PlayerEnterInVehicle(RPCParameters *rpcParameters)
 {
-	nm.RecievePlayerEnterInVehicle(rpcParameters);
+	nm.RecievePlayerEntranceInVehicle(rpcParameters);
 }
 
 void RPC_PlayerCancelEnterInVehicle(RPCParameters *rpcParameters)
 {
-	nm.RecievePlayerCancelEnterInVehicle(rpcParameters);
+	nm.RecievePlayerCancelEntranceInVehicle(rpcParameters);
 }
 
 void RPC_PlayerExitFromVehicle(RPCParameters *rpcParameters)
@@ -65,7 +65,7 @@ void RPC_SwapGun(RPCParameters *rpcParameters)
 
 void RPC_PlayerParams(RPCParameters *rpcParameters)
 {
-	nm.RecievePlayerHealthAndArmourChange(rpcParameters);
+	nm.RecievePlayerHealthAndArmorChange(rpcParameters);
 }
 
 void RPC_PlayerSpawn(RPCParameters *rpcParameters)

@@ -8,6 +8,7 @@
 #include <process.h>
 #include <stdio.h>
 #include "../structs.h"
+#include "..\..\..\Shared\Network\NetworkProtocol.h"
 /* ----------------------------------------------------------------------------------------------------- */
 /*					             Классы и структуры работы с потоками                                    */
 /* ----------------------------------------------------------------------------------------------------- */
@@ -187,7 +188,7 @@ public:
 	void PlayerSyncSkin(int, int);
 	void PlayerSyncSkinVariation(int, int*, int*);
 
-	void xPlayerSpawn(int, SpawnInfo);
+	void xPlayerSpawn(NetworkPlayerSpawnData data);
 
 	void InputFreeze(bool);
 

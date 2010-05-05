@@ -10,6 +10,7 @@ Syncronizashion this player
 #include "Hook\classes.h"
 #include "Hook\scripting.h"
 #include "functions.h"
+#include "..\..\Shared\Network\NetworkProtocol.h"
 
 // RakNet
 #include "..\..\Shared\RakNet\RakNetworkFactory.h"
@@ -19,6 +20,7 @@ Syncronizashion this player
 using namespace Natives;
 
 extern RakPeerInterface *net;
+extern short MyID;
 extern bool myEnter;
 
 
@@ -72,12 +74,14 @@ void FMPHook::MoveSync()
 			speed = speed * dr;
 			GetCarHeading(car, &a);
 		}
+		NetworkPlayerMoveData data;
+		data.position[0] = x;
+		data.position[1] = y;
+		data.position[2] = z;
+		data.angle = a;
+		data.speed = speed;
 		RakNet::BitStream bsSend;
-		bsSend.Write(x);
-		bsSend.Write(y);
-		bsSend.Write(z);
-		bsSend.Write(a);
-		bsSend.Write(speed);
+		bsSend.Write(data);
 		net->RPC("RPC_MovePlayer",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 		Log("MOVE SENDed");
 		gPlayer[MyID].position[0] = x;
@@ -95,8 +99,10 @@ void FMPHook::MoveSync()
 	if(IsCharDucking(gPlayer[MyID].PedID) != gPlayer[MyID].isducking)
 	{
 		gPlayer[MyID].isducking = IsCharDucking(gPlayer[MyID].PedID);
+		NetworkPlayerDuckData data;
+		data.shouldduck = gPlayer[MyID].isducking;
 		RakNet::BitStream bsSend;
-		bsSend.Write(gPlayer[MyID].isducking);
+		bsSend.Write(data);
 		net->RPC("RPC_DuckPlayer",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 		Log("DUCK SENDed");
 	}
@@ -107,9 +113,11 @@ void FMPHook::CarDoSync()
 	if(IsCharInAnyCar(gPlayer[MyID].PedID) && gPlayer[MyID].vehicleindex == -1)
 	{
 		gPlayer[MyID].vehicleindex = GetPlayerCar(_GetPedVehicle(gPlayer[MyID].PedID));
+		NetworkPlayerEntranceInVehicleData data;
+		data.vehicleindex = gPlayer[MyID].vehicleindex;
+		data.seat = 100;
 		RakNet::BitStream bsSend;
-		bsSend.Write(gPlayer[MyID].vehicleindex);
-		bsSend.Write(100);
+		bsSend.Write(data);
 		net->RPC("RPC_PlayerEnterInVehicle",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 	}
 	else if(!IsCharInAnyCar(gPlayer[MyID].PedID) && gPlayer[MyID].vehicleindex != -1)
@@ -129,9 +137,11 @@ void FMPHook::CarDoSync()
 			carid = _GetClosestCar(x, y, z, 10);
 			if(carid != -1)
 			{
+				NetworkPlayerEntranceInVehicleData data;
+				data.vehicleindex = carid;
+				data.seat = -1;
 				RakNet::BitStream bsSend;
-				bsSend.Write(carid);
-				bsSend.Write(-1);
+				bsSend.Write(data);
 				net->RPC("RPC_PlayerEnterInVehicle",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 				myEnter = 1;
 			}
@@ -189,9 +199,11 @@ void FMPHook::CarDoSync()
 			if(seatid >= 0)
 			{
 				TaskEnterCarAsPassenger(gPlayer[MyID].PedID, gCar[carid].CarID, -1, seatid);
+				NetworkPlayerEntranceInVehicleData data;
+				data.vehicleindex = carid;
+				data.seat = seatid;
 				RakNet::BitStream bsSend;
-				bsSend.Write(carid);
-				bsSend.Write(seatid);
+				bsSend.Write(data);
 				net->RPC("RPC_PlayerEnterInVehicle",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 			}
 		}
@@ -231,8 +243,10 @@ void FMPHook::GunSync()
 	if(gun != gPlayer[MyID].currentweapon)
 	{
 		gPlayer[MyID].currentweapon = gun;
+		NetworkPlayerWeaponChangeData data;
+		data.weapon = gun;
 		RakNet::BitStream bsSend;
-		bsSend.Write(gun);
+		bsSend.Write(data);
 		net->RPC("RPC_SwapGun",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 	}
 	Log("AIM FIRE");
@@ -264,7 +278,7 @@ void FMPHook::GunSync()
 		z = c + cz;
 
 		PlayerDamage dam;
-		dam.pid = -1; dam.hp = 0; dam.armour = 0;
+		dam.pid = -1; dam.hp = 0; dam.armor = 0;
 
 		unsigned char i;
 		unsigned int hp, ar;
@@ -274,25 +288,27 @@ void FMPHook::GunSync()
 			{
 				GetCharHealth(gPlayer[i].PedID, &hp);
 				GetCharArmour(gPlayer[i].PedID, &ar);
-				if(ar != gPlayer[i].armour || hp != gPlayer[i].health)
+				if(ar != gPlayer[i].armor || hp != gPlayer[i].health)
 				{
 					dam.pid = i;
 					dam.hp = hp;
-					dam.armour = ar;
+					dam.armor = ar;
 					break;
 				}
 			}
 		}
 
+		NetworkPlayerFireData data;
+		data.position[0] = x;
+		data.position[1] = y;
+		data.position[2] = z;
+		data.weapon = gun;
+		data.time = time;
+		data.target = i;
+		data.health = hp;
+		data.armor = ar;
 		RakNet::BitStream bsSend;
-		bsSend.Write(x);
-		bsSend.Write(y);
-		bsSend.Write(z);
-		bsSend.Write(gun);
-		bsSend.Write(time);
-		bsSend.Write(i);
-		bsSend.Write(hp);
-		bsSend.Write(ar);
+		bsSend.Write(data);
 		net->RPC("RPC_PlayerFire",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 	}
 	else if(IsControlPressed(0, 138)!=0) // Aim
@@ -325,12 +341,14 @@ void FMPHook::GunSync()
 		z = c + cz;
 		Log("TARGET %d", 4);
 		Log("Send");
+		NetworkPlayerAimData data;
+		data.position[0] = x;
+		data.position[1] = y;
+		data.position[2] = z;
+		data.weapon = gun;
+		data.time = time;
 		RakNet::BitStream bsSend;
-		bsSend.Write(x);
-		bsSend.Write(y);
-		bsSend.Write(z);
-		bsSend.Write(gun);
-		bsSend.Write(time);
+		bsSend.Write(data);
 		net->RPC("RPC_PlayerAim",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 	}
 	else if(gPlayer[MyID].Aim == 1)
@@ -347,14 +365,15 @@ void FMPHook::StatusSync()
 	unsigned int hp, arm;
 	GetCharHealth(gPlayer[MyID].PedID, &hp);
 	GetCharArmour(gPlayer[MyID].PedID, &arm);
-	if(hp != gPlayer[MyID].health || arm != gPlayer[MyID].armour)
+	if(hp != gPlayer[MyID].health || arm != gPlayer[MyID].armor)
 	{
 		gPlayer[MyID].health = hp;
-		gPlayer[MyID].armour = arm;
-
+		gPlayer[MyID].armor = arm;
+		NetworkPlayerHealthAndArmorChangeData data;
+		data.health = hp;
+		data.armor = arm;
 		RakNet::BitStream bsSend;
-		bsSend.Write(hp);
-		bsSend.Write(arm);
+		bsSend.Write(data);
 		net->RPC("RPC_PlayerParams",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
 	}
 }
