@@ -722,11 +722,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 		concore.RegisterStandardLibrary();
 		patchCode();
 
-		if(dwGameVersion == 0x00010006)
+		GetAddresses(dwGameVersion);
+
+		if(dwGameVersion == 0x1060 || dwGameVersion == 0x1051 || dwGameVersion == 0x1050)
 		{
 			Log("Skip load screens");
 			JmpHook(CGAME_PROCESS_SLEEP, CGAME_PROCESS_START_GAME);
-
 			SetString(GAME_NAME,"GTA IV: FOUR-MP");
 
 			Debug("Set DX9 Hook");
@@ -739,7 +740,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 			NetworkThreadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&NetworkThread, 0, 0, (LPDWORD)&threadId);
 		}
 		else
-			Log("This version not supported");
+			Log("This version not supported (%x)", dwGameVersion);
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{

@@ -3,6 +3,7 @@
 *	Created by:			009
 *	Last Modifed:		-
 */
+#pragma once
 
 enum NativesSystem {
 	NATIVE_TIMERA = 0x75706300,

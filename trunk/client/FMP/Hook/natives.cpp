@@ -1,5 +1,6 @@
 #include <windows.h>
 #include "../log.h"
+#include "hook.h"
 #include "natives.h"
 
 extern DWORD dwLoadOffset;
@@ -9,11 +10,9 @@ int GetNativeAddressByHash(unsigned int a1)
 	if(a1 == -1) return 0;
 	Debug("# GetNativeAddress: 0x%x , natives count: %d",a1,*(DWORD*)(0x18DF6EC+dwLoadOffset));
 
-	//DWORD pointer1 = *(DWORD*)(0x10890AC+dwLoadOffset);
-	//DWORD pointer2 = *(DWORD*)(0x10890A8+dwLoadOffset);
-	DWORD pointer1 = *(DWORD*)(0x198233C+dwLoadOffset);
-	DWORD pointer2 = *(DWORD*)(0x1982338+dwLoadOffset);
-	
+	DWORD pointer1 = *(DWORD*)SCRIPT_POINTER_1;
+	DWORD pointer2 = *(DWORD*)SCRIPT_POINTER_2;
+
 	Debug("# pointers: [0x%x]:(%d),[0x%x]:(%d)",pointer1,pointer1,pointer2,pointer2);
 
 	unsigned int v2;

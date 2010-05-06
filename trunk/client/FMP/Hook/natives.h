@@ -1,3 +1,5 @@
+#pragma once
+
 #include "types.h"
 #include "../log.h"
 #include "natives_list.h"

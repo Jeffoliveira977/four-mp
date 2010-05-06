@@ -2,6 +2,27 @@
 #include "hook.h"
 #include "../log.h"
 
+/* DirectX */
+DWORD ADDRESS_CREATE_DEVICE = 0x0;
+/* Scripts */
+DWORD ADDRESS_HASH_GET = 0x0;
+DWORD ADDRESS_THREAD_ID = 0x0;
+DWORD ADDRESS_SCRIPTS_COUNT = 0x0;
+DWORD SCRIPT_POINTER_1 = 0x0;
+DWORD SCRIPT_POINTER_2 = 0x0;
+/* Threads */
+DWORD ADDRESS_ACTIVE_THREAD = 0x0; 
+DWORD ADDRESS_THREADS_ARRAY = 0x0;
+DWORD ADDRESS_THREAD_TICK = 0x0;
+/* Pools */
+DWORD ADDRESS_PED_POOL = 0x0;
+DWORD ADDRESS_PLAYER_POOL = 0x0;
+DWORD ADDRESS_VEHICLE_POOL = 0x0;
+/* Game */
+DWORD CGAME_PROCESS_SLEEP = 0x0;
+DWORD CGAME_PROCESS_LOAD_MENU = 0x0;
+DWORD CGAME_PROCESS_START_GAME = 0x0;
+DWORD GAME_NAME = 0x0;
 
 FMPHook::FMPHook(): FMPThread()
 {
@@ -214,4 +235,83 @@ void SetString(DWORD address, char* string)
     DWORD oldp;
     VirtualProtect((PVOID)address,2,PAGE_EXECUTE_READWRITE,&oldp);
     strcpy((PCHAR)address,string);
+}
+
+void GetAddresses(DWORD version)
+{
+	switch(version)
+	{
+	case 0x1060: // Patch 1.0.6.0 (ENG-US)
+		{
+			/* DirectX */
+			ADDRESS_CREATE_DEVICE = 0xD301E4+dwLoadOffset;
+			/* Scripts */
+			ADDRESS_HASH_GET = 0x5A7FC0+dwLoadOffset;
+			ADDRESS_THREAD_ID = 0x1848B00+dwLoadOffset;
+			ADDRESS_SCRIPTS_COUNT = 0x1848B1C+dwLoadOffset;
+			SCRIPT_POINTER_1 = 0x198233C+dwLoadOffset;
+			SCRIPT_POINTER_2 = 0x1982338+dwLoadOffset;
+			/* Threads */
+			ADDRESS_ACTIVE_THREAD = 0x1848B04+dwLoadOffset; 
+			ADDRESS_THREADS_ARRAY = 0x1982320+dwLoadOffset;
+			ADDRESS_THREAD_TICK = 0xBBCC40+dwLoadOffset;
+			/* Pools */
+			/*ADDRESS_PED_POOL = 0x175B77C+dwLoadOffset;
+			ADDRESS_PLAYER_POOL = 0x1033058+dwLoadOffset;
+			ADDRESS_VEHICLE_POOL = 0x11F4F30+dwLoadOffset;*/
+			/* Game */
+			CGAME_PROCESS_SLEEP = 0x402B5C + dwLoadOffset;
+			CGAME_PROCESS_LOAD_MENU = 0x402BEA + dwLoadOffset;
+			CGAME_PROCESS_START_GAME = 0x402C1D + dwLoadOffset;
+			GAME_NAME = 0xE9D13C+dwLoadOffset;
+		} break;
+	case 0x1051: // Patch 1.0.6.0 / 1.0.5.1 (RUS)
+		{
+			/* DirectX */
+			ADDRESS_CREATE_DEVICE = 0xD2FF52+dwLoadOffset;
+			/* Scripts */
+			ADDRESS_HASH_GET = 0x5A7D10+dwLoadOffset;
+			ADDRESS_THREAD_ID = 0x1848B00+dwLoadOffset;
+			ADDRESS_SCRIPTS_COUNT = 0x1848B1C+dwLoadOffset;
+			SCRIPT_POINTER_1 = 0x198233C+dwLoadOffset;
+			SCRIPT_POINTER_2 = 0x1982338+dwLoadOffset;
+			/* Threads */
+			ADDRESS_ACTIVE_THREAD = 0x1848B04+dwLoadOffset; 
+			ADDRESS_THREADS_ARRAY = 0x1982320+dwLoadOffset;
+			ADDRESS_THREAD_TICK = 0xBC0230+dwLoadOffset;
+			/* Pools */
+			/*ADDRESS_PED_POOL = 0x175B77C+dwLoadOffset;
+			ADDRESS_PLAYER_POOL = 0x1033058+dwLoadOffset;
+			ADDRESS_VEHICLE_POOL = 0x11F4F30+dwLoadOffset;*/
+			/* Game */
+			CGAME_PROCESS_SLEEP = 0x402B5C + dwLoadOffset;
+			CGAME_PROCESS_LOAD_MENU = 0x402BEA + dwLoadOffset;
+			CGAME_PROCESS_START_GAME = 0x402C1D + dwLoadOffset;
+			GAME_NAME = 0xE9D11C+dwLoadOffset;
+		} break;
+	case 0x1050: // Patch 1.0.0.4
+		{	
+			/* DirectX */
+			ADDRESS_CREATE_DEVICE = 0xCE32AC+dwLoadOffset;
+			/* Scripts */
+			ADDRESS_HASH_GET = 0x6CF530+dwLoadOffset;
+			ADDRESS_THREAD_ID = 0x17DF36C+dwLoadOffset;
+			ADDRESS_SCRIPTS_COUNT = 0x17DF364+dwLoadOffset;
+			SCRIPT_POINTER_1 = 0x18DF6E4+dwLoadOffset;
+			SCRIPT_POINTER_2 = 0x18DF6E0+dwLoadOffset;
+			/* Threads */
+			ADDRESS_ACTIVE_THREAD = 0x17DF370+dwLoadOffset; 
+			ADDRESS_THREADS_ARRAY = 0x18DF6C8+dwLoadOffset;
+			ADDRESS_THREAD_TICK = 0xB4E1F0+dwLoadOffset;
+			/* Pools */
+			/*ADDRESS_PED_POOL = 0x175B77C+dwLoadOffset;
+			ADDRESS_PLAYER_POOL = 0x1033058+dwLoadOffset;
+			ADDRESS_VEHICLE_POOL = 0x11F4F30+dwLoadOffset;*/
+			/* Game */
+			CGAME_PROCESS_SLEEP = 0x526E79 + dwLoadOffset;
+			//CGAME_PROCESS_LOAD_MENU = 0x402BEA + dwLoadOffset;//
+			CGAME_PROCESS_START_GAME = 0x526F43 + dwLoadOffset;
+			GAME_NAME = 0xDEC28C+dwLoadOffset;
+		} break;
+	}
 }
