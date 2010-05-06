@@ -74,7 +74,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				AdditionalOptions="/NODEFAULTLIB:LIBCMT"
-				OutputFile="$(SolutionDir)\Gui.lib"
+				OutputFile="Gui.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -138,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(SolutionDir)\Guid.lib"
+				OutputFile="Guid.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
