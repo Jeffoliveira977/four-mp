@@ -1,0 +1,567 @@
+#include "CGUI.h"
+
+CGUI::CGUI( IDirect3DDevice9 * pDevice )
+{
+	if( !pDevice )
+		MessageBoxA( 0, "pDevice invalid.", 0, 0 );
+
+	m_pDevice = pDevice;
+	m_wFocus = 0;
+
+	D3DXCreateSprite( pDevice, &m_pSprite );
+	D3DXCreateLine( pDevice, &m_pLine );
+
+	m_pMouse = new CMouse( this, pDevice, m_pSprite );
+	m_pKeyboard = new CKeyboard(this);
+	m_pFont = 0;
+
+	Cvars[ "$Value" ] = new CVar( SliderValue );
+	Cvars[ "$MaxValue" ] = new CVar( MaxValue );
+	Cvars[ "$MinValue" ] = new CVar( MinValue );
+
+	SetVisible( false );
+	m_bReload = false;
+}
+
+CGUI::~CGUI()
+{
+	for( std::map<std::string,CVar*>::iterator iIter = Cvars.begin(); iIter != Cvars.end(); iIter++ )
+		SAFE_DELETE( iIter->second )
+
+	SAFE_DELETE( m_pFont )
+	SAFE_DELETE( m_pMouse )
+	SAFE_DELETE( m_pKeyboard )
+
+	SAFE_RELEASE( m_pSprite )
+	SAFE_RELEASE( m_pLine )
+
+	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
+		SAFE_DELETE( m_vWindows[i] )
+}
+
+void CGUI::LoadFont(int size, char *font)
+{
+	m_pFont = new CFont( this, GetDevice(), size, font );
+}
+
+void CGUI::SetFontColors(int Index, int r, int g, int b, int a)
+{
+	m_pFont->SetColor( Index, CColor( r, g, b, a ) );
+}
+
+void CGUI::SetVarInt(const char *name, int value)
+{
+	Cvars[ name ] = new CVar( value );
+}
+
+void CGUI::SetVarString(const char *name, std::string value)
+{
+	Cvars[ name ] = new CVar( value );
+}
+
+void CGUI::SetVarBool(const char *name, bool value)
+{
+	Cvars[ name ] = new CVar( value );
+}
+
+void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
+{
+	TiXmlDocument Document;
+
+	if( !Document.LoadFile( pszFilePath ) )
+	{
+		MessageBoxA( 0, Document.ErrorDesc(), "XML Error", 0 );
+		return;
+	}
+	
+	TiXmlHandle hDoc( &Document );
+
+	TiXmlElement * pGUI = hDoc.FirstChildElement( "GUI" ).Element();
+	if( pGUI )
+	{
+		TiXmlElement * pColorThemes = pGUI->FirstChildElement( "ColorThemes" );
+		if( pColorThemes )
+		{
+			const char * pszDefaultTheme = pColorThemes->Attribute( "default" );
+			if( pszDefaultTheme )
+					m_sCurTheme = pszDefaultTheme;
+
+			for( TiXmlElement * pThemeElement = pColorThemes->FirstChildElement(); pThemeElement; pThemeElement = pThemeElement->NextSiblingElement() )
+				for( TiXmlElement * pElementElement = pThemeElement->FirstChildElement(); pElementElement; pElementElement = pElementElement->NextSiblingElement() )
+				{
+					SElement * sCurElement = new SElement();
+
+					const char * pszDefault = pElementElement->Attribute( "default" );
+					if( pszDefault )
+						sCurElement->sDefaultState = std::string( pszDefault );
+
+					for( TiXmlElement * pStateElement = pElementElement->FirstChildElement( "State" ); pStateElement; pStateElement = pStateElement->NextSiblingElement( "State" ) )
+					{
+						const char * pszString = pStateElement->Attribute( "string" );
+
+						if( !pszString )
+							continue;
+
+						SElementState * pState = sCurElement->m_mStates[ pszString ] = new SElementState();
+
+						pState->pParent = sCurElement;
+
+						for( TiXmlElement * pColorElement = pStateElement->FirstChildElement( "Color" ); pColorElement; pColorElement = pColorElement->NextSiblingElement( "Color" ) )
+						{
+							pszString = pColorElement->Attribute( "string" );
+
+							if( !pszString )
+								continue;
+
+							pState->mColors[ pszString ] = new CColor( pColorElement );
+						}
+						for( TiXmlElement * pTextureElement = pStateElement->FirstChildElement( "Texture" ); pTextureElement; pTextureElement = pTextureElement->NextSiblingElement( "Texture" ) )
+						{
+							std::stringstream sStream;
+
+							sStream << pThemeElement->Value() << "/" << dir << pTextureElement->Attribute( "path" );
+							
+							pState->mTextures[ pTextureElement->Attribute( "string" ) ] = new CTexture( GetSprite(), sStream.str().c_str(), new CColor(pTextureElement) );
+						}
+						for( TiXmlElement * pIntElement = pStateElement->FirstChildElement( "Int" ); pIntElement; pIntElement = pIntElement->NextSiblingElement( "Int" ) )
+						{
+							pszString = pIntElement->Attribute( "string" );
+
+							if( !pszString )
+								continue;
+
+							pState->mInts[ pszString ] = atoi(pIntElement->Attribute("value"));
+						}
+
+						m_mThemes[ pThemeElement->Value() ][ pElementElement->Value() ] = sCurElement;
+					}
+				}
+		}
+	}
+}
+
+void CGUI::UpdateFromFile( const char * pszFilePath )
+{
+	TiXmlDocument Document;
+
+	if( !Document.LoadFile( pszFilePath ) )
+	{
+		MessageBoxA(NULL, Document.ErrorDesc(), "UpdateGUI", MB_OK);
+		return;
+	}
+
+	TiXmlHandle hDoc( &Document );
+
+	TiXmlElement * pGUI = hDoc.FirstChildElement( "GUI" ).Element();
+	if( !pGUI ) 
+	{
+		MessageBoxA(NULL, "XML Error", "UpdateGUI", MB_OK);
+		return;
+	}
+
+	for( TiXmlElement * pThemeElement = pGUI->FirstChildElement(); pThemeElement; pThemeElement = pThemeElement->NextSiblingElement() )
+	{
+		int Index = 0;
+		CWindow *wParent = NULL;
+
+		if(strcmp(pThemeElement->Value(), "Over") == 0) Index = 1;
+		if(strcmp(pThemeElement->Attribute("parent"), "none") != 0)
+			wParent = GetWindowByString(pThemeElement->Attribute("parent"), 1);
+
+		for( TiXmlElement * pElementElement = pThemeElement->FirstChildElement(); pElementElement; pElementElement = pElementElement->NextSiblingElement() )
+		{
+			const char *Element = pElementElement->Value();
+
+			if(strcmp(Element, "Element") == 0)
+			{
+				CElement *Element;
+				if(wParent == NULL)
+					Element = GetWindowByString(pElementElement->Attribute("name"), 1);
+				else
+					Element = wParent->GetElementByString(pElementElement->Attribute("name"), 1);
+				
+				for(TiXmlElement * pElem = pElementElement->FirstChildElement( "Base" ); pElem; pElem = pElem->NextSiblingElement( "Base" ))
+				{
+					const char *name = pElem->Attribute("string");
+					const char *value = pElem->Attribute("value");
+					if(strcmp(name, "height") == 0) Element->SetHeight(atoi(value));
+					else if(strcmp(name, "width") == 0) Element->SetWidth(atoi(value));
+					else if(strcmp(name, "name") == 0) Element->SetString(value);
+					else if(strcmp(name, "x") == 0) Element->SetRelPos(atoi(value), -1);
+					else if(strcmp(name, "y") == 0) Element->SetRelPos(-1, atoi(value));
+					else if(strcmp(name, "style") == 0) 
+					{
+						Element->SetThemeElement( GetThemeElement( value ), atoi(pElem->Attribute("number")));
+						Element->SetElementState("Norm", atoi(pElem->Attribute("number")));
+					}
+				}
+
+				TiXmlElement * pElem = pElementElement->FirstChildElement( "Font" );
+				if(pElem)
+				{
+					Element->SetFont(atoi(pElem->Attribute("size")), (char*)pElem->Attribute("name"), 
+						pElem->Attribute("bold")[0]=='1', pElem->Attribute("italic")[0]=='1');
+				}
+			}
+			else if(strcmp(Element, "Line") == 0)
+			{
+				CLine *tLine = new CLine(this, atoi(pElementElement->Attribute("sx")), atoi(pElementElement->Attribute("sy")),
+					atoi(pElementElement->Attribute("ex")),	atoi(pElementElement->Attribute("ey")),
+					atoi(pElementElement->Attribute("size")), new CColor(pElementElement), wParent);
+
+				if(!wParent) m_eLine[Index].push_back(tLine);
+				else wParent->m_eLine[Index].push_back(tLine);
+			}
+			else if(strcmp(Element, "Box") == 0)
+			{
+				CColor *Inner, *Border;
+
+				TiXmlElement * pColorElement = pElementElement->FirstChildElement( "Color" ); 
+				if(strcmp(pColorElement->Attribute("string"), "Inner") == 0) Inner = new CColor(pColorElement);
+				else if(strcmp(pColorElement->Attribute("string"), "Border") == 0) Border = new CColor(pColorElement);
+
+				pColorElement = pColorElement->NextSiblingElement( "Color" );
+				if(strcmp(pColorElement->Attribute("string"), "Inner") == 0) Inner = new CColor(pColorElement);
+				else if(strcmp(pColorElement->Attribute("string"), "Border") == 0) Border = new CColor(pColorElement);
+
+				CBox *tBox = new CBox(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
+					atoi(pElementElement->Attribute("width")), atoi(pElementElement->Attribute("height")),
+					Inner, Border, wParent);
+
+				if(!wParent) m_eBox[Index].push_back(tBox);
+				else wParent->m_eBox[Index].push_back(tBox);
+			}
+			else if(strcmp(Element, "Text") == 0)
+			{
+				CText *tText = new CText(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
+					atoi(pElementElement->Attribute("width")), 20, pElementElement->Attribute("string"), 
+					pElementElement->Attribute("name"), NULL);
+				if(!wParent) m_eText[Index].push_back(tText);
+				else wParent->AddElement(tText);
+			}
+			else if(strcmp(Element, "Image") == 0)
+			{
+				CTexture *tTexture = new CTexture(GetSprite(), pElementElement->Attribute("src"), new CColor(pElementElement));
+
+				CImage *tImg = new CImage(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
+					atoi(pElementElement->Attribute("width")), atoi(pElementElement->Attribute("height")),
+					tTexture, wParent);
+
+				if(!wParent) m_eImage[Index].push_back(tImg);
+				else wParent->m_eImage[Index].push_back(tImg);
+			}
+		}
+	}
+}
+
+void CGUI::FillArea( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3dColor )
+{
+	DrawLine( iX + iWidth / 2, iY, iX + iWidth / 2, iY + iHeight, iWidth, d3dColor );
+}
+
+void CGUI::DrawLine( int iStartX, int iStartY, int iEndX, int iEndY, int iWidth, D3DCOLOR d3dColor )
+{
+	m_pLine->SetWidth( static_cast<float>( iWidth ) );
+
+	D3DXVECTOR2 d3dxVector[2];
+	
+	d3dxVector[0] = D3DXVECTOR2( static_cast<float>( iStartX ), static_cast<float>( iStartY ) );
+	d3dxVector[1] = D3DXVECTOR2( static_cast<float>( iEndX ), static_cast<float>( iEndY ) );
+	
+	m_pLine->Begin();
+	m_pLine->Draw( d3dxVector, 2, d3dColor );
+	m_pLine->End();
+}
+
+void CGUI::DrawOutlinedBox( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3dInnerColor, D3DCOLOR d3dBorderColor )
+{
+	FillArea( iX + 1, iY + 1, iWidth - 2,  iHeight - 2, d3dInnerColor );
+
+	DrawLine( iX,				iY,					iX,					iY + iHeight,		1, d3dBorderColor );
+	DrawLine( iX + 1,			iY,					iX + iWidth - 1,	iY,					1, d3dBorderColor );
+	DrawLine( iX + 1,			iY + iHeight - 1,	iX + iWidth - 1,	iY + iHeight - 1,	1, d3dBorderColor );
+	DrawLine( iX + iWidth - 1,	iY,					iX + iWidth - 1,	iY + iHeight,		1, d3dBorderColor );
+}
+
+CWindow * CGUI::AddWindow( CWindow * pWindow ) 
+{
+	m_vWindows.push_back( pWindow );
+	return m_vWindows.back();
+}
+
+void CGUI::BringToTop( CWindow * pWindow )
+{
+	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
+	{
+		if(!m_vWindows[i]) continue;
+		if( m_vWindows[i] == pWindow )
+			m_vWindows.erase( m_vWindows.begin() + i );
+	}
+
+	if(m_wFocus)
+		m_wFocus->LostFocus();
+	if(pWindow)
+		pWindow->GotFocus();
+
+	m_vWindows.insert(  m_vWindows.end(), pWindow );
+	m_wFocus = pWindow;
+}
+
+void CGUI::Draw()
+{
+	if( !IsVisible() )
+		return;
+
+	PreDraw();
+
+	for(int i = 0; i < (int)m_eLine[0].size(); i++)
+		m_eLine[0][i]->Draw();
+
+	for(int i = 0; i < (int)m_eBox[0].size(); i++)
+		m_eBox[0][i]->Draw();
+
+	for(int i = 0; i < (int)m_eText[0].size(); i++)
+		m_eText[0][i]->Draw();
+
+	for(int i = 0; i < (int)m_eImage[0].size(); i++)
+		m_eImage[0][i]->Draw();
+
+	for( int iIndex = 0; iIndex < static_cast<int>( m_vWindows.size() ); iIndex++ )
+	{
+		if(!m_vWindows[ iIndex ]) continue;
+		if( !m_vWindows[ iIndex ]->IsVisible() )
+			continue;
+
+		m_vWindows[ iIndex ]->Draw();
+	}
+	
+	for(int i = 0; i < (int)m_eLine[1].size(); i++)
+		m_eLine[1][i]->Draw();
+
+	for(int i = 0; i < (int)m_eBox[1].size(); i++)
+		m_eBox[1][i]->Draw();
+
+	for(int i = 0; i < (int)m_eText[1].size(); i++)
+		m_eText[1][i]->Draw();
+
+	for(int i = 0; i < (int)m_eImage[1].size(); i++)
+		m_eImage[1][i]->Draw();
+
+	GetMouse()->Draw();
+}
+
+void CGUI::PreDraw()
+{
+	if( !m_tPreDrawTimer.Running() )
+	{
+		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
+		{
+			if(!m_vWindows[ iIndex ]) continue;
+			if( !m_vWindows[ iIndex ]->IsVisible() )
+				continue;
+
+			m_vWindows[ iIndex ]->PreDraw();
+		}
+
+		m_tPreDrawTimer.Start( 0.1f );
+	}
+}
+
+void CGUI::MouseMove( CMouse * pMouse )
+{
+	CElement * pDragging = GetMouse()->GetDragging();
+
+	if( !pDragging )
+	{
+		bool bGotWindow = false;
+
+		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
+		{
+			if(!m_vWindows[ iIndex ]) continue;
+			if( !m_vWindows[ iIndex ]->IsVisible() )
+				continue;
+
+			int iHeight = 0;
+
+			if( !m_vWindows[ iIndex ]->GetMaximized() )
+				iHeight = m_vWindows[ iIndex ]->GetTitleBarHeight();
+
+			if( !bGotWindow && GetMouse()->InArea( m_vWindows[ iIndex ], iHeight ) )
+			{
+				m_vWindows[ iIndex ]->MouseMove( pMouse );
+				bGotWindow = true;
+				break;
+			}
+			else
+			{
+				pMouse->SavePos();
+				pMouse->SetPos( -1, -1 );
+				m_vWindows[ iIndex ]->MouseMove( pMouse );
+				pMouse->LoadPos();
+			}
+		}
+	}
+	else
+		pDragging->MouseMove( pMouse );
+}
+
+bool CGUI::KeyEvent( SKey sKey )
+{
+	bool bTop = false;
+
+	if( !sKey.m_vKey && ( sKey.m_bDown || ( GetMouse()->GetWheel() && !sKey.m_bDown ) ) )
+	{
+		CMouse * pMouse = GetMouse();
+
+		//std::vector<CWindow*> vRepeat;
+
+		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
+		{
+			if(!m_vWindows[ iIndex ]) continue;
+
+			if( !m_vWindows[ iIndex ]->IsVisible() )
+				continue;
+
+			if( !bTop )
+			{
+				int iHeight = 0;
+
+				if( !m_vWindows[ iIndex ]->GetMaximized() )
+					iHeight = m_vWindows[ iIndex ]->GetTitleBarHeight();
+
+				if( pMouse->InArea( m_vWindows[ iIndex ], iHeight ) && !bTop )
+				{
+					m_vWindows[ iIndex ]->KeyEvent( sKey );
+					bTop = true;
+					break;
+				}
+				/*else
+					vRepeat.push_back( m_vWindows[ iIndex ] );*/
+			}
+			/*else
+			{
+				pMouse->SavePos();
+				pMouse->SetPos( CPos( -1, -1 ) );
+				m_vWindows[ iIndex ]->KeyEvent( sKey );
+				pMouse->LoadPos();
+			}*/
+		}
+
+		/*for( int iIndex = 0; iIndex < static_cast<int>( vRepeat.size() ); iIndex++ )
+		{
+			if(!vRepeat[ iIndex ]) continue;
+
+			pMouse->SavePos();
+			pMouse->SetPos( CPos( -1, -1 ) );
+			vRepeat[ iIndex ]->KeyEvent( sKey );
+			pMouse->LoadPos();
+		}*/
+	}
+	else
+	{
+		bTop = false;
+
+		/*for( */int iIndex = static_cast<int>( m_vWindows.size() ) - 1; /*iIndex >= 0; iIndex-- )
+		{
+			if(!m_vWindows[ iIndex ]) continue;*/
+			if( m_vWindows[ iIndex ]->IsVisible() )
+			{
+				if( m_vWindows[ iIndex ]->GetFocussedElement() && m_vWindows[ iIndex ]->GetMaximized() )
+					bTop = true;
+				
+				m_vWindows[ iIndex ]->KeyEvent( sKey );
+			}
+		/*}*/
+
+		if( !sKey.m_bDown )
+			bTop = false;
+	}
+
+	return bTop;
+}
+
+void CGUI::OnLostDevice()
+{
+	m_pDevice = 0;
+
+	if( GetFont() )
+		GetFont()->OnLostDevice();
+	GetSprite()->OnLostDevice();
+	
+	m_pLine->OnLostDevice();
+}
+
+void CGUI::OnResetDevice( IDirect3DDevice9 * pDevice )
+{
+	m_pDevice = pDevice;
+
+	if( GetFont() )
+		GetFont()->OnResetDevice( pDevice );
+	GetSprite()->OnResetDevice();
+	
+	m_pLine->OnResetDevice();
+}
+
+CMouse * CGUI::GetMouse()
+{
+	return m_pMouse;
+}
+
+CKeyboard * CGUI::GetKeyboard()
+{
+	return m_pKeyboard;
+}
+
+IDirect3DDevice9 * CGUI::GetDevice()
+{
+	return m_pDevice;
+}
+
+CFont * CGUI::GetFont()
+{
+	return m_pFont;
+}
+
+ID3DXSprite * CGUI::GetSprite()
+{
+	return m_pSprite;
+}
+
+CWindow * CGUI::GetWindowByString( std::string sString, int iIndex )
+{
+	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
+		if( m_vWindows[ i ] )
+			if( m_vWindows[ i ]->GetString( false, iIndex ) == sString )
+				return m_vWindows[ i ];
+	return 0;
+}
+
+SElement * CGUI::GetThemeElement( std::string sElement )
+{
+	return m_mThemes[ m_sCurTheme ][ sElement ];
+}
+
+void CGUI::SetVisible( bool bVisible )
+{
+	m_bVisible = bVisible;
+}
+
+bool CGUI::IsVisible()
+{
+	return m_bVisible;
+}
+
+bool CGUI::ShouldReload()
+{
+	return m_bReload;
+}
+
+void CGUI::Reload()
+{
+	m_bReload = true;
+}
+
+bool CGUI::IsFocus(CWindow * w)
+{
+	return w == m_wFocus;
+}
