@@ -1,4 +1,5 @@
 #pragma once
+#include "classes.h"
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                Функции работы с игровыми потоками                                     */
 /* ----------------------------------------------------------------------------------------------------- */
@@ -7,32 +8,34 @@ extern DWORD dwLoadOffset;
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                            Адреса игры                                                */
 /* ----------------------------------------------------------------------------------------------------- */
-/* DirectX */
-#define ADDRESS_CREATE_DEVICE (0xD301E4+dwLoadOffset)
-/* Scripts */
-#define ADDRESS_HASH_GET (0x5A7FC0+dwLoadOffset) 
-#define ADDRESS_THREAD_ID (0x1848B00+dwLoadOffset)
-#define ADDRESS_SCRIPTS_COUNT (0x1848B1C+dwLoadOffset)
-/* Threads */
-#define ADDRESS_ACTIVE_THREAD (0x1848B04+dwLoadOffset) 
-#define ADDRESS_THREADS_ARRAY (0x1982320+dwLoadOffset)
-#define ADDRESS_THREAD_TICK (0xBBCC40+dwLoadOffset)
-/* Pools */
-#define ADDRESS_PED_POOL (0x175B77C+dwLoadOffset)
-#define ADDRESS_PLAYER_POOL (0x1033058+dwLoadOffset)
-#define ADDRESS_VEHICLE_POOL (0x11F4F30+dwLoadOffset)
 /* Offsets */
 #define OFFSET_PLAYER_ID 0x4CA
 #define OFFSET_PLAYER_MAX_HEALTH 0x53A
 #define OFFSET_PLAYER_MAX_ARMOR 0x53C
 #define OFFSET_PLAYER_COLOR 0x560
 #define OFFSET_PLAYER_PED 0x578
-/* Game */
-#define CGAME_PROCESS_SLEEP (0x402B5C + dwLoadOffset)
-#define CGAME_PROCESS_LOAD_MENU (0x402BEA + dwLoadOffset)
-#define CGAME_PROCESS_START_GAME (0x402C1D + dwLoadOffset)
 
-#define GAME_NAME (0xE9D13C+dwLoadOffset)
+/* DirectX */
+extern DWORD ADDRESS_CREATE_DEVICE;
+/* Scripts */
+extern DWORD ADDRESS_HASH_GET;
+extern DWORD ADDRESS_THREAD_ID;
+extern DWORD ADDRESS_SCRIPTS_COUNT;
+extern DWORD SCRIPT_POINTER_1;
+extern DWORD SCRIPT_POINTER_2;
+/* Threads */
+extern DWORD ADDRESS_ACTIVE_THREAD; 
+extern DWORD ADDRESS_THREADS_ARRAY;
+extern DWORD ADDRESS_THREAD_TICK;
+/* Pools */
+extern DWORD ADDRESS_PED_POOL;
+extern DWORD ADDRESS_PLAYER_POOL;
+extern DWORD ADDRESS_VEHICLE_POOL;
+/* Game */
+extern DWORD CGAME_PROCESS_SLEEP;
+extern DWORD CGAME_PROCESS_LOAD_MENU;
+extern DWORD CGAME_PROCESS_START_GAME;
+extern DWORD GAME_NAME;
 
 sysArray<GtaThread>* GetThreadsArray();
 scrThread* GetActiveThread();
@@ -44,6 +47,8 @@ void DataHook(DWORD from, DWORD to);
 void PushHook(DWORD from, DWORD to);
 void ChangeByte(DWORD from, BYTE b, int start = 0);
 void SetString(DWORD address, char* string);
+
+void GetAddresses(DWORD version);
 
 void InstallMethodHook(DWORD dwInstallAddress,DWORD dwHookFunction);
 void InstallHook(DWORD dwInstallAddress,DWORD dwHookFunction,DWORD dwHookStorage,BYTE* pbyteJmpCode,int iJmpCodeSize);
