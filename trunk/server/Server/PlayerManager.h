@@ -8,6 +8,7 @@ public:
 	PlayerManager(void);
 	~PlayerManager(void);
 	short GetMaxPlayers(void);
+	short GetNumberOfPlayers(void);
 	bool IsServerFull(void);
 	bool IsPlayerConnected(const short index);
 	char *GetPlayerName(const short index);

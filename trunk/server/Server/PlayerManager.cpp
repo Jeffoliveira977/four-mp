@@ -28,6 +28,11 @@ short PlayerManager::GetMaxPlayers(void)
 	return maxplayerbuffersize;
 }
 
+short PlayerManager::GetNumberOfPlayers(void)
+{
+	return playerbuffersize;
+}
+
 bool PlayerManager::IsServerFull(void)
 {
 	if (playerbuffersize < maxplayerbuffersize)
