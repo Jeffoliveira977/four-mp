@@ -68,7 +68,7 @@ void debug(const char* string)
 #endif
 
 	SYSTEMTIME time;
-	GetSystemTime(&time);
+	GetLocalTime(&time);
 	fprintf(f_debug, "[%02d:%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 	fputs(string,f_debug);
 	fputs("\n",f_debug);
@@ -95,7 +95,7 @@ void log(const char* string)
 #endif
 
 	SYSTEMTIME time;
-	GetSystemTime(&time);
+	GetLocalTime(&time);
 	fprintf(f_log, "[%02d:%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 	fputs(string,f_log);
 	fputs("\n",f_log);
@@ -127,7 +127,7 @@ void Debug(const char *string, ...)
 #endif
 
 	SYSTEMTIME time;
-	GetSystemTime(&time);
+	GetLocalTime(&time);
 	fprintf(f_debug, "[%02d:%02d:%02d:%03d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 	fputs(buff,f_debug);
 	fputs("\n",f_debug);
@@ -155,7 +155,7 @@ void Log(const char *string, ...)
 #endif
 
 	SYSTEMTIME time;
-	GetSystemTime(&time);
+	GetLocalTime(&time);
 	fprintf(f_log, "[%02d:%02d:%02d:%03d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
 	fputs(buff,f_log);
 	fputs("\n",f_log);

@@ -5,9 +5,6 @@
 #include "../../Shared/RakNet/GetTime.h"
 #include <vector>
 
-using namespace std;
-using namespace RakNet;
-
 #define MASTER_HOST "master.four-mp.com"
 #define MASTER_PATH "/"
 
@@ -24,6 +21,7 @@ struct MasterServerInfo
 	char clan[64];			// Clan's server
 	bool ban;				// Server in black list?
 	bool vip;				// Server is VIP?
+	unsigned short ping;	// Ping
 };
 
 // Information of player
@@ -34,7 +32,7 @@ struct MasterUserInfo
 	char login[32];			// Player login
 	char status[128];		// Player status
 	char seskey[32];		// Session key hash
-	string friends;			// Player's friends
+	std::string friends;			// Player's friends
 };
 
 // Query states
@@ -57,17 +55,17 @@ class MasterServer
 	TCPInterface *tcp;
 	HTTPConnection *http;
 
-	vector<MasterServerInfo*> slist;
+	std::vector<MasterServerInfo*> slist;
 	MasterUserInfo *user;
 
 	MasterServerStates state;
 protected:
 	void Process();
-	void ReadPacket(RakString data);
+	void ReadPacket(RakNet::RakString data);
 
-	void ReadServerList(RakString data);
-	void ReadUserInfo(RakString data);
-	void ReadClanInfo(RakString data);
+	void ReadServerList(RakNet::RakString data);
+	void ReadUserInfo(RakNet::RakString data);
+	void ReadClanInfo(RakNet::RakString data);
 public:
 	MasterServer();
 	~MasterServer();
@@ -82,10 +80,12 @@ public:
 	bool QueryUserLogout();
 	bool QueryClan();
 
-	vector<MasterServerInfo*> *GetServerList();
+	std::vector<MasterServerInfo*> *GetServerList();
 	MasterServerInfo *GetServerInfo(int Index);
+	MasterServerInfo *GetServerInfo(char *ip, unsigned short port, int *index);
 	int GetNumServers();
-	int GetServerPing(char *ip, int port);
+	bool IsServerVIP(char *ip, unsigned short port);
+	bool IsServerBanned(char *ip, unsigned short port);
 
 	bool IsUserInfo();
 	MasterUserInfo *GetUserInfo();

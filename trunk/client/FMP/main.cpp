@@ -22,18 +22,19 @@
 #include "functions.h"
 #include "main.h"
 // RakNet
-#include "..\..\Shared\RakNet\RakNetworkFactory.h"
-#include "..\..\Shared\RakNet\RakPeerInterface.h"
-#include "..\..\Shared\RakNet\MessageIdentifiers.h"
-#include "..\..\Shared\RakNet\BitStream.h"
-#include "..\..\Shared\RakNet\NetworkIDObject.h"
-#include "..\..\Shared\RakNet\NetworkIDManager.h"
+#include "../../Shared/RakNet/RakNetworkFactory.h"
+#include "../../Shared/RakNet/RakPeerInterface.h"
+#include "../../Shared/RakNet/MessageIdentifiers.h"
+#include "../../Shared/RakNet/BitStream.h"
+#include "../../Shared/RakNet/NetworkIDObject.h"
+#include "../../Shared/RakNet/NetworkIDManager.h"
+#include "../../Shared/RakNet/GetTime.h"
 
 #include "..\..\Shared\Network\NetworkProtocol.h"
 #include "Check\check.h"
 #include "..\..\Shared\Console\ConsoleCore.h"
-#include "d3d9\d3d9hook.h"
-#include "d3d9\gui.h"
+#include "d3d9/d3d9hook.h"
+#include "d3d9/gui.h"
 #include "ConsoleWindow.h"
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                     Потоки для работы с игрой                                         */
@@ -628,9 +629,6 @@ void MainThread(void* dummy)
 	concore.AddConCmd("getmypos", GetMyPos);
 	concore.AddConCmd("getpos", GetMyPos);
 
-	//Log("Skip menu");
-	//JmpHook(CGAME_PROCESS_SLEEP, CGAME_PROCESS_START_GAME);
-
 	HOOK.AttachGtaThread("FOURMP");
 	Debug("Atached");
 
@@ -641,7 +639,7 @@ void MainThread(void* dummy)
 void NetworkThread(void *dummy)
 {
 	Packet *pack;
-	Debug("Network Thread\nInit RakNet");
+	Debug("Network Thread");
 	net = RakNetworkFactory::GetRakPeerInterface();
 	SocketDescriptor s(0, 0);
 	net->Startup(8, 1, &s, 1);
@@ -660,51 +658,104 @@ void NetworkThread(void *dummy)
 		if(pack)
 		{
 			Debug("Pack: %s[%d], %s", pack->data, pack->data[0], pack->systemAddress.ToString());
-			if(pack->data[0] == ID_CONNECTION_REQUEST_ACCEPTED)
+	
+			switch(pack->data[0])
 			{
-				Log("Connection accepted. Sending client info...");
-				NetworkPlayerConnectionRequestData data;
-				strcpy(data.name, Conf.Name);
-				RakNet::BitStream bsSend;
-				bsSend.Write(data);
-				net->RPC("RPC_ClientConnect",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
-				Log("Client info has been sent.");
-			}
-			else if(pack->data[0] == ID_CONNECTION_ATTEMPT_FAILED)
-			{
-				Log("Can't connect to server");
-				clientstate.game = GameStateOffline;
-			}
-			else if(pack->data[0] == ID_RPC_REMOTE_ERROR)
-			{
-				switch (pack->data[1])
+			case ID_CONNECTION_REQUEST_ACCEPTED:
 				{
-				case RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
-					Log("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
-					break;
-				case RPC_ERROR_OBJECT_DOES_NOT_EXIST:
-					Log("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
-					break;
-				case RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
-					Log("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
-					break;
-				case RPC_ERROR_FUNCTION_NOT_REGISTERED:
-					Log("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
-					break;
-				case RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
-					Log("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
-					break;
-				case RPC_ERROR_CALLING_CPP_AS_C:
-					Log("RPC_ERROR_CALLING_CPP_AS_C\n");
-					break;
-				case RPC_ERROR_CALLING_C_AS_CPP:
-					Log("RPC_ERROR_CALLING_C_AS_CPP\n");
-					break;
-				}
+					Log("RakNet: Connection accepted. Sending client info...");
+					NetworkPlayerConnectionRequestData data;
+					strcpy(data.name, Conf.Name);
+					RakNet::BitStream bsSend;
+					bsSend.Write(data);
+					net->RPC("RPC_ClientConnect",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
+					Log("Client info has been sent.");
+				} break;
+			case ID_ALREADY_CONNECTED:
+				{
+					Log("RakNet: Already connected");
+					clientstate.game = GameStateInGame;	
+				} break;
+			case ID_NO_FREE_INCOMING_CONNECTIONS:
+				{
+					Log("RakNet: No free connections");
+					clientstate.game = GameStateOffline;
+				} break;
+			case ID_DISCONNECTION_NOTIFICATION:
+				{
+					Log("RakNet: Disconnect (Close connection)");
+					clientstate.game = GameStateOffline;
+				} break;
+			case ID_CONNECTION_LOST:
+				{
+					Log("RakNet: Disconnect (Connection lost)");
+					clientstate.game = GameStateOffline;
+				} break;
+			case ID_CONNECTION_BANNED:
+				{
+					Log("RakNet: Disconnect (Connection banned)");
+					clientstate.game = GameStateOffline;
+				} break;
+			case ID_INVALID_PASSWORD:
+				{
+					Log("RakNet: Invalid password");
+				} break;
+			case ID_CONNECTION_ATTEMPT_FAILED:
+				{
+					Log("RakNet: Connection failed");
+					clientstate.game = GameStateOffline;
+				} break;
+			case ID_PONG:
+				{
+					Log("RakNet: Pong");
+					RakNetTime time, dataLength;
+					RakNet::BitStream pong( pack->data+1, sizeof(RakNetTime), false);
+					pong.Read(time);
+					dataLength = pack->length - sizeof(unsigned char) - sizeof(RakNetTime);
+					Debug("ID_PONG from SystemAddress:%u:%u.\n", pack->systemAddress.binaryAddress, pack->systemAddress.port);
+					Debug("Time is %i\n",time);
+					Debug("Ping is %i\n", (unsigned int)(RakNet::GetTime()-time));
+					Debug("Data is %i bytes long.\n", dataLength);
+					if (dataLength > 0)
+						Debug("Data is %s\n", pack->data+sizeof(unsigned char)+sizeof(RakNetTime));
+				} break;
+			case ID_RPC_REMOTE_ERROR:
+				{
+					Log("RakNet: RPC remote error");
+					switch (pack->data[1])
+					{
+					case RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
+						Log("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
+						break;
+					case RPC_ERROR_OBJECT_DOES_NOT_EXIST:
+						Log("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
+						break;
+					case RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
+						Log("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
+						break;
+					case RPC_ERROR_FUNCTION_NOT_REGISTERED:
+						Log("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
+						break;
+					case RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
+						Log("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
+						break;
+					case RPC_ERROR_CALLING_CPP_AS_C:
+						Log("RPC_ERROR_CALLING_CPP_AS_C\n");
+						break;
+					case RPC_ERROR_CALLING_C_AS_CPP:
+						Log("RPC_ERROR_CALLING_C_AS_CPP\n");
+						break;
+					}
+				} break;
+			default:
+				{
+					Log("RakNet: Unknown message (0x%x) [%s]", pack->data[0], pack->data);
+				} break;
 			}
 		}
 		net->DeallocatePacket(pack);
 	}
+
 	net->Shutdown(300);
 	RakNetworkFactory::DestroyRakPeerInterface(net);
 
