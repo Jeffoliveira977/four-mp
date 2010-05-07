@@ -1,5 +1,4 @@
 #include "masterserver.h"
-#include "log.h"
 
 #include "..\..\Shared\RakNet\RakNetworkFactory.h"
 #include "..\..\Shared\RakNet\RakPeerInterface.h"
@@ -38,19 +37,19 @@ bool MasterServer::QueryServerList(bool ban, bool vip, bool empty, bool full, bo
 
 	if(http->IsBusy()) return 0;
 
-	RakString data, tmp;
+	RakNet::RakString data, tmp;
 	if(ban) data += "ban=1&";
 	if(vip) data += "vip=1&"; 
 	if(empty) data += "empty=1&"; 
 	if(full) data += "full=1&"; 
 	if(password) data += "password=1&"; 
-	if(clan) { tmp = clan; tmp.URLEncode(); data += RakString("clan=%s&", tmp.C_String()); } 
-	if(name) { tmp = name; tmp.URLEncode(); data += RakString("name=%s&", tmp.C_String()); } 
-	if(mode) { tmp = mode; tmp.URLEncode(); data += RakString("mode=%s&", tmp.C_String()); } 
-	if(loc) { tmp = loc; tmp.URLEncode(); data += RakString("loc=%s&", tmp.C_String()); } 
+	if(clan) { tmp = clan; tmp.URLEncode(); data += RakNet::RakString("clan=%s&", tmp.C_String()); } 
+	if(name) { tmp = name; tmp.URLEncode(); data += RakNet::RakString("name=%s&", tmp.C_String()); } 
+	if(mode) { tmp = mode; tmp.URLEncode(); data += RakNet::RakString("mode=%s&", tmp.C_String()); } 
+	if(loc) { tmp = loc; tmp.URLEncode(); data += RakNet::RakString("loc=%s&", tmp.C_String()); } 
 	data += "t=list";
 
-	http->Post(RakString("%s%s", MASTER_PATH, "list.php").C_String(), data.C_String());
+	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "list.php").C_String(), data.C_String());
 	state = MSS_WAIT_SERVER_LIST;
 
 	RakNetTimeMS endTime=RakNet::GetTimeMS() + 10000;
@@ -76,10 +75,10 @@ bool MasterServer::QueryUserLogin(const char *login, const char *password)
 
 	if(http->IsBusy()) return 0;
 
-	RakString data = RakString("login=%s&pass=%s&t=login", 
-		RakString(login).URLEncode().C_String(), RakString(password).URLEncode().C_String());
+	RakNet::RakString data = RakNet::RakString("login=%s&pass=%s&t=login", 
+		RakNet::RakString(login).URLEncode().C_String(), RakNet::RakString(password).URLEncode().C_String());
 
-	http->Post(RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
+	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_LOGIN;
 	strcpy(user->login, login);
 
@@ -106,12 +105,12 @@ bool MasterServer::QueryUserRegister(const char *login, const char *nick, const 
 
 	if(http->IsBusy()) return 0;
 
-	RakString data = RakString("login=%s&pass=%s&email=%s&nick=%s&hard=%s&t=reg", 
-		RakString(login).URLEncode().C_String(), RakString(password).URLEncode().C_String(),
-		RakString(email).URLEncode().C_String(), RakString(nick).URLEncode().C_String(), 
-		RakString("fmp02a").URLEncode().C_String());
+	RakNet::RakString data = RakNet::RakString("login=%s&pass=%s&email=%s&nick=%s&hard=%s&t=reg", 
+		RakNet::RakString(login).URLEncode().C_String(), RakNet::RakString(password).URLEncode().C_String(),
+		RakNet::RakString(email).URLEncode().C_String(), RakNet::RakString(nick).URLEncode().C_String(), 
+		RakNet::RakString("fmp02a").URLEncode().C_String());
 
-	http->Post(RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
+	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_REGISTER;
 
 	RakNetTimeMS endTime=RakNet::GetTimeMS() + 10000;
@@ -137,10 +136,10 @@ bool MasterServer::QueryUserLogout()
 
 	if(http->IsBusy()) return 0;
 
-	RakString data = RakString("fmpid=%d&seskey=%s&t=logout", user->fmpid, 
-		RakString(user->seskey).URLEncode().C_String());
+	RakNet::RakString data = RakNet::RakString("fmpid=%d&seskey=%s&t=logout", user->fmpid, 
+		RakNet::RakString(user->seskey).URLEncode().C_String());
 
-	http->Post(RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
+	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_LOGOUT;
 
 	RakNetTimeMS endTime=RakNet::GetTimeMS() + 10000;
@@ -166,10 +165,10 @@ bool MasterServer::QueryUserUpdate(const char *status)
 
 	if(http->IsBusy()) return 0;
 
-	RakString data = RakString("fmpid=%d&seskey=%s&status=%s&t=update", user->fmpid, 
-		RakString(user->seskey).URLEncode().C_String(), RakString(status).URLEncode().C_String());
+	RakNet::RakString data = RakNet::RakString("fmpid=%d&seskey=%s&status=%s&t=update", user->fmpid, 
+		RakNet::RakString(user->seskey).URLEncode().C_String(), RakNet::RakString(status).URLEncode().C_String());
 
-	http->Post(RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
+	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_UPDATE;
 
 	RakNetTimeMS endTime=RakNet::GetTimeMS() + 10000;
@@ -189,7 +188,7 @@ bool MasterServer::QueryUserUpdate(const char *status)
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MasterServer::ReadPacket(RakString data)
+void MasterServer::ReadPacket(RakNet::RakString data)
 {
 
 	switch(state)
@@ -205,7 +204,7 @@ void MasterServer::ReadPacket(RakString data)
 
 }
 
-void MasterServer::ReadServerList(RakString data)
+void MasterServer::ReadServerList(RakNet::RakString data)
 {
 	const char *dataCode = data.C_String();
 	// `ip`, `port`, `name`, `location`, `mode`, `password`, `players`, `maxplayers`, `clan`, `ban`, `vip`
@@ -214,23 +213,21 @@ void MasterServer::ReadServerList(RakString data)
 	memset(tmp_info, 0, sizeof(MasterServerInfo));
 
 	unsigned char read_id = 0;
-	Log("%s", dataCode);
 
 	for(int i = 1; i < (int)strlen(dataCode); i++)
 	{
 		if(dataCode[i] == 1) 
 		{ 
 			read_id++; 
-			Log("Next read %d", read_id);
 			continue; 
 		}
 		else if(dataCode[i] == 2) 
 		{ 
 			read_id = 0;
+			tmp_info->ping = 9999;
 			slist.push_back(tmp_info);
 			tmp_info = new MasterServerInfo;
 			memset(tmp_info, 0, sizeof(MasterServerInfo));
-			Log("Next server");
 			continue;
 		}
 		
@@ -293,7 +290,7 @@ void MasterServer::ReadServerList(RakString data)
 	state = MSS_NONE;
 }
 
-void MasterServer::ReadUserInfo(RakString data)
+void MasterServer::ReadUserInfo(RakNet::RakString data)
 {
 	const char *dataCode = data.C_String();
 
@@ -359,7 +356,7 @@ void MasterServer::ReadUserInfo(RakString data)
 	}
 }
 
-void MasterServer::ReadClanInfo(RakString data)
+void MasterServer::ReadClanInfo(RakNet::RakString data)
 {
 	//printf("%s\n", data.C_String());
 	state = MSS_NONE;
@@ -396,7 +393,7 @@ void MasterServer::ClearServerList()
 	slist.clear();
 }
 
-vector<MasterServerInfo*> *MasterServer::GetServerList()
+std::vector<MasterServerInfo*> *MasterServer::GetServerList()
 {
 	return &slist;
 }
@@ -407,15 +404,43 @@ MasterServerInfo *MasterServer::GetServerInfo(int Index)
 	return slist[Index];
 }
 
+MasterServerInfo *MasterServer::GetServerInfo(char *ip, unsigned short port, int *index)
+{
+	for(int i = 0; i < (int)slist.size(); i++)
+	{
+		if(strcmp(slist[i]->ip, ip) == 0 && port == slist[i]->port)
+		{
+			*index = i;
+			return slist[i];
+		}
+	}
+
+	*index = -1;
+	return 0;
+}
+
+bool MasterServer::IsServerVIP(char *ip, unsigned short port)
+{
+	for(int i = 0; i < (int)slist.size(); i++)
+	{
+		if(strcmp(slist[i]->ip, ip) == 0 && port == slist[i]->port)
+			return slist[i]->vip;
+	}
+	return 0;
+}
+bool MasterServer::IsServerBanned(char *ip, unsigned short port)
+{
+	for(int i = 0; i < (int)slist.size(); i++)
+	{
+		if(strcmp(slist[i]->ip, ip) == 0 && port == slist[i]->port)
+			return slist[i]->ban;
+	}
+	return 0;
+}
+
 int MasterServer::GetNumServers()
 {
 	return (int)slist.size();
-}
-
-int MasterServer::GetServerPing(char *ip, int port)
-{
-	//net->Ping(ip, port, 1);
-	return 9999;
 }
 
 bool MasterServer::IsUserInfo()

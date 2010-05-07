@@ -6,8 +6,11 @@
 #include "../ConsoleWindow.h"
 #include "../Hook/classes.h"
 
+#include <vector>
+#include <map>
 
 extern ConsoleWindow conwindow;
+extern RakPeerInterface *net;
 
 // Windows
 CWindow * fServBrowser;
@@ -38,6 +41,9 @@ CEditBox *upLogin, *upPassword;
 CButton *upSendLogin, *upShowRegister;
 CCheckBox *upRemeberMe;
 
+std::vector<MasterServerInfo*> server_list;
+std::map<const char*, int> server_index;
+
 int tab = 3;
 
 MasterServer fmpms;
@@ -56,35 +62,21 @@ namespace CALLBACKS
 		if(tab == 0 || tab == 2)
 		{
 			fmpms.ClearServerList();
+			server_list.clear();
+
 			bool r = fmpms.QueryServerList(0, tab == 2, sbFltNotEmpty->GetChecked(), sbFltNotFull->GetChecked(), 
 				sbFltNoPassword->GetChecked(),	0, 0, sbFltMode->GetString().size()>0?(char*)sbFltMode->GetString().c_str():0, sbFltLocation->GetString().size()?(char*)sbFltLocation->GetString().c_str():0);
-			Log("Sended");
+
 			if(!r) { fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Load server list failed"); fInfo->SetVisible(1); }
 			else
 			{
 				char *tmp = new char[128];
 				MasterServerInfo *msi;
-				Log("MS %d", fmpms.GetNumServers());
 				for(int i = 0; i < fmpms.GetNumServers(); i++)
 				{
-					Log("Add %d", i);
 					msi = fmpms.GetServerInfo(i);
-					if(!msi || !sbServList) continue;
-
-					Log("Enter pass");
-					sbServList->PutStr((msi->password?"1":"0"), 0);
-					Log("Help %s %d 0x%x", msi->ip, msi->port, tmp);
-					sprintf_s(tmp, 128, "%s:%d", msi->ip, msi->port);
-					Log("HELP");
-					//Log("'%s' FROM `%s` & `%d`", tmp, msi->ip, msi->port);
-					sbServList->PutStr(msi->name, 1, -1, tmp);
-					sprintf(tmp, "%d/%d", msi->players, msi->maxplayers);
-					sbServList->PutStr(tmp, 2);
-					sprintf(tmp, "%d", 9999/*fmpms.GetServerPing(msi->ip, msi->port)*/);
-					sbServList->PutStr(tmp, 3);
-					sbServList->PutStr(msi->mode, 4);
-					sbServList->PutStr(msi->loc, 5);
-					Log("END");
+					if(!msi) continue;
+					net->Ping(msi->ip, msi->port, false); 
 				}
 			}
 		}
@@ -116,18 +108,13 @@ namespace CALLBACKS
 			char tmp[64];
 			MasterServerInfo *msi;
 			sbServList->Clear();
+			server_list.clear();
+
 			for(int i = 0; i < fmpms.GetNumServers(); i++)
 			{
 				msi = fmpms.GetServerInfo(i);
-				sprintf(tmp, "%s:%d", msi->ip, msi->port);
-				sbServList->PutStr((msi->password?"1":"0"), 0);
-				sbServList->PutStr(msi->name, 1, -1, tmp);
-				sprintf(tmp, "%d/%d", msi->players, msi->maxplayers);
-				sbServList->PutStr(tmp, 2);
-				sprintf(tmp, "%d", 9999);
-				sbServList->PutStr(tmp, 3);
-				sbServList->PutStr(msi->mode, 4);
-				sbServList->PutStr(msi->loc, 5);
+				if(!msi) continue;
+				net->Ping(msi->ip, msi->port, false); 
 			}
 		}
 		Debug("CALLBACKS::GetInet complete");
@@ -146,21 +133,14 @@ namespace CALLBACKS
 			char tmp[64];
 			MasterServerInfo *msi;
 			sbServList->Clear();
+			server_list.clear();
+
 			for(int i = 0; i < fmpms.GetNumServers(); i++)
 			{
 				msi = fmpms.GetServerInfo(i);
+				if(!msi) continue;
 				if(msi->vip == 1)
-				{
-					sprintf(tmp, "%s:%d", msi->ip, msi->port);
-					sbServList->PutStr((msi->password?"1":"0"), 0);
-					sbServList->PutStr(msi->name, 1, -1, tmp);
-					sprintf(tmp, "%d/%d", msi->players, msi->maxplayers);
-					sbServList->PutStr(tmp, 2);
-					sprintf(tmp, "%d", 9999);
-					sbServList->PutStr(tmp, 3);
-					sbServList->PutStr(msi->mode, 4);
-					sbServList->PutStr(msi->loc, 5);
-				}
+					net->Ping(msi->ip, msi->port, false); 
 			}
 		}
 		Debug("CALLBACKS::GetVIP complete");
@@ -182,8 +162,8 @@ namespace CALLBACKS
 		if(msg != CLICK) return;
 		Debug("CALLBACKS::Login called");
 
-		string login = upLogin->GetString();
-		string pass = upPassword->GetString();
+		std::string login = upLogin->GetString();
+		std::string pass = upPassword->GetString();
 
 		bool r = fmpms.QueryUserLogin((char*)login.c_str(), (char*)pass.c_str());
 		if(!r) fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Autorization failed");
@@ -222,11 +202,11 @@ namespace CALLBACKS
 		if(msg != CLICK) return;
 		Debug("CALLBACKS::Register called");
 
-		string login = urLogin->GetString();
-		string pass = urPass->GetString();
-		string confirm = urConfirm->GetString();
-		string email = urEmail->GetString();
-		string nick = urNick->GetString();
+		std::string login = urLogin->GetString();
+		std::string pass = urPass->GetString();
+		std::string confirm = urConfirm->GetString();
+		std::string email = urEmail->GetString();
+		std::string nick = urNick->GetString();
 
 		if(strcmp(pass.c_str(), confirm.c_str()) == 0)
 		{
@@ -304,45 +284,15 @@ namespace CALLBACKS
 		int sel = sbServList->GetSelected();
 		if(sel >= 0)
 		{
-			// Connect sel server
-			std::string help = sbServList->GetHelpString(sel);
-			char *ip = (char*)help.c_str();
-			unsigned short port = 0;
-			int len = strlen(ip);
-			bool read_port = 0;
-			for(int i = 0; i < len; i++)
-			{
-				if(ip[i] == ':')
-				{
-					ip[i] = 0;
-					read_port = 1;
-				}
-				else if(read_port)
-				{
-					port = port*10 + ip[i]-48;
-					ip[i] = 0;
-				}
-			}
-			Log("FROM LIST - Server: %s %d (%s,%d,%d,%d)", ip, port, help.c_str(), len, read_port, sel);
-			HOOK.ConnectToServer(ip, port);
-		}
-		else if(sbEnterIP->GetString().length() > 0 && sbEnterPort->GetString().length() > 0)
-		{
-			// Connect entered server
-			Log("FROM EDIT - Server: %s & %s", sbEnterIP->GetString().c_str(), sbEnterPort->GetString().c_str());
-			HOOK.ConnectToServer((char*)sbEnterIP->GetString().c_str(), atoi(sbEnterPort->GetString().c_str()));
+			Log("FROM LIST - Server: [%s:%d]", server_list[sel]->ip, server_list[sel]->port);
+			HOOK.ConnectToServer(server_list[sel]->ip, server_list[sel]->port);
 		}
 	}
 	void AddFav(CElement *pElement, CMSG msg, int Param)
 	{
 		if(msg != CLICK) return;
 
-		int sel = 0;
-		if((sel = sbServList->GetSelected()) != -1)
-		{
-			// Add sel server
-		}
-		else if(sbEnterIP->GetString().length() > 0 && sbEnterPort->GetString().length() > 0)
+		if(sbEnterIP->GetString().length() > 0 && sbEnterPort->GetString().length() > 0)
 		{
 			// Add entered server
 			sbEnterIP->SetString("");
@@ -625,4 +575,26 @@ void FMPGUI::Logged()
 bool FMPGUI::IsLogged()
 {
 	return logged;
+}
+
+void FMPGUI::UpdateServer(const char *ip_port, MasterServerInfo *msi)
+{
+	int index = -1;
+	index = server_index[ip_port];
+	char tmp[32];
+
+	if(!index)
+		index = -1;
+
+	sbServList->PutStr((msi->password?"1":"0"), 0, index);
+	sbServList->PutStr(msi->name, 1, index);
+	sprintf_s(tmp, 32, "%d/%d", msi->players, msi->maxplayers);
+	sbServList->PutStr(tmp, 2, index);
+	sprintf_s(tmp, 32, "%d", msi->ping);
+	sbServList->PutStr(tmp, 3, index);
+	sbServList->PutStr(msi->mode, 4, index);
+	sbServList->PutStr(msi->loc, 5, index);
+
+	if(index == -1)
+		server_index[ip_port] = sbServList->GetSize()-1;
 }
