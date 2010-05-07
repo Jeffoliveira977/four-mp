@@ -50,6 +50,14 @@ void NetworkManager::Init(const short maxclients, const unsigned short port)
 	REGISTER_STATIC_RPC(net, RPC_Chat);
 }
 
+void NetworkManager::UpdateServerInfo(char *name, char *mode, char *loc, unsigned short players, unsigned short maxPlayers, bool password, char *clan)
+{
+	char *info = new char[512];
+	sprintf(info, "%s%c%s%c%s%c%d%c%d%c%d%c%s%c", name, 1, mode, 1, loc, 1, players, 1, maxPlayers, 1, password, 1, clan, 1);
+	net->SetOfflinePingResponse(info, strlen(info));
+	free(info);
+}
+
 void NetworkManager::Tick(void)
 {
 	static Packet *pack;

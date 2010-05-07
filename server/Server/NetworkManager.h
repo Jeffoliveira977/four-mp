@@ -19,6 +19,7 @@ public:
 	NetworkManager(void);
 	~NetworkManager(void);
 	void Init(short maxclients, unsigned short port);
+	void UpdateServerInfo(char *name, char *mode, char *loc, unsigned short players, unsigned short maxPlayers, bool password, char *clan);
 	void Tick(void);
 	void CheckClients(void);
 	void RemoveClient(const short index);

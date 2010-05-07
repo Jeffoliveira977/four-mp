@@ -1,3 +1,4 @@
+#include <time.h>
 #include "ServerCore.h"
 #include "logging.h"
 #include "HandleManager.h"
@@ -134,8 +135,9 @@ bool ServerCore::Load(void)
 		{
 			PrintToServer("Unable to register server.");
 		}
-		lastmasterservercheck = GetTickCount();
+		lastmasterservercheck = time(0);
 	}
+	nm.UpdateServerInfo(hostname, gamemodename, "World", playm.GetNumberOfPlayers(), maxplayers, password, ""); // MAKE:0:0:1
 	running = true;
 	debug("Started");
 	return true;
@@ -156,9 +158,9 @@ void ServerCore::Tick(void)
 	}
 	if (!lan)
 	{
-		if (GetTickCount() - lastmasterservercheck >= 3600000)
+		if (time(0) - lastmasterservercheck >= 3600000)
 		{
-			lastmasterservercheck = GetTickCount();
+			lastmasterservercheck = time(0);
 			if (!msm.RegisterServer(port, hostname, gamemodename, "World", maxplayers, password))
 			{
 				PrintToServer("Unable to register server.");
