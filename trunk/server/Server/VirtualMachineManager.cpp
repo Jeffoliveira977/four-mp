@@ -8,9 +8,7 @@
 #include <string.h>
 #include <io.h>
 
-#include "VirtualMachineManager.h"
-#include "HandleManager.h"
-#include "CoreHandleTypesManager.h"
+#include "sq/squirrel.h"
 #include "sq/sqstdaux.h"
 #include "sq/sqstdblob.h"
 #include "sq/sqstdio.h"
@@ -18,9 +16,14 @@
 #include "sq/sqstdstring.h"
 #include "sq/sqstdsystem.h"
 
+#include "VirtualMachineManager.h"
 #include "../../Shared/Console/common.h"
+#include "HandleManager.h"
+#include "CoreHandleTypesManager.h"
+
 #include "sq.h"
 #include "sq_consolenatives.h"
+#include "sq_playernatives.h"
 
 extern HandleManager hm;
 extern CoreHandleTypesManager chtm;
@@ -527,12 +530,17 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgFloat, "GetCmdArgFloat");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_printr, "printr");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ServerCommand, "ServerCommand");
-			// Car functions
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateCar, "CreateCar");
 			// Player functions
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerName, "GetPlayerName");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerModel, "GetPlayerModel");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerAngle, "GetPlayerAngle");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerScore, "GetPlayerScore");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerWantedLevel, "GetPlayerWantedLevel");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GiveWeapon, "GiveWeapon");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_addPlayerClass, "addPlayerClass");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_enableComponentSelect, "enableComponentSelect");
+			// Car functions
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateCar, "CreateCar");
 			sq_pushroottable(*vmbuffer[index]->ptr.squirrel);
 			// Register Standard Script Functions
 			sqstd_register_stringlib(*vmbuffer[index]->ptr.squirrel);

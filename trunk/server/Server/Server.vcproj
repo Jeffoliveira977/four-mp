@@ -233,6 +233,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\sq_playernatives.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\sq_scriptfunc.cpp"
 				>
 			</File>
@@ -308,6 +312,10 @@
 			</File>
 			<File
 				RelativePath=".\sq_consolenatives.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sq_playernatives.h"
 				>
 			</File>
 			<File

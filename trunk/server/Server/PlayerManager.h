@@ -1,6 +1,8 @@
 #pragma once
 
 #define INVALID_PLAYER_INDEX -1
+#define INVALID_PLAYER_MODEL 0
+#define INVALID_PLAYER_WANTED_LEVEL -1
 
 class PlayerManager
 {
@@ -12,7 +14,12 @@ public:
 	bool IsServerFull(void);
 	bool IsPlayerConnected(const short index);
 	char *GetPlayerName(const short index);
-	int GetPlayerScore(const short index);
+	int GetPlayerModel(const short index);
+	bool GetPlayerPosition(const short index, float (&postion)[3]);
+	bool GetPlayerAngle(const short index, float &angle);
+	short GetPlayerVehicle(const short index);
+	bool GetPlayerScore(const short index, int &score);
+	char GetPlayerWantedLevel(const short index);
 	bool GetPlayerColor(const short index, unsigned char (&color)[4]);
 	unsigned char GetNumberOfPlayerClasses(void);
 	bool AddPlayerClass(const int model, const float position[3], const float angle, const int weapons[8], const int ammo[8], unsigned char &index);
@@ -34,7 +41,7 @@ private:
 		int seat_id;
 		int score;
 		int health, armor;
-		int wanted_level;
+		char wanted_level;
 		bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
 		bool isducking;
 		int room;
@@ -44,6 +51,7 @@ private:
 	};
 	short maxplayerbuffersize;
 	short playerbuffersize;
+	short numplayers;
 	Player **playerbuffer;
 	struct PlayerClass
 	{
