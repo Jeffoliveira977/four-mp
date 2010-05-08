@@ -88,7 +88,7 @@ namespace CALLBACKS
 			{
 				if(server_list_fav[i])
 				{
-					Gui.UpdateServer(server_list_fav[i]->name, server_list_fav[i]);
+					//Gui.UpdateServer(server_list_fav[i]->name, server_list_fav[i]);
 					net->Ping(server_list_fav[i]->ip, server_list_fav[i]->port, false); 
 				}
 			}
@@ -179,7 +179,7 @@ namespace CALLBACKS
 			{
 				char tmp[128];
 				sprintf(tmp, "%s:%d", server_list_fav[i]->ip, server_list_fav[i]->port);
-				Gui.UpdateServer(tmp, server_list_fav[i]);
+				//Gui.UpdateServer(tmp, server_list_fav[i]);
 				net->Ping(server_list_fav[i]->ip, server_list_fav[i]->port, false); 
 			}
 		}
