@@ -15,6 +15,8 @@ PlayerManager::PlayerManager(void)
 {
 	maxplayerbuffersize = 32;
 	maxclassbuffersize = 64;
+	playerbuffer = NULL;
+	classbuffer = NULL;
 	playerbuffersize = 0;
 	classbuffersize = 0;
 }
@@ -75,7 +77,7 @@ char *PlayerManager::GetPlayerName(const short index)
 	return playerbuffer[index]->name;
 }
 
-int PlayerManager::GetPlayerModel(const short index)
+unsigned int PlayerManager::GetPlayerModel(const short index)
 {
 	if ((index < 0) || (index >= playerbuffersize))
 	{
@@ -211,8 +213,9 @@ unsigned char PlayerManager::GetNumberOfPlayerClasses(void)
 	return numclasses;
 }
 
-bool PlayerManager::AddPlayerClass(const int model, const float position[3], const float angle, const int weapons[8], const int ammo[8], unsigned char &index)
+bool PlayerManager::AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index)
 {
+	PrintToServer("Player manager::AddPlayerClass");
 	if (!this->GetClassFreeSlot(index))
 	{
 		PrintToServer("Unable to add player class. No free slots.");
@@ -224,13 +227,16 @@ bool PlayerManager::AddPlayerClass(const int model, const float position[3], con
 		{
 			return false;
 		}
-		if (!ResizeBuffer<PlayerClass **, PlayerClass, unsigned char>(classbuffer, index + 1))
+		debug("resize, index = %d", index);
+		if (!ResizeBuffer<PlayerClass **, PlayerClass *, unsigned char>(classbuffer, index + 1))
 		{
+			debug("finish resize");
 			return false;
 		}
 		classbuffer[index] = NULL;
 		classbuffersize = index + 1;
 	}
+	PrintToServer("111");
 	classbuffer[index] = new PlayerClass;
 	classbuffer[index]->model = model;
 	classbuffer[index]->position[0] = position[0];
@@ -257,7 +263,7 @@ bool PlayerManager::AddPlayerClass(const int model, const float position[3], con
 	return true;
 }
 
-bool PlayerManager::GetPlayerClassData(const unsigned char index, int &model, float (&position)[3], float &angle, int (&weapons)[8], int (&ammo)[8])
+bool PlayerManager::GetPlayerClassData(const unsigned char index, unsigned int &model, float (&position)[3], float &angle, char (&weapons)[8], short (&ammo)[8])
 {
 	if (index >= classbuffersize)
 	{

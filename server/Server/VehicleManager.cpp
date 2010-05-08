@@ -9,6 +9,7 @@ extern NetworkManager nm;
 VehicleManager::VehicleManager(void)
 {
 	maxvehiclebuffersize = 64;
+	vehiclebuffer = NULL;
 	vehiclebuffersize = 0;
 }
 

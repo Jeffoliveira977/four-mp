@@ -30,6 +30,8 @@ HandleManager::HandleManager(void)
 		typebuffer[i]->owner = 255;
 	}
 	typebuffersize = NUM_CORE_HANDLE_TYPES;
+	handlebuffer = NULL;
+	countbuffer = NULL;
 	handlebuffersize = 0;
 	countbuffersize = 0;
 }

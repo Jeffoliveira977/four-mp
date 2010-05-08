@@ -17,9 +17,12 @@ ConsoleCore::ConsoleCore(void)
 	outputfunction = NULL;
 	execpath = NULL;
 	maxsymbolbuffersize = 65535;
+	symbolbuffer = NULL;
 	symbolbuffersize = 0;
 	maxhookspercvar = 255;
 	maxcmdspersymbol = 255;
+	commandbuffer = NULL;
+	commandargs = NULL;
 	argpos = 0;
 	numargs = 0;
 }

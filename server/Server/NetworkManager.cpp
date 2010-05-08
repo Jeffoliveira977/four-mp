@@ -19,6 +19,7 @@ extern VehicleManager vm;
 NetworkManager::NetworkManager(void)
 {
 	maxaddressbuffersize = playm.GetMaxPlayers();
+	addressbuffer = NULL;
 	addressbuffersize = 0;
 }
 
@@ -811,11 +812,11 @@ void NetworkManager::SendClassInfo(const short client)
 	bsSend.Write(server.GetComponentSelectStatus());
 	unsigned char numclasses = playm.GetNumberOfPlayerClasses();
 	bsSend.Write(numclasses);
-	int model;
+	unsigned int model;
 	float position[3];
 	float angle;
-	int weapons[8];
-	int ammo[8];
+	char weapons[8];
+	short ammo[8];
 	unsigned char i = 0;
 	unsigned char j = 0;
 	while (j < numclasses)
