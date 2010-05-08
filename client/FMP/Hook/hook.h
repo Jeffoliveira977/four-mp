@@ -36,6 +36,9 @@ extern DWORD CGAME_PROCESS_SLEEP;
 extern DWORD CGAME_PROCESS_LOAD_MENU;
 extern DWORD CGAME_PROCESS_START_GAME;
 extern DWORD GAME_NAME;
+/* */
+extern DWORD MOUSE_POS_X;
+extern DWORD MOUSE_POS_Y;
 
 sysArray<GtaThread>* GetThreadsArray();
 scrThread* GetActiveThread();

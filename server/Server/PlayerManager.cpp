@@ -75,6 +75,19 @@ char *PlayerManager::GetPlayerName(const short index)
 	return playerbuffer[index]->name;
 }
 
+int PlayerManager::GetPlayerScore(const short index)
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return NULL;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return NULL;
+	}
+	return playerbuffer[index]->score;
+}
+
 bool PlayerManager::GetPlayerColor(const short index, unsigned char (&color)[4])
 {
 	if ((index < 0) || (index >= playerbuffersize))

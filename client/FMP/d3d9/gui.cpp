@@ -42,6 +42,7 @@ CButton *upSendLogin, *upShowRegister;
 CCheckBox *upRemeberMe;
 
 std::vector<MasterServerInfo*> server_list;
+std::vector<MasterServerInfo*> server_list_fav;
 std::map<const char*, int> server_index;
 
 int tab = 3;
@@ -80,6 +81,17 @@ namespace CALLBACKS
 				}
 			}
 		}
+		else if(tab == 3)
+		{
+			for(int i = 0; i < (int)server_list_fav.size(); i++)
+			{
+				if(server_list_fav[i])
+				{
+					Gui.UpdateServer(server_list_fav[i]->name, server_list_fav[i]);
+					net->Ping(server_list_fav[i]->ip, server_list_fav[i]->port, false); 
+				}
+			}
+		}
 		Debug("CALLBACKS::Refresh complete");
 	}
 	void GetLAN( CElement * pElement, CMSG msg, int param )
@@ -88,6 +100,7 @@ namespace CALLBACKS
 		Debug("CALLBACKS::GetLAN called");
 
 		sbServList->Clear();
+		server_list.clear();
 
 		sbTab[tab]->SetEnabled(1);
 		tab = 1;
@@ -151,10 +164,25 @@ namespace CALLBACKS
 		Debug("CALLBACKS::GetFavourite called");
 
 		sbServList->Clear();
+		server_list.clear();
 
 		sbTab[tab]->SetEnabled(1);
 		tab = 3;
 		sbTab[tab]->SetEnabled(0);
+
+		if(server_list_fav.size() == 0) return;
+
+		for(int i = 0; i < (int)server_list_fav.size(); i++)
+		{
+			if(server_list_fav[i])
+			{
+				char tmp[128];
+				sprintf(tmp, "%s:%d", server_list_fav[i]->ip, server_list_fav[i]->port);
+				Gui.UpdateServer(tmp, server_list_fav[i]);
+				net->Ping(server_list_fav[i]->ip, server_list_fav[i]->port, false); 
+			}
+		}
+
 		Debug("CALLBACKS::GetFavourite complete");
 	}
 	void Login( CElement * pElement, CMSG msg, int param )
@@ -166,17 +194,14 @@ namespace CALLBACKS
 		std::string pass = upPassword->GetString();
 
 		bool r = fmpms.QueryUserLogin((char*)login.c_str(), (char*)pass.c_str());
-		if(!r) fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Autorization failed");
-		else 
+		if(r) 
 		{
-			fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Autorization ok");
 			fUserLogin->SetVisible(0);
 			fServBrowser->SetVisible(1);
 			Gui.Logged();
 			strcpy_s(Conf.Name, 32, login.c_str());
 		}
 
-		fInfo->SetVisible(1);
 		Debug("CALLBACKS::Login complete");
 	}
 	void ShowRegister( CElement * pElement, CMSG msg, int param )
@@ -280,13 +305,18 @@ namespace CALLBACKS
 	{
 		if(msg != CLICK) return;
 
-		Log("Start connect");
+		Debug("CALLBACKS::Connect called");
+		if(!sbServList) return;
+
 		int sel = sbServList->GetSelected();
+		Debug("Selected %d (%d/%d)", sel, sbServList->GetSize(), server_list.size());
 		if(sel >= 0)
 		{
-			Log("FROM LIST - Server: [%s:%d]", server_list[sel]->ip, server_list[sel]->port);
-			HOOK.ConnectToServer(server_list[sel]->ip, server_list[sel]->port);
+			MasterServerInfo *tmp_msi = server_list.at(sel);
+			Debug("FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
+			HOOK.ConnectToServer(tmp_msi->ip, tmp_msi->port);
 		}
+		Debug("CALLBACKS::Connect complete");
 	}
 	void AddFav(CElement *pElement, CMSG msg, int Param)
 	{
@@ -295,6 +325,19 @@ namespace CALLBACKS
 		if(sbEnterIP->GetString().length() > 0 && sbEnterPort->GetString().length() > 0)
 		{
 			// Add entered server
+			MasterServerInfo * tmp_msi = new MasterServerInfo;
+			memset(tmp_msi, 0, sizeof(MasterServerInfo));
+			strcpy_s(tmp_msi->ip, 64, sbEnterIP->GetString().c_str());
+			tmp_msi->port = atoi(sbEnterPort->GetString().c_str());
+			sprintf_s(tmp_msi->name, 128, "%s:%d", tmp_msi->ip, tmp_msi->port);
+
+			if(tab == 3)
+			{
+				Gui.UpdateServer(tmp_msi->name, tmp_msi);
+				net->Ping(tmp_msi->ip, tmp_msi->port, false);
+			}
+			server_list_fav.push_back(tmp_msi);
+
 			sbEnterIP->SetString("");
 			sbEnterPort->SetString("");
 		}
@@ -579,12 +622,10 @@ bool FMPGUI::IsLogged()
 
 void FMPGUI::UpdateServer(const char *ip_port, MasterServerInfo *msi)
 {
-	int index = -1;
-	index = server_index[ip_port];
+	int index = server_index[ip_port] - 1;
 	char tmp[32];
 
-	if(!index)
-		index = -1;
+	Log("%s = %s = %d", ip_port, msi->name, index);
 
 	sbServList->PutStr((msi->password?"1":"0"), 0, index);
 	sbServList->PutStr(msi->name, 1, index);
@@ -596,5 +637,12 @@ void FMPGUI::UpdateServer(const char *ip_port, MasterServerInfo *msi)
 	sbServList->PutStr(msi->loc, 5, index);
 
 	if(index == -1)
-		server_index[ip_port] = sbServList->GetSize()-1;
+	{
+		server_list.push_back(msi);
+		server_index[ip_port] = server_list.size();
+	}
+	else
+	{
+		server_list[index] = msi;
+	}
 }
