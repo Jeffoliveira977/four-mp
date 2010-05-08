@@ -12,6 +12,7 @@ public:
 	bool IsServerFull(void);
 	bool IsPlayerConnected(const short index);
 	char *GetPlayerName(const short index);
+	int GetPlayerScore(const short index);
 	bool GetPlayerColor(const short index, unsigned char (&color)[4]);
 	unsigned char GetNumberOfPlayerClasses(void);
 	bool AddPlayerClass(const int model, const float position[3], const float angle, const int weapons[8], const int ammo[8], unsigned char &index);

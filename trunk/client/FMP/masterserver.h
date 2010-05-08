@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "../../Shared/RakNet/TCPInterface.h"
 #include "../../Shared/RakNet/HTTPConnection.h"
 #include "../../Shared/RakNet/RakString.h"
@@ -21,7 +20,7 @@ struct MasterServerInfo
 	char clan[64];			// Clan's server
 	bool ban;				// Server in black list?
 	bool vip;				// Server is VIP?
-	unsigned short ping;	// Ping
+	unsigned int ping;	// Ping
 };
 
 // Information of player

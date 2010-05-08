@@ -8,6 +8,8 @@
 #define D3DHOOK_TEXTURES //comment this to disable texture hooking
 
 extern DWORD dwLoadOffset;
+extern DWORD MOUSE_POS_X;
+extern DWORD MOUSE_POS_Y;
 extern FMPGUI Gui;
 
 LPD3DXFONT fFMP = NULL;
@@ -212,8 +214,8 @@ HRESULT APIENTRY hkIDirect3DDevice9::DrawTriPatch(UINT Handle, CONST float *pNum
 
 HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 {
-	MouseY = *(int*)(0x1889BC0+dwLoadOffset); 
-	MouseX = *(int*)(0x1889BB4+dwLoadOffset);
+	MouseY = *(int*)MOUSE_POS_Y; 
+	MouseX = *(int*)MOUSE_POS_X;
 
 	switch (clientstate.input)
 	{

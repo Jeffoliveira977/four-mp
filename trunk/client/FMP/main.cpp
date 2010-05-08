@@ -6,6 +6,8 @@
 // --------------------------------------------------
 // includes
 // --------------------------------------------------
+#include "masterserver.h"
+
 #include <windows.h>
 #include <process.h>
 #include <stdio.h>
@@ -36,6 +38,7 @@
 #include "d3d9/d3d9hook.h"
 #include "d3d9/gui.h"
 #include "ConsoleWindow.h"
+
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                     Потоки для работы с игрой                                         */
 /* ----------------------------------------------------------------------------------------------------- */
@@ -389,7 +392,7 @@ void FMPHook::GameThread()
 
 	RunMP();
 	
-	while(IsThreadAlive())
+	while(IsThreadAlive() && clientstate.game != GameStateExiting)
 	{
 		//player_dump();
 		//car_dump();
@@ -648,12 +651,6 @@ void NetworkThread(void *dummy)
 
 	while(clientstate.game != GameStateExiting)
 	{
-		if(clientstate.game == GameStateOffline)
-		{
-			Sleep(100);
-			continue;
-		}
-
 		pack = net->Receive();
 		if(pack)
 		{
@@ -712,12 +709,23 @@ void NetworkThread(void *dummy)
 					RakNet::BitStream pong( pack->data+1, sizeof(RakNetTime), false);
 					pong.Read(time);
 					dataLength = pack->length - sizeof(unsigned char) - sizeof(RakNetTime);
+
+					MasterServerInfo *tmp_msi = new MasterServerInfo;
+					tmp_msi->ping = (unsigned int)(RakNet::GetTime()-time);
+
 					Debug("ID_PONG from SystemAddress:%u:%u.\n", pack->systemAddress.binaryAddress, pack->systemAddress.port);
 					Debug("Time is %i\n",time);
-					Debug("Ping is %i\n", (unsigned int)(RakNet::GetTime()-time));
+					Debug("Ping is %i\n", tmp_msi->ping);
 					Debug("Data is %i bytes long.\n", dataLength);
 					if (dataLength > 0)
+					{
 						Debug("Data is %s\n", pack->data+sizeof(unsigned char)+sizeof(RakNetTime));
+						unsigned char *data = pack->data+sizeof(unsigned char)+sizeof(RakNetTime);
+
+						sscanf((char*)data, "%[^\1]\1%[^\1]\1%[^\1]\1%d\1%d\1%d\1%[^\1]\1", &tmp_msi->name, &tmp_msi->mode, &tmp_msi->loc, 
+							&tmp_msi->players, &tmp_msi->maxplayers, &tmp_msi->password, &tmp_msi->clan);
+					}
+					Gui.UpdateServer(pack->systemAddress.ToString(1), tmp_msi);
 				} break;
 			case ID_RPC_REMOTE_ERROR:
 				{
@@ -795,6 +803,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{
+		clientstate.game = GameStateExiting;
+
 		if(MainThreadHandle != NULL)
 		{
 			TerminateThread(MainThreadHandle, 1);
@@ -805,6 +815,9 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 			TerminateThread(NetworkThreadHandle, 1);
 			CloseHandle(NetworkThreadHandle);
 		}
+
+		//while(NetworkThreadHandle != NULL) Sleep(10);
+
 		Debug("EXIT FMP");
 		CloseLogs();
 	}
