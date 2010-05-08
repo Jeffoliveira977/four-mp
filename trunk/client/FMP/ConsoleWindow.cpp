@@ -77,8 +77,23 @@ void ConsoleWindow::Print(const char *string, ...)
 	free(tempstring);
 }
 
+void ConsoleWindow::SubmitText(void)
+{
+	this->Print("> %s", inputbox->GetString().c_str());
+	concore.InterpretLine(inputbox->GetString().c_str());
+	inputbox->SetString("");
+}
+
 void InputBoxCallback(CElement *pElement, CMSG msg, int Param)
 {
+	switch (msg)
+	{
+	case END:
+		{
+			conwindow.SubmitText();
+			break;
+		}
+	}
 }
 
 void SubmitButtonCallback(CElement *pElement, CMSG msg, int Param)
@@ -87,7 +102,5 @@ void SubmitButtonCallback(CElement *pElement, CMSG msg, int Param)
 	{
 		return;
 	}
-	conwindow.Print("> %s", conwindow.inputbox->GetString().c_str());
-	concore.InterpretLine(conwindow.inputbox->GetString().c_str());
-	conwindow.inputbox->SetString("");
+	conwindow.SubmitText();
 }

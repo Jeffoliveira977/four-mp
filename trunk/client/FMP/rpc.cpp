@@ -112,7 +112,7 @@ void ConnectPlayer(RPCParameters *rpcParameters)
 	memcpy(gPlayer[data.index].position, data.position, sizeof(float) * 3);
 	gPlayer[data.index].angle = data.angle;
 	gPlayer[data.index].vehicleindex = data.vehicleindex;
-	gPlayer[data.index].seat_id = data.seat_id;
+	gPlayer[data.index].seatindex = data.seatindex;
 	gPlayer[data.index].score = data.score;
 	gPlayer[data.index].health = data.health;
 	gPlayer[data.index].armor = data.armor;

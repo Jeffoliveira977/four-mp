@@ -60,6 +60,32 @@ void sq_GetPlayerScore(HSQUIRRELVM v)
 	sq_pushinteger(v, score);
 }
 
+void sq_GetPlayerHealth(HSQUIRRELVM v)
+{
+	int index;
+	sq_getinteger(v, 2, &index);
+	int health;
+	if (!playm.GetPlayerHealth(index, health))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushinteger(v, health);
+}
+
+void sq_GetPlayerArmor(HSQUIRRELVM v)
+{
+	int index;
+	sq_getinteger(v, 2, &index);
+	int armor;
+	if (!playm.GetPlayerArmor(index, armor))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_pushinteger(v, armor);
+}
+
 void sq_GetPlayerWantedLevel(HSQUIRRELVM v)
 {
 	int index;

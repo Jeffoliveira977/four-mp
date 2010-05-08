@@ -315,13 +315,13 @@ void NetworkManager::RecievePlayerEntranceInVehicle(const RPCParameters *rpcPara
 	{
 		return;
 	}
-	if (data.seat == 100)
+	if (data.seat == INVALID_PLAYER_SEAT_INDEX)
 	{
 		playm.playerbuffer[client]->car_enter = false;
 		return;
 	}
 	playm.playerbuffer[client]->car_enter = true;
-	playm.playerbuffer[client]->seat_id = data.seat;
+	playm.playerbuffer[client]->seatindex = data.seat;
 	data.client = client;
 	RakNet::BitStream bsSend;
 	bsSend.Write(data);
@@ -630,7 +630,7 @@ bool NetworkManager::SendNewVehicleInfoToAll(const short index)
 	data.position[0] = vm.vehiclebuffer[index]->position[0];
 	data.position[1] = vm.vehiclebuffer[index]->position[1];
 	data.position[2] = vm.vehiclebuffer[index]->position[2];
-	data.angle = vm.vehiclebuffer[index]->angle;
+	data.angle = vm.vehiclebuffer[index]->angle[1];
 	data.color[0] = vm.vehiclebuffer[index]->color[0];
 	data.color[1] = vm.vehiclebuffer[index]->color[2];
 	RakNet::BitStream bsSend;
@@ -743,7 +743,7 @@ NetworkPlayerFullUpdateData *NetworkManager::GetPlayerFullUpdateData(const short
 	memcpy(data->position, playm.playerbuffer[index]->position, sizeof(float) * 3);
 	data->angle = playm.playerbuffer[index]->angle;
 	data->vehicleindex = playm.playerbuffer[index]->vehicleindex;
-	data->seat_id = playm.playerbuffer[index]->seat_id;
+	data->seatindex = playm.playerbuffer[index]->seatindex;
 	data->score = playm.playerbuffer[index]->score;
 	data->health = playm.playerbuffer[index]->health;
 	data->armor = playm.playerbuffer[index]->armor;
@@ -768,7 +768,7 @@ NetworkVehicleFullUpdateData *NetworkManager::GetVehicleFullUpdateData(const sho
 	data->index = index;
 	data->model = vm.vehiclebuffer[index]->model;
 	memcpy(data->position, vm.vehiclebuffer[index]->position, sizeof(float) * 3);
-	data->angle = vm.vehiclebuffer[index]->angle;
+	data->angle = vm.vehiclebuffer[index]->angle[1];
 	memcpy(data->color, vm.vehiclebuffer[index]->color, sizeof(unsigned char) * 2);
 	return data;
 }

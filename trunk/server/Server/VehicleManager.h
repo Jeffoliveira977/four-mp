@@ -12,7 +12,7 @@ public:
 	short GetVehicleBufferSize(void);
 	bool IsVehicleExists(const short index);
 	short CreateVehicle(const int model, const float position[3], const float angle, const unsigned char color[2]);
-	int GetVehicleModel(const short index);
+	unsigned int GetVehicleModel(const short index);
 	bool GetVehiclePosition(const short index, float (&position)[3]);
 	bool GetVehicleAngle(const short index, float &angle);
 	bool GetVehicleColor(const short index, unsigned char (&color)[2]);
@@ -21,13 +21,15 @@ public:
 private:
 	struct Vehicle
 	{
-		int model; //unsigned int?
-		float position[3];
-		float angle;
-		short Health, engHealth;
-		int DoorState[6]; //unsigned char? bool?
-		int DoorLock[6]; //unsigned char? bool?
-		unsigned char color[2];
+		unsigned int model; ///< Holds the model hash of the vehicle.
+		float position[3]; ///< Holds the position of the vehicle.
+		float angle[3]; ///< Holds the angle of the vehicle.
+		short health; ///< Holds the health of the vehicle.
+		short enginehealth; ///< Holds the engine health of the vehicle.
+		bool doorexists[6]; ///< Holds whether the vehicle's doors exist.
+		bool doorlock[6]; ///< Holds whether the vehicle's doors are locked.
+		float doorangle[6]; ///< Holds the vehicle's doors angles.
+		unsigned char color[2]; ///< Holds the color of the vehicle.
 	};
 	short maxvehiclebuffersize;
 	short vehiclebuffersize;

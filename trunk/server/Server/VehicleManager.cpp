@@ -72,17 +72,17 @@ short VehicleManager::CreateVehicle(const int model, const float position[3], co
 	vehiclebuffer[index]->position[0] = position[0];
 	vehiclebuffer[index]->position[1] = position[1];
 	vehiclebuffer[index]->position[2] = position[2];
-	vehiclebuffer[index]->angle = angle;
+	vehiclebuffer[index]->angle[1] = angle;
 	vehiclebuffer[index]->color[0] = color[0];
 	vehiclebuffer[index]->color[1] = color[1];
-	vehiclebuffer[index]->engHealth = 1000;
-	vehiclebuffer[index]->Health = 1000;
-	vehiclebuffer[index]->DoorLock[0] = 0;
-	vehiclebuffer[index]->DoorLock[1] = 0;
-	vehiclebuffer[index]->DoorLock[2] = 0;
-	vehiclebuffer[index]->DoorLock[3] = 0;
-	vehiclebuffer[index]->DoorLock[4] = 0;
-	vehiclebuffer[index]->DoorLock[5] = 0;
+	vehiclebuffer[index]->enginehealth = 1000;
+	vehiclebuffer[index]->health = 1000;
+	vehiclebuffer[index]->doorlock[0] = 0;
+	vehiclebuffer[index]->doorlock[1] = 0;
+	vehiclebuffer[index]->doorlock[2] = 0;
+	vehiclebuffer[index]->doorlock[3] = 0;
+	vehiclebuffer[index]->doorlock[4] = 0;
+	vehiclebuffer[index]->doorlock[5] = 0;
 	if (!nm.SendNewVehicleInfoToAll(index))
 	{
 		return INVALID_VEHICLE_INDEX;
@@ -90,7 +90,7 @@ short VehicleManager::CreateVehicle(const int model, const float position[3], co
 	return index;
 }
 
-int VehicleManager::GetVehicleModel(const short index)
+unsigned int VehicleManager::GetVehicleModel(const short index)
 {
 	if ((index < 0) || (index >= vehiclebuffersize))
 	{
@@ -129,7 +129,7 @@ bool VehicleManager::GetVehicleAngle(const short index, float &angle)
 	{
 		return false;
 	}
-	angle = vehiclebuffer[index]->angle;
+	angle = vehiclebuffer[index]->angle[1];
 	return true;
 }
 
@@ -209,6 +209,6 @@ bool VehicleManager::SetVehicleAngleInternal(const short index, const float angl
 	{
 		return false;
 	}
-	vehiclebuffer[index]->angle = angle;
+	vehiclebuffer[index]->angle[1] = angle;
 	return true;
 }

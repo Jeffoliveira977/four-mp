@@ -91,7 +91,7 @@ void player_dump()
 			fprintf(f, "%s:%d\n%s\n%d\n", gPlayer[i].ip, gPlayer[i].port, gPlayer[i].name, gPlayer[i].model);
 			fprintf(f, "%f %f %f %f\n", gPlayer[i].position[0], gPlayer[i].position[1], gPlayer[i].position[2], gPlayer[i].angle); 
 			fprintf(f, "%d %d\n", gPlayer[i].last_active, gPlayer[i].sync_state);
-			fprintf(f, "%d %d\n", gPlayer[i].vehicleindex, gPlayer[i].seat_id);
+			fprintf(f, "%d %d\n", gPlayer[i].vehicleindex, gPlayer[i].seatindex);
 			fprintf(f, "---------------------------\n");
 		}
 	}

@@ -24,6 +24,7 @@ private:
 	CTextBox *outputbox;
 	CEditBox *inputbox;
 	CButton *submitbutton;
+	void SubmitText(void);
 	friend void InputBoxCallback(CElement *pElement, CMSG msg, int Param);
 	friend void SubmitButtonCallback(CElement *pElement, CMSG msg, int Param);
 };

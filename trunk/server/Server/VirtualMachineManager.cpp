@@ -535,6 +535,8 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerModel, "GetPlayerModel");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerAngle, "GetPlayerAngle");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerScore, "GetPlayerScore");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerScore, "GetPlayerHealth");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerScore, "GetPlayerArmor");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerWantedLevel, "GetPlayerWantedLevel");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GiveWeapon, "GiveWeapon");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_addPlayerClass, "addPlayerClass");
