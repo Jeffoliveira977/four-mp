@@ -19,11 +19,9 @@ public:
 	NetworkManager(void);
 	~NetworkManager(void);
 	void Init(short maxclients, unsigned short port);
-	void UpdateServerInfo(char *name, char *mode, char *loc, unsigned short players, unsigned short maxPlayers, bool password, char *clan);
 	void Tick(void);
 	void CheckClients(void);
-	void RemoveClient(const short index);
-	void DisconnectClient(const short index);
+	void UpdateServerInfo(char *name, char *mode, char *loc, short players, short maxplayers, bool password, char *clan);
 	void RecieveClientConnection(const RPCParameters *rpcParameters);
 	void RecievePlayerMove(const RPCParameters *rpcParameters);
 	void RecievePlayerJump(const RPCParameters *rpcParameters);

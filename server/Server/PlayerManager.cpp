@@ -30,7 +30,7 @@ short PlayerManager::GetMaxPlayers(void)
 
 short PlayerManager::GetNumberOfPlayers(void)
 {
-	return playerbuffersize;
+	return numplayers;
 }
 
 bool PlayerManager::IsServerFull(void)
@@ -75,17 +75,85 @@ char *PlayerManager::GetPlayerName(const short index)
 	return playerbuffer[index]->name;
 }
 
-int PlayerManager::GetPlayerScore(const short index)
+int PlayerManager::GetPlayerModel(const short index)
 {
 	if ((index < 0) || (index >= playerbuffersize))
 	{
-		return NULL;
+		return INVALID_PLAYER_MODEL;
 	}
 	if (playerbuffer[index] == NULL)
 	{
-		return NULL;
+		return INVALID_PLAYER_MODEL;
 	}
-	return playerbuffer[index]->score;
+	return playerbuffer[index]->model;
+}
+
+bool PlayerManager::GetPlayerPosition(const short index, float (&position)[3])
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return false;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	memcpy(position, playerbuffer[index]->position, sizeof(float) * 3);
+	return true;
+}
+
+bool PlayerManager::GetPlayerAngle(const short index, float &angle)
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return false;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	angle = playerbuffer[index]->angle;
+	return true;
+}
+
+short PlayerManager::GetPlayerVehicle(const short index)
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return INVALID_VEHICLE_INDEX;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return INVALID_VEHICLE_INDEX;
+	}
+	return playerbuffer[index]->vehicleindex;
+}
+
+bool PlayerManager::GetPlayerScore(const short index, int &score)
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return false;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	score = playerbuffer[index]->score;
+	return true;
+}
+
+char PlayerManager::GetPlayerWantedLevel(const short index)
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return INVALID_PLAYER_WANTED_LEVEL;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return INVALID_PLAYER_WANTED_LEVEL;
+	}
+	return playerbuffer[index]->wanted_level;
 }
 
 bool PlayerManager::GetPlayerColor(const short index, unsigned char (&color)[4])
@@ -254,6 +322,7 @@ bool PlayerManager::RegisterNewPlayer(const short index, const char *name)
 	playerbuffer[index]->color[2] = 0x00;
 	playerbuffer[index]->color[3] = 0x00;
 	playerbuffer[index]->currentweapon = 0;
+	numplayers++;
 	return true;
 }
 
