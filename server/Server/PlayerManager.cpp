@@ -143,6 +143,34 @@ bool PlayerManager::GetPlayerScore(const short index, int &score)
 	return true;
 }
 
+bool PlayerManager::GetPlayerHealth(const short index, int &health)
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return false;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	health = playerbuffer[index]->health;
+	return true;
+}
+
+bool PlayerManager::GetPlayerArmor(const short index, int &armor)
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return false;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	armor = playerbuffer[index]->armor;
+	return true;
+}
+
 char PlayerManager::GetPlayerWantedLevel(const short index)
 {
 	if ((index < 0) || (index >= playerbuffersize))
@@ -303,7 +331,7 @@ bool PlayerManager::RegisterNewPlayer(const short index, const char *name)
 	}
 	playerbuffer[index]->animation[0] = 0;
 	playerbuffer[index]->vehicleindex = -1;
-	playerbuffer[index]->seat_id = 99;
+	playerbuffer[index]->seatindex = -1;
 	playerbuffer[index]->score = 0;
 	playerbuffer[index]->health = 200;
 	playerbuffer[index]->armor = 0;

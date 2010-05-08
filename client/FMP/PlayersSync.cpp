@@ -208,10 +208,10 @@ void FMPHook::ExitFromVehicle(int id)
 void FMPHook::EnterInVehicle(int id, int car, int seat)
 {
 	Log("EnterInVehicle %d, %d, %d", id, car, seat);
-	if(seat == -1) TaskEnterCarAsDriver(gPlayer[id].PedID, gCar[car].CarID, -1);
+	if(seat == 0) TaskEnterCarAsDriver(gPlayer[id].PedID, gCar[car].CarID, -1);
 	else TaskEnterCarAsPassenger(gPlayer[id].PedID, gCar[car].CarID, -1, seat);
 	gPlayer[id].vehicleindex = car;
-	gPlayer[id].seat_id = seat;
+	gPlayer[id].seatindex = seat;
 }
 
 void FMPHook::PlayerFireAim(int playerid, int gun, int time, float x, float y, float z, bool fire)

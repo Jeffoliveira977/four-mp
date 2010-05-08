@@ -1,6 +1,6 @@
 #pragma once
 
-#define PROTOCOL_VERSION 1
+#define PROTOCOL_VERSION 2
 
 struct NetworkPlayerConnectionRequestData
 {
@@ -34,17 +34,17 @@ struct NetworkPlayerFullUpdateData
 {
 	short index;
 	char name[32];
-	int model;
+	unsigned int model;
 	float position[3];
 	float angle;
 	short vehicleindex;
-	int seat_id;
+	char seatindex;
 	int score;
 	int health;
 	int armor;
 	int room;
-	int weapons[8];
-	int ammo[8];
+	char weapons[8];
+	short ammo[8];
 	unsigned char color[4];
 };
 
@@ -71,7 +71,7 @@ struct NetworkPlayerEntranceInVehicleData
 {
 	short client;
 	short vehicleindex;
-	int seat;
+	char seat;
 };
 
 struct NetworkPlayerCancelEntranceInVehicleData
@@ -88,7 +88,7 @@ struct NetworkPlayerFireData
 {
 	short client;
 	float position[3];
-	int weapon;
+	char weapon;
 	int time;
 	short target;
 	unsigned int health;
@@ -99,14 +99,14 @@ struct NetworkPlayerAimData
 {
 	short client;
 	float position[3];
-	int weapon;
+	char weapon;
 	int time;
 };
 
 struct NetworkPlayerWeaponChangeData
 {
 	short client;
-	int weapon;
+	char weapon;
 };
 
 struct NetworkPlayerHealthAndArmorChangeData
@@ -124,7 +124,7 @@ struct NetworkPlayerSpawnRequestData
 struct NetworkPlayerSpawnData
 {
 	short client;
-	int model;
+	unsigned int model;
 	float position[3];
 	float angle;
 	int room;
@@ -137,7 +137,7 @@ struct NetworkPlayerSpawnData
 struct NetworkPlayerModelChangeData
 {
 	short client;
-	int model;
+	unsigned int model;
 };
 
 struct NetworkPlayerComponentsChangeData
@@ -157,7 +157,7 @@ struct NetworkPlayerChatData
 struct NetworkVehicleFullUpdateData
 {
 	short index;
-	int model;
+	unsigned int model;
 	float position[3];
 	float angle;
 	unsigned char color[2];

@@ -139,7 +139,7 @@ void FMPHook::CarDoSync()
 			{
 				NetworkPlayerEntranceInVehicleData data;
 				data.vehicleindex = carid;
-				data.seat = -1;
+				data.seat = 0;
 				RakNet::BitStream bsSend;
 				bsSend.Write(data);
 				net->RPC("RPC_PlayerEnterInVehicle",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);

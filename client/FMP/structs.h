@@ -16,20 +16,20 @@ struct FPlayer
 	char ip[16];
 	unsigned short port;
 	char name[32];
-	int model;
+	unsigned int model;
 	float position[3];
 	float angle;
 	int last_active;
 	int sync_state;
-	int currentweapon;
-	int weapons[8];
-	int ammo[8];
+	char currentweapon;
+	char weapons[8];
+	short ammo[8];
 	char animation[128];
 	short vehicleindex;
-	int seat_id;
+	char seatindex;
 	int score;
 	int health, armor;
-	int wanted_level;
+	char wanted_level;
 	bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
 	bool Aim;
 	bool isducking;
@@ -40,7 +40,7 @@ struct FPlayer
 
 struct PlayerDamage
 {
-	int pid;
+	short pid;
 	int hp;
 	int armor;
 };
@@ -57,12 +57,14 @@ struct FVehicle
 {
 	Vehicle CarID;
 	bool exist;
-	int model;
+	unsigned int model;
 	float position[3];
 	float angle;
-	short Health, engHealth;
-	int DoorState[6];
-	int DoorLock[6];
+	short health;
+	short enginehealth;
+	bool doorexists[6];
+	bool doorlock[6];
+	float doorangle[6];
 	unsigned char color[2];
 };
 

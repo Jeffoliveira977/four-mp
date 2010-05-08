@@ -2,6 +2,7 @@
 
 #define INVALID_PLAYER_INDEX -1
 #define INVALID_PLAYER_MODEL 0
+#define INVALID_PLAYER_SEAT_INDEX -1
 #define INVALID_PLAYER_WANTED_LEVEL -1
 
 class PlayerManager
@@ -19,6 +20,8 @@ public:
 	bool GetPlayerAngle(const short index, float &angle);
 	short GetPlayerVehicle(const short index);
 	bool GetPlayerScore(const short index, int &score);
+	bool GetPlayerHealth(const short index, int &health);
+	bool GetPlayerArmor(const short index, int &armor);
 	char GetPlayerWantedLevel(const short index);
 	bool GetPlayerColor(const short index, unsigned char (&color)[4]);
 	unsigned char GetNumberOfPlayerClasses(void);
@@ -27,20 +30,20 @@ public:
 private:
 	struct Player
 	{
-		char name[32];
-		int model;
-		float position[3];
-		float angle;
+		char name[32]; ///< Holds the name of the player.
+		unsigned int model; ///< Holds the model hash of the player.
+		float position[3]; ///< Holds the position of the player.
+		float angle; ///< Holds the angle of the player.
 		int last_active;
 		int sync_state;
-		int currentweapon;
-		int weapons[8];
-		int ammo[8];
+		char currentweapon;
+		char weapons[8];
+		short ammo[8];
 		char animation[128];
-		short vehicleindex;
-		int seat_id;
+		short vehicleindex; ///< Holds
+		char seatindex;
 		int score;
-		int health, armor;
+		int health, armor; // TODO: test and reduce
 		char wanted_level;
 		bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
 		bool isducking;
