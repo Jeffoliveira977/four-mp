@@ -215,7 +215,6 @@ unsigned char PlayerManager::GetNumberOfPlayerClasses(void)
 
 bool PlayerManager::AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index)
 {
-	PrintToServer("Player manager::AddPlayerClass");
 	if (!this->GetClassFreeSlot(index))
 	{
 		PrintToServer("Unable to add player class. No free slots.");
@@ -227,16 +226,13 @@ bool PlayerManager::AddPlayerClass(const unsigned int model, const float positio
 		{
 			return false;
 		}
-		debug("resize, index = %d", index);
 		if (!ResizeBuffer<PlayerClass **, PlayerClass *, unsigned char>(classbuffer, index + 1))
 		{
-			debug("finish resize");
 			return false;
 		}
 		classbuffer[index] = NULL;
 		classbuffersize = index + 1;
 	}
-	PrintToServer("111");
 	classbuffer[index] = new PlayerClass;
 	classbuffer[index]->model = model;
 	classbuffer[index]->position[0] = position[0];

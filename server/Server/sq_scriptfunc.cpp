@@ -7,7 +7,6 @@
 #include "sq/squirrel.h"
 #include "sq/sqstdsystem.h"
 
-#include "logging.h"
 #include "ServerCore.h"
 #include "PlayerManager.h"
 #include "VehicleManager.h"
@@ -70,7 +69,6 @@ void sq_GiveWeapon(HSQUIRRELVM v)
 
 void sq_addPlayerClass(HSQUIRRELVM v) 
 {
-	PrintToServer("Adding player class");
 	int model;
 	float position[3];
 	float angle;
@@ -102,7 +100,7 @@ void sq_addPlayerClass(HSQUIRRELVM v)
 		return;
 	}
 	sq_pushinteger(v, index);
-} 
+}
 
 void sq_enableComponentSelect(HSQUIRRELVM v) 
 {
