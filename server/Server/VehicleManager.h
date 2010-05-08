@@ -25,8 +25,8 @@ private:
 		float position[3];
 		float angle;
 		short Health, engHealth;
-		int DoorState[6]; //unsigned char?
-		int DoorLock[6]; //unsigned char?
+		int DoorState[6]; //unsigned char? bool?
+		int DoorLock[6]; //unsigned char? bool?
 		unsigned char color[2];
 	};
 	short maxvehiclebuffersize;
