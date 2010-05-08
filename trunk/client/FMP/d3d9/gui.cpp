@@ -5,6 +5,7 @@
 #include "../log.h"
 #include "../ConsoleWindow.h"
 #include "../Hook/classes.h"
+#include "../../../Shared/RakNet/RakPeerInterface.h"
 
 #include <vector>
 #include <map>
