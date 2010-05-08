@@ -122,6 +122,7 @@ bool ServerCore::Load(void)
 	maxplayers = playm.GetMaxPlayers();
 	plugm.LoadPlugins();
 	vmm.LoadFilterScripts();
+	PrintToServer(gamemode);
 	if (!vmm.LoadGameMode(gamemode))
 	{
 		PrintToServer("Can't load gamemode.");

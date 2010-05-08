@@ -47,10 +47,11 @@ struct PlayerDamage
 
 struct PlayerClass
 {
-	int model;
-	float x, y, z;
+	unsigned int model;
+	float position[3];
 	float angle;
-	int gun[3], ammo[3];
+	char gun[3];
+	short ammo[3];
 };
 
 struct FVehicle
@@ -75,7 +76,7 @@ struct FConfig
 	char Name[32];
 
 	bool ComponentSelect;
-	int NumSkins;
+	unsigned char NumSkins;
 	bool SkinSelect;
 };
 

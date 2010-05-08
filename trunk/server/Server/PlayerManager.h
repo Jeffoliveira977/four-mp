@@ -15,7 +15,7 @@ public:
 	bool IsServerFull(void);
 	bool IsPlayerConnected(const short index);
 	char *GetPlayerName(const short index);
-	int GetPlayerModel(const short index);
+	unsigned int GetPlayerModel(const short index);
 	bool GetPlayerPosition(const short index, float (&postion)[3]);
 	bool GetPlayerAngle(const short index, float &angle);
 	short GetPlayerVehicle(const short index);
@@ -25,8 +25,8 @@ public:
 	char GetPlayerWantedLevel(const short index);
 	bool GetPlayerColor(const short index, unsigned char (&color)[4]);
 	unsigned char GetNumberOfPlayerClasses(void);
-	bool AddPlayerClass(const int model, const float position[3], const float angle, const int weapons[8], const int ammo[8], unsigned char &index);
-	bool GetPlayerClassData(const unsigned char index, int &model, float (&position)[3], float &angle, int (&weapons)[8], int (&ammo)[8]);
+	bool AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index);
+	bool GetPlayerClassData(const unsigned char index, unsigned int &model, float (&position)[3], float &angle, char (&weapons)[8], short (&ammo)[8]);
 private:
 	struct Player
 	{
@@ -40,16 +40,16 @@ private:
 		char weapons[8];
 		short ammo[8];
 		char animation[128];
-		short vehicleindex; ///< Holds
-		char seatindex;
-		int score;
+		short vehicleindex; ///< Holds the index of the vehicle the player is in.
+		char seatindex; ///< Holds the index of the seat of the vehicle the player is in.
+		int score; /// Holds the score of the player.
 		int health, armor; // TODO: test and reduce
-		char wanted_level;
+		char wanted_level; ///< Holds the wanted level of the player.
 		bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
-		bool isducking;
+		bool isducking; ///< Holds true if the player is ducking and false otherwise.
 		int room;
 		bool car_enter;
-		unsigned char color[4];
+		unsigned char color[4]; ///< Holds the color of the player.
 		int compT[11], compD[11];
 	};
 	short maxplayerbuffersize;
@@ -58,10 +58,11 @@ private:
 	Player **playerbuffer;
 	struct PlayerClass
 	{
-		int model;
+		unsigned int model;
 		float position[3];
 		float angle;
-		int weapons[8], ammo[8];
+		char weapons[8];
+		short ammo[8];
 	};
 	unsigned char maxclassbuffersize;
 	unsigned char classbuffersize;
