@@ -1,9 +1,9 @@
 #pragma once
 #include <d3d9.h>
 #include <d3dx9.h>
-#include "../../GUI/CGUI.h"
 
 struct MasterServerInfo;
+class CGUI;
 
 class FMPGUI
 {
@@ -26,6 +26,7 @@ public:
 	void Logged();
 
 	void UpdateServer(const char *ip_port, MasterServerInfo *msi);
+	void Message(char *data);
 
 	DWORD GetWidth();
 	DWORD GetHeight();

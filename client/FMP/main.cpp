@@ -701,6 +701,9 @@ void NetworkThread(void *dummy)
 				{
 					Log("RakNet: Connection failed");
 					clientstate.game = GameStateOffline;
+					char str[128];
+					sprintf(str, "Can't connect to %s", pack->systemAddress.ToString());
+					Gui.Message(str);
 				} break;
 			case ID_PONG:
 				{
