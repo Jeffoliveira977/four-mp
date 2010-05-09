@@ -18,6 +18,7 @@ extern VehicleManager vm;
 
 NetworkManager::NetworkManager(void)
 {
+	net = NULL;
 	maxaddressbuffersize = playm.GetMaxPlayers();
 	addressbuffer = NULL;
 	addressbuffersize = 0;
@@ -25,6 +26,22 @@ NetworkManager::NetworkManager(void)
 
 NetworkManager::~NetworkManager(void)
 {
+	if (net != NULL)
+	{
+		net->Shutdown(100,0);
+		RakNetworkFactory::DestroyRakPeerInterface(net);
+	}
+	if (addressbuffer != NULL)
+	{
+		for (short i = 0; i < addressbuffersize; i++)
+		{
+			if (addressbuffer[i] != NULL)
+			{
+				delete addressbuffer[i];
+			}
+		}
+		free(addressbuffer);
+	}
 }
 
 void NetworkManager::Init(const short maxclients, const unsigned short port)
@@ -89,7 +106,7 @@ void NetworkManager::Tick(void)
 						}
 						vmm.OnPlayerDisconnect(client);
 						PrintToServer("Player %s disconnected", playm.playerbuffer[client]->name);
-						free(playm.playerbuffer[client]);
+						delete playm.playerbuffer[client];
 						playm.playerbuffer[client] = NULL;
 						playm.numplayers--;
 						if ((client < 0) && (client >= addressbuffersize))
@@ -100,7 +117,7 @@ void NetworkManager::Tick(void)
 						{
 							break;
 						}
-						free(addressbuffer[client]);
+						delete addressbuffer[client];
 						addressbuffer[client] = NULL;
 						NetworkPlayerDisconnectionData data;
 						data.client = client;
@@ -127,7 +144,7 @@ void NetworkManager::UpdateServerInfo(char *name, char *mode, char *loc, short p
 	char *info = new char[512];
 	sprintf(info, "%s%c%s%c%s%c%d%c%d%c%d%c%s%c", name, 1, mode, 1, loc, 1, players, 1, maxplayers, 1, password, 1, clan, 1);
 	net->SetOfflinePingResponse(info, strlen(info));
-	free(info);
+	delete info;
 }
 
 void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
@@ -155,13 +172,13 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 	NetworkPlayerConnectionRequestData data;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, clientindex);
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	PrintToServer("Player %s[%d] connected", data.name, clientindex);
 	if (!vmm.OnPlayerConnect(clientindex, data.name))
 	{
 		this->SendConnectionError(rpcParameters->sender, NetworkPlayerConnectionErrorScriptLock);
 		net->CloseConnection(rpcParameters->sender, true);
-		free(addressbuffer[clientindex]);
+		delete addressbuffer[clientindex];
 		addressbuffer[clientindex] = NULL;
 		return;
 	}
@@ -169,7 +186,7 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 	{
 		this->SendConnectionError(rpcParameters->sender, NetworkPlayerConnectionErrorAllocationError);
 		net->CloseConnection(rpcParameters->sender, true);
-		free(addressbuffer[clientindex]);
+		delete addressbuffer[clientindex];
 		addressbuffer[clientindex] = NULL;
 		return;
 	}
@@ -179,15 +196,15 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 	{
 		this->SendConnectionError(rpcParameters->sender, NetworkPlayerConnectionErrorAllocationError);
 		net->CloseConnection(rpcParameters->sender, true);
-		free(addressbuffer[clientindex]);
+		delete addressbuffer[clientindex];
 		addressbuffer[clientindex] = NULL;
 		return;
 	}
 	RakNet::BitStream *bsSend = new RakNet::BitStream;
 	bsSend->Write(*playerdata);
-	free(playerdata);
+	delete playerdata;
 	this->SendDataToAll("ConnectPlayer", bsSend);
-	free(bsSend);
+	delete bsSend;
 	//TODO: Optimize using currently connected players, not buffer size.
 	for (short i = 0; i < addressbuffersize; i++)
 	{
@@ -198,9 +215,9 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 			{
 				bsSend = new RakNet::BitStream;
 				bsSend->Write(*playerdata);
-				free(playerdata);
+				delete playerdata;
 				net->RPC("ConnectPlayer", bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[clientindex][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
-				free(bsSend);
+				delete bsSend;
 			}
 		}
 	}
@@ -212,9 +229,9 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 		{
 			bsSend = new RakNet::BitStream;
 			bsSend->Write(*vehicledata);
-			free(vehicledata);
+			delete vehicledata;
 			net->RPC("CreateVehicle", bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[clientindex][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
-			free(bsSend);
+			delete bsSend;
 		}
 	}
 }
@@ -229,7 +246,7 @@ void NetworkManager::RecievePlayerMove(const RPCParameters *rpcParameters)
 	}
 	NetworkPlayerMoveData data;
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -264,6 +281,7 @@ void NetworkManager::RecievePlayerJump(const RPCParameters *rpcParameters)
 	{
 		return;
 	}
+	delete bsData;
 	NetworkPlayerJumpData data;
 	data.client = client;
 	RakNet::BitStream bsSend;
@@ -281,7 +299,7 @@ void NetworkManager::RecievePlayerDuck(const RPCParameters *rpcParameters)
 	}
 	NetworkPlayerDuckData data;
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -307,7 +325,7 @@ void NetworkManager::RecievePlayerEntranceInVehicle(const RPCParameters *rpcPara
 	}
 	NetworkPlayerEntranceInVehicleData data;
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -337,7 +355,7 @@ void NetworkManager::RecievePlayerCancelEntranceInVehicle(const RPCParameters *r
 	{
 		return;
 	}
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -363,7 +381,7 @@ void NetworkManager::RecievePlayerExitFromVehicle(const RPCParameters *rpcParame
 	{
 		return;
 	}
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -391,7 +409,7 @@ void NetworkManager::RecievePlayerFire(const RPCParameters *rpcParameters)
 	}
 	NetworkPlayerFireData data;
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -430,7 +448,7 @@ void NetworkManager::RecievePlayerAim(const RPCParameters *rpcParameters)
 	}
 	NetworkPlayerAimData data;
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -456,7 +474,7 @@ void NetworkManager::RecievePlayerWeaponChange(const RPCParameters *rpcParameter
 	}
 	NetworkPlayerWeaponChangeData data;
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -482,6 +500,7 @@ void NetworkManager::RecievePlayerHealthAndArmorChange(const RPCParameters *rpcP
 	}
 	NetworkPlayerHealthAndArmorChangeData data;
 	bsData->Read(data);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -508,7 +527,7 @@ void NetworkManager::RecievePlayerSpawnRequest(const RPCParameters *rpcParameter
 	}
 	NetworkPlayerSpawnRequestData data;
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -551,7 +570,7 @@ void NetworkManager::RecievePlayerModelChange(const RPCParameters *rpcParameters
 	}
 	NetworkPlayerModelChangeData data;
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -577,7 +596,7 @@ void NetworkManager::RecievePlayerComponentsChange(const RPCParameters *rpcParam
 	}
 	NetworkPlayerComponentsChangeData data;
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	if ((client < 0) || (client >= playm.playerbuffersize))
 	{
 		return;
@@ -604,7 +623,7 @@ void NetworkManager::RecievePlayerChat(const RPCParameters *rpcParameters)
 	}
 	NetworkPlayerChatData data;
 	bsData->Read(data);
-	free(bsData);
+	delete bsData;
 	if (!playm.GetPlayerColor(client, data.color))
 	{
 		return;

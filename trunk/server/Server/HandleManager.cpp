@@ -412,7 +412,7 @@ bool HandleManager::DeleteHandleOwner(const int handle, const short owner)
 			free(handlebuffer[handle]->ptr);
 		}
 		typebuffer[handlebuffer[handle]->type]->handlecount--;
-		free(handlebuffer[handle]);
+		delete handlebuffer[handle];
 		handlebuffer[handle] = NULL;
 	}
 	this->DecreaseHandleCount(owner);

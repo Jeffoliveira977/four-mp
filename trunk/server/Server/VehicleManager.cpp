@@ -19,7 +19,7 @@ VehicleManager::~VehicleManager(void)
 	{
 		if (vehiclebuffer[i] != NULL)
 		{
-			free(vehiclebuffer[i]);
+			delete vehiclebuffer[i];
 		}
 	}
 	free(vehiclebuffer);
