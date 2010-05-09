@@ -31,7 +31,6 @@ extern CoreHandleTypesManager chtm;
 VirtualMachineManager::VirtualMachineManager(void)
 {
 	maxvmbuffersize = 17;
-	vmbuffer = NULL;
 	vmbuffer = (VirtualMachine **)calloc(1, sizeof(VirtualMachine *));
 	vmbuffer[0] = NULL;
 	vmbuffersize = 0;

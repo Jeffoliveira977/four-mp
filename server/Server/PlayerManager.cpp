@@ -23,6 +23,7 @@ PlayerManager::PlayerManager(void)
 
 PlayerManager::~PlayerManager(void)
 {
+	//TODO:
 }
 
 short PlayerManager::GetMaxPlayers(void)

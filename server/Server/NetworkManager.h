@@ -1,7 +1,7 @@
 /// \file
 /// \brief Header file that describes the NetworkManager class.
 /// \details See class description.
-/// \author FaTony
+/// \author WNeZRoS, FaTony
 
 #pragma once
 
@@ -11,7 +11,7 @@
 
 /// \brief A network manager. It handles all network traffic.
 /// \details TODO:
-/// \author FaTony
+/// \author WNeZRoS, FaTony
 
 class NetworkManager
 {
