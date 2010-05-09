@@ -1,6 +1,7 @@
 #include "../masterserver.h"
 #include <windows.h>
 #include "gui.h"
+#include "../../GUI/CGUI.h"
 #include "../main.h"
 #include "../log.h"
 #include "../ConsoleWindow.h"
@@ -20,6 +21,7 @@ CWindow * fOption;
 CWindow * fUserRegister;
 CWindow * fUserLogin;
 CWindow * fInfo;
+CWindow * fEnterNick;
 // Chat elements
 CTextBox * cc_tChat;
 CEditBox * cc_tEnter;
@@ -41,6 +43,9 @@ CText *upLoginInfo, *upStrLogin, *upStrPass;
 CEditBox *upLogin, *upPassword;
 CButton *upSendLogin, *upShowRegister;
 CCheckBox *upRemeberMe;
+// Enter nick
+CEditBox * enNick; 
+CButton * enOK;
 
 std::vector<MasterServerInfo*> server_list;
 std::vector<MasterServerInfo*> server_list_fav;
@@ -93,6 +98,10 @@ namespace CALLBACKS
 				}
 			}
 		}
+		else if(tab == 1)
+		{
+			net->Ping("255.255.255.255", 7777, false);
+		}
 		Debug("CALLBACKS::Refresh complete");
 	}
 	void GetLAN( CElement * pElement, CMSG msg, int param )
@@ -106,11 +115,21 @@ namespace CALLBACKS
 		sbTab[tab]->SetEnabled(1);
 		tab = 1;
 		sbTab[tab]->SetEnabled(0);
+
+		net->Ping("255.255.255.255", 7777, false);
+
 		Debug("CALLBACKS::GetLAN complete");
 	}
 	void GetInet( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
+		if(!Gui.IsLogged()) 
+		{
+			fUserLogin->SetVisible(1);
+			fServBrowser->SetVisible(0);
+			return;
+		}
+
 		Debug("CALLBACKS::GetInet called");
 
 		sbTab[tab]->SetEnabled(1);
@@ -136,6 +155,13 @@ namespace CALLBACKS
 	void GetVIP( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
+		if(!Gui.IsLogged()) 
+		{
+			fUserLogin->SetVisible(1);
+			fServBrowser->SetVisible(0);
+			return;
+		}
+
 		Debug("CALLBACKS::GetVIP called");
 
 		sbTab[tab]->SetEnabled(1);
@@ -162,6 +188,12 @@ namespace CALLBACKS
 	void GetFavourite( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
+		if(!Gui.IsLogged()) 
+		{
+			fUserLogin->SetVisible(1);
+			fServBrowser->SetVisible(0);
+			return;
+		}
 		Debug("CALLBACKS::GetFavourite called");
 
 		sbServList->Clear();
@@ -188,11 +220,13 @@ namespace CALLBACKS
 	}
 	void Login( CElement * pElement, CMSG msg, int param )
 	{
-		if(msg != CLICK) return;
+		if(msg != CLICK && msg != END) return;
 		Debug("CALLBACKS::Login called");
 
 		std::string login = upLogin->GetString();
 		std::string pass = upPassword->GetString();
+
+		if(login.length() < 3 || pass.length() < 6) return;
 
 		bool r = fmpms.QueryUserLogin((char*)login.c_str(), (char*)pass.c_str());
 		if(r) 
@@ -202,6 +236,7 @@ namespace CALLBACKS
 			Gui.Logged();
 			strcpy_s(Conf.Name, 32, login.c_str());
 		}
+		else Gui.Message("Can't login");
 
 		Debug("CALLBACKS::Login complete");
 	}
@@ -313,15 +348,85 @@ namespace CALLBACKS
 		Debug("Selected %d (%d/%d)", sel, sbServList->GetSize(), server_list.size());
 		if(sel >= 0)
 		{
+			if(!Gui.IsLogged())
+			{
+				fEnterNick->SetVisible(1);
+				return;
+			}
 			MasterServerInfo *tmp_msi = server_list.at(sel);
 			Debug("FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
 			HOOK.ConnectToServer(tmp_msi->ip, tmp_msi->port);
 		}
 		Debug("CALLBACKS::Connect complete");
 	}
+	void EnterNick(CElement *pElement, CMSG msg, int Param)
+	{
+		if(msg != CLICK && msg != END) return;
+
+		std::string n = enNick->GetString();
+		if(n.length() < 4) 
+		{
+			if(n.length() > 0)
+				Gui.Message("Small nick");
+			return;
+		}
+		
+		strcpy_s(Conf.Name, 32, n.c_str());
+		fEnterNick->SetVisible(0);
+
+		if(!sbServList) return;
+
+		int sel = sbServList->GetSelected();
+		if(sel >= 0)
+		{
+			MasterServerInfo *tmp_msi = server_list.at(sel);
+			Debug("FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
+			HOOK.ConnectToServer(tmp_msi->ip, tmp_msi->port);
+		}
+	}
+	void ServerBrowser(CElement *pElement, CMSG msg, int Param)
+	{
+		if(msg == END)
+		{
+			if(Gui.IsLogged())
+			{
+				if(fChat->IsVisible()) fChat->SetVisible(0);
+
+				if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
+					if(!conwindow.IsVisible()) 
+					{
+						clientstate.input = InputStateGame;
+						HOOK.InputFreeze(0);
+					}
+			}
+			else
+			{
+				fUserLogin->SetVisible(1);
+				fServBrowser->SetVisible(0);
+			}
+		}
+	}
+	void UserLogin(CElement *pElement, CMSG msg, int Param)
+	{
+		if(msg == END)
+		{
+			fUserLogin->SetVisible(0);
+			fServBrowser->SetVisible(1);
+			sbTab[1]->SetEnabled(0);
+			sbTab[tab]->SetEnabled(1);
+			tab = 1;
+		}
+	}
 	void AddFav(CElement *pElement, CMSG msg, int Param)
 	{
 		if(msg != CLICK) return;
+
+		if(!Gui.IsLogged()) 
+		{
+			fUserLogin->SetVisible(1);
+			fServBrowser->SetVisible(0);
+			return;
+		}
 
 		if(sbEnterIP->GetString().length() > 0 && sbEnterPort->GetString().length() > 0)
 		{
@@ -384,7 +489,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	Debug("FMPGUI::Load >> Create server browser");
 	// Create Servers Brouser
-	fServBrowser = new CWindow(m_Gui, s_iWidth/2-375, s_iHeight/2-250, 750, 500, "SERVER BROWSER", "SERVER_BROWSER");
+	fServBrowser = new CWindow(m_Gui, s_iWidth/2-375, s_iHeight/2-250, 750, 500, "SERVER BROWSER", "SERVER_BROWSER", CALLBACKS::ServerBrowser);
 	
 	int ServerWidth[6] = {16, 210, 60, 60, 100, 100};
 	sbServList = new CListView(m_Gui, 0, 29, ServerWidth, 350, 6, NULL, "SERVER_LIST", CALLBACKS::ServerList);
@@ -472,10 +577,10 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	// Create login window
 	Debug("FMPGUI::Load >> Create login");
-	fUserLogin = new CWindow(m_Gui, s_iWidth/2-150, s_iHeight/2-100, 300, 200, "USER LOGIN", "WND_USER_LOGIN");
+	fUserLogin = new CWindow(m_Gui, s_iWidth/2-150, s_iHeight/2-100, 300, 200, "USER LOGIN", "WND_USER_LOGIN", CALLBACKS::UserLogin);
 	upLoginInfo = new CText(m_Gui, 20, 15, 280, 40, "Please login or Regsiter", "UP_INFO");
-	upLogin = new CEditBox(m_Gui, 100, 45, 180, 0, "", "UP_LOGIN");
-	upPassword = new CEditBox(m_Gui, 100, 75, 180, 0, "", "UP_PASSWORD");
+	upLogin = new CEditBox(m_Gui, 100, 45, 180, 0, "", "UP_LOGIN", CALLBACKS::Login);
+	upPassword = new CEditBox(m_Gui, 100, 75, 180, 0, "", "UP_PASSWORD", CALLBACKS::Login);
 	upPassword->HideContent(1);
 	upStrLogin = new CText(m_Gui, 20, 50, 100, 20, "Login", "UP_STR_LOGIN");
 	upStrPass = new CText(m_Gui, 20, 80, 100, 20, "Password", "UP_STR_PASSWORD");
@@ -491,7 +596,6 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	fUserLogin->AddElement(upSendLogin);
 	fUserLogin->AddElement(upShowRegister);
 	fUserLogin->AddElement(upRemeberMe);
-	fUserLogin->SetCloseButton(0);
 
 	// Create register window
 	Debug("FMPGUI::Load >> Create register");
@@ -537,6 +641,13 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	fInfo->AddElement(iTxt);
 	fInfo->AddElement(iBt);
 	fInfo->SetVisible(0);
+
+	fEnterNick = new CWindow(m_Gui, s_iWidth/2-100, s_iHeight/2-40, 200, 80, "Enter nick", "WND_ENTER_NICK");
+	enNick = new CEditBox(m_Gui, 10, 10, 130, 0, NULL, NULL, CALLBACKS::EnterNick);
+	enOK = new CButton(m_Gui, 150, 10, 40, 0, "OK", NULL, CALLBACKS::EnterNick);
+	fEnterNick->AddElement(enNick);
+	fEnterNick->AddElement(enOK);
+	fEnterNick->SetVisible(0);
 
 	Debug("FMPGUI::Load >> Load console");
 	conwindow.Load();
@@ -646,4 +757,10 @@ void FMPGUI::UpdateServer(const char *ip_port, MasterServerInfo *msi)
 	{
 		server_list[index] = msi;
 	}
+}
+
+void FMPGUI::Message(char *data)
+{
+	fInfo->GetElementByString("INFO_TEXT", 1)->SetString(data);
+	fInfo->SetVisible(1);
 }
