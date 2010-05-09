@@ -755,6 +755,7 @@ void FMPGUI::UpdateServer(const char *ip_port, MasterServerInfo *msi)
 	}
 	else
 	{
+		//delete server_list[index];
 		server_list[index] = msi;
 	}
 }
