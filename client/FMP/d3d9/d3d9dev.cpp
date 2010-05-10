@@ -217,18 +217,21 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 	MouseY = *(int*)MOUSE_POS_Y; 
 	MouseX = *(int*)MOUSE_POS_X;
 
+	RECT rc = {2, 2, 800, 600}; 
+	if(clientstate.input != InputStateGui && clientstate.game > GameStateConnecting)
+	{	
+		for(int i = 7; i >= 0; i--)
+		{
+			fChat->DrawText(0, mChat[i].msg, -1, &rc, DT_TOP|DT_LEFT, 
+				D3DCOLOR_XRGB(mChat[i].color.r, mChat[i].color.g, mChat[i].color.b));
+			rc.top += 11;
+		}
+	}
+
 	switch (clientstate.input)
 	{
 	case InputStateChat:
 		{
-			RECT rc = {2, 2, 800, 600}; 
-			for(int i = 7; i >= 0; i--)
-			{
-				fChat->DrawText(0, mChat[i].msg, -1, &rc, DT_TOP|DT_LEFT, 
-					D3DCOLOR_XRGB(mChat[i].color.r, mChat[i].color.g, mChat[i].color.b));
-				rc.top += 11;
-			}
-
 			//if(enterChat != -1)
 			//{
 				rc.top += 2;
