@@ -9,7 +9,6 @@
 #include "../../../Shared/RakNet/RakPeerInterface.h"
 
 #include <vector>
-#include <map>
 
 extern ConsoleWindow conwindow;
 extern RakPeerInterface *net;
@@ -49,7 +48,6 @@ CButton * enOK;
 
 std::vector<MasterServerInfo*> server_list;
 std::vector<MasterServerInfo*> server_list_fav;
-std::map<const char*, int> server_index;
 
 int tab = 3;
 
@@ -93,7 +91,7 @@ namespace CALLBACKS
 			{
 				if(server_list_fav[i])
 				{
-					//Gui.UpdateServer(server_list_fav[i]->name, server_list_fav[i]);
+					Gui.UpdateServer(server_list_fav[i]);
 					net->Ping(server_list_fav[i]->ip, server_list_fav[i]->port, false); 
 				}
 			}
@@ -209,9 +207,7 @@ namespace CALLBACKS
 		{
 			if(server_list_fav[i])
 			{
-				char tmp[128];
-				sprintf(tmp, "%s:%d", server_list_fav[i]->ip, server_list_fav[i]->port);
-				//Gui.UpdateServer(tmp, server_list_fav[i]);
+				Gui.UpdateServer(server_list_fav[i]);
 				net->Ping(server_list_fav[i]->ip, server_list_fav[i]->port, false); 
 			}
 		}
@@ -439,7 +435,7 @@ namespace CALLBACKS
 
 			if(tab == 3)
 			{
-				Gui.UpdateServer(tmp_msi->name, tmp_msi);
+				Gui.UpdateServer(tmp_msi);
 				net->Ping(tmp_msi->ip, tmp_msi->port, false);
 			}
 			server_list_fav.push_back(tmp_msi);
@@ -732,12 +728,17 @@ bool FMPGUI::IsLogged()
 	return logged;
 }
 
-void FMPGUI::UpdateServer(const char *ip_port, MasterServerInfo *msi)
+void FMPGUI::UpdateServer(MasterServerInfo *msi)
 {
-	int index = server_index[ip_port] - 1;
+	int index = -1;
 	char tmp[32];
 
-	Log("%s = %s = %d", ip_port, msi->name, index);
+	for(int i = 0; i < (int)server_list.size(); i++)
+		if(strcmp(server_list[i]->ip, msi->ip) == 0 && server_list[i]->port == msi->port)
+		{
+			index = i;
+			break;
+		}
 
 	sbServList->PutStr((msi->password?"1":"0"), 0, index);
 	sbServList->PutStr(msi->name, 1, index);
@@ -751,7 +752,6 @@ void FMPGUI::UpdateServer(const char *ip_port, MasterServerInfo *msi)
 	if(index == -1)
 	{
 		server_list.push_back(msi);
-		server_index[ip_port] = server_list.size();
 	}
 	else
 	{

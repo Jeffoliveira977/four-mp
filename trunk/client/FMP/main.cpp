@@ -728,10 +728,10 @@ void NetworkThread(void *dummy)
 						sscanf((char*)data, "%[^\1]\1%[^\1]\1%[^\1]\1%d\1%d\1%d\1%[^\1]\1", &tmp_msi->name, &tmp_msi->mode, &tmp_msi->loc, 
 							&tmp_msi->players, &tmp_msi->maxplayers, &tmp_msi->password, &tmp_msi->clan);
 					}
-					strcpy_s(tmp_msi->name, 64, pack->systemAddress.ToString(0));
+					strcpy_s(tmp_msi->ip, 64, pack->systemAddress.ToString(0));
 					tmp_msi->port = pack->systemAddress.port;
 
-					Gui.UpdateServer(pack->systemAddress.ToString(1), tmp_msi);
+					Gui.UpdateServer(tmp_msi);
 				} break;
 			case ID_RPC_REMOTE_ERROR:
 				{
