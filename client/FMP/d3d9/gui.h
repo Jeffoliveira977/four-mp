@@ -25,7 +25,7 @@ public:
 	bool IsLogged();
 	void Logged();
 
-	void UpdateServer(const char *ip_port, MasterServerInfo *msi);
+	void UpdateServer(MasterServerInfo *msi);
 	void Message(char *data);
 
 	DWORD GetWidth();
