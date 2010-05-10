@@ -423,6 +423,28 @@ void VirtualMachineManager::OnPlayerSpawn(const short playerindex, const unsigne
 	}
 }
 
+bool VirtualMachineManager::OnPlayerText(const short playerindex, const char *data)
+{
+	for (unsigned char i = 0; i < vmbuffersize; i++)
+	{
+		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
+		{
+			switch (vmbuffer[i]->lang)
+			{
+			case VMLanguageSquirrel:
+				{
+					if (!sc_OnPlayerText(*vmbuffer[i]->ptr.squirrel, playerindex, data))
+					{
+						return false;
+					}
+					break;
+				}
+			}
+		}
+	}
+	return true;
+}
+
 void VirtualMachineManager::FireCommandCallback(const unsigned char index, const char *callback, const unsigned char numargs)
 {
 	if (index >= vmbuffersize)

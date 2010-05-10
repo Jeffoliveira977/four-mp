@@ -104,6 +104,23 @@ void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex, const unsigned cha
 	sq_settop(v,top); 
 }
 
+bool sc_OnPlayerText(HSQUIRRELVM v, const short playerindex, const char *text)
+{
+	int result;
+	int top = sq_gettop(v); 
+	sq_pushroottable(v);
+	sq_pushstring(v,_SC("OnPlayerText"),-1);
+	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
+		sq_pushroottable(v); 
+		sq_pushinteger(v,playerindex); 
+		sq_pushstring(v,text,-1); 
+		sq_call(v,3,0,0); 
+		sq_getinteger(v, sq_gettop(v), &result);
+	}
+	sq_settop(v,top); 
+	return result != 0;
+}
+
 void sc_CommandCallback(HSQUIRRELVM v, const char *callback, const unsigned char numargs)
 {
 	int top = sq_gettop(v); 

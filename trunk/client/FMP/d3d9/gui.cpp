@@ -186,12 +186,12 @@ namespace CALLBACKS
 	void GetFavourite( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
-		if(!Gui.IsLogged()) 
+		/*if(!Gui.IsLogged()) 
 		{
 			fUserLogin->SetVisible(1);
 			fServBrowser->SetVisible(0);
 			return;
-		}
+		}*/
 		Debug("CALLBACKS::GetFavourite called");
 
 		sbServList->Clear();
@@ -417,12 +417,12 @@ namespace CALLBACKS
 	{
 		if(msg != CLICK) return;
 
-		if(!Gui.IsLogged()) 
+		/*if(!Gui.IsLogged()) 
 		{
 			fUserLogin->SetVisible(1);
 			fServBrowser->SetVisible(0);
 			return;
-		}
+		}*/
 
 		if(sbEnterIP->GetString().length() > 0 && sbEnterPort->GetString().length() > 0)
 		{

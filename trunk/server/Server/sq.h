@@ -49,6 +49,12 @@ void sc_OnPlayerDisconnect(HSQUIRRELVM v, const short index);
 /// \return No return.
 void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex, const unsigned char classindex);
 
+/// \brief Called when send message in chat
+/// \param[in] playersindex
+/// \param[in] text
+/// \return No return
+bool sc_OnPlayerText(HSQUIRRELVM v, const short playerindex, const char *text);
+
 /// \brief Fires a dynamic command callback.
 /// \param[in] callback Name of the callback to call.
 /// \param[in] numargs Number of arguments to pass.
