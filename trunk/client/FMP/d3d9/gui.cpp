@@ -384,18 +384,17 @@ namespace CALLBACKS
 	{
 		if(msg == END)
 		{
-			if(Gui.IsLogged())
+			if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
 			{
 				if(fChat->IsVisible()) fChat->SetVisible(0);
 
-				if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
-					if(!conwindow.IsVisible()) 
-					{
-						clientstate.input = InputStateGame;
-						HOOK.InputFreeze(0);
-					}
+				if(!conwindow.IsVisible()) 
+				{
+					clientstate.input = InputStateGame;
+					HOOK.InputFreeze(0);
+				}
 			}
-			else
+			else if(!Gui.IsLogged())
 			{
 				fUserLogin->SetVisible(1);
 				fServBrowser->SetVisible(0);

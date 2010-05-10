@@ -172,7 +172,7 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 	NetworkPlayerConnectionRequestData data;
 	RakNet::BitStream *bsData = this->TranslateMessage(rpcParameters, clientindex);
 	bsData->Read(data);
-	delete bsData;
+	//delete bsData;
 	PrintToServer("Player %s[%d] connected", data.name, clientindex);
 	if (!vmm.OnPlayerConnect(clientindex, data.name))
 	{
@@ -204,7 +204,7 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 	bsSend->Write(*playerdata);
 	//delete playerdata; BAG:0:0:1
 	this->SendDataToAll("ConnectPlayer", bsSend);
-	delete bsSend;
+	//delete bsSend;
 	//TODO: Optimize using currently connected players, not buffer size.
 	for (short i = 0; i < addressbuffersize; i++)
 	{
@@ -229,9 +229,9 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 		{
 			bsSend = new RakNet::BitStream;
 			bsSend->Write(*vehicledata);
-			delete vehicledata;
+			//delete vehicledata;
 			net->RPC("CreateVehicle", bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[clientindex][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
-			delete bsSend;
+			//delete bsSend;
 		}
 	}
 }
