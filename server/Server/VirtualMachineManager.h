@@ -157,6 +157,12 @@ public:
 	/// \return No return.
 	void OnPlayerSpawn(const short playerindex, const unsigned char classindex);
 
+	///
+	///
+	///
+	///
+	bool OnPlayerText(const short playerindex, const char *data);
+
 	/// \brief Fires a dynamic command callback.
 	/// \param[in] index Index of the virtual machine.
 	/// \param[in] callback Name of the callback to call.

@@ -628,6 +628,9 @@ void NetworkManager::RecievePlayerChat(const RPCParameters *rpcParameters)
 	{
 		return;
 	}
+	if(!vmm.OnPlayerText(client, data.msg))
+		return;
+
 	data.client = client;
 	RakNet::BitStream bsSend;
 	bsSend.Write(data);

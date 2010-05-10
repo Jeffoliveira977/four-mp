@@ -229,13 +229,13 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 				rc.top += 11;
 			}
 
-			if(enterChat != -1)
-			{
+			//if(enterChat != -1)
+			//{
 				rc.top += 2;
 				fChat->DrawText(0, ">", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
 				rc.left += 10;
 				fChat->DrawText(0, enterMsg, -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
-			}
+			//}
 			break;
 		}
 	case InputStateGui:
