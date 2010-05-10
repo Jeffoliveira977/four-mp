@@ -67,26 +67,24 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 					break;
 				}
 
-				if(wParam == 13 && enterChat != -1)
+				if(wParam == 13)
 				{
 					if(strlen(enterMsg) != 0)
 						SendChatMessage();
-					else
-					{	
-						enterChat = -1;
-						enterMsg[0] = 0;
-					}
-					HOOK.InputFreeze(1);
+
+					clientstate.input = InputStateGame; 
+					HOOK.InputFreeze(0);
 				}
 				else if(wParam == 8)
 				{
-					enterChat--;
-					enterMsg[enterChat] = 0;
+					if(strlen(enterMsg) > 0)
+						enterMsg[strlen(enterMsg)-1] = 0;
 				}
-				else if(enterChat != -1)
+				else
 				{
-					if(enterChat != 255)
+					if(strlen(enterMsg) != 255)
 					{
+						int enterChat = strlen(enterMsg);
 						BYTE ks[256];
 						GetKeyboardState(ks);
 						ToAsciiEx(wParam,0,ks, (LPWORD)&enterMsg[enterChat],0, GetKeyboardLayout(GetCurrentThreadId()));

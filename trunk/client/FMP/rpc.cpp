@@ -121,8 +121,6 @@ void ConnectPlayer(RPCParameters *rpcParameters)
 	memcpy(gPlayer[data.index].ammo, data.ammo, sizeof(int) * 8);
 	memcpy(gPlayer[data.index].color, data.color, sizeof(unsigned char) * 4);
 
-	clientstate.input = InputStateGame;
-
 	Log("ConnectPlayer Center %s", data.name);
 	HOOK.PlayerConnect(data.name, data.index, gPlayer[data.index].model, gPlayer[data.index].position[0], gPlayer[data.index].position[1], gPlayer[data.index].position[2]);
 	Log("ConnectPlayer End");

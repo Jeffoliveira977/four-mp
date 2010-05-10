@@ -202,7 +202,7 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 	}
 	RakNet::BitStream *bsSend = new RakNet::BitStream;
 	bsSend->Write(*playerdata);
-	delete playerdata;
+	//delete playerdata; BAG:0:0:1
 	this->SendDataToAll("ConnectPlayer", bsSend);
 	delete bsSend;
 	//TODO: Optimize using currently connected players, not buffer size.
@@ -215,9 +215,9 @@ void NetworkManager::RecieveClientConnection(const RPCParameters *rpcParameters)
 			{
 				bsSend = new RakNet::BitStream;
 				bsSend->Write(*playerdata);
-				delete playerdata;
+				//delete playerdata;
 				net->RPC("ConnectPlayer", bsSend, HIGH_PRIORITY, RELIABLE, 0, addressbuffer[clientindex][0], false, 0, UNASSIGNED_NETWORK_ID, 0);
-				delete bsSend;
+				//delete bsSend;
 			}
 		}
 	}
@@ -634,7 +634,7 @@ void NetworkManager::RecievePlayerChat(const RPCParameters *rpcParameters)
 	data.client = client;
 	RakNet::BitStream bsSend;
 	bsSend.Write(data);
-	this->SendDataToAllExceptOne("Chat", client, &bsSend);
+	this->SendDataToAll("Chat", &bsSend);
 }
 
 bool NetworkManager::SendNewVehicleInfoToAll(const short index)
