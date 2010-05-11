@@ -117,8 +117,8 @@ void ConnectPlayer(RPCParameters *rpcParameters)
 	gPlayer[data.index].health = data.health;
 	gPlayer[data.index].armor = data.armor;
 	gPlayer[data.index].room = data.room;
-	memcpy(gPlayer[data.index].weapons, data.weapons, sizeof(int) * 8);
-	memcpy(gPlayer[data.index].ammo, data.ammo, sizeof(int) * 8);
+	memcpy(gPlayer[data.index].weapons, data.weapons, sizeof(char) * 8);
+	memcpy(gPlayer[data.index].ammo, data.ammo, sizeof(short) * 8);
 	memcpy(gPlayer[data.index].color, data.color, sizeof(unsigned char) * 4);
 
 	Log("ConnectPlayer Center %s", data.name);

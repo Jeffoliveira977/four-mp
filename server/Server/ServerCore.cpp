@@ -172,6 +172,12 @@ void ServerCore::Tick(void)
 
 void ServerCore::Unload(void)
 {
+	//TODO:
+	//1. Politely kick all players.
+	//2. Destroy all vehicles.
+	//3. Unload all virtual machines.
+	//4. Unload all plugins.
+	//5. Clean up all remaining data - destructors.
 }
 
 void ServerCore::Shutdown(void)

@@ -15,14 +15,17 @@ VehicleManager::VehicleManager(void)
 
 VehicleManager::~VehicleManager(void)
 {
-	for (short i = 0; i < vehiclebuffersize; i++)
+	if (vehiclebuffer != NULL)
 	{
-		if (vehiclebuffer[i] != NULL)
+		for (short i = 0; i < vehiclebuffersize; i++)
 		{
-			delete vehiclebuffer[i];
+			if (vehiclebuffer[i] != NULL)
+			{
+				delete vehiclebuffer[i];
+			}
 		}
+		free(vehiclebuffer);
 	}
-	free(vehiclebuffer);
 }
 
 short VehicleManager::GetMaxVehicleBufferSize(void)
