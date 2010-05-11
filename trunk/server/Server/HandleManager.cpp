@@ -27,7 +27,8 @@ HandleManager::HandleManager(void)
 	for (unsigned short i = 0; i < NUM_CORE_HANDLE_TYPES; i++)
 	{
 		typebuffer[i] = new HandleType;
-		typebuffer[i]->owner = 255;
+		typebuffer[i]->owner = 0;
+		typebuffer[i]->handlecount = 0;
 	}
 	typebuffersize = NUM_CORE_HANDLE_TYPES;
 	handlebuffer = NULL;
@@ -43,16 +44,28 @@ HandleManager::~HandleManager(void)
 		delete typebuffer[i];
 	}
 	delete typebuffer;
-	for (int i = 0; i < handlebuffersize; i++)
+	if (handlebuffer != NULL)
 	{
-		delete handlebuffer[i];
+		for (int i = 0; i < handlebuffersize; i++)
+		{
+			if (handlebuffer[i] != NULL)
+			{
+				delete handlebuffer[i];
+			}
+		}
+		delete handlebuffer;
 	}
-	delete handlebuffer;
-	for (short i = 0; i < countbuffersize; i++)
+	if (countbuffer != NULL)
 	{
-		delete countbuffer[i];
+		for (short i = 0; i < countbuffersize; i++)
+		{
+			if (countbuffer[i] != NULL)
+			{
+				delete countbuffer[i];
+			}
+		}
+		delete countbuffer;
 	}
-	delete countbuffer;
 }
 
 void HandleManager::ReleaseAllHandleTypes(const unsigned char pluginindex)
@@ -110,6 +123,10 @@ bool HandleManager::ReleaseHandleType(const unsigned char pluginindex, const uns
 void HandleManager::CloseAllHandles(const short owner)
 {
 	if ((owner < 0) || (owner >= countbuffersize))
+	{
+		return;
+	}
+	if (countbuffer[owner] == NULL)
 	{
 		return;
 	}
@@ -463,10 +480,10 @@ bool HandleManager::DecreaseHandleCount(const short owner)
 	{
 		return false;
 	}
-	if (countbuffer[owner] <= 0)
+	if (countbuffer[owner][0] <= 0)
 	{
 		return false;
 	}
-	countbuffer[owner]--;
+	countbuffer[owner][0]--;
 	return true;
 }
