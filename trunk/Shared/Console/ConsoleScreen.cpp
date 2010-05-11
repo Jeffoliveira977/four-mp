@@ -271,16 +271,17 @@ void ConsoleScreen::PrintCaption(void)
 	this->SetCursorPosition(0, 0);
 #ifdef WIN32
 	unsigned int length = strlen(caption);
+	DWORD temp;
 #ifdef _UNICODE
 	wchar_t *tempstring = (wchar_t *)calloc(length + 1, sizeof(wchar_t));
 	mbstowcs(tempstring, caption, length + 1);
-	WriteConsole(outputhandle, tempstring, length, NULL, NULL);
+	WriteConsole(outputhandle, tempstring, length, &temp, NULL);
 	free(tempstring);
 #else
-	WriteConsole(outputhandle, caption, length, NULL, NULL);
+	WriteConsole(outputhandle, caption, length, &temp, NULL);
 #endif
 	COORD coords = {0, 0};
-	FillConsoleOutputAttribute(outputhandle, FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY, 80, coords, NULL);
+	FillConsoleOutputAttribute(outputhandle, FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY, 80, coords, &temp);
 #else
 	printf(caption);
 #endif
