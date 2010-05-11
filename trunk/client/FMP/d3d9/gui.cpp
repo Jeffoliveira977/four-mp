@@ -216,7 +216,8 @@ namespace CALLBACKS
 	}
 	void Login( CElement * pElement, CMSG msg, int param )
 	{
-		if(msg != CLICK && msg != END) return;
+		if(!(msg == CLICK && pElement == upSendLogin)) return;
+		if(!(msg == END && (pElement == upLogin || pElement == upPassword))) return;
 		Debug("CALLBACKS::Login called");
 
 		std::string login = upLogin->GetString();
