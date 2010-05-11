@@ -175,8 +175,9 @@ void ServerCore::Unload(void)
 	//TODO:
 	//1. Politely kick all players.
 	//2. Destroy all vehicles.
-	//3. Unload all virtual machines.
-	//4. Unload all plugins.
+	vmm.UnloadGameMode(); //3. Unload all virtual machines.
+	vmm.UnloadFilterScripts(); //3. Unload all virtual machines.
+	plugm.UnloadPlugins(); //4. Unload all plugins.
 	//5. Clean up all remaining data - destructors.
 }
 
