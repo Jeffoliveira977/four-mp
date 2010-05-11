@@ -23,7 +23,26 @@ PlayerManager::PlayerManager(void)
 
 PlayerManager::~PlayerManager(void)
 {
-	//TODO:
+	if (playerbuffer != NULL)
+	{
+		for (short i = 0; i < playerbuffersize; i++)
+		{
+			if (playerbuffer[i] != NULL)
+			{
+				delete playerbuffer[i];
+			}
+		}
+	}
+	if (classbuffer != NULL)
+	{
+		for (unsigned char i = 0; i < classbuffersize; i++)
+		{
+			if (classbuffer[i] != NULL)
+			{
+				delete classbuffer[i];
+			}
+		}
+	}
 }
 
 short PlayerManager::GetMaxPlayers(void)
