@@ -152,9 +152,17 @@ ConVar *ConsoleCore::AddConVar(const char *name, const float defaultvalue, const
 	{
 		return NULL;
 	}
-	if (this->IsConsoleSymbolExist(name))
+	unsigned short index;
+	if (this->GetConsoleSymbolIndex(name, index))
 	{
-		return NULL;
+		if (symbolbuffer[index].type != ConsoleSymbolTypeConAlias)
+		{
+			return NULL;
+		}
+		delete symbolbuffer[index].ptr->conalias;
+		symbolbuffer[index].type = ConsoleSymbolTypeConVar;
+		symbolbuffer[index].ptr->convar = new ConVar(this, name, defaultvalue, description, flags, hasMin, min, hasMax, max);
+		return symbolbuffer[index].ptr->convar;
 	}
 	if (!ResizeBuffer<ConsoleSymbol *, ConsoleSymbol, unsigned short>(symbolbuffer, symbolbuffersize + 1))
 	{
@@ -184,9 +192,17 @@ ConVar *ConsoleCore::AddConVar(const char *name, const int defaultvalue, const c
 	{
 		return NULL;
 	}
-	if (this->IsConsoleSymbolExist(name))
+	unsigned short index;
+	if (this->GetConsoleSymbolIndex(name, index))
 	{
-		return NULL;
+		if (symbolbuffer[index].type != ConsoleSymbolTypeConAlias)
+		{
+			return NULL;
+		}
+		delete symbolbuffer[index].ptr->conalias;
+		symbolbuffer[index].type = ConsoleSymbolTypeConVar;
+		symbolbuffer[index].ptr->convar = new ConVar(this, name, defaultvalue, description, flags, hasMin, min, hasMax, max);
+		return symbolbuffer[index].ptr->convar;
 	}
 	if (!ResizeBuffer<ConsoleSymbol *, ConsoleSymbol, unsigned short>(symbolbuffer, symbolbuffersize + 1))
 	{
@@ -212,9 +228,17 @@ ConVar *ConsoleCore::AddConVar(const char *name, const char *defaultvalue, const
 	{
 		return NULL;
 	}
-	if (this->IsConsoleSymbolExist(name))
+	unsigned short index;
+	if (this->GetConsoleSymbolIndex(name, index))
 	{
-		return NULL;
+		if (symbolbuffer[index].type != ConsoleSymbolTypeConAlias)
+		{
+			return NULL;
+		}
+		delete symbolbuffer[index].ptr->conalias;
+		symbolbuffer[index].type = ConsoleSymbolTypeConVar;
+		symbolbuffer[index].ptr->convar = new ConVar(this, name, defaultvalue, description, flags);
+		return symbolbuffer[index].ptr->convar;
 	}
 	if (!ResizeBuffer<ConsoleSymbol *, ConsoleSymbol, unsigned short>(symbolbuffer, symbolbuffersize + 1))
 	{
@@ -243,6 +267,17 @@ ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *des
 	unsigned short index;
 	if (this->GetConsoleSymbolIndex(name, index))
 	{
+		if (symbolbuffer[index].type == ConsoleSymbolTypeConVar)
+		{
+			return NULL;
+		}
+		if (symbolbuffer[index].type == ConsoleSymbolTypeConAlias)
+		{
+			delete symbolbuffer[index].ptr->conalias;
+			symbolbuffer[index].type == ConsoleSymbolTypeConCmd;
+			symbolbuffer[index].ptr[0].concmd = new ConCmd(this, name, callback, description, flags);
+			return symbolbuffer[index].ptr[0].concmd;
+		}
 		if (symbolbuffer[index].numcmds == maxcmdspersymbol)
 		{
 			return NULL;
