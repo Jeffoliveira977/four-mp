@@ -20,7 +20,7 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 	case InputStateGame:
 		{
-			if (Msg == WM_KEYUP && clientstate.game != GameStateOffline)
+			if (Msg == WM_KEYUP)
 			{
 				switch (wParam)
 				{
@@ -104,15 +104,15 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 				{
 				case VK_F5:
 					{
-						fServBrowser->SetVisible(!fServBrowser->IsVisible() && Gui.IsLogged());
-						if(fChat->IsVisible()) fChat->SetVisible(0);
+						//fServBrowser->SetVisible(!fServBrowser->IsVisible() && Gui.IsLogged());
+						//if(fChat->IsVisible()) fChat->SetVisible(0);
 
-						if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
-							if(!conwindow.IsVisible()) 
-							{
-								clientstate.input = InputStateGame;
-								HOOK.InputFreeze(0);
-							}
+						//if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
+						//	if(!conwindow.IsVisible()) 
+						//	{
+						clientstate.input = InputStateGame;
+						HOOK.InputFreeze(0);
+						//	}
 						break;
 					}
 				case VK_F6:
@@ -131,16 +131,14 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 					{
 						if(conwindow.IsVisible())
 						{
-							if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
-								if(!fServBrowser->IsVisible() && !fChat->IsVisible()) 
-								{
-									clientstate.input = InputStateGame;
-									HOOK.InputFreeze(0);
-								}
 							conwindow.Hide();
+							clientstate.input = InputStateGame;
+							HOOK.InputFreeze(0);
 						}
 						else
+						{
 							conwindow.Show();
+						}
 						break;
 					}
 				}

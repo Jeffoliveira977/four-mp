@@ -118,7 +118,7 @@ bool ServerCore::Load(void)
 	hm.AddNewHandle(0, HandleTypeConVar, portcvar);
 	PrintToServer("FOUR-MP. Copyright 2009-2010 Four-mp team.");
 	concore.InterpretLine("exec server.cfg");
-	nm.Init(playm.GetMaxPlayers(), port);
+	nm.Load(playm.GetMaxPlayers(), port);
 	maxplayers = playm.GetMaxPlayers();
 	plugm.LoadPlugins();
 	vmm.LoadFilterScripts();
@@ -137,7 +137,7 @@ bool ServerCore::Load(void)
 		}
 		lastmasterservercheck = time(0);
 	}
-	nm.UpdateServerInfo(hostname, gamemodename, "World", playm.GetNumberOfPlayers(), maxplayers, password, ""); // MAKE:0:0:1
+	nm.UpdateServerInfo();
 	running = true;
 	debug("Started");
 	return true;
@@ -178,6 +178,7 @@ void ServerCore::Unload(void)
 	vmm.UnloadGameMode(); //3. Unload all virtual machines.
 	vmm.UnloadFilterScripts(); //3. Unload all virtual machines.
 	plugm.UnloadPlugins(); //4. Unload all plugins.
+	nm.Unload();
 	//5. Clean up all remaining data - destructors.
 }
 
@@ -189,6 +190,26 @@ void ServerCore::Shutdown(void)
 bool ServerCore::IsLAN(void)
 {
 	return lan;
+}
+
+bool ServerCore::IsPasswordProtected(void)
+{
+	if (password == NULL)
+	{
+		return false;
+	}
+	return true;
+}
+
+char *ServerCore::GetHostname(void)
+{
+	if (hostname == NULL)
+	{
+		return NULL;
+	}
+	char *tempstring = (char *)calloc(strlen(hostname) + 1, sizeof(char));
+	strcpy(tempstring, hostname);
+	return tempstring;
 }
 
 bool ServerCore::GetComponentSelectStatus(void)
