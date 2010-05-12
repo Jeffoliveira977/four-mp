@@ -1,12 +1,14 @@
 #include "masterserver.h"
 
-#include "..\..\Shared\RakNet\RakNetworkFactory.h"
-#include "..\..\Shared\RakNet\RakPeerInterface.h"
+#include "RakNetworkFactory.h"
+#include "RakPeerInterface.h"
 extern RakPeerInterface *net;
 
 MasterServer::MasterServer()
 {
-	
+	tcp = NULL;
+	http = NULL;
+	user = NULL;
 }
 
 void MasterServer::Load()
@@ -24,8 +26,18 @@ void MasterServer::Load()
 
 MasterServer::~MasterServer()
 {
-	free(http);
-	free(tcp);
+	if (http)
+	{
+		free(http);
+	}
+	if (tcp)
+	{
+		free(tcp);
+	}
+	if (user)
+	{
+		delete user;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

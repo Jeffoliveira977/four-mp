@@ -5,7 +5,10 @@
 
 #pragma once
 
-#include "../../Shared/RakNet/RakPeerInterface.h"
+#include "NetworkIDObject.h"
+#include "NetworkIDManager.h"
+#include "../../Shared/RPC3/RPC3.h"
+#include "RakPeerInterface.h"
 
 #include "../../Shared/Network/NetworkProtocol.h"
 

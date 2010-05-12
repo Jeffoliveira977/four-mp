@@ -5,7 +5,7 @@
 
 #pragma once
 
-#define INVALID_HANDLE -1 ///< Used to indicate an error. Equivalent to NULL pointer.
+#define INVALID_HANDLE -1 ///< Used to indicate an error. Equivalent of NULL pointer.
 
 /// \brief A handle manager. Handles are indirect pointers.
 /// \details Since scripting languages can't directly work with pointers and they may
@@ -94,7 +94,7 @@ private:
 	/// \brief Describes the type of the handle.
 	struct HandleType
 	{
-		unsigned char owner; ///< Since only plugins can reserve handle types, this is equal to the plugin index.
+		unsigned char owner; ///< Since only plugins can reserve handle types, this is equal to the plugin index or 255 for the core.
 		int handlecount; ///< Number of handles with this type.
 	};
 	unsigned short maxtypebuffersize; ///< Holds the maximum size of the handle \b *types* buffer.

@@ -10,9 +10,9 @@
 #include "main.h"
 #include "hook\classes.h"
 // RakNet
-#include "..\..\Shared\RakNet\RakNetworkFactory.h"
-#include "..\..\Shared\RakNet\RakPeerInterface.h"
-#include "..\..\Shared\RakNet\BitStream.h"
+#include "RakNetworkFactory.h"
+#include "RakPeerInterface.h"
+#include "BitStream.h"
 
 scrThread* GetActiveThread();
 void SetActiveThread(scrThread* thread);

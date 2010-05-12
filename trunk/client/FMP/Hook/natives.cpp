@@ -8,12 +8,12 @@ extern DWORD dwLoadOffset;
 int GetNativeAddressByHash(unsigned int a1)
 {
 	if(a1 == -1) return 0;
-	Debug("# GetNativeAddress: 0x%x , natives count: %d",a1,*(DWORD*)(0x18DF6EC+dwLoadOffset));
+	//Debug("# GetNativeAddress: 0x%x , natives count: %d",a1,*(DWORD*)(0x18DF6EC+dwLoadOffset));
 
 	DWORD pointer1 = *(DWORD*)SCRIPT_POINTER_1;
 	DWORD pointer2 = *(DWORD*)SCRIPT_POINTER_2;
 
-	Debug("# pointers: [0x%x]:(%d),[0x%x]:(%d)",pointer1,pointer1,pointer2,pointer2);
+	//Debug("# pointers: [0x%x]:(%d),[0x%x]:(%d)",pointer1,pointer1,pointer2,pointer2);
 
 	unsigned int v2;
 	unsigned int v3;
@@ -35,15 +35,15 @@ int GetNativeAddressByHash(unsigned int a1)
 		v4 = (v4 >> 1) + 1;
 		v3 = (v4 + v3) % pointer1;
 		hash_pointer = *(DWORD *)(pointer2 + (8 * v3));
-		Debug("# hash_pointer: 0x%x [%d]",hash_pointer,hash_pointer);
+		//Debug("# hash_pointer: 0x%x [%d]",hash_pointer,hash_pointer);
 	}
-	Debug("# hash_pointer: 0x%x [%d]",hash_pointer,hash_pointer);
+	//Debug("# hash_pointer: 0x%x [%d]",hash_pointer,hash_pointer);
 	if(hash_pointer == 0)
 	{
 		Log("# hash_pointer null");
 		return 0;
 	}
 	int addr = (int)(*(DWORD*)(pointer2 + (8 * v3) + 4));
-	Debug("# addr = 0x%x",addr);
+	//Debug("# addr = 0x%x",addr);
 	return addr;
 }

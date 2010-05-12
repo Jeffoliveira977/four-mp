@@ -5,12 +5,12 @@
 #include "main.h"
 #include "..\..\Shared\Network\NetworkProtocol.h"
 // RakNet
-#include "..\..\Shared\RakNet\RakNetworkFactory.h"
-#include "..\..\Shared\RakNet\RakPeerInterface.h"
-#include "..\..\Shared\RakNet\MessageIdentifiers.h"
-#include "..\..\Shared\RakNet\BitStream.h"
-#include "..\..\Shared\RakNet\NetworkIDObject.h"
-#include "..\..\Shared\RakNet\NetworkIDManager.h"
+#include "RakNetworkFactory.h"
+#include "RakPeerInterface.h"
+#include "MessageIdentifiers.h"
+#include "BitStream.h"
+#include "NetworkIDObject.h"
+#include "NetworkIDManager.h"
 
 extern RakPeerInterface *net;
 

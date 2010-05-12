@@ -1,7 +1,7 @@
-#include "../../Shared/RakNet/TCPInterface.h"
-#include "../../Shared/RakNet/HTTPConnection.h"
-#include "../../Shared/RakNet/RakString.h"
-#include "../../Shared/RakNet/GetTime.h"
+#include "TCPInterface.h"
+#include "HTTPConnection.h"
+#include "RakString.h"
+#include "GetTime.h"
 #include <vector>
 
 #define MASTER_HOST "master.four-mp.com"
