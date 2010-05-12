@@ -1,5 +1,4 @@
 #summary Link to wiki.four-mp.com.
-#labels Featured
 
 = Official FOUR-MP wiki =
 
