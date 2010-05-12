@@ -43,6 +43,7 @@ void FMPHook::PlayerConnect(char *name, int index, int model, float x, float y, 
 		/*SetCharDefaultComponentVariation(gPlayer[index].PedID());
 		SetCharCoordinates(gPlayer[index].PedID(), x, y, z);
 		Debug("PlayerConnect: %s", "SetCoords");*/
+		clientstate.game = GameStateInGame;
 		clientstate.input = InputStateGame;
 		HOOK.InputFreeze(0);
 	}
