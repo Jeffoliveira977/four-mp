@@ -31,9 +31,11 @@ void NetworkManager::Init(void)
 	manager = new NetworkIDManager;
 	clientid.localSystemAddress = 65535;
 	serverid.localSystemAddress = 0;
+	this->SetNetworkIDManager(manager);
+	this->SetNetworkID(clientid);
 	rpc3 = new RakNet::RPC3;
 	rpc3->SetNetworkIDManager(manager);
-	//RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::TestFunction);
+	//RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::Function);
 	net = RakNetworkFactory::GetRakPeerInterface();
 	//SocketDescriptor socketDescriptor(50000,0);
 	//net->Startup(1, 1, &socketDescriptor, 1);

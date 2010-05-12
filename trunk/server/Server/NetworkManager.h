@@ -16,46 +16,56 @@
 /// \details TODO:
 /// \author WNeZRoS, FaTony
 
-class NetworkManager
+class NetworkManager : public NetworkIDObject
 {
 public:
 	NetworkManager(void);
 	~NetworkManager(void);
-	void Init(short maxclients, unsigned short port);
+	void Load(short maxclients, unsigned short port);
 	void Tick(void);
+	void Unload(void);
 	void CheckClients(void);
-	void UpdateServerInfo(char *name, char *mode, char *loc, short players, short maxplayers, bool password, char *clan);
-	void RecieveClientConnection(const RPCParameters *rpcParameters);
-	void RecievePlayerMove(const RPCParameters *rpcParameters);
-	void RecievePlayerJump(const RPCParameters *rpcParameters);
-	void RecievePlayerDuck(const RPCParameters *rpcParameters);
-	void RecievePlayerEntranceInVehicle(const RPCParameters *rpcParameters);
-	void RecievePlayerCancelEntranceInVehicle(const RPCParameters *rpcParameters);
-	void RecievePlayerExitFromVehicle(const RPCParameters *rpcParameters);
-	void RecievePlayerFire(const RPCParameters *rpcParameters);
-	void RecievePlayerAim(const RPCParameters *rpcParameters);
-	void RecievePlayerWeaponChange(const RPCParameters *rpcParameters);
-	void RecievePlayerHealthAndArmorChange(const RPCParameters *rpcParameters);
-	void RecievePlayerSpawnRequest(const RPCParameters *rpcParameters);
-	void RecievePlayerModelChange(const RPCParameters *rpcParameters);
-	void RecievePlayerComponentsChange(const RPCParameters *rpcParameters);
-	void RecievePlayerChat(const RPCParameters *rpcParameters);
+	void UpdateServerInfo(void);
+	void RecieveClientConnection(NetworkPlayerConnectionRequestData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerJump(NetworkPlayerJumpData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerDuck(NetworkPlayerDuckData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerEntranceInVehicle(NetworkPlayerEntranceInVehicleData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerCancelEntranceInVehicle(NetworkPlayerCancelEntranceInVehicleData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerExitFromVehicle(NetworkPlayerExitFromVehicleData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerAim(NetworkPlayerAimData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerWeaponChange(NetworkPlayerWeaponChangeData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerHealthAndArmorChange(NetworkPlayerHealthAndArmorChangeData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerSpawnRequest(NetworkPlayerSpawnRequestData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerModelChange(NetworkPlayerModelChangeData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerComponentsChange(NetworkPlayerComponentsChangeData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 *clientrpc3);
 	bool SendNewVehicleInfoToAll(const short index);
 private:
 	unsigned short serverport;
+	NetworkIDManager *manager;
+	NetworkID serverid;
+	NetworkID defaultclientid;
+	RakNet::RPC3 *rpc3;
 	RakPeerInterface *net;
-	short maxaddressbuffersize;
-	short addressbuffersize;
-	SystemAddress **addressbuffer;
+	struct Client
+	{
+		SystemAddress address;
+		NetworkID id;
+	};
+	short maxclientbuffersize;
+	short clientbuffersize;
+	Client **clientbuffer;
 	short RegisterNewClient(const SystemAddress address);
 	short GetClientIndex(const SystemAddress address);
-	short GetAddressFreeSlot(void);
-	RakNet::BitStream *TranslateMessage(const RPCParameters *rpcParameters, short &index);
+	short GetClientFreeSlot(void);
 	void SendConnectionError(const SystemAddress address, const NetworkPlayerConnectionError error);
 	NetworkPlayerFullUpdateData *GetPlayerFullUpdateData(const short index);
 	NetworkVehicleFullUpdateData *GetVehicleFullUpdateData(const short index);
-	void SendDataToAll(const char *RPC, const RakNet::BitStream *bsSend);
-	void SendDataToAllExceptOne(const char *RPC, const short index, const RakNet::BitStream *bsSend);
-	void SendClassInfo(const short client);
-	void SendChatMessageToAll(const short client, const char *message, const unsigned char color[4]);
+	template <typename DATATYPE>
+	void SendDataToAll(const char *RPC, const DATATYPE *data);
+	template <typename DATATYPE>
+	void SendDataToAllExceptOne(const char *RPC, const short index, const DATATYPE *data);
+	//void SendClassInfo(const short client);
 };

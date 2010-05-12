@@ -215,10 +215,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\rpc.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\ServerCore.cpp"
 				>
 			</File>
@@ -298,10 +294,6 @@
 			</File>
 			<File
 				RelativePath=".\PluginManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\rpc.h"
 				>
 			</File>
 			<File

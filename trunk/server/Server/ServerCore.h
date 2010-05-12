@@ -13,6 +13,8 @@ public:
 	void Unload(void);
 	void Shutdown(void);
 	bool IsLAN(void);
+	bool IsPasswordProtected(void);
+	char *GetHostname(void);
 	bool GetComponentSelectStatus(void);
 	void EnableComponentSelect(bool enable);
 private:

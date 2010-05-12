@@ -10,8 +10,10 @@
 
 #include "ServerCore.h"
 #include "../../Shared/Console/common.h"
+#include "NetworkManager.h"
 
 extern ServerCore server;
+extern NetworkManager nm;
 
 void ConVarHookHostGamemode(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue)
 {
@@ -34,6 +36,10 @@ void ConVarHookHostname(ConVar *convar, const ConVarType oldtype, void *oldvalue
 	{
 		ResizeBuffer<char *, char, unsigned int>(server.hostname, strlen((char *)newvalue) + 1);
 		strcpy(server.hostname, (char *)newvalue);
+		if (server.running)
+		{
+			nm.UpdateServerInfo();
+		}
 		return;
 	}
 	char *value;
@@ -41,6 +47,10 @@ void ConVarHookHostname(ConVar *convar, const ConVarType oldtype, void *oldvalue
 	ResizeBuffer<char *, char, unsigned int>(server.hostname, strlen(value) + 1);
 	strcpy(server.hostname, value);
 	free(value);
+	if (server.running)
+	{
+		nm.UpdateServerInfo();
+	}
 }
 
 void ConVarHookRconPassword(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue)
@@ -81,6 +91,10 @@ void ConVarHookSvPassword(ConVar *convar, const ConVarType oldtype, void *oldval
 	{
 		ResizeBuffer<char *, char, unsigned int>(server.password, strlen((char *)newvalue) + 1);
 		strcpy(server.password, (char *)newvalue);
+		if (server.running)
+		{
+			nm.UpdateServerInfo();
+		}
 		return;
 	}
 	char *value;
@@ -88,6 +102,10 @@ void ConVarHookSvPassword(ConVar *convar, const ConVarType oldtype, void *oldval
 	ResizeBuffer<char *, char, unsigned int>(server.password, strlen(value) + 1);
 	strcpy(server.password, value);
 	free(value);
+	if (server.running)
+	{
+		nm.UpdateServerInfo();
+	}
 }
 
 void ConVarHookSvPort(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue)
