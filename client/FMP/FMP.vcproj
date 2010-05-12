@@ -41,6 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="..\..\Shared\Boost; ..\..\Shared\RakNet"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FMPHOOK_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -210,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\NetworkManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PlayersSync.cpp"
 				>
 			</File>
@@ -293,6 +298,10 @@
 			</File>
 			<File
 				RelativePath=".\masterserver.h"
+				>
+			</File>
+			<File
+				RelativePath=".\NetworkManager.h"
 				>
 			</File>
 			<File

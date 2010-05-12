@@ -12,10 +12,10 @@
 #include "chat.h"
 #include "..\..\Shared\Network\NetworkProtocol.h"
 
-#include "..\..\Shared\RakNet\RakNetworkFactory.h"
-#include "..\..\Shared\RakNet\RakPeerInterface.h"
-#include "..\..\Shared\RakNet\MessageIdentifiers.h"
-#include "..\..\Shared\RakNet\BitStream.h"
+#include "RakNetworkFactory.h"
+#include "RakPeerInterface.h"
+#include "MessageIdentifiers.h"
+#include "BitStream.h"
 
 extern FMPHook HOOK;
 extern int LastUpdate;

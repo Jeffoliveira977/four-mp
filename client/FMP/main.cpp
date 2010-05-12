@@ -24,13 +24,13 @@
 #include "functions.h"
 #include "main.h"
 // RakNet
-#include "../../Shared/RakNet/RakNetworkFactory.h"
-#include "../../Shared/RakNet/RakPeerInterface.h"
-#include "../../Shared/RakNet/MessageIdentifiers.h"
-#include "../../Shared/RakNet/BitStream.h"
-#include "../../Shared/RakNet/NetworkIDObject.h"
-#include "../../Shared/RakNet/NetworkIDManager.h"
-#include "../../Shared/RakNet/GetTime.h"
+#include "RakNetworkFactory.h"
+#include "RakPeerInterface.h"
+#include "MessageIdentifiers.h"
+#include "BitStream.h"
+#include "NetworkIDObject.h"
+#include "NetworkIDManager.h"
+#include "GetTime.h"
 
 #include "..\..\Shared\Network\NetworkProtocol.h"
 #include "Check\check.h"
@@ -47,6 +47,7 @@ HANDLE MainThreadHandle, NetworkThreadHandle;
 
 ConsoleCore concore;
 
+//NetworkManager nm;
 RakPeerInterface *net;
 SystemAddress servAddr;
 
@@ -645,7 +646,7 @@ void NetworkThread(void *dummy)
 	Debug("Network Thread");
 	net = RakNetworkFactory::GetRakPeerInterface();
 	SocketDescriptor s(0, 0);
-	net->Startup(8, 1, &s, 1);
+	net->Startup(1, 1, &s, 1);
 
 	RegisterRPC();
 
@@ -791,7 +792,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 
 		if(dwGameVersion == 0x1060 || dwGameVersion == 0x1051 || dwGameVersion == 0x1050)
 		{
-			Log("Skip load screens");
+			Log("Skipping main menu");
 			JmpHook(CGAME_PROCESS_SLEEP, CGAME_PROCESS_START_GAME);
 			SetString(GAME_NAME,"GTA IV: FOUR-MP");
 

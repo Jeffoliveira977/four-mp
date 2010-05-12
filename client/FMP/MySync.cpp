@@ -13,9 +13,9 @@ Syncronizashion this player
 #include "..\..\Shared\Network\NetworkProtocol.h"
 
 // RakNet
-#include "..\..\Shared\RakNet\RakNetworkFactory.h"
-#include "..\..\Shared\RakNet\RakPeerInterface.h"
-#include "..\..\Shared\RakNet\BitStream.h"
+#include "RakNetworkFactory.h"
+#include "RakPeerInterface.h"
+#include "BitStream.h"
 
 using namespace Natives;
 

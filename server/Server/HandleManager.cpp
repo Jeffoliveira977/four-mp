@@ -27,7 +27,7 @@ HandleManager::HandleManager(void)
 	for (unsigned short i = 0; i < NUM_CORE_HANDLE_TYPES; i++)
 	{
 		typebuffer[i] = new HandleType;
-		typebuffer[i]->owner = 0;
+		typebuffer[i]->owner = 255;
 		typebuffer[i]->handlecount = 0;
 	}
 	typebuffersize = NUM_CORE_HANDLE_TYPES;
