@@ -58,7 +58,7 @@ void NetworkManager::Load(const short maxclients, const unsigned short port)
 	manager = new NetworkIDManager;
 	manager->SetIsNetworkIDAuthority(true);
 	serverid.localSystemAddress = 0;
-	defaultclientid.localSystemAddress = 65535;
+	defaultclientid.localSystemAddress = 65534;
 	this->SetNetworkIDManager(manager);
 	this->SetNetworkID(serverid);
 	rpc3 = new RakNet::RPC3;
@@ -245,7 +245,7 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 			playerdata = this->GetPlayerFullUpdateData(i);
 			if (playerdata != NULL)
 			{
-				rpc3->CallCPP("&NetworkManager::RecievePlayerFullUpdate", clientbuffer[clientindex]->id, playerdata);
+				rpc3->CallCPP("&NetworkManager::RecievePlayerFullUpdate", defaultclientid, *playerdata);
 				delete playerdata;
 			}
 		}
@@ -256,7 +256,7 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 		vehicledata = this->GetVehicleFullUpdateData(i);
 		if (vehicledata != NULL)
 		{
-			rpc3->CallCPP("&NetworkManager::RecieveVehicleFullUpdate", clientbuffer[clientindex]->id, vehicledata);
+			rpc3->CallCPP("&NetworkManager::RecieveVehicleFullUpdate", defaultclientid, *vehicledata);
 			delete vehicledata;
 		}
 	}
@@ -269,7 +269,8 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 		clientbuffer[clientindex] = NULL;
 		return;
 	}
-	this->SendDataToAll("&NetworkManager::RecieveClientConnection", playerdata);
+	rpc3->CallCPP("&NetworkManager::RecieveClientConnection", defaultclientid, *playerdata);
+	this->SendDataToAllExceptOne("&NetworkManager::RecieveClientConnection", clientindex, playerdata);
 	delete playerdata;
 	this->UpdateServerInfo();
 }
@@ -743,7 +744,7 @@ void NetworkManager::SendDataToAll(const char *RPC, const DATATYPE *data)
 	{
 		if (clientbuffer[i] != NULL)
 		{
-			rpc3->CallCPP(RPC, clientbuffer[i]->id, data, rpc3);
+			rpc3->CallCPP(RPC, clientbuffer[i]->id, *data, rpc3);
 		}
 	}
 }
@@ -756,7 +757,7 @@ void NetworkManager::SendDataToAllExceptOne(const char *RPC, const short index, 
 	{
 		if ((i != index) && (clientbuffer[i] != NULL))
 		{
-			rpc3->CallCPP(RPC, clientbuffer[i]->id, data, rpc3);
+			rpc3->CallCPP(RPC, clientbuffer[i]->id, *data, rpc3);
 		}
 	}
 }

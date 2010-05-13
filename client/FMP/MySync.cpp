@@ -195,8 +195,8 @@ void FMPHook::CarDoSync()
 void FMPHook::GunSync()
 {
 	Log("Start GunSync");
-	char gun;
-	Natives::GetCurrentCharWeapon(gPlayer[MyID].PedID, (eWeapon*)&gun);
+	eWeapon gun;
+	Natives::GetCurrentCharWeapon(gPlayer[MyID].PedID, &gun);
 	if(gun != gPlayer[MyID].currentweapon)
 	{
 		gPlayer[MyID].currentweapon = gun;
