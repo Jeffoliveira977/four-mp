@@ -35,6 +35,7 @@ NetworkManager::~NetworkManager(void)
 	{
 		delete rpc3;
 	}
+	this->networkID = UNASSIGNED_NETWORK_ID;
 	if (manager)
 	{
 		delete manager;
@@ -55,13 +56,14 @@ NetworkManager::~NetworkManager(void)
 void NetworkManager::Load(const short maxclients, const unsigned short port)
 {
 	manager = new NetworkIDManager;
+	manager->SetIsNetworkIDAuthority(true);
 	serverid.localSystemAddress = 0;
 	defaultclientid.localSystemAddress = 65535;
 	this->SetNetworkIDManager(manager);
 	this->SetNetworkID(serverid);
 	rpc3 = new RakNet::RPC3;
 	rpc3->SetNetworkIDManager(manager);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnection);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnectionRequest);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerMove);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerJump);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerDuck);
@@ -189,13 +191,18 @@ void NetworkManager::UpdateServerInfo(void)
 	delete info;
 }
 
-void NetworkManager::RecieveClientConnection(NetworkPlayerConnectionRequestData data, RakNet::RPC3 *clientrpc3)
+void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionRequestData data, RakNet::RPC3 *clientrpc3)
 {
 	if (playm.IsServerFull())
 	{
 		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorServerFull);
 		net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
 		return;
+	}
+	if (data.protocol != PROTOCOL_VERSION)
+	{
+		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorServerFull);
+		net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
 	}
 	short clientindex = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
 	if (clientindex != INVALID_PLAYER_INDEX)
@@ -229,17 +236,7 @@ void NetworkManager::RecieveClientConnection(NetworkPlayerConnectionRequestData 
 		return;
 	}
 	//TODO: Recieve all server data (other players, vehicles...) and then send new player data to all. More fair.
-	NetworkPlayerFullUpdateData *playerdata = this->GetPlayerFullUpdateData(clientindex);
-	if (playerdata == NULL)
-	{
-		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorAllocationError);
-		net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
-		delete clientbuffer[clientindex];
-		clientbuffer[clientindex] = NULL;
-		return;
-	}
-	this->SendDataToAll("&NetworkManager::RecieveClientConnection", playerdata);
-	delete playerdata;
+	NetworkPlayerFullUpdateData *playerdata;
 	//TODO: Optimize using currently connected players, not buffer size.
 	for (short i = 0; i < clientbuffersize; i++)
 	{
@@ -248,7 +245,7 @@ void NetworkManager::RecieveClientConnection(NetworkPlayerConnectionRequestData 
 			playerdata = this->GetPlayerFullUpdateData(i);
 			if (playerdata != NULL)
 			{
-				rpc3->CallCPP("&NetworkManager::RecieveClientFullUpdate", clientbuffer[clientindex]->id, playerdata);
+				rpc3->CallCPP("&NetworkManager::RecievePlayerFullUpdate", clientbuffer[clientindex]->id, playerdata);
 				delete playerdata;
 			}
 		}
@@ -263,6 +260,17 @@ void NetworkManager::RecieveClientConnection(NetworkPlayerConnectionRequestData 
 			delete vehicledata;
 		}
 	}
+	playerdata = this->GetPlayerFullUpdateData(clientindex);
+	if (playerdata == NULL)
+	{
+		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorAllocationError);
+		net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
+		delete clientbuffer[clientindex];
+		clientbuffer[clientindex] = NULL;
+		return;
+	}
+	this->SendDataToAll("&NetworkManager::RecieveClientConnection", playerdata);
+	delete playerdata;
 	this->UpdateServerInfo();
 }
 
@@ -669,7 +677,7 @@ void NetworkManager::SendConnectionError(const SystemAddress address, const Netw
 {
 	NetworkPlayerConnectionErrorData data;
 	data.error = error;
-	rpc3->CallCPP("&NetworkManager::RecieveConnectionError", defaultclientid, data, rpc3);
+	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionError", defaultclientid, data, rpc3);
 }
 
 NetworkPlayerFullUpdateData *NetworkManager::GetPlayerFullUpdateData(const short index)

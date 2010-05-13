@@ -26,7 +26,7 @@ public:
 	void Unload(void);
 	void CheckClients(void);
 	void UpdateServerInfo(void);
-	void RecieveClientConnection(NetworkPlayerConnectionRequestData data, RakNet::RPC3 *clientrpc3);
+	void RecieveClientConnectionRequest(NetworkPlayerConnectionRequestData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerJump(NetworkPlayerJumpData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerDuck(NetworkPlayerDuckData data, RakNet::RPC3 *clientrpc3);

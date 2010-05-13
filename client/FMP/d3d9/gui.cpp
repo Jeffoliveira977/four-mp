@@ -6,12 +6,12 @@
 #include "../log.h"
 #include "../ConsoleWindow.h"
 #include "../Hook/classes.h"
-#include "RakPeerInterface.h"
+#include "../NetworkManager.h"
 
 #include <vector>
 
 extern ConsoleWindow conwindow;
-extern RakPeerInterface *net;
+extern NetworkManager nm;
 
 // Windows
 CWindow * fServBrowser;
@@ -81,7 +81,7 @@ namespace CALLBACKS
 				{
 					msi = fmpms.GetServerInfo(i);
 					if(!msi) continue;
-					net->Ping(msi->ip, msi->port, false); 
+					nm.Ping(msi->ip, msi->port);
 				}
 			}
 		}
@@ -92,13 +92,13 @@ namespace CALLBACKS
 				if(server_list_fav[i])
 				{
 					Gui.UpdateServer(server_list_fav[i]);
-					net->Ping(server_list_fav[i]->ip, server_list_fav[i]->port, false); 
+					nm.Ping(server_list_fav[i]->ip, server_list_fav[i]->port); 
 				}
 			}
 		}
 		else if(tab == 1)
 		{
-			net->Ping("255.255.255.255", 7777, false);
+			nm.Ping("255.255.255.255");
 		}
 		Debug("CALLBACKS::Refresh complete");
 	}
@@ -114,7 +114,7 @@ namespace CALLBACKS
 		tab = 1;
 		sbTab[tab]->SetEnabled(0);
 
-		net->Ping("255.255.255.255", 7777, false);
+		nm.Ping("255.255.255.255");
 
 		Debug("CALLBACKS::GetLAN complete");
 	}
@@ -145,7 +145,7 @@ namespace CALLBACKS
 			{
 				msi = fmpms.GetServerInfo(i);
 				if(!msi) continue;
-				net->Ping(msi->ip, msi->port, false); 
+				nm.Ping(msi->ip, msi->port); 
 			}
 		}
 		Debug("CALLBACKS::GetInet complete");
@@ -178,7 +178,7 @@ namespace CALLBACKS
 				msi = fmpms.GetServerInfo(i);
 				if(!msi) continue;
 				if(msi->vip == 1)
-					net->Ping(msi->ip, msi->port, false); 
+					nm.Ping(msi->ip, msi->port); 
 			}
 		}
 		Debug("CALLBACKS::GetVIP complete");
@@ -208,7 +208,7 @@ namespace CALLBACKS
 			if(server_list_fav[i])
 			{
 				Gui.UpdateServer(server_list_fav[i]);
-				net->Ping(server_list_fav[i]->ip, server_list_fav[i]->port, false); 
+				nm.Ping(server_list_fav[i]->ip, server_list_fav[i]->port); 
 			}
 		}
 
@@ -353,7 +353,7 @@ namespace CALLBACKS
 			}
 			MasterServerInfo *tmp_msi = server_list.at(sel);
 			Debug("FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
-			HOOK.ConnectToServer(tmp_msi->ip, tmp_msi->port);
+			nm.ConnectToServer(tmp_msi->ip, tmp_msi->port);
 		}
 		Debug("CALLBACKS::Connect complete");
 	}
@@ -379,7 +379,7 @@ namespace CALLBACKS
 		{
 			MasterServerInfo *tmp_msi = server_list.at(sel);
 			Debug("FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
-			HOOK.ConnectToServer(tmp_msi->ip, tmp_msi->port);
+			nm.ConnectToServer(tmp_msi->ip, tmp_msi->port);
 		}
 	}
 	void ServerBrowser(CElement *pElement, CMSG msg, int Param)
@@ -437,7 +437,7 @@ namespace CALLBACKS
 			if(tab == 3)
 			{
 				Gui.UpdateServer(tmp_msi);
-				net->Ping(tmp_msi->ip, tmp_msi->port, false);
+				nm.Ping(tmp_msi->ip, tmp_msi->port);
 			}
 			server_list_fav.push_back(tmp_msi);
 

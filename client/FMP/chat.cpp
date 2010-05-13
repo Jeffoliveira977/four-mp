@@ -3,16 +3,9 @@
 
 #include "log.h"
 #include "main.h"
-#include "..\..\Shared\Network\NetworkProtocol.h"
-// RakNet
-#include "RakNetworkFactory.h"
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
-#include "BitStream.h"
-#include "NetworkIDObject.h"
-#include "NetworkIDManager.h"
+#include "NetworkManager.h"
 
-extern RakPeerInterface *net;
+extern NetworkManager nm;
 
 void AddChatMessage(char *msg, COLOR clr, int playerid = -1)
 {
@@ -33,12 +26,7 @@ void AddChatMessage(char *msg, COLOR clr, int playerid = -1)
 
 void SendChatMessage()
 {
-	NetworkPlayerChatData data;
-	strcpy(data.msg, enterMsg);
-	RakNet::BitStream bsSend;
-	bsSend.Write(data);
-	net->RPC("RPC_Chat",&bsSend,HIGH_PRIORITY, RELIABLE, 0, UNASSIGNED_SYSTEM_ADDRESS, true, 0, UNASSIGNED_NETWORK_ID,0);
-
+	nm.SendPlayerChat();
 	enterChat = -1;
 	enterMsg[0] = 0;
 }

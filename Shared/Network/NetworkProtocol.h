@@ -1,15 +1,17 @@
 #pragma once
 
-#define PROTOCOL_VERSION 2
+#define PROTOCOL_VERSION 3
 
 struct NetworkPlayerConnectionRequestData
 {
+	short protocol;
 	char name[32];
 };
 
 enum NetworkPlayerConnectionError
 {
 	NetworkPlayerConnectionErrorServerFull,
+	NetworkPlayerConnectionErrorInvalidProtocol,
 	NetworkPlayerConnectionErrorAlreadyConnected,
 	NetworkPlayerConnectionErrorAllocationError,
 	NetworkPlayerConnectionErrorScriptLock

@@ -58,7 +58,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(ProjectName).lib"
+				OutputFile="$(ProjectName)$(ConfigurationName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -104,8 +104,6 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\RakNet;..\Boost"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>

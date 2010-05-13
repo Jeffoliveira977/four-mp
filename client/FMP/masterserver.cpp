@@ -1,8 +1,11 @@
-#include "masterserver.h"
-
 #include "RakNetworkFactory.h"
 #include "RakPeerInterface.h"
-extern RakPeerInterface *net;
+#include "TCPInterface.h"
+#include "HTTPConnection.h"
+#include "RakString.h"
+#include "GetTime.h"
+
+#include "masterserver.h"
 
 MasterServer::MasterServer()
 {
