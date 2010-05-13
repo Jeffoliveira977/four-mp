@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="..\..\Shared\RakNet\RakNetDebug.lib ws2_32.lib ..\GUI\guid.lib ..\..\Shared\Console\ConsoleDebug.lib"
+				AdditionalDependencies="..\..\Shared\RakNet\RakNetDebug.lib ws2_32.lib ..\GUI\guid.lib ..\..\Shared\Console\ConsoleDebug.lib ..\..\Shared\RPC3\RPC3Debug.lib"
 				OutputFile="$(OutDir)\xlive.dll"
 				LinkIncremental="2"
 				GenerateManifest="false"
@@ -141,7 +141,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="false"
-				AdditionalDependencies="..\..\Shared\RakNet\RakNet.lib ws2_32.lib ..\GUI\Gui.lib ..\..\Shared\Console\Console.lib"
+				AdditionalDependencies="..\..\Shared\RakNet\RakNet.lib ws2_32.lib ..\GUI\Gui.lib ..\..\Shared\Console\Console.lib ..\..\Shared\RPC3\RPC3.lib"
 				OutputFile="$(OutDir)\xlive.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="$(ProjectDir)\xlive.def"
