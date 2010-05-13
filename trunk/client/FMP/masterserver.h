@@ -1,8 +1,8 @@
-#include "TCPInterface.h"
-#include "HTTPConnection.h"
-#include "RakString.h"
-#include "GetTime.h"
 #include <vector>
+#include "RakString.h"
+
+class TCPInterface;
+class HTTPConnection;
 
 #define MASTER_HOST "master.four-mp.com"
 #define MASTER_PATH "/"

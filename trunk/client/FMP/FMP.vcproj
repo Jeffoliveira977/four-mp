@@ -219,10 +219,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\rpc.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\xlive.cpp"
 				>
 			</File>
@@ -302,10 +298,6 @@
 			</File>
 			<File
 				RelativePath=".\NetworkManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\rpc.h"
 				>
 			</File>
 			<File

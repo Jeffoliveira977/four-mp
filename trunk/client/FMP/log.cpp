@@ -165,3 +165,39 @@ void Log(const char *string, ...)
 	LeaveCriticalSection(&cs_log);
 	#endif
 }
+
+//void player_dump()
+//{
+//	FILE *f = fopen("fmp_player.txt", "a");
+//	for(int i = 0; i< MAX_PLAYERS; i++)
+//	{
+//		if(gPlayer[i].connected == 1)
+//		{
+//			fprintf(f, "%s:%d\n%s\n%d\n", gPlayer[i].ip, gPlayer[i].port, gPlayer[i].name, gPlayer[i].model);
+//			fprintf(f, "%f %f %f %f\n", gPlayer[i].position[0], gPlayer[i].position[1], gPlayer[i].position[2], gPlayer[i].angle); 
+//			fprintf(f, "%d %d\n", gPlayer[i].last_active, gPlayer[i].sync_state);
+//			fprintf(f, "%d %d\n", gPlayer[i].vehicleindex, gPlayer[i].seatindex);
+//			fprintf(f, "---------------------------\n");
+//		}
+//	}
+//	fprintf(f, "|||||||||||||||||||||||||||||||||||||\n-------------------------------\n");
+//	fclose(f);
+//}
+//
+//void car_dump()
+//{
+//	FILE *f = fopen("fmp_car.txt", "a");
+//	for(int i = 0; i< MAX_CARS; i++)
+//	{
+//		if(gCar[i].exist == 1)
+//		{
+//
+//
+//			fprintf(f, "%d %d %d\n", gCar[i].model, gCar[i].color[0], gCar[i].color[1]);
+//			fprintf(f, "%f %f %f %f\n", gCar[i].position[0], gCar[i].position[1], gCar[i].position[2], gCar[i].angle); 
+//			fprintf(f, "---------------------------\n");
+//		}
+//	}
+//	fprintf(f, "|||||||||||||||||||||||||||||||||||||\n-------------------------------\n");
+//	fclose(f);
+//}

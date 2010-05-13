@@ -165,8 +165,6 @@ public:
 
 	// -- Start mp
 	void RunMP();
-	void InitNetwork();
-	void ConnectToServer(char *ip = "\0", unsigned short port = 0);
 
 	// -- Car sync
 	void CreateCar(int, int, float, float, float, float, int, int);

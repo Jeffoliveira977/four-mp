@@ -31,18 +31,11 @@ struct FPlayer
 	int health, armor;
 	char wanted_level;
 	bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
-	bool Aim;
-	bool isducking;
+	bool isaiming; ///< Holds true if the player is aiming.
+	bool isducking; ///< Holds true if the player is ducking.
 	int room;
 	unsigned char color[4];
 	int compT[11], compD[11];
-};
-
-struct PlayerDamage
-{
-	short pid;
-	int hp;
-	int armor;
 };
 
 struct PlayerClass
