@@ -47,13 +47,17 @@ NetworkManager::~NetworkManager(void)
 void NetworkManager::Load(void)
 {
 	manager = new NetworkIDManager;
-	clientid.localSystemAddress = 65535;
+	clientid.localSystemAddress = 65534;
 	serverid.localSystemAddress = 0;
 	this->SetNetworkIDManager(manager);
 	this->SetNetworkID(clientid);
 	rpc3 = new RakNet::RPC3;
 	rpc3->SetNetworkIDManager(manager);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnection);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnectionError);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientDisconnection);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFullUpdate);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveVehicleFullUpdate);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerMove);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerJump);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerDuck);
@@ -359,6 +363,8 @@ void NetworkManager::RecieveClientConnection(NetworkPlayerFullUpdateData data, R
 {
 	Log("Recieving player info");
 	LastUpdate = GetTickCount();
+	clientid.localSystemAddress = data.index + 1;
+	this->SetNetworkID(clientid);
 	gPlayer[data.index].model = data.model;
 	memcpy(gPlayer[data.index].position, data.position, sizeof(float) * 3);
 	gPlayer[data.index].angle = data.angle;

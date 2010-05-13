@@ -24,7 +24,10 @@ void ConVarHookHostGamemode(ConVar *convar, const ConVarType oldtype, void *oldv
 		return;
 	}
 	char *value;
-	convar->GetValue(value);
+	if (!convar->GetValue(value))
+	{
+		return;
+	}
 	ResizeBuffer<char *, char, unsigned int>(server.gamemode, strlen(value) + 1);
 	strcpy(server.gamemode, value);
 	free(value);
@@ -36,18 +39,21 @@ void ConVarHookHostname(ConVar *convar, const ConVarType oldtype, void *oldvalue
 	{
 		ResizeBuffer<char *, char, unsigned int>(server.hostname, strlen((char *)newvalue) + 1);
 		strcpy(server.hostname, (char *)newvalue);
-		if (server.running)
+		if (server.isrunning)
 		{
 			nm.UpdateServerInfo();
 		}
 		return;
 	}
 	char *value;
-	convar->GetValue(value);
+	if (!convar->GetValue(value))
+	{
+		return;
+	}
 	ResizeBuffer<char *, char, unsigned int>(server.hostname, strlen(value) + 1);
 	strcpy(server.hostname, value);
 	free(value);
-	if (server.running)
+	if (server.isrunning)
 	{
 		nm.UpdateServerInfo();
 	}
@@ -62,7 +68,10 @@ void ConVarHookRconPassword(ConVar *convar, const ConVarType oldtype, void *oldv
 		return;
 	}
 	char *value;
-	convar->GetValue(value);
+	if (!convar->GetValue(value))
+	{
+		return;
+	}
 	ResizeBuffer<char *, char, unsigned int>(server.rconpassword, strlen(value) + 1);
 	strcpy(server.rconpassword, value);
 	free(value);
@@ -91,18 +100,21 @@ void ConVarHookSvPassword(ConVar *convar, const ConVarType oldtype, void *oldval
 	{
 		ResizeBuffer<char *, char, unsigned int>(server.password, strlen((char *)newvalue) + 1);
 		strcpy(server.password, (char *)newvalue);
-		if (server.running)
+		if (server.isrunning)
 		{
 			nm.UpdateServerInfo();
 		}
 		return;
 	}
 	char *value;
-	convar->GetValue(value);
+	if (!convar->GetValue(value))
+	{
+		return;
+	}
 	ResizeBuffer<char *, char, unsigned int>(server.password, strlen(value) + 1);
 	strcpy(server.password, value);
 	free(value);
-	if (server.running)
+	if (server.isrunning)
 	{
 		nm.UpdateServerInfo();
 	}

@@ -18,7 +18,7 @@ public:
 	bool GetComponentSelectStatus(void);
 	void EnableComponentSelect(bool enable);
 private:
-	bool running;
+	bool isrunning;
 	unsigned int lastcheck;
 	unsigned int lastmasterservercheck;
 	char *hostname;

@@ -25,7 +25,7 @@ extern PlayerManager playm;
 
 ServerCore::ServerCore(void)
 {
-	running = false;
+	isrunning = false;
 	lastcheck = 0;
 	hostname = NULL;
 	port = 7777;
@@ -138,14 +138,14 @@ bool ServerCore::Load(void)
 		lastmasterservercheck = time(0);
 	}
 	nm.UpdateServerInfo();
-	running = true;
+	isrunning = true;
 	debug("Started");
 	return true;
 }
 
 bool ServerCore::IsRunning(void)
 {
-	return running;
+	return isrunning;
 }
 void ServerCore::Tick(void)
 {
@@ -184,7 +184,7 @@ void ServerCore::Unload(void)
 
 void ServerCore::Shutdown(void)
 {
-	running = false;
+	isrunning = false;
 }
 
 bool ServerCore::IsLAN(void)
