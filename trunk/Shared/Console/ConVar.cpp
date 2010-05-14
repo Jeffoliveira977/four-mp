@@ -109,7 +109,7 @@ void ConVar::Reset(void)
 	{
 		if (defaultvalue.type == ConVarTypeString)
 		{
-			if (!ResizeBuffer<char *, char, unsigned int>(value.value.s, strlen(defaultvalue.value.s) + 1))
+			if (!ResizeBuffer<char *>(value.value.s, strlen(defaultvalue.value.s) + 1))
 			{
 				return;
 			}
@@ -447,7 +447,7 @@ bool ConVar::SetValue(const char *val)
 		{
 			char *oldvalue = (char *)calloc(strlen(value.value.s) + 1, sizeof(char));
 			strcpy(oldvalue, value.value.s);
-			if (!ResizeBuffer<char *, char, unsigned int>(value.value.s, length + 1))
+			if (!ResizeBuffer<char *>(value.value.s, length + 1))
 			{
 				free(oldvalue);
 				return false;
@@ -626,7 +626,7 @@ bool ConVar::HookChange(void *callback)
 			return true;
 		}
 	}
-	if (!ResizeBuffer<void **, void *, unsigned char>(hookbuffer, hookbuffersize + 1))
+	if (!ResizeBuffer<void **>(hookbuffer, hookbuffersize + 1))
 	{
 		return false;
 	}
@@ -645,7 +645,7 @@ bool ConVar::UnhookChange(const void *callback)
 			{
 				hookbuffer[i] = hookbuffer[i+1];
 			}
-			if (!ResizeBuffer<void **, void *, unsigned char>(hookbuffer, hookbuffersize - 1))
+			if (!ResizeBuffer<void **>(hookbuffer, hookbuffersize - 1))
 			{
 				return false;
 			}

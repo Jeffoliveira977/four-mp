@@ -47,14 +47,15 @@ NetworkManager::~NetworkManager(void)
 void NetworkManager::Load(void)
 {
 	manager = new NetworkIDManager;
-	clientid.localSystemAddress = 65534;
-	serverid.localSystemAddress = 0;
+	clientid.localSystemAddress = DEFAULT_CLIENT_NETWORK_ID;;
+	serverid.localSystemAddress = DEFAULT_SERVER_NETWORK_ID;;
 	this->SetNetworkIDManager(manager);
 	this->SetNetworkID(clientid);
 	rpc3 = new RakNet::RPC3;
 	rpc3->SetNetworkIDManager(manager);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnection);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnectionError);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientInfo);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientDisconnection);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFullUpdate);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveVehicleFullUpdate);
@@ -361,10 +362,8 @@ void NetworkManager::SendPlayerChat(void)
 
 void NetworkManager::RecieveClientConnection(NetworkPlayerFullUpdateData data, RakNet::RPC3 *serverrpc3)
 {
-	Log("Recieving player info");
+	Log("New player connection. Name is %s", data.name);
 	LastUpdate = GetTickCount();
-	clientid.localSystemAddress = data.index + 1;
-	this->SetNetworkID(clientid);
 	gPlayer[data.index].model = data.model;
 	memcpy(gPlayer[data.index].position, data.position, sizeof(float) * 3);
 	gPlayer[data.index].angle = data.angle;
@@ -378,7 +377,6 @@ void NetworkManager::RecieveClientConnection(NetworkPlayerFullUpdateData data, R
 	memcpy(gPlayer[data.index].ammo, data.ammo, sizeof(short) * 8);
 	memcpy(gPlayer[data.index].color, data.color, sizeof(unsigned char) * 4);
 
-	Log("Name is %s", data.name);
 	HOOK.PlayerConnect(data.name, data.index, gPlayer[data.index].model, gPlayer[data.index].position[0], gPlayer[data.index].position[1], gPlayer[data.index].position[2]);
 }
 
@@ -389,30 +387,42 @@ void NetworkManager::RecieveClientConnectionError(NetworkPlayerConnectionErrorDa
 	{
 	case NetworkPlayerConnectionErrorServerFull:
 		{
-			Log("ConnectError: Server is full.");
+			PrintToConsole("Connection error: Server is full.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorInvalidProtocol:
 		{
-			Log("ConnectError: Server is using different protocol.");
+			PrintToConsole("Connection error: Server is using different protocol.");
+			break;
+		}
+	case NetworkPlayerConnectionErrorInvalidName:
+		{
+			PrintToConsole("Connection error: Invalid user name.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorAlreadyConnected:
 		{
-			Log("ConnectError: You are already connected.");
+			PrintToConsole("Connection error: You are already connected.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorAllocationError:
 		{
-			Log("ConnectError: Server was unable to allocate player resources.");
+			PrintToConsole("Connection error: Server was unable to allocate player resources.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorScriptLock:
 		{
-			Log("ConnectError: Script lock connect");
+			PrintToConsole("Connection error: Connection has been refused by a server script.");
 			break;
 		}
 	}
+}
+
+void NetworkManager::RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 *serverrpc3)
+{
+	clientid.localSystemAddress = data.index + 1;
+	this->SetNetworkID(clientid);
+	MyID = data.index;
 }
 
 void NetworkManager::RecieveClientDisconnection(NetworkPlayerDisconnectionData data, RakNet::RPC3 *serverrpc3)
@@ -438,7 +448,7 @@ void NetworkManager::RecievePlayerFullUpdate(NetworkPlayerFullUpdateData data, R
 	memcpy(gPlayer[data.index].ammo, data.ammo, sizeof(short) * 8);
 	memcpy(gPlayer[data.index].color, data.color, sizeof(unsigned char) * 4);
 
-	Log("Name is %s", data.name);
+	Log("Player full update. Name is %s", data.name);
 	HOOK.PlayerConnect(data.name, data.index, gPlayer[data.index].model, gPlayer[data.index].position[0], gPlayer[data.index].position[1], gPlayer[data.index].position[2]);
 }
 

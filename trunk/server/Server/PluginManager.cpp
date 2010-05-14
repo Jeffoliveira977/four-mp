@@ -267,7 +267,7 @@ bool PluginManager::LoadPluginInternal(const unsigned char index, const char *st
 		{
 			return false;
 		}
-		if (!ResizeBuffer<Plugin **, Plugin *, unsigned char>(pluginbuffer, index + 1))
+		if (!ResizeBuffer<Plugin **>(pluginbuffer, index + 1))
 		{
 			return false;
 		}

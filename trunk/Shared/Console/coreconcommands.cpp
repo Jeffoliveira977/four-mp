@@ -30,7 +30,7 @@ void ConCmdAlias(ConsoleCore *concore, const unsigned char numargs)
 				sprintf(aliasstring, "%s :", tempstring);
 				free(tempstring);
 				tempstring = concore->symbolbuffer[i].ptr->conalias->GetDescription();
-				ResizeBuffer<char *, char, unsigned int>(aliasstring, _scprintf("%s %s", aliasstring, tempstring) + 1);
+				ResizeBuffer<char *>(aliasstring, _scprintf("%s %s", aliasstring, tempstring) + 1);
 				sprintf(aliasstring, "%s %s", aliasstring, tempstring);
 				free(tempstring);
 				concore->Output(aliasstring);
@@ -88,15 +88,15 @@ void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 			case ConsoleCore::ConsoleSymbolTypeConVar:
 				{
 					concore->symbolbuffer[i].ptr->convar->GetValue(tempstring);
-					ResizeBuffer<char *, char, unsigned int>(symbolstring, _scprintf("%s %s	:", symbolstring, tempstring) + 1);
+					ResizeBuffer<char *>(symbolstring, _scprintf("%s %s	:", symbolstring, tempstring) + 1);
 					sprintf(symbolstring, "%s %s	:", symbolstring, tempstring);
 					//TODO: flags
-					ResizeBuffer<char *, char, unsigned int>(symbolstring, strlen(symbolstring) + 3);
+					ResizeBuffer<char *>(symbolstring, strlen(symbolstring) + 3);
 					sprintf(symbolstring, "%s	:", symbolstring);
 					//TODO: flags
 					free(tempstring);
 					tempstring = concore->symbolbuffer[i].ptr->convar->GetDescription();
-					ResizeBuffer<char *, char, unsigned int>(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
+					ResizeBuffer<char *>(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
 					sprintf(symbolstring, "%s %s", symbolstring, tempstring);
 					free(tempstring);
 					concore->Output(symbolstring);
@@ -104,15 +104,15 @@ void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 				}
 			case ConsoleCore::ConsoleSymbolTypeConCmd:
 				{
-					ResizeBuffer<char *, char, unsigned int>(symbolstring, strlen(symbolstring) + 7);
+					ResizeBuffer<char *>(symbolstring, strlen(symbolstring) + 7);
 					sprintf(symbolstring, "%s cmd	:", symbolstring);
 					//TODO: flags
-					ResizeBuffer<char *, char, unsigned int>(symbolstring, strlen(symbolstring) + 3);
+					ResizeBuffer<char *>(symbolstring, strlen(symbolstring) + 3);
 					sprintf(symbolstring, "%s	:", symbolstring);
 					//TODO: flags
 					//free(tempstring);
 					tempstring = concore->symbolbuffer[i].ptr[j].concmd->GetDescription();
-					ResizeBuffer<char *, char, unsigned int>(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
+					ResizeBuffer<char *>(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
 					sprintf(symbolstring, "%s %s", symbolstring, tempstring);
 					free(tempstring);
 					concore->Output(symbolstring);

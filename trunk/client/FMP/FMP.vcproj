@@ -407,6 +407,10 @@
 			Name="Shared"
 			>
 			<File
+				RelativePath="..\..\Shared\Network\Limits.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Shared\Network\NetworkProtocol.h"
 				>
 			</File>

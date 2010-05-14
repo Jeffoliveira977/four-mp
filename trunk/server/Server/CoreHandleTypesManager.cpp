@@ -251,7 +251,7 @@ bool CoreHandleTypesManager::AddDynamicCommand(const short owner, const char *ca
 	{
 		return false;
 	}
-	if (!ResizeBuffer<DynamicCommand *, DynamicCommand, unsigned short>(commandbuffer, commandbuffersize + 1))
+	if (!ResizeBuffer<DynamicCommand *>(commandbuffer, commandbuffersize + 1))
 	{
 		return false;
 	}
@@ -276,7 +276,7 @@ int *CoreHandleTypesManager::GetDynamicCommandHandles(const char *name, unsigned
 		cmdname = ((ConCmd *)hm.handlebuffer[commandbuffer[i].index]->ptr)->GetName();
 		if (strcmp(cmdname, name) == 0)
 		{
-			if (!ResizeBuffer<int *, int, unsigned char>(handles, numcmds + 1))
+			if (!ResizeBuffer<int *>(handles, numcmds + 1))
 			{
 				return NULL;
 			}

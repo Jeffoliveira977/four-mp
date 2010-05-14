@@ -333,7 +333,7 @@ void VirtualMachineManager::SetVirtualMachineName(const unsigned char index, con
 	{
 		return;
 	}
-	ResizeBuffer<char *, char, unsigned int>(vmbuffer[index]->name, strlen(string) + 1);
+	ResizeBuffer<char *>(vmbuffer[index]->name, strlen(string) + 1);
 	strcpy(vmbuffer[index]->name, string);
 }
 
@@ -347,7 +347,7 @@ void VirtualMachineManager::SetVirtualMachineVersion(const unsigned char index, 
 	{
 		return;
 	}
-	ResizeBuffer<char *, char, unsigned int>(vmbuffer[index]->version, strlen(string) + 1);
+	ResizeBuffer<char *>(vmbuffer[index]->version, strlen(string) + 1);
 	strcpy(vmbuffer[index]->version, string);
 }
 
@@ -361,7 +361,7 @@ void VirtualMachineManager::SetVirtualMachineAuthor(const unsigned char index, c
 	{
 		return;
 	}
-	ResizeBuffer<char *, char, unsigned int>(vmbuffer[index]->author, strlen(string) + 1);
+	ResizeBuffer<char *>(vmbuffer[index]->author, strlen(string) + 1);
 	strcpy(vmbuffer[index]->author, string);
 }
 
@@ -492,7 +492,7 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 		{
 			return false;
 		}
-		if (!ResizeBuffer<VirtualMachine **, VirtualMachine *, unsigned char>(vmbuffer, index + 1))
+		if (!ResizeBuffer<VirtualMachine **>(vmbuffer, index + 1))
 		{
 			return false;
 		}

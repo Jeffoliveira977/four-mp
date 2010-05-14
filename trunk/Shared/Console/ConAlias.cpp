@@ -21,7 +21,7 @@ ConAlias::~ConAlias(void)
 
 void ConAlias::SetCommandString(const char *string)
 {
-	ResizeBuffer<char *, char, unsigned int>(description, strlen(string) + 1);
+	ResizeBuffer<char *>(description, strlen(string) + 1);
 	strcpy(description, string);
 }
 

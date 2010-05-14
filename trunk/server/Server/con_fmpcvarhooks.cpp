@@ -19,7 +19,7 @@ void ConVarHookHostGamemode(ConVar *convar, const ConVarType oldtype, void *oldv
 {
 	if (newtype == ConVarTypeString)
 	{
-		ResizeBuffer<char *, char, unsigned int>(server.gamemode, strlen((char *)newvalue) + 1);
+		ResizeBuffer<char *>(server.gamemode, strlen((char *)newvalue) + 1);
 		strcpy(server.gamemode, (char *)newvalue);
 		return;
 	}
@@ -28,7 +28,7 @@ void ConVarHookHostGamemode(ConVar *convar, const ConVarType oldtype, void *oldv
 	{
 		return;
 	}
-	ResizeBuffer<char *, char, unsigned int>(server.gamemode, strlen(value) + 1);
+	ResizeBuffer<char *>(server.gamemode, strlen(value) + 1);
 	strcpy(server.gamemode, value);
 	free(value);
 }
@@ -37,7 +37,7 @@ void ConVarHookHostname(ConVar *convar, const ConVarType oldtype, void *oldvalue
 {
 	if (newtype == ConVarTypeString)
 	{
-		ResizeBuffer<char *, char, unsigned int>(server.hostname, strlen((char *)newvalue) + 1);
+		ResizeBuffer<char *>(server.hostname, strlen((char *)newvalue) + 1);
 		strcpy(server.hostname, (char *)newvalue);
 		if (server.isrunning)
 		{
@@ -50,7 +50,7 @@ void ConVarHookHostname(ConVar *convar, const ConVarType oldtype, void *oldvalue
 	{
 		return;
 	}
-	ResizeBuffer<char *, char, unsigned int>(server.hostname, strlen(value) + 1);
+	ResizeBuffer<char *>(server.hostname, strlen(value) + 1);
 	strcpy(server.hostname, value);
 	free(value);
 	if (server.isrunning)
@@ -63,7 +63,7 @@ void ConVarHookRconPassword(ConVar *convar, const ConVarType oldtype, void *oldv
 {
 	if (newtype == ConVarTypeString)
 	{
-		ResizeBuffer<char *, char, unsigned int>(server.rconpassword, strlen((char *)newvalue) + 1);
+		ResizeBuffer<char *>(server.rconpassword, strlen((char *)newvalue) + 1);
 		strcpy(server.rconpassword, (char *)newvalue);
 		return;
 	}
@@ -72,7 +72,7 @@ void ConVarHookRconPassword(ConVar *convar, const ConVarType oldtype, void *oldv
 	{
 		return;
 	}
-	ResizeBuffer<char *, char, unsigned int>(server.rconpassword, strlen(value) + 1);
+	ResizeBuffer<char *>(server.rconpassword, strlen(value) + 1);
 	strcpy(server.rconpassword, value);
 	free(value);
 }
@@ -98,7 +98,7 @@ void ConVarHookSvPassword(ConVar *convar, const ConVarType oldtype, void *oldval
 {
 	if (newtype == ConVarTypeString)
 	{
-		ResizeBuffer<char *, char, unsigned int>(server.password, strlen((char *)newvalue) + 1);
+		ResizeBuffer<char *>(server.password, strlen((char *)newvalue) + 1);
 		strcpy(server.password, (char *)newvalue);
 		if (server.isrunning)
 		{
@@ -111,7 +111,7 @@ void ConVarHookSvPassword(ConVar *convar, const ConVarType oldtype, void *oldval
 	{
 		return;
 	}
-	ResizeBuffer<char *, char, unsigned int>(server.password, strlen(value) + 1);
+	ResizeBuffer<char *>(server.password, strlen(value) + 1);
 	strcpy(server.password, value);
 	free(value);
 	if (server.isrunning)

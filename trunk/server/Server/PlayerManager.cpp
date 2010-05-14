@@ -94,7 +94,9 @@ char *PlayerManager::GetPlayerName(const short index)
 	{
 		return NULL;
 	}
-	return playerbuffer[index]->name;
+	char *tempstring = (char *)calloc(strlen(playerbuffer[index]->name) + 1, sizeof(char));
+	strcpy(tempstring, playerbuffer[index]->name);
+	return tempstring;
 }
 
 unsigned int PlayerManager::GetPlayerModel(const short index)
@@ -246,7 +248,7 @@ bool PlayerManager::AddPlayerClass(const unsigned int model, const float positio
 		{
 			return false;
 		}
-		if (!ResizeBuffer<PlayerClass **, PlayerClass *, unsigned char>(classbuffer, index + 1))
+		if (!ResizeBuffer<PlayerClass **>(classbuffer, index + 1))
 		{
 			return false;
 		}
@@ -313,7 +315,7 @@ bool PlayerManager::GetPlayerClassData(const unsigned char index, unsigned int &
 	return true;
 }
 
-bool PlayerManager::RegisterNewPlayer(const short index, const char *name)
+bool PlayerManager::RegisterNewPlayer(const short index, char (&name)[MAX_PLAYER_NAME_LENGTH])
 {
 	if ((index < 0) || (index >= maxplayerbuffersize))
 	{
@@ -325,7 +327,7 @@ bool PlayerManager::RegisterNewPlayer(const short index, const char *name)
 		{
 			return false;
 		}
-		if (!ResizeBuffer<Player **, Player *, short>(playerbuffer, index + 1))
+		if (!ResizeBuffer<Player **>(playerbuffer, index + 1))
 		{
 			return false;
 		}
@@ -336,8 +338,11 @@ bool PlayerManager::RegisterNewPlayer(const short index, const char *name)
 	{
 		return false;
 	}
+	if (!this->AssignPlayerName(name))
+	{
+		return false;
+	}
 	playerbuffer[index] = new Player;
-	//playerbuffer[index]->name = (char *)calloc(strlen(name) + 1, sizeof(char));
 	strcpy(playerbuffer[index]->name, name);
 	playerbuffer[index]->model = 0x98E29920;
 	playerbuffer[index]->position[0] = 0;
@@ -352,8 +357,8 @@ bool PlayerManager::RegisterNewPlayer(const short index, const char *name)
 		playerbuffer[index]->ammo[i] = 0;
 	}
 	playerbuffer[index]->animation[0] = 0;
-	playerbuffer[index]->vehicleindex = -1;
-	playerbuffer[index]->seatindex = -1;
+	playerbuffer[index]->vehicleindex = INVALID_VEHICLE_INDEX;
+	playerbuffer[index]->seatindex = INVALID_PLAYER_SEAT_INDEX;
 	playerbuffer[index]->score = 0;
 	playerbuffer[index]->health = 200;
 	playerbuffer[index]->armor = 0;
@@ -391,6 +396,40 @@ short PlayerManager::GetPlayerFreeSlot(void)
 		return INVALID_PLAYER_INDEX;
 	}
 	return index;
+}
+
+bool PlayerManager::AssignPlayerName(char (&name)[MAX_PLAYER_NAME_LENGTH])
+{
+	if (strlen(name) == 0)
+	{
+		strcpy(name, "unnamed");
+		if (!this->AssignPlayerName(name))
+		{
+			return false;
+		}
+		return true;
+	}
+	bool stop;
+	short j = 1;
+	char tempname[MAX_PLAYER_NAME_LENGTH];
+	strncpy(tempname, name, MAX_PLAYER_NAME_LENGTH - 1);
+	tempname[MAX_PLAYER_NAME_LENGTH-1] = '\0';
+	do
+	{
+		stop = true;
+		for (short i = 0; i < playerbuffersize; i++)
+		{
+			if ((playerbuffer[i] != NULL) && (strcmp(playerbuffer[i]->name, tempname) == 0))
+			{
+				stop = false;
+				_snprintf(tempname, MAX_PLAYER_NAME_LENGTH - 1, "(%d)%s", j, name);
+				tempname[MAX_PLAYER_NAME_LENGTH-1] = '\0';
+				j++;
+			}
+		}
+	} while (!stop);
+	strcpy(name, tempname);
+	return true;
 }
 
 bool PlayerManager::GetClassFreeSlot(unsigned char &index)
