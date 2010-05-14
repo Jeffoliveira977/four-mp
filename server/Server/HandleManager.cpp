@@ -84,7 +84,7 @@ bool HandleManager::RequestNewHandleType(const unsigned char pluginindex, unsign
 	}
 	if (typeindex == typebuffersize)
 	{
-		if (!ResizeBuffer<HandleType **, HandleType *, unsigned short>(typebuffer, typebuffersize + 1))
+		if (!ResizeBuffer<HandleType **>(typebuffer, typebuffersize + 1))
 		{
 			return false;
 		}
@@ -183,7 +183,7 @@ int HandleManager::AddNewHandle(const short owner, const unsigned short type, vo
 	}
 	if (handle == handlebuffersize)
 	{
-		if (!ResizeBuffer<Handle **, Handle *, int>(handlebuffer, handle + 1))
+		if (!ResizeBuffer<Handle **>(handlebuffer, handle + 1))
 		{
 			return INVALID_HANDLE;
 		}
@@ -372,7 +372,7 @@ bool HandleManager::AddHandleOwner(const int handle, const short owner)
 	{
 		return true;
 	}
-	if (!ResizeBuffer<short *, short, short>(handlebuffer[handle]->owner, handlebuffer[handle]->numowners + 1))
+	if (!ResizeBuffer<short *>(handlebuffer[handle]->owner, handlebuffer[handle]->numowners + 1))
 	{
 		return false;
 	}
@@ -412,7 +412,7 @@ bool HandleManager::DeleteHandleOwner(const int handle, const short owner)
 	{
 		handlebuffer[handle]->owner[i] = handlebuffer[handle]->owner[i+1];
 	}
-	if (!ResizeBuffer<short *, short, short>(handlebuffer[handle]->owner, handlebuffer[handle]->numowners - 1))
+	if (!ResizeBuffer<short *>(handlebuffer[handle]->owner, handlebuffer[handle]->numowners - 1))
 	{
 		return false;
 	}
@@ -444,7 +444,7 @@ bool HandleManager::IncreaseHandleCount(const short owner)
 	}
 	if (owner >= countbuffersize)
 	{
-		if (!ResizeBuffer<short **, short *, short>(countbuffer, owner + 1))
+		if (!ResizeBuffer<short **>(countbuffer, owner + 1))
 		{
 			return false;
 		}

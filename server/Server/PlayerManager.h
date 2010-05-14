@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../../Shared/Network/Limits.h"
+
 #define INVALID_PLAYER_INDEX -1
 #define INVALID_PLAYER_MODEL 0
 #define INVALID_PLAYER_SEAT_INDEX -1
@@ -30,7 +32,7 @@ public:
 private:
 	struct Player
 	{
-		char name[32]; ///< Holds the name of the player.
+		char name[MAX_PLAYER_NAME_LENGTH]; ///< Holds the name of the player.
 		unsigned int model; ///< Holds the model hash of the player.
 		float position[3]; ///< Holds the position of the player.
 		float angle; ///< Holds the angle of the player.
@@ -67,8 +69,9 @@ private:
 	unsigned char maxclassbuffersize;
 	unsigned char classbuffersize;
 	PlayerClass **classbuffer;
-	bool RegisterNewPlayer(const short index, const char *name);
+	bool RegisterNewPlayer(const short index, char (&name)[MAX_PLAYER_NAME_LENGTH]);
 	short GetPlayerFreeSlot(void);
+	bool AssignPlayerName(char (&name)[MAX_PLAYER_NAME_LENGTH]);
 	bool GetClassFreeSlot(unsigned char &index);
 	friend class NetworkManager;
 };

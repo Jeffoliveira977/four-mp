@@ -12,6 +12,7 @@ extern NetworkManager nm;
 
 ClientCore::ClientCore(void)
 {
+	index = 32767; // Should be defined in PlayerManager.h
 	isrunning = false;
 	strcpy(name, "unnamed");
 }
@@ -67,4 +68,15 @@ char *ClientCore::GetName(void)
 	char *tempstring = (char *)calloc(strlen(name) + 1, sizeof(char));
 	strcpy(tempstring, name);
 	return tempstring;
+}
+
+short ClientCore::GetIndex(void)
+{
+	return index;
+}
+
+bool ClientCore::SetIndex(short i)
+{
+	index = i;
+	return true;
 }

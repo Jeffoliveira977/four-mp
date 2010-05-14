@@ -64,7 +64,7 @@ short VehicleManager::CreateVehicle(const int model, const float position[3], co
 		{
 			return INVALID_VEHICLE_INDEX;
 		}
-		if (!ResizeBuffer<Vehicle **, Vehicle *, short>(vehiclebuffer, index + 1))
+		if (!ResizeBuffer<Vehicle **>(vehiclebuffer, index + 1))
 		{
 			return INVALID_VEHICLE_INDEX;
 		}

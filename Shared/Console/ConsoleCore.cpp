@@ -164,7 +164,7 @@ ConVar *ConsoleCore::AddConVar(const char *name, const float defaultvalue, const
 		symbolbuffer[index].ptr->convar = new ConVar(this, name, defaultvalue, description, flags, hasMin, min, hasMax, max);
 		return symbolbuffer[index].ptr->convar;
 	}
-	if (!ResizeBuffer<ConsoleSymbol *, ConsoleSymbol, unsigned short>(symbolbuffer, symbolbuffersize + 1))
+	if (!ResizeBuffer<ConsoleSymbol *>(symbolbuffer, symbolbuffersize + 1))
 	{
 		return NULL;
 	}
@@ -204,7 +204,7 @@ ConVar *ConsoleCore::AddConVar(const char *name, const int defaultvalue, const c
 		symbolbuffer[index].ptr->convar = new ConVar(this, name, defaultvalue, description, flags, hasMin, min, hasMax, max);
 		return symbolbuffer[index].ptr->convar;
 	}
-	if (!ResizeBuffer<ConsoleSymbol *, ConsoleSymbol, unsigned short>(symbolbuffer, symbolbuffersize + 1))
+	if (!ResizeBuffer<ConsoleSymbol *>(symbolbuffer, symbolbuffersize + 1))
 	{
 		return NULL;
 	}
@@ -240,7 +240,7 @@ ConVar *ConsoleCore::AddConVar(const char *name, const char *defaultvalue, const
 		symbolbuffer[index].ptr->convar = new ConVar(this, name, defaultvalue, description, flags);
 		return symbolbuffer[index].ptr->convar;
 	}
-	if (!ResizeBuffer<ConsoleSymbol *, ConsoleSymbol, unsigned short>(symbolbuffer, symbolbuffersize + 1))
+	if (!ResizeBuffer<ConsoleSymbol *>(symbolbuffer, symbolbuffersize + 1))
 	{
 		return NULL;
 	}
@@ -274,7 +274,7 @@ ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *des
 		if (symbolbuffer[index].type == ConsoleSymbolTypeConAlias)
 		{
 			delete symbolbuffer[index].ptr->conalias;
-			symbolbuffer[index].type == ConsoleSymbolTypeConCmd;
+			symbolbuffer[index].type = ConsoleSymbolTypeConCmd;
 			symbolbuffer[index].ptr[0].concmd = new ConCmd(this, name, callback, description, flags);
 			return symbolbuffer[index].ptr[0].concmd;
 		}
@@ -282,7 +282,7 @@ ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *des
 		{
 			return NULL;
 		}
-		if (!ResizeBuffer<ConsoleSymbolPtr *, ConsoleSymbolPtr, unsigned char>(symbolbuffer[index].ptr, symbolbuffer[index].numcmds + 1))
+		if (!ResizeBuffer<ConsoleSymbolPtr *>(symbolbuffer[index].ptr, symbolbuffer[index].numcmds + 1))
 		{
 			return NULL;
 		}
@@ -294,7 +294,7 @@ ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *des
 	{
 		return NULL;
 	}
-	if (!ResizeBuffer<ConsoleSymbol *, ConsoleSymbol, unsigned short>(symbolbuffer, symbolbuffersize + 1))
+	if (!ResizeBuffer<ConsoleSymbol *>(symbolbuffer, symbolbuffersize + 1))
 	{
 		return NULL;
 	}
@@ -495,7 +495,7 @@ void ConsoleCore::AddConAlias(const char *name, const char *cmdstring)
 	{
 		return;
 	}
-	if (!ResizeBuffer<ConsoleSymbol *, ConsoleSymbol, unsigned short>(symbolbuffer, symbolbuffersize + 1))
+	if (!ResizeBuffer<ConsoleSymbol *>(symbolbuffer, symbolbuffersize + 1))
 	{
 		return;
 	}
@@ -521,7 +521,7 @@ bool ConsoleCore::DeleteConsoleSymbolByIndex(const unsigned short index)
 		symbolbuffer[i] = symbolbuffer[i+1];
 	}
 	
-	if (!ResizeBuffer<ConsoleSymbol *, ConsoleSymbol, unsigned short>(symbolbuffer, symbolbuffersize - 1))
+	if (!ResizeBuffer<ConsoleSymbol *>(symbolbuffer, symbolbuffersize - 1))
 	{
 		return false;
 	}
@@ -585,7 +585,7 @@ void ConsoleCore::DeleteConCmd(const char *name, ConCmd *ptr)
 			{
 				symbolbuffer[index].ptr[i] = symbolbuffer[index].ptr[i+1];
 			}
-			if (!ResizeBuffer<ConsoleSymbolPtr *, ConsoleSymbolPtr, unsigned char>(symbolbuffer[index].ptr, symbolbuffer[index].numcmds - 1))
+			if (!ResizeBuffer<ConsoleSymbolPtr *>(symbolbuffer[index].ptr, symbolbuffer[index].numcmds - 1))
 			{
 				return;
 			}
@@ -621,7 +621,7 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 				{
 					float value;
 					symbol->ptr->convar->GetValue(value);
-					ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s = \"%f\"", helpstring, value) + 1);
+					ResizeBuffer<char *>(helpstring, _scprintf("%s = \"%f\"", helpstring, value) + 1);
 					sprintf(helpstring, "%s = \"%f\"", helpstring, value);
 					break;
 				}
@@ -629,7 +629,7 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 				{
 					int value;
 					symbol->ptr->convar->GetValue(value);
-					ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s = \"%d\"", helpstring, value) + 1);
+					ResizeBuffer<char *>(helpstring, _scprintf("%s = \"%d\"", helpstring, value) + 1);
 					sprintf(helpstring, "%s = \"%d\"", helpstring, value);
 					break;
 				}
@@ -637,7 +637,7 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 				{
 					char *value;
 					symbol->ptr->convar->GetValue(value);
-					ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s = \"%s\"", helpstring, value) + 1);
+					ResizeBuffer<char *>(helpstring, _scprintf("%s = \"%s\"", helpstring, value) + 1);
 					sprintf(helpstring, "%s = \"%s\"", helpstring, value);
 					free(value);
 					break;
@@ -649,16 +649,16 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 				{
 					float value;
 					symbol->ptr->convar->GetDefaultValue(value);
-					ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s ( def. \"%f\" )", helpstring, value) + 1);
+					ResizeBuffer<char *>(helpstring, _scprintf("%s ( def. \"%f\" )", helpstring, value) + 1);
 					sprintf(helpstring, "%s ( def. \"%f\" )", helpstring, value);
 					if (symbol->ptr->convar->GetBound(ConVarBoundLower, value))
 					{
-						ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s min. %f", helpstring, value) + 1);
+						ResizeBuffer<char *>(helpstring, _scprintf("%s min. %f", helpstring, value) + 1);
 						sprintf(helpstring, "%s min. %f", helpstring, value);
 					}
 					if (symbol->ptr->convar->GetBound(ConVarBoundUpper, value))
 					{
-						ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s max. %f", helpstring, value) + 1);
+						ResizeBuffer<char *>(helpstring, _scprintf("%s max. %f", helpstring, value) + 1);
 						sprintf(helpstring, "%s max. %f", helpstring, value);
 					}
 					break;
@@ -667,16 +667,16 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 				{
 					int value;
 					symbol->ptr->convar->GetDefaultValue(value);
-					ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s ( def. \"%d\" )", helpstring, value) + 1);
+					ResizeBuffer<char *>(helpstring, _scprintf("%s ( def. \"%d\" )", helpstring, value) + 1);
 					sprintf(helpstring, "%s ( def. \"%d\" )", helpstring, value);
 					if (symbol->ptr->convar->GetBound(ConVarBoundLower, value))
 					{
-						ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s min. %d", helpstring, value) + 1);
+						ResizeBuffer<char *>(helpstring, _scprintf("%s min. %d", helpstring, value) + 1);
 						sprintf(helpstring, "%s min. %d", helpstring, value);
 					}
 					if (symbol->ptr->convar->GetBound(ConVarBoundUpper, value))
 					{
-						ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s max. %d", helpstring, value) + 1);
+						ResizeBuffer<char *>(helpstring, _scprintf("%s max. %d", helpstring, value) + 1);
 						sprintf(helpstring, "%s max. %d", helpstring, value);
 					}
 					break;
@@ -685,7 +685,7 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 				{
 					char *value;
 					symbol->ptr->convar->GetDefaultValue(value);
-					ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s  ( def. \"%s\" )", helpstring, value) + 1);
+					ResizeBuffer<char *>(helpstring, _scprintf("%s  ( def. \"%s\" )", helpstring, value) + 1);
 					sprintf(helpstring, "%s  ( def. \"%s\" )", helpstring, value);
 					free(value);
 					break;
@@ -698,7 +698,7 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 			char *desc = symbol->ptr->convar->GetDescription();
 			if (strlen(desc) != 0)
 			{
-				ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s\n - %s", helpstring, desc) + 1);
+				ResizeBuffer<char *>(helpstring, _scprintf("%s\n - %s", helpstring, desc) + 1);
 				sprintf(helpstring, "%s\n - %s", helpstring, desc);
 			}
 			free(desc);
@@ -716,7 +716,7 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 				desc = symbol->ptr->convar->GetDescription();
 				if (strlen(desc) != 0)
 				{
-					ResizeBuffer<char *, char, unsigned int>(helpstring, _scprintf("%s\n - %s", helpstring, desc) + 1);
+					ResizeBuffer<char *>(helpstring, _scprintf("%s\n - %s", helpstring, desc) + 1);
 					sprintf(helpstring, "%s\n - %s", helpstring, desc);
 				}
 				free(desc);
@@ -725,7 +725,7 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 		}
 	case ConsoleSymbolTypeConAlias:
 		{
-			ResizeBuffer<char *, char, unsigned int>(helpstring, 1);
+			ResizeBuffer<char *>(helpstring, 1);
 			helpstring[0] = '\0';
 			break;
 		}
@@ -817,7 +817,7 @@ bool ConsoleCore::InterpretCommand(void)
 			}
 			templength = i - startindex;
 			i++;
-			ResizeBuffer<char **, char *, unsigned short>(commandargs, j + 1);
+			ResizeBuffer<char **>(commandargs, j + 1);
 			commandargs[j] = (char *)calloc(templength + 1, sizeof(char));
 			strncpy(commandargs[j], commandbuffer + startindex, templength);
 			commandargs[j][templength] = '\0';
@@ -845,7 +845,7 @@ bool ConsoleCore::InterpretCommand(void)
 					i++;
 				}
 				templength = i - startindex;
-				ResizeBuffer<char **, char *, unsigned short>(commandargs, j + 1);
+				ResizeBuffer<char **>(commandargs, j + 1);
 				commandargs[j] = (char *)calloc(templength + 1, sizeof(char));
 				strncpy(commandargs[j], commandbuffer + startindex, templength);
 				commandargs[j][templength] = '\0';

@@ -20,11 +20,8 @@ void FMPHook::PlayerConnect(char *name, int index, int model, float x, float y, 
 {
 	Debug("PlayerConnect: %s", "Start");
 	Log("ConnectInfo: %s %d 0x%x %f %f %f", name, index, model, x, y, z);
-	Log("STRCMP"); Log("'%s'", name); Log("'%s'", Conf.Name);
-	Debug("GO");
-	if(strcmp(name, Conf.Name) == 0) // My connect
+	if(MyID == index) // My connect
 	{
-		MyID = index;
 		gPlayer[index].LocalPlayer = 1;
 		//gPlayer[index].model = model;
 		/*Log("Local player %d", IsThisModelAPed((eModel)model));

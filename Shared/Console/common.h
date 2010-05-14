@@ -9,15 +9,13 @@
 
 /// \brief Wrapper for realloc.
 /// \tparam BUFFERTYPE Type of the buffer.
-/// \tparam INTERNALTYPE Type that buffer points to.
-/// \tparam SIZETYPE Type of the size.
 /// \param[in,out] buffer Buffer to resize.
 /// \param[in] size Size to which resize.
 /// \return True on success, false otherwise.
-template <typename BUFFERTYPE, typename INTERNALTYPE, typename SIZETYPE>
-bool ResizeBuffer(BUFFERTYPE &buffer, const SIZETYPE size)
+template <typename BUFFERTYPE>
+bool ResizeBuffer(BUFFERTYPE &buffer, const size_t size)
 {
-	BUFFERTYPE tempbuffer = (BUFFERTYPE)realloc(buffer, size * sizeof(INTERNALTYPE));
+	BUFFERTYPE tempbuffer = (BUFFERTYPE)realloc(buffer, size * sizeof(*tempbuffer));
 	if ((tempbuffer == NULL) && (size != 0))
 	{
 		return false;

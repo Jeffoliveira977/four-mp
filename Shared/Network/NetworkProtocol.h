@@ -1,17 +1,23 @@
 #pragma once
 
-#define PROTOCOL_VERSION 3
+#include "Limits.h"
+
+#define PROTOCOL_VERSION 4
+
+#define DEFAULT_SERVER_NETWORK_ID 0
+#define DEFAULT_CLIENT_NETWORK_ID 65534
 
 struct NetworkPlayerConnectionRequestData
 {
 	short protocol;
-	char name[32];
+	char name[MAX_PLAYER_NAME_LENGTH];
 };
 
 enum NetworkPlayerConnectionError
 {
 	NetworkPlayerConnectionErrorServerFull,
 	NetworkPlayerConnectionErrorInvalidProtocol,
+	NetworkPlayerConnectionErrorInvalidName,
 	NetworkPlayerConnectionErrorAlreadyConnected,
 	NetworkPlayerConnectionErrorAllocationError,
 	NetworkPlayerConnectionErrorScriptLock
@@ -20,6 +26,11 @@ enum NetworkPlayerConnectionError
 struct NetworkPlayerConnectionErrorData
 {
 	NetworkPlayerConnectionError error;
+};
+
+struct NetworkPlayerInfoData
+{
+	short index;
 };
 
 struct NetworkPlayerDisconnectionData
@@ -35,7 +46,7 @@ struct NetworkPlayerCheckData
 struct NetworkPlayerFullUpdateData
 {
 	short index;
-	char name[32];
+	char name[MAX_PLAYER_NAME_LENGTH];
 	unsigned int model;
 	float position[3];
 	float angle;
@@ -152,7 +163,7 @@ struct NetworkPlayerComponentsChangeData
 struct NetworkPlayerChatData
 {
 	short client;
-	char msg[128];
+	char msg[MAX_CHAT_MESSAGE_LENGTH];
 	unsigned char color[4];
 };
 

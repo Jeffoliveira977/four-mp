@@ -37,14 +37,15 @@ NetworkManager::~NetworkManager(void)
 void NetworkManager::Load(void)
 {
 	manager = new NetworkIDManager;
-	clientid.localSystemAddress = 65534;
-	serverid.localSystemAddress = 0;
+	clientid.localSystemAddress = DEFAULT_CLIENT_NETWORK_ID;
+	serverid.localSystemAddress = DEFAULT_SERVER_NETWORK_ID;
 	this->SetNetworkIDManager(manager);
 	this->SetNetworkID(clientid);
 	rpc3 = new RakNet::RPC3;
 	rpc3->SetNetworkIDManager(manager);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnection);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnectionError);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientInfo);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientDisconnection);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFullUpdate);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveVehicleFullUpdate);
@@ -175,7 +176,6 @@ void NetworkManager::Ping(const char *hostname, const unsigned short port)
 
 void NetworkManager::ConnectToServer(const char *hostname, const unsigned short port)
 {
-	// Коннект
 	net->Connect(hostname, port, 0, 0, 0);
 	serveraddress.SetBinaryAddress(hostname);
 	serveraddress.port = port;
@@ -274,9 +274,8 @@ void NetworkManager::SendPlayerChat(void)
 
 void NetworkManager::RecieveClientConnection(NetworkPlayerFullUpdateData data, RakNet::RPC3 *serverrpc3)
 {
-	conscreen.Print("Recieving player info");
-	clientid.localSystemAddress = data.index + 1;
-	this->SetNetworkID(clientid);
+	conscreen.Print("Recieving new player connection.");
+	conscreen.Print("Index is %d", data.index);
 	conscreen.Print("Name is %s", data.name);
 }
 
@@ -286,44 +285,60 @@ void NetworkManager::RecieveClientConnectionError(NetworkPlayerConnectionErrorDa
 	{
 	case NetworkPlayerConnectionErrorServerFull:
 		{
-			conscreen.Print("ConnectError: Server is full.");
+			conscreen.Print("Connection error: Server is full.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorInvalidProtocol:
 		{
-			conscreen.Print("ConnectError: Server is using different protocol.");
+			conscreen.Print("Connection error: Server is using different protocol.");
+			break;
+		}
+	case NetworkPlayerConnectionErrorInvalidName:
+		{
+			conscreen.Print("Connection error: Invalid user name.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorAlreadyConnected:
 		{
-			conscreen.Print("ConnectError: You are already connected.");
+			conscreen.Print("Connection error: You are already connected.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorAllocationError:
 		{
-			conscreen.Print("ConnectError: Server was unable to allocate player resources.");
+			conscreen.Print("Connection error: Server was unable to allocate player resources.");
 			break;
 		}
 	case NetworkPlayerConnectionErrorScriptLock:
 		{
-			conscreen.Print("ConnectError: Script lock connect");
+			conscreen.Print("Connection error: Connection has been refused by a server script.");
 			break;
 		}
 	}
 }
 
+void NetworkManager::RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 *serverrpc3)
+{
+	conscreen.Print("Recieving our client info");
+	conscreen.Print("Our index is %d", data.index);
+	clientid.localSystemAddress = data.index + 1;
+	this->SetNetworkID(clientid);
+	client.SetIndex(data.index);
+}
+
 void NetworkManager::RecieveClientDisconnection(NetworkPlayerDisconnectionData data, RakNet::RPC3 *serverrpc3)
 {
+	conscreen.Print("Recieving client disconnection notification.");
 }
 
 void NetworkManager::RecievePlayerFullUpdate(NetworkPlayerFullUpdateData data, RakNet::RPC3 *serverrpc3)
 {
+	conscreen.Print("Recieving player full update.");
 	conscreen.Print("Name is %s", data.name);
 }
 
 void NetworkManager::RecieveVehicleFullUpdate(NetworkVehicleFullUpdateData data, RakNet::RPC3 *serverrpc3)
 {
-	conscreen.Print("Recieving vehicle info");
+	conscreen.Print("Recieving vehicle full update.");
 }
 
 void NetworkManager::RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *serverrpc3)

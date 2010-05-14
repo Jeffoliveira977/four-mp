@@ -57,8 +57,8 @@ void NetworkManager::Load(const short maxclients, const unsigned short port)
 {
 	manager = new NetworkIDManager;
 	manager->SetIsNetworkIDAuthority(true);
-	serverid.localSystemAddress = 0;
-	defaultclientid.localSystemAddress = 65534;
+	serverid.localSystemAddress = DEFAULT_SERVER_NETWORK_ID;
+	defaultclientid.localSystemAddress = DEFAULT_CLIENT_NETWORK_ID;
 	this->SetNetworkIDManager(manager);
 	this->SetNetworkID(serverid);
 	rpc3 = new RakNet::RPC3;
@@ -201,13 +201,19 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 	}
 	if (data.protocol != PROTOCOL_VERSION)
 	{
-		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorServerFull);
+		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorInvalidProtocol);
 		net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
 	}
+	if (strlen(data.name) == 0)
+	{
+		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorInvalidName);
+		net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
+	}
+	//TODO: Add more strict name checks (control characters, etc.)
 	short clientindex = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
 	if (clientindex != INVALID_PLAYER_INDEX)
 	{
-		PrintToServer("Player %s has tried to connect twice.", playm.GetPlayerName(clientindex));
+		PrintToServer("Player %s has tried to connect twice.", playm.playerbuffer[clientindex]->name);
 		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorAlreadyConnected);
 	}
 	clientindex = this->RegisterNewClient(clientrpc3->GetLastSenderAddress());
@@ -235,6 +241,9 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 		clientbuffer[clientindex] = NULL;
 		return;
 	}
+	NetworkPlayerInfoData infodata;
+	infodata.index = clientindex;
+	rpc3->CallCPP("&NetworkManager::RecieveClientInfo", defaultclientid, infodata, rpc3);
 	//TODO: Recieve all server data (other players, vehicles...) and then send new player data to all. More fair.
 	NetworkPlayerFullUpdateData *playerdata;
 	//TODO: Optimize using currently connected players, not buffer size.
@@ -245,7 +254,7 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 			playerdata = this->GetPlayerFullUpdateData(i);
 			if (playerdata != NULL)
 			{
-				rpc3->CallCPP("&NetworkManager::RecievePlayerFullUpdate", defaultclientid, *playerdata);
+				rpc3->CallCPP("&NetworkManager::RecievePlayerFullUpdate", clientbuffer[clientindex]->id, *playerdata);
 				delete playerdata;
 			}
 		}
@@ -256,7 +265,7 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 		vehicledata = this->GetVehicleFullUpdateData(i);
 		if (vehicledata != NULL)
 		{
-			rpc3->CallCPP("&NetworkManager::RecieveVehicleFullUpdate", defaultclientid, *vehicledata);
+			rpc3->CallCPP("&NetworkManager::RecieveVehicleFullUpdate", clientbuffer[clientindex]->id, *vehicledata);
 			delete vehicledata;
 		}
 	}
@@ -269,7 +278,7 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 		clientbuffer[clientindex] = NULL;
 		return;
 	}
-	rpc3->CallCPP("&NetworkManager::RecieveClientConnection", defaultclientid, *playerdata);
+	rpc3->CallCPP("&NetworkManager::RecieveClientConnection", clientbuffer[clientindex]->id, *playerdata);
 	this->SendDataToAllExceptOne("&NetworkManager::RecieveClientConnection", clientindex, playerdata);
 	delete playerdata;
 	this->UpdateServerInfo();
@@ -296,7 +305,7 @@ void NetworkManager::RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 
 	{
 		return;
 	}
-	if (playm.playerbuffer[client]->vehicleindex != -1)
+	if (playm.playerbuffer[client]->vehicleindex != INVALID_VEHICLE_INDEX)
 	{
 
 		vm.SetVehiclePositionInternal(playm.playerbuffer[client]->vehicleindex, data.position);
@@ -378,7 +387,7 @@ void NetworkManager::RecievePlayerCancelEntranceInVehicle(NetworkPlayerCancelEnt
 	{
 		return;
 	}
-	playm.playerbuffer[client]->vehicleindex = -1;
+	playm.playerbuffer[client]->vehicleindex = INVALID_VEHICLE_INDEX;
 	playm.playerbuffer[client]->car_enter = false;
 	data.client = client;
 	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerCancelEntranceInVehicle", client, &data);
@@ -399,7 +408,7 @@ void NetworkManager::RecievePlayerExitFromVehicle(NetworkPlayerExitFromVehicleDa
 	{
 		return;
 	}
-	playm.playerbuffer[client]->vehicleindex = -1;
+	playm.playerbuffer[client]->vehicleindex = INVALID_VEHICLE_INDEX;
 	playm.playerbuffer[client]->car_enter = false;
 	data.client = client;
 	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerExitFromVehicle", client, &data);
@@ -421,7 +430,7 @@ void NetworkManager::RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 
 		return;
 	}
 	playm.playerbuffer[client]->currentweapon = data.weapon;
-	if (data.target != -1)
+	if (data.target != INVALID_PLAYER_INDEX)
 	{
 		if (data.target >= playm.playerbuffersize)
 		{
@@ -631,7 +640,7 @@ short NetworkManager::RegisterNewClient(const SystemAddress address)
 		{
 			return INVALID_PLAYER_INDEX;
 		}
-		if (!ResizeBuffer<Client **, Client *, short>(clientbuffer, index + 1))
+		if (!ResizeBuffer<Client **>(clientbuffer, index + 1))
 		{
 			return INVALID_PLAYER_INDEX;
 		}

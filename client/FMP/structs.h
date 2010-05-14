@@ -5,6 +5,7 @@
 */
 
 #pragma once
+#include "../../Shared/Network/Limits.h"
 #include "Hook/types.h"
 #include "Hook/scripting.h"
 
@@ -15,7 +16,7 @@ struct FPlayer
 	bool connected;
 	char ip[16];
 	unsigned short port;
-	char name[32];
+	char name[MAX_PLAYER_NAME_LENGTH];
 	unsigned int model;
 	float position[3];
 	float angle;
@@ -66,7 +67,7 @@ struct FConfig
 {
 	char server[32];
 	int port;
-	char Name[32];
+	char Name[MAX_PLAYER_NAME_LENGTH];
 
 	bool ComponentSelect;
 	unsigned char NumSkins;
@@ -77,19 +78,19 @@ class COLOR
 {
 public:
 	COLOR() {  }
-	COLOR(int r, int g, int b)
+	COLOR(unsigned char r, unsigned char g, unsigned char b)
 	{
 		this->r = r;
 		this->g = g;
 		this->b = b;
 	}
 
-	int r, g, b;
+	unsigned char r, g, b;
 };
 
 struct CHATMSG 
 {
-	char msg[128];
+	char msg[MAX_CHAT_MESSAGE_LENGTH];
 	COLOR color;
 };
 
@@ -101,7 +102,7 @@ enum GameState
 	GameStateInGame, ///< Indicates that client is connected to the server and is playing.
 	GameStateSkinSelect, ///< Indicates that client is connected to the server and is choosing their skin.
 	GameStateComponentSelect, ///< Indicates that client is connected to the server and is choosing their components (clothes).
-	GameStateExiting ///< Indicates that game closing.
+	GameStateExiting ///< Indicates that game is closing.
 };
 
 /// \brief Indicates the target that all keyboard and mouse input is redirected to.
