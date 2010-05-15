@@ -16,9 +16,11 @@ public:
 	char *GetName(void);
 	short GetIndex(void);
 	bool SetIndex(short i);
+	unsigned int GetSessionKey(void);
 private:
 	bool isrunning;
 	char name[MAX_PLAYER_NAME_LENGTH];
 	short index;
+	unsigned int sessionkey;
 	friend void ConVarHookName(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);
 };

@@ -19,7 +19,6 @@ extern bool myEnter;
 
 void FMPHook::MoveSync()
 {
-	Log("Move Sync START");
 	if(MyID < 0 || !Natives::DoesCharExist(gPlayer[MyID].PedID)) 
 	{
 		Natives::GetPlayerChar(_GetPlayer(), &gPlayer[MyID].PedID);
@@ -194,7 +193,6 @@ void FMPHook::CarDoSync()
 
 void FMPHook::GunSync()
 {
-	Log("Start GunSync");
 	eWeapon gun;
 	Natives::GetCurrentCharWeapon(gPlayer[MyID].PedID, &gun);
 	if(gun != gPlayer[MyID].currentweapon)
@@ -267,7 +265,6 @@ void FMPHook::GunSync()
 			FreezeCharPosition(gPlayer[MyID].PedID, 0);
 		gPlayer[MyID].Aim = 0;
 	}*/
-	Log("End GunSync");
 }
 
 void FMPHook::StatusSync()

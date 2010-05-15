@@ -170,7 +170,7 @@ public:
 	void CreateCar(int, int, float, float, float, float, int, int);
 
 	// -- Other players sync
-	void PlayerConnect(char *name, int index, int model, float x, float y, float z);
+	void PlayerConnect(char *name, short index, unsigned int model, float x, float y, float z);
 	void PlayerDisconnect(int id);
 	void ReCreatePlayer(int);
 	void PlayerMove(int, float, float, float, float);

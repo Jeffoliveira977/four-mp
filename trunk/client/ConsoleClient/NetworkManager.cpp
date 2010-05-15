@@ -78,44 +78,44 @@ void NetworkManager::Tick(void)
 		{
 		case ID_CONNECTION_REQUEST_ACCEPTED:
 			{
-				conscreen.Print("RakNet: Connection accepted. Sending client info...");
+				conscreen.Print("Connection accepted. Sending client info...");
 				this->SendClientConnectionRequest();
 			} break;
 		case ID_ALREADY_CONNECTED:
 			{
-				conscreen.Print("RakNet: Already connected");
+				conscreen.Print("Already connected");
 			} break;
 		case ID_NO_FREE_INCOMING_CONNECTIONS:
 			{
-				conscreen.Print("RakNet: No free connections");
+				conscreen.Print("No free connections");
 			} break;
 		case ID_DISCONNECTION_NOTIFICATION:
 			{
-				conscreen.Print("RakNet: Disconnect (Close connection)");
+				conscreen.Print("ID_DISCONNECTION_NOTIFICATION");
 			} break;
 		case ID_CONNECTION_LOST:
 			{
-				conscreen.Print("RakNet: Disconnect (Connection lost)");
+				conscreen.Print("ID_CONNECTION_LOST");
 			} break;
 		case ID_CONNECTION_BANNED:
 			{
-				conscreen.Print("RakNet: Disconnect (Connection banned)");
+				conscreen.Print("Disconnect (Connection banned)");
 			} break;
 		case ID_INVALID_PASSWORD:
 			{
-				conscreen.Print("RakNet: Invalid password");
+				conscreen.Print("Invalid password");
 			} break;
 		case ID_CONNECTION_ATTEMPT_FAILED:
 			{
-				conscreen.Print("RakNet: Connection failed");
+				conscreen.Print("Connection failed");
 			} break;
 		case ID_PONG:
 			{
-				conscreen.Print("RakNet: Pong");
+				conscreen.Print("Pong");
 			} break;
 		case ID_RPC_REMOTE_ERROR:
 			{
-				conscreen.Print("RakNet: RPC remote error");
+				conscreen.Print("RPC remote error");
 				switch (pack->data[1])
 				{
 				case RakNet::RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
@@ -189,6 +189,7 @@ void NetworkManager::SendClientConnectionRequest(void)
 	char *name = client.GetName();
 	strcpy(data.name, name);
 	free(name);
+	data.sessionkey = client.GetSessionKey();
 	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionRequest", serverid, data, rpc3);
 }
 
@@ -318,7 +319,12 @@ void NetworkManager::RecieveClientConnectionError(NetworkPlayerConnectionErrorDa
 
 void NetworkManager::RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 *serverrpc3)
 {
-	conscreen.Print("Recieving our client info");
+	conscreen.Print("Recieving client info");
+	if (data.sessionkey != client.GetSessionKey())
+	{
+		conscreen.Print("Not our info");
+		return;
+	}
 	conscreen.Print("Our index is %d", data.index);
 	clientid.localSystemAddress = data.index + 1;
 	this->SetNetworkID(clientid);

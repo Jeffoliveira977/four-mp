@@ -1,3 +1,6 @@
+#define _CRT_RAND_S
+#include <stdlib.h>
+
 #include "ClientCore.h"
 #include "logging.h"
 #include "../../Shared/Console/ConsoleCore.h"
@@ -12,9 +15,10 @@ extern NetworkManager nm;
 
 ClientCore::ClientCore(void)
 {
-	index = 32767; // Should be defined in PlayerManager.h
+	index = -1; // Should be defined in PlayerManager.h
 	isrunning = false;
 	strcpy(name, "unnamed");
+	sessionkey = 0;
 }
 
 ClientCore::~ClientCore(void)
@@ -32,6 +36,7 @@ bool ClientCore::Load(void)
 	ConVar *namecvar = concore.AddConVar("name", "unnamed", "Current user name.", 0);
 	namecvar->HookChange(ConVarHookName);
 	concore.AddConCmd("quit", ConCmdQuit, "Exit the engine.", 0);
+	rand_s(&sessionkey);
 	nm.Load();
 	concore.InterpretLine("exec autoexec.cfg");
 	isrunning = true;
@@ -47,6 +52,7 @@ void ClientCore::Tick(void)
 {
 	conscreen.CheckUserInput();
 	nm.Tick();
+	Sleep(100);
 }
 
 void ClientCore::Unload(void)
@@ -79,4 +85,9 @@ bool ClientCore::SetIndex(short i)
 {
 	index = i;
 	return true;
+}
+
+unsigned int ClientCore::GetSessionKey(void)
+{
+	return sessionkey;
 }

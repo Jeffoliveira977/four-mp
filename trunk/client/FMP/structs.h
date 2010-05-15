@@ -11,7 +11,6 @@
 
 struct FPlayer
 {
-	bool LocalPlayer;
 	Ped PedID;
 	bool connected;
 	char ip[16];
