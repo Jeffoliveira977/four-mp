@@ -12,6 +12,10 @@
 
 #include "../../Shared/Network/NetworkProtocol.h"
 
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 /// \brief A network manager. It handles all network traffic.
 /// \details TODO:
 /// \author WNeZRoS, FaTony
@@ -57,6 +61,63 @@ private:
 	short maxclientbuffersize;
 	short clientbuffersize;
 	Client **clientbuffer;
+	enum NetworkRPCType
+	{
+		NetworkRPCPlayerConnectionRequest,
+		NetworkRPCPlayerMove,
+		NetworkRPCPlayerJump,
+		NetworkRPCPlayerDuck,
+		NetworkRPCPlayerEntranceInVehicle,
+		NetworkRPCPlayerCancelEntranceInVehicle,
+		NetworkRPCPlayerExitFromVehicle,
+		NetworkRPCPlayerFire,
+		NetworkRPCPlayerAim,
+		NetworkRPCPlayerWeaponChange,
+		NetworkRPCPlayerHealthAndArmorChange,
+		NetworkRPCPlayerSpawnRequest,
+		NetworkRPCPlayerModelChange,
+		NetworkRPCPlayerComponentsChange,
+		NetworkRPCPlayerChat
+	};
+	struct NetworkPlayerConnectionRequestDataInternal
+	{
+		SystemAddress address;
+		char name[MAX_PLAYER_NAME_LENGTH];
+		unsigned int sessionkey;
+	};
+	union NetworkRPCUnion
+	{
+		NetworkPlayerConnectionRequestDataInternal *playerconnectionrequest;
+		NetworkPlayerMoveData *playermove;
+		NetworkPlayerJumpData *playerjump;
+		NetworkPlayerDuckData *playerduck;
+		NetworkPlayerEntranceInVehicleData *playerentranceinvehicle;
+		NetworkPlayerCancelEntranceInVehicleData *playercancelentranceinvehicle;
+		NetworkPlayerExitFromVehicleData *playerexitfromvehicle;
+		NetworkPlayerFireData *playerfire;
+		NetworkPlayerAimData *playeraim;
+		NetworkPlayerWeaponChangeData *playerweaponchange;
+		NetworkPlayerHealthAndArmorChangeData *playerhealthandarmorchange;
+		NetworkPlayerSpawnRequestData *playerspawnrequest;
+		NetworkPlayerModelChangeData *playermodelchange;
+		NetworkPlayerComponentsChangeData *playercomponentschange;
+		NetworkPlayerChatData *playerchat;
+	};
+	struct NetworkRPCData
+	{
+		NetworkRPCType type;
+		NetworkRPCUnion data;
+	};
+	int maxrpcbuffersize;
+	int rpcbuffersize;
+	NetworkRPCData *rpcbuffer;
+#ifdef WIN32
+	CRITICAL_SECTION rpcbuffersection;
+#endif
+	template <typename DATATYPE>
+	void WriteToRPCBuffer(const NetworkRPCType type, const DATATYPE *data);
+	void HandleRPCData(const NetworkRPCType type, const NetworkRPCUnion *data);
+	void FreeRPCBuffer(void);
 	short RegisterNewClient(const SystemAddress address);
 	short GetClientIndex(const SystemAddress address);
 	short GetClientFreeSlot(void);

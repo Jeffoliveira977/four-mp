@@ -37,13 +37,13 @@ FMPHook::FMPHook(): FMPThread()
 
 FMPHook::~FMPHook()
 {
-	debug("FMPHook::~FMPHook called");
-	debug("FMPHook::~FMPHook complete");
+	Debug("FMPHook::~FMPHook called");
+	Debug("FMPHook::~FMPHook complete");
 }
 
 ThreadStates FMPHook::Reset(unsigned int hash,int v2,int i3)
 {
-	debug("FMPHook::reset called");
+	Debug("FMPHook::reset called");
 	if (m_pScriptFiber)
 		DeleteFiber(m_pScriptFiber);
 
@@ -54,18 +54,18 @@ ThreadStates FMPHook::Reset(unsigned int hash,int v2,int i3)
 		Kill();
 		return m_context.eThreadState;
 	}
-	debug("FMPHook::reset complete");
+	Debug("FMPHook::reset complete");
 	return FMPThread::Reset(hash,v2,i3);
 }
 
 void FMPHook::FiberStart(void* parameter)
 {
-	debug("FMPHook::FiberStart called");
+	Debug("FMPHook::FiberStart called");
 	FMPHook* Thread = ptr_cast<FMPHook>(parameter);
 	Thread->GameThread();
 	Thread->m_bKillRequested = true;
 	SwitchToFiber(Thread->m_pPrimaryFiber);
-	debug("FMPHook::FiberStart complete");
+	Debug("FMPHook::FiberStart complete");
 }
 
 ThreadStates FMPHook::Run(int i1)
@@ -111,7 +111,7 @@ void FMPHook::wait(unsigned int timeMS)
 
 void FMPHook::Kill()
 {
-	debug("FMPHook::Kill called");
+	Debug("FMPHook::Kill called");
 	if (GetCurrentFiber() != m_pPrimaryFiber) return;
 
 	DeleteFiber(m_pScriptFiber);
@@ -121,7 +121,7 @@ void FMPHook::Kill()
 	m_bKillRequested = false;
 
 	FMPThread::Kill();
-	debug("FMPHook::Kill complete");
+	Debug("FMPHook::Kill complete");
 }
 
 bool FMPHook::IsThreadAlive()
@@ -131,13 +131,13 @@ bool FMPHook::IsThreadAlive()
 
 void FMPHook::TerminateThisScript()
 {
-	debug("FMPHook::TerminateThisScript called");
+	Debug("FMPHook::TerminateThisScript called");
 	if (GetCurrentFiber() != m_pScriptFiber)
 		return;
 
 	m_bKillRequested = true;	
 	SwitchToFiber(m_pPrimaryFiber);
-	debug("FMPHook::TerminateThisScript complete");
+	Debug("FMPHook::TerminateThisScript complete");
 }
 
 //-----------------------------------------------------------

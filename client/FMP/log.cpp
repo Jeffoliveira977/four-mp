@@ -18,8 +18,8 @@ FILE *f_log, *f_debug;
 
 void InitLogs()
 {
-	debug_clear();
-	log_clear();
+	if(FileExists("FMP\\debug.txt")) DeleteFile("FMP\\debug.txt");
+	if(FileExists("FMP\\log.txt")) DeleteFile("FMP\\log.txt");
 
 #ifdef DEBUG_ON
 	InitializeCriticalSection(&cs_debug);
@@ -54,60 +54,6 @@ void PrintToConsole(const char *string, ...)
 	free(tempstring);
 	va_end(arglist); 
 #endif
-}
-
-void debug(const char* string)
-{
-	#if defined DEBUG_ON
-	if(!f_debug) return;
-	EnterCriticalSection(&cs_debug);
-	if(!f_debug) return;
-
-#ifdef PRINT_TO_CONSOLE
-	conwindow.Print(string);
-#endif
-
-	SYSTEMTIME time;
-	GetLocalTime(&time);
-	fprintf(f_debug, "[%02d:%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
-	fputs(string,f_debug);
-	fputs("\n",f_debug);
-	fflush(f_debug);
-	
-	LeaveCriticalSection(&cs_debug);
-	#endif
-}
-
-void debug_clear()
-{
-	if(FileExists("FMP\\debug.txt")) DeleteFile("FMP\\debug.txt");
-}
-
-void log(const char* string)
-{
-	#if defined LOGGING_ON
-	if(!f_log) return;
-	EnterCriticalSection(&cs_log);
-	if(!f_log) return;
-
-#ifdef PRINT_TO_CONSOLE
-	conwindow.Print(string);
-#endif
-
-	SYSTEMTIME time;
-	GetLocalTime(&time);
-	fprintf(f_log, "[%02d:%02d:%02d:%02d] ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
-	fputs(string,f_log);
-	fputs("\n",f_log);
-	fflush(f_log);
-	
-	LeaveCriticalSection(&cs_log);
-	#endif
-}
-
-void log_clear()
-{
-	if(FileExists("FMP\\log.txt")) DeleteFile("FMP\\log.txt");
 }
 
 void Debug(const char *string, ...)

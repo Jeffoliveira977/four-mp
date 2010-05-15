@@ -327,7 +327,7 @@ void FMPHook::GameThread()
 				Natives::RequestModel((eModel)gPlayer[i].model);
 				while(!Natives::HasModelLoaded((eModel)gPlayer[i].model)) wait(1);
 
-				if(gPlayer[i].LocalPlayer)
+				if(i == MyID)
 				{
 					Log("Change me");
 					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[i].model);

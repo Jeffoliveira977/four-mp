@@ -138,10 +138,10 @@ void NetworkManager::Tick(void)
 				dataLength = pack->length - sizeof(unsigned char) - sizeof(RakNetTime);
 				MasterServerInfo *tmp_msi = new MasterServerInfo;
 				tmp_msi->ping = (unsigned int)(RakNet::GetTime()-time);
-				Debug("ID_PONG from SystemAddress:%u:%u.\n", pack->systemAddress.binaryAddress, pack->systemAddress.port);
-				Debug("Time is %i\n",time);
-				Debug("Ping is %i\n", tmp_msi->ping);
-				Debug("Data is %i bytes long.\n", dataLength);
+				Debug("ID_PONG from SystemAddress:%u:%u.", pack->systemAddress.binaryAddress, pack->systemAddress.port);
+				Debug("Time is %i",time);
+				Debug("Ping is %i", tmp_msi->ping);
+				Debug("Data is %i bytes long.", dataLength);
 				if (dataLength > 0)
 				{
 					Debug("Data is %s\n", pack->data+sizeof(unsigned char)+sizeof(RakNetTime));

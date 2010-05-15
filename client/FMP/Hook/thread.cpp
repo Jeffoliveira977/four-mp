@@ -25,7 +25,7 @@ void SetActiveThread(scrThread* thread)
 
 void FMPThread::AttachGtaThread(char *s_name)
 {
-	debug("FMPThread::AttachGtaThread called");
+	Debug("FMPThread::AttachGtaThread called");
 
 	while(*(PDWORD)ADDRESS_ACTIVE_THREAD == 0) Sleep(1);
 
@@ -79,12 +79,12 @@ void FMPThread::AttachGtaThread(char *s_name)
 	*(PDWORD)ADDRESS_SCRIPTS_COUNT = ScriptsCount + 1;
 
 	m_context.nThreadId = value;
-	debug("FMPThread::AttachGtaThread complete");
+	Debug("FMPThread::AttachGtaThread complete");
 }
 
 ThreadStates FMPThread::Reset(unsigned int hash,int v2,int i3)
 {
-	debug("FMPThread::reset called");
+	Debug("FMPThread::reset called");
 	m_context.dwOpcodeOff = 0;
 	m_context.field_10 = 0;
 	m_context.nStackOff = 0;
@@ -100,13 +100,13 @@ ThreadStates FMPThread::Reset(unsigned int hash,int v2,int i3)
 	m_pszExitMessage = "Normal exit";
 	m_bCanBePaused = true;
 
-	debug("FMPThread::reset complete");
+	Debug("FMPThread::reset complete");
 	return m_context.eThreadState;
 }
 
 ThreadStates FMPThread::Run(int i1)
 {
-	debug("FMPThread::run called");
+	Debug("FMPThread::run called");
 
 	scrThread* oldThread = GetActiveThread();
 	SetActiveThread(this);
@@ -117,7 +117,7 @@ ThreadStates FMPThread::Run(int i1)
 	}
 
 	SetActiveThread(oldThread);
-	debug("FMPThread::run complete");
+	Debug("FMPThread::run complete");
 	return m_context.eThreadState;
 }
 
@@ -146,14 +146,14 @@ FMPThread::FMPThread()
 
 FMPThread::~FMPThread()
 {
-	debug("FMPThread::~FMPThread called");
+	Debug("FMPThread::~FMPThread called");
 	if(m_pOriginalThread != NULL) Kill();
-	debug("FMPThread::~FMPThread complete");
+	Debug("FMPThread::~FMPThread complete");
 }
 
 void FMPThread::Kill()
 {
-	debug("FMPThread::Kill called");
+	Debug("FMPThread::Kill called");
 	sysArray<GtaThread>* nowThreads = GetThreadsArray();
 	nowThreads->pData[m_nThreadIndex] = m_pOriginalThread;
 
@@ -162,5 +162,5 @@ void FMPThread::Kill()
 
 	m_pOriginalThread = NULL;
 	m_nThreadIndex = -1;
-	debug("FMPThread::Kill complete");
+	Debug("FMPThread::Kill complete");
 }

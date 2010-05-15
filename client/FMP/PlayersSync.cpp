@@ -16,13 +16,12 @@ void SetActiveThread(scrThread* thread);
 extern FMPHook HOOK;
 extern short MyID;
 
-void FMPHook::PlayerConnect(char *name, int index, int model, float x, float y, float z)
+void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float x, float y, float z)
 {
 	Debug("PlayerConnect: %s", "Start");
 	Log("ConnectInfo: %s %d 0x%x %f %f %f", name, index, model, x, y, z);
 	if(MyID == index) // My connect
 	{
-		gPlayer[index].LocalPlayer = 1;
 		//gPlayer[index].model = model;
 		/*Log("Local player %d", IsThisModelAPed((eModel)model));
 		RequestModel((eModel)model);
@@ -41,8 +40,6 @@ void FMPHook::PlayerConnect(char *name, int index, int model, float x, float y, 
 	}
 	else // Other player connect
 	{
-		gPlayer[index].LocalPlayer = 0;
-		
 		/*RequestModel((eModel)model);
 		Debug("PlayerConnect: %s", "RequestModel");
 		while(!HasModelLoaded((eModel)model)) wait(1);

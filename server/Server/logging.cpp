@@ -52,7 +52,6 @@ void debug(const char *string, ...)
 		vfprintf(f, string, arglist);
 		fprintf(f, "\n");
 		fclose(f);
-
 		free(tempstring);
 	#endif
     va_end(arglist); 
