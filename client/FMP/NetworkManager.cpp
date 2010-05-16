@@ -5,16 +5,17 @@
 #include "NetworkManager.h"
 #include "main.h"
 #include "log.h"
+#include "ClientCore.h"
 #include "Hook/classes.h"
 #include "masterserver.h"
 #include "chat.h"
 #include "d3d9/gui.h"
 
+extern ClientCore client;
 extern FMPHook HOOK;
 extern FMPGUI Gui;
 
 extern ClientState clientstate;
-extern short MyID;
 extern unsigned char selectedplayerclass;
 extern int LastUpdate;
 extern char enterMsg[256];
@@ -248,14 +249,15 @@ void NetworkManager::SendClientConnectionRequest(void)
 	NetworkPlayerConnectionRequestData data;
 	data.protocol = PROTOCOL_VERSION;
 	strcpy(data.name, Conf.Name);
+	data.sessionkey = client.GetSessionKey();
 	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionRequest", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerMove(const float speed)
 {
 	NetworkPlayerMoveData data;
-	memcpy(data.position, gPlayer[MyID].position, sizeof(float) * 3);
-	data.angle = gPlayer[MyID].angle;
+	memcpy(data.position, gPlayer[client.GetIndex()].position, sizeof(float) * 3);
+	data.angle = gPlayer[client.GetIndex()].angle;
 	data.speed = speed;
 	rpc3->CallCPP("&NetworkManager::RecievePlayerMove", serverid, data, rpc3);
 }
@@ -269,14 +271,14 @@ void NetworkManager::SendPlayerJump(void)
 void NetworkManager::SendPlayerDuck(void)
 {
 	NetworkPlayerDuckData data;
-	data.shouldduck = gPlayer[MyID].isducking;
+	data.shouldduck = gPlayer[client.GetIndex()].isducking;
 	rpc3->CallCPP("&NetworkManager::RecievePlayerDuck", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerEntranceInVehicle(const char seat)
 {
 	NetworkPlayerEntranceInVehicleData data;
-	data.vehicleindex = gPlayer[MyID].vehicleindex;
+	data.vehicleindex = gPlayer[client.GetIndex()].vehicleindex;
 	data.seat = seat;
 	rpc3->CallCPP("&NetworkManager::RecievePlayerEntranceInVehicle", serverid, data, rpc3);
 }
@@ -297,7 +299,7 @@ void NetworkManager::SendPlayerFire(const float position[3], const int time, con
 {
 	NetworkPlayerFireData data;
 	memcpy(data.position, position, sizeof(float) * 3);
-	data.weapon = gPlayer[MyID].currentweapon;
+	data.weapon = gPlayer[client.GetIndex()].currentweapon;
 	data.time = time;
 	data.target = target;
 	data.health = health;
@@ -309,7 +311,7 @@ void NetworkManager::SendPlayerAim(const float position[3], const int time)
 {
 	NetworkPlayerAimData data;
 	memcpy(data.position, position, sizeof(float) * 3);
-	data.weapon = gPlayer[MyID].currentweapon;
+	data.weapon = gPlayer[client.GetIndex()].currentweapon;
 	data.time = time;
 	rpc3->CallCPP("&NetworkManager::RecievePlayerAim", serverid, data, rpc3);
 }
@@ -317,15 +319,15 @@ void NetworkManager::SendPlayerAim(const float position[3], const int time)
 void NetworkManager::SendPlayerWeaponChange(void)
 {
 	NetworkPlayerWeaponChangeData data;
-	data.weapon = gPlayer[MyID].currentweapon;
+	data.weapon = gPlayer[client.GetIndex()].currentweapon;
 	rpc3->CallCPP("&NetworkManager::RecievePlayerWeaponChange", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerHealthAndArmorChange(void)
 {
 	NetworkPlayerHealthAndArmorChangeData data;
-	data.health = gPlayer[MyID].health;
-	data.armor = gPlayer[MyID].armor;
+	data.health = gPlayer[client.GetIndex()].health;
+	data.armor = gPlayer[client.GetIndex()].armor;
 	rpc3->CallCPP("&NetworkManager::RecievePlayerHealthAndArmorChange", serverid, data, rpc3);
 }
 
@@ -340,7 +342,7 @@ void NetworkManager::SendPlayerSpawnRequest(void)
 void NetworkManager::SendPlayerModelChange(void)
 {
 	NetworkPlayerModelChangeData data;
-	data.model = gPlayer[MyID].model;
+	data.model = gPlayer[client.GetIndex()].model;
 	rpc3->CallCPP("&NetworkManager::RecievePlayerModelChange", serverid, data, rpc3);
 	Log("Player model change has been sent.");
 }
@@ -348,8 +350,8 @@ void NetworkManager::SendPlayerModelChange(void)
 void NetworkManager::SendPlayerComponentsChange(void)
 {
 	NetworkPlayerComponentsChangeData data;
-	memcpy(data.compD, gPlayer[MyID].compD, sizeof(int) * 11);
-	memcpy(data.compT, gPlayer[MyID].compT, sizeof(int) * 11);
+	memcpy(data.compD, gPlayer[client.GetIndex()].compD, sizeof(int) * 11);
+	memcpy(data.compT, gPlayer[client.GetIndex()].compT, sizeof(int) * 11);
 	rpc3->CallCPP("&NetworkManager::RecievePlayerComponentsChange", serverid, data, rpc3);
 }
 
@@ -420,9 +422,13 @@ void NetworkManager::RecieveClientConnectionError(NetworkPlayerConnectionErrorDa
 
 void NetworkManager::RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 *serverrpc3)
 {
+	if (data.sessionkey != client.GetSessionKey())
+	{
+		return;
+	}
 	clientid.localSystemAddress = data.index + 1;
 	this->SetNetworkID(clientid);
-	MyID = data.index;
+	client.SetIndex(data.index);
 }
 
 void NetworkManager::RecieveClientDisconnection(NetworkPlayerDisconnectionData data, RakNet::RPC3 *serverrpc3)
