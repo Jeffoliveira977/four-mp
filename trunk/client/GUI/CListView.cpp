@@ -40,6 +40,7 @@ CListView::CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Colum
 
 void CListView::Draw()
 {
+	EnterCriticalSection(&cs);
 	CPos Pos = *GetRelPos();
 	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 
@@ -99,6 +100,7 @@ void CListView::Draw()
 	}
 
 	pSlider->Draw( Pos );
+	LeaveCriticalSection(&cs);
 }	
 
 void CListView::PreDraw()
@@ -162,6 +164,8 @@ int CListView::GetSize(int Index)
 void CListView::PutStr( std::string sString, int Column, int Row, std::string sHelp )
 {
 	if(Column < 0 || Column >= Count) return;
+	EnterCriticalSection(&cs);
+
 	if(Row >= static_cast<int>( m_vRows[Column].size() ) || Row == -1)
 	{
 		pSlider->SetMaxValue( m_vRows[Column].size() );
@@ -173,6 +177,8 @@ void CListView::PutStr( std::string sString, int Column, int Row, std::string sH
 		m_vRows[Column][Row] = sString;
 		m_vRowsHelp[Row] = sHelp;
 	}
+
+	LeaveCriticalSection(&cs);
 }
 
 std::string CListView::GetStr( int Row, int Column )
@@ -186,6 +192,7 @@ std::string CListView::GetStr( int Row, int Column )
 
 void CListView::SetTitle( std::string sString, int Column )
 {
+	EnterCriticalSection(&cs);
 	if(Column == -1)
 	{
 		mTitles.push_back(sString);
@@ -194,12 +201,15 @@ void CListView::SetTitle( std::string sString, int Column )
 	{
 		mTitles[Column] = sString;
 	}
+	LeaveCriticalSection(&cs);
 }
 
 void CListView::Clear()
 {
+	EnterCriticalSection(&cs);
 	for(int i = 0; i < Count; i++)
 		while(!m_vRows[i].empty()) m_vRows[i].clear();
+	LeaveCriticalSection(&cs);
 }
 
 void CListView::UpdateTheme( int iIndex )

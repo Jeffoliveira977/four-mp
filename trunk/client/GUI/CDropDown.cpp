@@ -86,7 +86,7 @@ bool CDropDown::MouseMove( CMouse * pMouse, bool over )
 	else iHeight = 0;
 
 	bool inArea = over;
-	if(vp.Height < Pos.GetY()+GetHeight()+iHeight && m_bDropped)
+	if(vp.Height < (DWORD)Pos.GetY()+GetHeight()+iHeight && m_bDropped)
 		inArea &= pMouse->InArea( Pos.GetX(), Pos.GetY()-iHeight, GetWidth(), iHeight + GetHeight() );
 	else
 		inArea &= pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), iHeight + GetHeight() );
@@ -94,7 +94,7 @@ bool CDropDown::MouseMove( CMouse * pMouse, bool over )
 
 	if( GetMouseOver() )
 	{
-		if(vp.Height < Pos.GetY()+GetHeight()+iHeight)
+		if(vp.Height < (DWORD)Pos.GetY()+GetHeight()+iHeight)
 		{
 			for( int iIndex = 0; iIndex < static_cast<int>( m_vEntrys.size() ); iIndex++ )
 			{
