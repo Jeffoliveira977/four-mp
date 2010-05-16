@@ -67,18 +67,12 @@ void FMPThread::AttachGtaThread(char *s_name)
 	Reset(hash,NULL,0);
 
 	// Забираем ид потока..
-	unsigned int value;
-	value = *(PDWORD)ADDRESS_THREAD_ID;
-	*(PDWORD)ADDRESS_THREAD_ID = value + 1;
+	m_context.nThreadId = *(PDWORD)ADDRESS_THREAD_ID;
+	*(PDWORD)ADDRESS_THREAD_ID = m_context.nThreadId + 1;
 
 	// Говорим игре что у нас есть ещё 1 скрипт 
+	*(PDWORD)ADDRESS_SCRIPTS_COUNT++;
 
-	DWORD ScriptsCount;
-	ScriptsCount = *(PDWORD)ADDRESS_SCRIPTS_COUNT;
-
-	*(PDWORD)ADDRESS_SCRIPTS_COUNT = ScriptsCount + 1;
-
-	m_context.nThreadId = value;
 	Debug("FMPThread::AttachGtaThread complete");
 }
 

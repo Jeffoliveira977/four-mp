@@ -32,7 +32,7 @@ void CEditBox::Draw()
 	SElementState * pState = GetElementState();
 	std::string DataString;
 	if(!Hide) DataString = GetString();
-	else for(int i = 0; i < GetString().size(); i++) DataString.push_back('*');
+	else for(int i = 0; i < (int)GetString().size(); i++) DataString.push_back('*');
 
 	if( pState )
 	{

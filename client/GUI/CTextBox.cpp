@@ -18,6 +18,7 @@ CTextBox::CTextBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 
 void CTextBox::Draw()
 {
+	EnterCriticalSection(&cs);
 	CPos Pos = *GetRelPos();
 	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 	pGui->DrawOutlinedBox( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight(), pInner->GetD3DCOLOR(), pBorder->GetD3DCOLOR() );
@@ -30,6 +31,7 @@ void CTextBox::Draw()
 			iHeight += iAddHeight;
 		}
 	pSlider->Draw( Pos );
+	LeaveCriticalSection(&cs);
 }
 
 void CTextBox::PreDraw()
@@ -64,6 +66,7 @@ void CTextBox::AddString( std::string sString )
 	if( !sString.length() )
 		return;
 
+	EnterCriticalSection(&cs);
 	std::vector<std::string> vPending;
 	int iLength = static_cast<int>( sString.length() );
 	for( int i = iLength - 1; i > 0; i-- )
@@ -111,11 +114,14 @@ void CTextBox::AddString( std::string sString )
 	for( std::vector<std::string>::reverse_iterator iIter = vPending.rbegin(); iIter != vPending.rend(); iIter++ )
 		AddString( *iIter );
 
+	LeaveCriticalSection(&cs);
 }
 
 void CTextBox::Clear()
 {
+	EnterCriticalSection(&cs);
 	m_vStrings.clear();
+	LeaveCriticalSection(&cs);
 }
 
 void CTextBox::UpdateTheme( int iIndex )
@@ -145,6 +151,8 @@ int CTextBox::GetMaxStrings()
 
 void CTextBox::RemoveStrings(int Row, int Count)
 {
+	EnterCriticalSection(&cs);
 	if((int)m_vStrings.size() > Row)
 		m_vStrings.erase(m_vStrings.begin()+Row, (!Count?m_vStrings.end():m_vStrings.begin()+Row+Count));
+	LeaveCriticalSection(&cs);
 }
