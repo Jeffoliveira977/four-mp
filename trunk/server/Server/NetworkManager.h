@@ -119,6 +119,7 @@ private:
 	void HandleRPCData(const NetworkRPCType type, const NetworkRPCUnion *data);
 	void FreeRPCBuffer(void);
 	short RegisterNewClient(const SystemAddress address);
+	void HandleClientDisconnection(const SystemAddress address);
 	short GetClientIndex(const SystemAddress address);
 	short GetClientFreeSlot(void);
 	void SendConnectionError(const SystemAddress address, const NetworkPlayerConnectionError error);

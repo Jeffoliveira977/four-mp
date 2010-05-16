@@ -112,39 +112,14 @@ void NetworkManager::Tick(void)
 				debug("New connection from %s:%d", pack->systemAddress.ToString(0), pack->systemAddress.port);
 				break;
 			}
-		case (ID_DISCONNECTION_NOTIFICATION || ID_CONNECTION_LOST):
+		case ID_DISCONNECTION_NOTIFICATION:
 			{
-				short client = this->GetClientIndex(pack->systemAddress);
-				if (client != INVALID_PLAYER_INDEX)
-				{
-					if ((client < 0) || (client >= playm.playerbuffersize))
-					{
-						break;
-					}
-					if (playm.playerbuffer[client] == NULL)
-					{
-						break;
-					}
-					vmm.OnPlayerDisconnect(client);
-					PrintToServer("Player %s disconnected", playm.playerbuffer[client]->name);
-					delete playm.playerbuffer[client];
-					playm.playerbuffer[client] = NULL;
-					playm.numplayers--;
-					if ((client < 0) && (client >= clientbuffersize))
-					{
-						break;
-					}
-					if (clientbuffer[client] == NULL)
-					{
-						break;
-					}
-					delete clientbuffer[client];
-					clientbuffer[client] = NULL;
-					NetworkPlayerDisconnectionData data;
-					data.client = client;
-					this->SendDataToAll("&NetworkManager::RecieveClientDisconnection", &data);
-					this->UpdateServerInfo();
-				}
+				this->HandleClientDisconnection(pack->systemAddress);
+				break;
+			}
+		case ID_CONNECTION_LOST:
+			{
+				this->HandleClientDisconnection(pack->systemAddress);
 				break;
 			}
 		}
@@ -1031,6 +1006,42 @@ short NetworkManager::RegisterNewClient(const SystemAddress address)
 	clientbuffer[index]->address = address;
 	clientbuffer[index]->id.localSystemAddress = index + 1;
 	return index;
+}
+
+void NetworkManager::HandleClientDisconnection(const SystemAddress address)
+{
+	short client = this->GetClientIndex(address);
+	if (client == INVALID_PLAYER_INDEX)
+	{
+		return;
+	}
+	if ((client < 0) || (client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[client] == NULL)
+	{
+		return;
+	}
+	vmm.OnPlayerDisconnect(client);
+	PrintToServer("Player %s disconnected", playm.playerbuffer[client]->name);
+	delete playm.playerbuffer[client];
+	playm.playerbuffer[client] = NULL;
+	playm.numplayers--;
+	if ((client < 0) && (client >= clientbuffersize))
+	{
+		return;
+	}
+	if (clientbuffer[client] == NULL)
+	{
+		return;
+	}
+	delete clientbuffer[client];
+	clientbuffer[client] = NULL;
+	NetworkPlayerDisconnectionData data;
+	data.client = client;
+	this->SendDataToAll("&NetworkManager::RecieveClientDisconnection", &data);
+	this->UpdateServerInfo();
 }
 
 short NetworkManager::GetClientIndex(const SystemAddress address)
