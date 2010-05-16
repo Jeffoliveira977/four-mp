@@ -8,7 +8,7 @@ extern DWORD dwLoadOffset;
 int GetNativeAddressByHash(unsigned int a1)
 {
 	if(a1 == -1) return 0;
-	Debug("# GetNativeAddress: 0x%x , natives count: %d",a1,*(DWORD*)(0x18DF6EC+dwLoadOffset));
+	//Debug("# GetNativeAddress: 0x%x , natives count: %d",a1,*(DWORD*)(0x18DF6EC+dwLoadOffset));
 
 	DWORD pointer1 = *(DWORD*)SCRIPT_POINTER_1;
 	DWORD pointer2 = *(DWORD*)SCRIPT_POINTER_2;
@@ -44,6 +44,6 @@ int GetNativeAddressByHash(unsigned int a1)
 		return 0;
 	}
 	int addr = (int)(*(DWORD*)(pointer2 + (8 * v3) + 4));
-	Debug("# addr = 0x%x",addr);
+	//Debug("# addr = 0x%x",addr);
 	return addr;
 }

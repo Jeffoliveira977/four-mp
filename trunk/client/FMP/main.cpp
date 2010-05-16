@@ -22,6 +22,7 @@
 #include "Hook\scripting.h"
 #include "functions.h"
 #include "main.h"
+#include "ClientCore.h"
 #include "NetworkManager.h"
 #include "Check\check.h"
 #include "..\..\Shared\Console\ConsoleCore.h"
@@ -32,6 +33,7 @@
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                     Потоки для работы с игрой                                         */
 /* ----------------------------------------------------------------------------------------------------- */
+ClientCore client;
 FMPHook HOOK;
 HANDLE MainThreadHandle, NetworkThreadHandle;
 
@@ -42,7 +44,6 @@ FMPGUI Gui;
 ConsoleWindow conwindow;
 
 ClientState clientstate;
-short MyID = -1;
 int LastUpdate = 0;
 bool myEnter = 0;
 bool cheats = 0;
@@ -299,6 +300,7 @@ void FMPHook::RunMP()
 void FMPHook::GameThread()
 {
 	Debug("GameThread");
+	client.Load();
 	Natives::AddHospitalRestart(0,0,0,0,1000);
 	Natives::AddHospitalRestart(0,0,100,0,1001);
 	Natives::AddHospitalRestart(0,0,0,90,1002);
@@ -315,19 +317,17 @@ void FMPHook::GameThread()
 	
 	while(IsThreadAlive() && clientstate.game != GameStateExiting)
 	{
-		//player_dump();
-		//car_dump();
 
 		// Sync
-		for(int i = 0; i < MAX_PLAYERS; i++)
+		for(short i = 0; i < MAX_PLAYERS; i++)
 		{
 			if(!gPlayer[i].connected) continue;
-			if(gPlayer[i].PedID == 0 && gPlayer[i].model != 0)
+			if ((gPlayer[i].PedID == 0) && (gPlayer[i].model != 0))
 			{
 				Natives::RequestModel((eModel)gPlayer[i].model);
 				while(!Natives::HasModelLoaded((eModel)gPlayer[i].model)) wait(1);
 
-				if(i == MyID)
+				if(i == client.GetIndex())
 				{
 					Log("Change me");
 					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[i].model);
@@ -342,7 +342,7 @@ void FMPHook::GameThread()
 					Natives::CreateChar(1, (eModel)gPlayer[i].model, gPlayer[i].position[0], gPlayer[i].position[1], 
 						gPlayer[i].position[2], &gPlayer[i].PedID, 1);
 
-					while(Natives::DoesCharExist(gPlayer[i].PedID)) wait(1);
+					while(!Natives::DoesCharExist(gPlayer[i].PedID)) wait(1);
 
 					Natives::SetCharDefaultComponentVariation(gPlayer[i].PedID);
 					Natives::GivePedFakeNetworkName(gPlayer[i].PedID, gPlayer[i].name, gPlayer[i].color[1],
@@ -384,7 +384,7 @@ void FMPHook::GameThread()
 				Natives::SetPlayerControl(_GetPlayer(), 0);
 				if(GetAsyncKeyState(VK_SHIFT) != 0)
 				{
-					gPlayer[MyID].model = pClass[selectedplayerclass].model;	
+					gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;	
 					Natives::SetPlayerControl(_GetPlayer(), 1);
 					clientstate.game = GameStateInGame;
 					if(Conf.ComponentSelect == 1) clientstate.game = GameStateComponentSelect;
@@ -399,12 +399,12 @@ void FMPHook::GameThread()
 					selectedplayerclass++;
 					if(selectedplayerclass == Conf.NumSkins)
 						selectedplayerclass = 0;
-					gPlayer[MyID].model = pClass[selectedplayerclass].model;
+					gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;
 					nm.SendPlayerModelChange();
 					
-					Natives::RequestModel((eModel)gPlayer[MyID].model);
-					while(!Natives::HasModelLoaded((eModel)gPlayer[MyID].model)) wait(1);
-					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
+					Natives::RequestModel((eModel)gPlayer[client.GetIndex()].model);
+					while(!Natives::HasModelLoaded((eModel)gPlayer[client.GetIndex()].model)) wait(1);
+					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[client.GetIndex()].model);
 					Natives::SetCharDefaultComponentVariation(_GetPlayerPed());
 
 					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
@@ -419,12 +419,12 @@ void FMPHook::GameThread()
 					{
 						selectedplayerclass--;
 					}
-					gPlayer[MyID].model = pClass[selectedplayerclass].model;
+					gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;
 					nm.SendPlayerModelChange();
 					
-					Natives::RequestModel((eModel)gPlayer[MyID].model);
-					while(!Natives::HasModelLoaded((eModel)gPlayer[MyID].model)) wait(1);
-					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[MyID].model);
+					Natives::RequestModel((eModel)gPlayer[client.GetIndex()].model);
+					while(!Natives::HasModelLoaded((eModel)gPlayer[client.GetIndex()].model)) wait(1);
+					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[client.GetIndex()].model);
 					Natives::SetCharDefaultComponentVariation(_GetPlayerPed());
 
 					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
@@ -441,8 +441,8 @@ void FMPHook::GameThread()
 
 					for(int i = 0; i < 11; i++)
 					{
-						gPlayer[MyID].compD[i] = Natives::GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)i);
-						gPlayer[MyID].compT[i] = Natives::GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)i);
+						gPlayer[client.GetIndex()].compD[i] = Natives::GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)i);
+						gPlayer[client.GetIndex()].compT[i] = Natives::GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)i);
 					}
 					nm.SendPlayerComponentsChange();
 					nm.SendPlayerSpawnRequest();
@@ -489,17 +489,18 @@ void FMPHook::GameThread()
 			}
 		case GameStateInGame:
 			{
-				if(GetTickCount() - LastUpdate > 60*1000)
-				{
-					// Disconnect: Not info from server
-					Natives::PrintStringWithLiteralStringNow("STRING", "SERVER NOT SEND INFO TO YOU", 5000, 1);
-				}
+
+				//if(GetTickCount() - LastUpdate > 60*1000)
+				//{
+				//	// Disconnect: Not info from server
+				//	Natives::PrintStringWithLiteralStringNow("STRING", "SERVER NOT SEND INFO TO YOU", 5000, 1);
+				//}
 				MoveSync();
 				CarDoSync();
 				GunSync();
 				StatusSync();
 
-				gPlayer[MyID].last_active = GetTickCount();
+				gPlayer[client.GetIndex()].last_active = GetTickCount();
 				break;
 			}
 		}

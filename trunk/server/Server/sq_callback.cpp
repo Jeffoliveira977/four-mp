@@ -106,7 +106,7 @@ void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex, const unsigned cha
 
 bool sc_OnPlayerText(HSQUIRRELVM v, const short playerindex, const char *text)
 {
-	int result;
+	int result = 1;
 	int top = sq_gettop(v); 
 	sq_pushroottable(v);
 	sq_pushstring(v,_SC("OnPlayerText"),-1);

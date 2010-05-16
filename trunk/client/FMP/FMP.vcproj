@@ -187,6 +187,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ClientCore.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ConsoleWindow.cpp"
 				>
 			</File>
@@ -274,6 +278,10 @@
 			>
 			<File
 				RelativePath=".\chat.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ClientCore.h"
 				>
 			</File>
 			<File

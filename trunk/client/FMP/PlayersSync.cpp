@@ -8,20 +8,22 @@
 #include "functions.h"
 #include "structs.h"
 #include "main.h"
+#include "ClientCore.h"
 #include "hook\classes.h"
 
 scrThread* GetActiveThread();
 void SetActiveThread(scrThread* thread);
 
+extern ClientCore client;
 extern FMPHook HOOK;
-extern short MyID;
 
 void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float x, float y, float z)
 {
 	Debug("PlayerConnect: %s", "Start");
 	Log("ConnectInfo: %s %d 0x%x %f %f %f", name, index, model, x, y, z);
-	if(MyID == index) // My connect
+	if(client.GetIndex() == index) // My connect
 	{
+		Debug("Our PlayerConnect");
 		//gPlayer[index].model = model;
 		/*Log("Local player %d", IsThisModelAPed((eModel)model));
 		RequestModel((eModel)model);
@@ -40,6 +42,7 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float x
 	}
 	else // Other player connect
 	{
+		Debug("Other player connect");
 		/*RequestModel((eModel)model);
 		Debug("PlayerConnect: %s", "RequestModel");
 		while(!HasModelLoaded((eModel)model)) wait(1);
@@ -223,7 +226,7 @@ void FMPHook::PlayerSyncSkin(int player, int skin)
 {
 	Log("Player Sync Skin START");
 	//Totally bug here.
-	if(player == MyID)
+	if(player == client.GetIndex())
 	{
 		Natives::RequestModel((eModel)skin);
 		while(!Natives::HasModelLoaded((eModel)skin)) wait(0);

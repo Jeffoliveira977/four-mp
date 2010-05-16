@@ -15,9 +15,9 @@ extern NetworkManager nm;
 
 ClientCore::ClientCore(void)
 {
+	strcpy(name, "unnamed");
 	index = -1; // Should be defined in PlayerManager.h
 	isrunning = false;
-	strcpy(name, "unnamed");
 	sessionkey = 0;
 }
 
@@ -81,7 +81,7 @@ short ClientCore::GetIndex(void)
 	return index;
 }
 
-bool ClientCore::SetIndex(short i)
+bool ClientCore::SetIndex(const short i)
 {
 	index = i;
 	return true;
