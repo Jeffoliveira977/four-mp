@@ -109,11 +109,11 @@ void FMPHook::CreateCar(int id, int model, float x, float y, float z, float r, i
 {
 	Log("CREATE CAR %d", id);
 
-	/*RequestModel((eModel)model);
-	while(!HasModelLoaded((eModel)model)) wait(0);
+	Natives::RequestModel((eModel)model);
+	while(!Natives::HasModelLoaded((eModel)model)) wait(0);
 	Log("Model LOADED");
-	::CreateCar(model, x, y, z, &gCar[id].CarID, 1);
-	SetCarHeading(gCar[id].CarID, r);*/
+	Natives::CreateCar(model, x, y, z, &gCar[id].CarID, 1);
+	Natives::SetCarHeading(gCar[id].CarID, r);
 	gCar[id].exist = 1;
 	gCar[id].model = model;
 	gCar[id].position[0] = x;
@@ -318,7 +318,7 @@ void FMPHook::GameThread()
 	{
 		nm.Tick();
 		// Sync
-		for(short i = 0; i < MAX_PLAYERS; i++)
+		/*for(short i = 0; i < MAX_PLAYERS; i++)
 		{
 			if(!gPlayer[i].connected) continue;
 			if ((gPlayer[i].PedID == 0) && (gPlayer[i].model != 0))
@@ -361,7 +361,7 @@ void FMPHook::GameThread()
 				Natives::CreateCar(gCar[i].model, gCar[i].position[0], gCar[i].position[1], gCar[i].position[2], &gCar[i].CarID, 1);
 				Natives::SetCarHeading(gCar[i].CarID, gCar[i].angle);
 			}
-		}
+		}*/
 
 
 		switch (clientstate.game)
