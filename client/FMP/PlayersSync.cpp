@@ -24,18 +24,18 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float x
 	if(client.GetIndex() == index) // My connect
 	{
 		Debug("Our PlayerConnect");
-		//gPlayer[index].model = model;
-		/*Log("Local player %d", IsThisModelAPed((eModel)model));
-		RequestModel((eModel)model);
+		gPlayer[index].model = model;
+		Log("Local player %d", Natives::IsThisModelAPed((eModel)model));
+		Natives::RequestModel((eModel)model);
 		Debug("PlayerConnect: %s", "RequestModel");
-		while(!HasModelLoaded((eModel)model)) Sleep(1);
+		while(!Natives::HasModelLoaded((eModel)model)) Sleep(1);
 		Debug("PlayerConnect: %s", "ModelLoaded");
-		ChangePlayerModel(_GetPlayer(), (eModel)model);
-		Debug("PlayerConnect: %s", "ChangeModel");*/
-		//GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
-		/*SetCharDefaultComponentVariation(gPlayer[index].PedID());
-		SetCharCoordinates(gPlayer[index].PedID(), x, y, z);
-		Debug("PlayerConnect: %s", "SetCoords");*/
+		Natives::ChangePlayerModel(_GetPlayer(), (eModel)model);
+		Debug("PlayerConnect: %s", "ChangeModel");
+		Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
+		Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
+		Natives::SetCharCoordinates(gPlayer[index].PedID, x, y, z);
+		Debug("PlayerConnect: %s", "SetCoords");
 		clientstate.game = GameStateInGame;
 		clientstate.input = InputStateGame;
 		HOOK.InputFreeze(0);
@@ -43,35 +43,35 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float x
 	else // Other player connect
 	{
 		Debug("Other player connect");
-		/*RequestModel((eModel)model);
+		Natives::RequestModel((eModel)model);
 		Debug("PlayerConnect: %s", "RequestModel");
-		while(!HasModelLoaded((eModel)model)) wait(1);
+		while(!Natives::HasModelLoaded((eModel)model)) wait(1);
 		Debug("PlayerConnect: %s", "ModelLoaded");
-		CreateChar(1, (eModel)model, x, y, z, &gPlayer[index].iPedID, 1);
-		while(DoesCharExist(gPlayer[index].PedID())) wait(1);
-		SetCharDefaultComponentVariation(gPlayer[index].PedID());
-		Log("MovePlayer %d(%d) = %d", index,DoesCharExist(gPlayer[index].PedID()),gPlayer[index].PedID());
+		Natives::CreateChar(1, (eModel)model, x, y, z, &gPlayer[index].PedID, 1);
+		while(Natives::DoesCharExist(gPlayer[index].PedID)) wait(1);
+		Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
+		Log("MovePlayer %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID),gPlayer[index].PedID);
 		Debug("PlayerConnect: %s", "CreateChar");
-		GivePedFakeNetworkName(gPlayer[index].PedID(), name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
-		Log("Player NAME: %s 0x%x%x%x alpha:%x",name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);*/
+		Natives::GivePedFakeNetworkName(gPlayer[index].PedID, name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
+		Log("Player NAME: %s 0x%x%x%x alpha:%x",name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
 	}
-	//AddArmourToChar(gPlayer[index].PedID(), gPlayer[index].armour);
-	/*gPlayer[index].model = model;
+	Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
+	gPlayer[index].model = model;
 	gPlayer[index].position[0] = x;
 	gPlayer[index].position[1] = y;
 	gPlayer[index].position[2] = z;
 
 	if(gPlayer[index].vehicleindex != -1)
 	{
-		if(gPlayer[index].seat_id == -1) TaskEnterCarAsDriver(gPlayer[index].PedID(), gCar[gPlayer[index].vehicleindex].CarID, 0);
-		else TaskEnterCarAsPassenger(gPlayer[index].PedID(), gCar[gPlayer[index].vehicleindex].CarID, 0, gPlayer[index].seat_id);
+		if(gPlayer[index].seatindex == -1) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gCar[gPlayer[index].vehicleindex].CarID, 0);
+		else Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gCar[gPlayer[index].vehicleindex].CarID, 0, gPlayer[index].seatindex);
 	}
 
 	for(int i = 0; i < 8; i++)
 	{
 		if(gPlayer[index].weapons[i] != 0 && gPlayer[index].ammo[i] > 0)
-			GiveWeaponToChar(gPlayer[index].PedID(), (eWeapon)gPlayer[index].weapons[i], gPlayer[index].ammo[i], 0);
-	}*/
+			Natives::GiveWeaponToChar(gPlayer[index].PedID, (eWeapon)gPlayer[index].weapons[i], gPlayer[index].ammo[i], 0);
+	}
 
 	strcpy(gPlayer[index].name, name);
 	gPlayer[index].last_active = GetTickCount();
