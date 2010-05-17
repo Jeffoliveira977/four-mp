@@ -661,7 +661,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			memcpy(gPlayer[data->playerconnection->index].weapons, data->playerconnection->weapons, sizeof(char) * 8);
 			memcpy(gPlayer[data->playerconnection->index].ammo, data->playerconnection->ammo, sizeof(short) * 8);
 			memcpy(gPlayer[data->playerconnection->index].color, data->playerconnection->color, sizeof(unsigned char) * 4);
-			HOOK.PlayerConnect(data->playerconnection->name, data->playerconnection->index, gPlayer[data->playerconnection->index].model, gPlayer[data->playerconnection->index].position[0], gPlayer[data->playerconnection->index].position[1], gPlayer[data->playerconnection->index].position[2]);
+			HOOK.PlayerConnect(data->playerconnection->name, data->playerconnection->index, gPlayer[data->playerconnection->index].model, gPlayer[data->playerconnection->index].position);
 			delete data->playerconnection;
 			break;
 		}
@@ -738,14 +738,14 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			memcpy(gPlayer[data->playerfullupdate->index].color, data->playerfullupdate->color, sizeof(unsigned char) * 4);
 
 			Log("Player full update. Name is %s", data->playerfullupdate->name);
-			HOOK.PlayerConnect(data->playerfullupdate->name, data->playerfullupdate->index, gPlayer[data->playerfullupdate->index].model, gPlayer[data->playerfullupdate->index].position[0], gPlayer[data->playerfullupdate->index].position[1], gPlayer[data->playerfullupdate->index].position[2]);
+			HOOK.PlayerConnect(data->playerfullupdate->name, data->playerfullupdate->index, gPlayer[data->playerfullupdate->index].model, gPlayer[data->playerfullupdate->index].position);
 			delete data->playerfullupdate;
 			break;
 		}
 	case NetworkRPCVehicleFullUpdate:
 		{
 			//TODO: Do NOT load at connect, redo the whole thing.
-			HOOK.CreateCar(data->vehiclefullupdate->index, data->vehiclefullupdate->model, data->vehiclefullupdate->position[0], data->vehiclefullupdate->position[1], data->vehiclefullupdate->position[2], data->vehiclefullupdate->angle, data->vehiclefullupdate->color[0], data->vehiclefullupdate->color[2]);
+			HOOK.CreateCar(data->vehiclefullupdate->index, data->vehiclefullupdate->model, data->vehiclefullupdate->position, data->vehiclefullupdate->angle, data->vehiclefullupdate->color);
 			delete data->vehiclefullupdate;
 			break;
 		}
@@ -843,7 +843,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		}
 	case NetworkRPCNewVehicle:
 		{
-			HOOK.CreateCar(data->newvehicle->index, data->newvehicle->model, data->newvehicle->position[0], data->newvehicle->position[1], data->newvehicle->position[2], data->newvehicle->angle, data->newvehicle->color[0], data->newvehicle->color[2]);
+			HOOK.CreateCar(data->newvehicle->index, data->newvehicle->model, data->newvehicle->position, data->newvehicle->angle, data->newvehicle->color);
 			delete data->newvehicle;
 			break;
 		}
