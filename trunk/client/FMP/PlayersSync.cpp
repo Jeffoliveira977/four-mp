@@ -108,15 +108,16 @@ void FMPHook::Duck(int player, bool duck)
 	gPlayer[player].isducking = duck;
 }
 
-void FMPHook::PlayerMove(int player, float x, float y, float z, float speed)
+void FMPHook::PlayerMove(short index, float position[3], float speed)
 {
 	Log("PlayerMOVE HOOK");
-	if(gPlayer[player].connected == 0) return;
+	Log("Index: %d, position: %f %f %f, speed: %f", index, position[0], position[1], position[2], speed);
+	if(gPlayer[index].connected == 0) return;
 	float lx,ly,lz;
-	Natives::GetCharCoordinates(gPlayer[player].PedID, &lx, &ly, &lz);
+	Natives::GetCharCoordinates(gPlayer[index].PedID, &lx, &ly, &lz);
 	Log("GETCOORD");
-	float d = GetDist(lx, ly, lz, x, y, z);
-	if(gPlayer[player].vehicleindex == -1) // Если пешком
+	float d = GetDist(lx, ly, lz, position[0], position[1], position[2]);
+	if(gPlayer[index].vehicleindex == -1) // Если пешком
 	{
 		Log("MovePlayer (HOOK) %s", "Start");
 		int ms = 4;
@@ -126,8 +127,8 @@ void FMPHook::PlayerMove(int player, float x, float y, float z, float speed)
 			ms = 2;
 			if(d > 10)
 			{
-				Natives::SetCharCoordinates(gPlayer[player].PedID, x, y, z);
-				Natives::SetCharHeading(gPlayer[player].PedID, gPlayer[player].angle);
+				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
+				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
 				Log("PORTAL or TIMESHIFT");
 			}
 		}
@@ -136,8 +137,8 @@ void FMPHook::PlayerMove(int player, float x, float y, float z, float speed)
 			ms = 3;
 			if(d > 20)
 			{
-				Natives::SetCharCoordinates(gPlayer[player].PedID, x, y, z);
-				Natives::SetCharHeading(gPlayer[player].PedID, gPlayer[player].angle);
+				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
+				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
 				Log("PORTAL or TIMESHIFT");
 			}
 		}
@@ -146,17 +147,15 @@ void FMPHook::PlayerMove(int player, float x, float y, float z, float speed)
 			ms = 4;
 			if(d > 30)
 			{
-				Natives::SetCharCoordinates(gPlayer[player].PedID, x, y, z);
-				Natives::SetCharHeading(gPlayer[player].PedID, gPlayer[player].angle);
+				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
+				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
 				Log("PORTAL or TIMESHIFT");
 			}
 		}
 		Log("MOVE %f=(%f) %d", speed, d, ms);
-		Natives::TaskGoStraightToCoord(gPlayer[player].PedID, x, y, z, ms, 45000);
+		Natives::TaskGoStraightToCoord(gPlayer[index].PedID, position[0], position[1], position[2], ms, 45000);
 		wait(1);
-		gPlayer[player].position[0] = x;
-		gPlayer[player].position[1] = y;
-		gPlayer[player].position[2] = z;
+		memcpy(gPlayer[index].position, position, sizeof(float) * 3);
 	}
 	else // Если на машине
 	{
@@ -164,13 +163,13 @@ void FMPHook::PlayerMove(int player, float x, float y, float z, float speed)
 		if(speed < 0) { vect = 2; speed = speed*-1; }
 		if(speed * 3 < d)
 		{
-			Natives::SetCharCoordinates(gPlayer[player].PedID, x, y, z);
-			Natives::SetCarHeading(gCar[gPlayer[player].vehicleindex].CarID, gCar[gPlayer[player].vehicleindex].angle);
+			Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
+			Natives::SetCarHeading(gCar[gPlayer[index].vehicleindex].CarID, gCar[gPlayer[index].vehicleindex].angle);
 		}
 
-		Natives::TaskCarDriveToCoord(gPlayer[player].PedID, gCar[gPlayer[player].vehicleindex].CarID, x, y, z, speed, vect, 2, 3, 2, 45000000);
+		Natives::TaskCarDriveToCoord(gPlayer[index].PedID, gCar[gPlayer[index].vehicleindex].CarID, position[0], position[1], position[2], speed, vect, 2, 3, 2, 45000000);
 	}
-	gPlayer[player].last_active = GetTickCount();
+	gPlayer[index].last_active = GetTickCount();
 }
 
 void FMPHook::PlayerDisconnect(int id)

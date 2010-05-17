@@ -173,7 +173,7 @@ public:
 	void PlayerConnect(char *name, short index, unsigned int model, float x, float y, float z);
 	void PlayerDisconnect(int id);
 	void ReCreatePlayer(int);
-	void PlayerMove(int, float, float, float, float);
+	void PlayerMove(short index, float position[3], float speed);
 	void Jump(int);
 	void Duck(int, bool);
 	void PlayerFireAim(int, int, int, float, float, float, bool);
