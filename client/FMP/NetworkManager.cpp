@@ -760,7 +760,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			memcpy(gPlayer[data->playermove->client].position, data->playermove->position, sizeof(float) * 3);
 			gPlayer[data->playermove->client].angle = data->playermove->angle;
 
-			HOOK.PlayerMove(data->playermove->client, data->playermove->position[0], data->playermove->position[1], data->playermove->position[2], data->playermove->speed);
+			HOOK.PlayerMove(data->playermove->client, data->playermove->position, data->playermove->speed);
 			delete data->playermove;
 			break;
 		}
