@@ -1,5 +1,6 @@
 #pragma once
 
+#include <windows.h>
 #include "NetworkIDObject.h"
 #include "NetworkIDManager.h"
 #include "../../Shared/RPC3/RPC3.h"
@@ -60,4 +61,65 @@ private:
 	SystemAddress serveraddress;
 	RakNet::RPC3 *rpc3;
 	RakPeerInterface *net;
+	enum NetworkRPCType
+	{
+		NetworkRPCPlayerConnection,
+		NetworkRPCPlayerConnectionError,
+		NetworkRPCPlayerInfo,
+		NetworkRPCPlayerDisconnection,
+		NetworkRPCPlayerFullUpdate,
+		NetworkRPCVehicleFullUpdate,
+		NetworkRPCPlayerMove,
+		NetworkRPCPlayerJump,
+		NetworkRPCPlayerDuck,
+		NetworkRPCPlayerEntranceInVehicle,
+		NetworkRPCPlayerCancelEntranceInVehicle,
+		NetworkRPCPlayerExitFromVehicle,
+		NetworkRPCPlayerFire,
+		NetworkRPCPlayerAim,
+		NetworkRPCPlayerWeaponChange,
+		NetworkRPCPlayerHealthAndArmorChange,
+		NetworkRPCPlayerSpawn,
+		NetworkRPCPlayerModelChange,
+		NetworkRPCPlayerComponentsChange,
+		NetworkRPCPlayerChat,
+		NetworkRPCNewVehicle
+	};
+	union NetworkRPCUnion
+	{
+		NetworkPlayerFullUpdateData *playerconnection;
+		NetworkPlayerConnectionErrorData *playerconnectionerror;
+		NetworkPlayerInfoData *playerinfo;
+		NetworkPlayerDisconnectionData *playerdisconnection;
+		NetworkPlayerFullUpdateData *playerfullupdate;
+		NetworkVehicleFullUpdateData *vehiclefullupdate;
+		NetworkPlayerMoveData *playermove;
+		NetworkPlayerJumpData *playerjump;
+		NetworkPlayerDuckData *playerduck;
+		NetworkPlayerEntranceInVehicleData *playerentranceinvehicle;
+		NetworkPlayerCancelEntranceInVehicleData *playercancelentranceinvehicle;
+		NetworkPlayerExitFromVehicleData *playerexitfromvehicle;
+		NetworkPlayerFireData *playerfire;
+		NetworkPlayerAimData *playeraim;
+		NetworkPlayerWeaponChangeData *playerweaponchange;
+		NetworkPlayerHealthAndArmorChangeData *playerhealthandarmorchange;
+		NetworkPlayerSpawnData *playerspawn;
+		NetworkPlayerModelChangeData *playermodelchange;
+		NetworkPlayerComponentsChangeData *playercomponentschange;
+		NetworkPlayerChatData *playerchat;
+		NetworkVehicleFullUpdateData *newvehicle;
+	};
+	struct NetworkRPCData
+	{
+		NetworkRPCType type;
+		NetworkRPCUnion data;
+	};
+	int maxrpcbuffersize;
+	int rpcbuffersize;
+	NetworkRPCData *rpcbuffer;
+	CRITICAL_SECTION rpcbuffersection;
+	template <typename DATATYPE>
+	void WriteToRPCBuffer(const NetworkRPCType type, const DATATYPE *data);
+	void HandleRPCData(const NetworkRPCType type, const NetworkRPCUnion *data);
+	void FreeRPCBuffer(void);
 };
