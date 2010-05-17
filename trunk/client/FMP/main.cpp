@@ -35,7 +35,7 @@
 /* ----------------------------------------------------------------------------------------------------- */
 ClientCore client;
 FMPHook HOOK;
-HANDLE MainThreadHandle, NetworkThreadHandle;
+HANDLE MainThreadHandle;
 
 ConsoleCore concore;
 NetworkManager nm;
@@ -44,7 +44,6 @@ FMPGUI Gui;
 ConsoleWindow conwindow;
 
 ClientState clientstate;
-int LastUpdate = 0;
 bool myEnter = 0;
 bool cheats = 0;
 unsigned char selectedplayerclass = 0;
@@ -153,7 +152,6 @@ void FMPHook::InputFreeze(bool e)
 
 void FMPHook::RunMP()
 {
-	LastUpdate = GetTickCount();
 	Log("Starting up multiplayer mode.");
 	//AllowEmergencyServices(0);
 	Natives::SetPedDensityMultiplier(0);
@@ -301,6 +299,7 @@ void FMPHook::GameThread()
 {
 	Debug("GameThread");
 	client.Load();
+	nm.Load();
 	Natives::AddHospitalRestart(0,0,0,0,1000);
 	Natives::AddHospitalRestart(0,0,100,0,1001);
 	Natives::AddHospitalRestart(0,0,0,90,1002);
@@ -317,7 +316,7 @@ void FMPHook::GameThread()
 	
 	while(IsThreadAlive() && clientstate.game != GameStateExiting)
 	{
-
+		nm.Tick();
 		// Sync
 		for(short i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -373,10 +372,10 @@ void FMPHook::GameThread()
 			}
 		case GameStateConnecting:
 			{
-				if(GetTickCount() - LastUpdate > 15*1000)
+				/*if(GetTickCount() - LastUpdate > 15*1000)
 				{
 					nm.ConnectToServer();
-				}
+				}*/
 				break;
 			}
 		case GameStateSkinSelect:
@@ -506,6 +505,7 @@ void FMPHook::GameThread()
 		}
 		wait(100);
 	}
+	nm.Unload();
 	Debug("Exit GameThread");
 }
 
@@ -536,20 +536,6 @@ void MainThread(void* dummy)
 	MainThreadHandle = NULL;
 }
 
-void NetworkThread(void *dummy)
-{
-	Debug("Network Thread");
-	nm.Load();
-	while (clientstate.game != GameStateExiting)
-	{
-		nm.Tick();
-	}
-	nm.Unload();
-	CloseHandle(NetworkThreadHandle);
-	NetworkThreadHandle = NULL;
-	Debug("Network thread has exited");
-}
-
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) 
 {
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
@@ -574,7 +560,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 			Debug("Set script hook");
 			DWORD threadId = 0; 
 			MainThreadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&MainThread, 0, 0, (LPDWORD)&threadId);
-			NetworkThreadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&NetworkThread, 0, 0, (LPDWORD)&threadId);
 		}
 		else
 			Log("This version not supported (%x)", dwGameVersion);
@@ -588,14 +573,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 			TerminateThread(MainThreadHandle, 1);
 			CloseHandle(MainThreadHandle);
 		}
-		if(NetworkThreadHandle != NULL)
-		{
-			TerminateThread(NetworkThreadHandle, 1);
-			CloseHandle(NetworkThreadHandle);
-		}
-
-		//while(NetworkThreadHandle != NULL) Sleep(10);
-
 		Debug("EXIT FMP");
 		CloseLogs();
 	}

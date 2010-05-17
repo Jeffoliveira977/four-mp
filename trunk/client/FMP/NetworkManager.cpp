@@ -4,6 +4,7 @@
 
 #include "NetworkManager.h"
 #include "main.h"
+#include "../../Shared/Console/common.h"
 #include "log.h"
 #include "ClientCore.h"
 #include "Hook/classes.h"
@@ -17,7 +18,6 @@ extern FMPGUI Gui;
 
 extern ClientState clientstate;
 extern unsigned char selectedplayerclass;
-extern int LastUpdate;
 extern char enterMsg[256];
 
 NetworkManager::NetworkManager(void)
@@ -25,6 +25,9 @@ NetworkManager::NetworkManager(void)
 	manager = NULL;
 	rpc3 = NULL;
 	net = NULL;
+	maxrpcbuffersize = 2147483647;
+	rpcbuffer = NULL;
+	rpcbuffersize = 0;
 }
 
 NetworkManager::~NetworkManager(void)
@@ -43,6 +46,7 @@ NetworkManager::~NetworkManager(void)
 	{
 		delete manager;
 	}
+	this->FreeRPCBuffer();
 }
 
 void NetworkManager::Load(void)
@@ -78,10 +82,12 @@ void NetworkManager::Load(void)
 	SocketDescriptor socketDescriptor(0,0);
 	net->Startup(1, 1, &socketDescriptor, 1);
 	net->AttachPlugin(rpc3);
+	InitializeCriticalSection(&rpcbuffersection);
 }
 
 void NetworkManager::Tick(void)
 {
+	EnterCriticalSection(&rpcbuffersection);
 	static Packet *pack;
 	for (pack = net->Receive(); pack; net->DeallocatePacket(pack), pack = net->Receive())
 	{
@@ -188,6 +194,17 @@ void NetworkManager::Tick(void)
 			} break;
 		}
 	}
+	if (rpcbuffer != NULL)
+	{
+		for (int i = 0; i < rpcbuffersize; i++)
+		{
+			this->HandleRPCData(rpcbuffer[i].type, &rpcbuffer[i].data);
+		}
+		free(rpcbuffer);
+		rpcbuffer = NULL;
+		rpcbuffersize = 0;
+	}
+	LeaveCriticalSection(&rpcbuffersection);
 }
 
 void NetworkManager::Unload(void)
@@ -208,6 +225,8 @@ void NetworkManager::Unload(void)
 		delete manager;
 		manager = NULL;
 	}
+	this->FreeRPCBuffer();
+	DeleteCriticalSection(&rpcbuffersection);
 }
 
 void NetworkManager::Ping(const char *hostname, const unsigned short port)
@@ -217,9 +236,6 @@ void NetworkManager::Ping(const char *hostname, const unsigned short port)
 
 void NetworkManager::ConnectToServer(const char *hostname, const unsigned short port)
 {
-	LastUpdate = GetTickCount();
-
-	// Коннект
 	Log("Connecting to server...");
 	if(clientstate.game == GameStateOffline)
 	{
@@ -364,64 +380,19 @@ void NetworkManager::SendPlayerChat(void)
 
 void NetworkManager::RecieveClientConnection(NetworkPlayerFullUpdateData data, RakNet::RPC3 *serverrpc3)
 {
-	Log("New player connection. Name is %s", data.name);
-	LastUpdate = GetTickCount();
-	gPlayer[data.index].model = data.model;
-	memcpy(gPlayer[data.index].position, data.position, sizeof(float) * 3);
-	gPlayer[data.index].angle = data.angle;
-	gPlayer[data.index].vehicleindex = data.vehicleindex;
-	gPlayer[data.index].seatindex = data.seatindex;
-	gPlayer[data.index].score = data.score;
-	gPlayer[data.index].health = data.health;
-	gPlayer[data.index].armor = data.armor;
-	gPlayer[data.index].room = data.room;
-	memcpy(gPlayer[data.index].weapons, data.weapons, sizeof(char) * 8);
-	memcpy(gPlayer[data.index].ammo, data.ammo, sizeof(short) * 8);
-	memcpy(gPlayer[data.index].color, data.color, sizeof(unsigned char) * 4);
-
-	HOOK.PlayerConnect(data.name, data.index, gPlayer[data.index].model, gPlayer[data.index].position[0], gPlayer[data.index].position[1], gPlayer[data.index].position[2]);
+	this->WriteToRPCBuffer(NetworkRPCPlayerConnection, &data);
 }
 
 void NetworkManager::RecieveClientConnectionError(NetworkPlayerConnectionErrorData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	switch (data.error)
-	{
-	case NetworkPlayerConnectionErrorServerFull:
-		{
-			PrintToConsole("Connection error: Server is full.");
-			break;
-		}
-	case NetworkPlayerConnectionErrorInvalidProtocol:
-		{
-			PrintToConsole("Connection error: Server is using different protocol.");
-			break;
-		}
-	case NetworkPlayerConnectionErrorInvalidName:
-		{
-			PrintToConsole("Connection error: Invalid user name.");
-			break;
-		}
-	case NetworkPlayerConnectionErrorAlreadyConnected:
-		{
-			PrintToConsole("Connection error: You are already connected.");
-			break;
-		}
-	case NetworkPlayerConnectionErrorAllocationError:
-		{
-			PrintToConsole("Connection error: Server was unable to allocate player resources.");
-			break;
-		}
-	case NetworkPlayerConnectionErrorScriptLock:
-		{
-			PrintToConsole("Connection error: Connection has been refused by a server script.");
-			break;
-		}
-	}
+	this->WriteToRPCBuffer(NetworkRPCPlayerConnectionError, &data);
 }
 
 void NetworkManager::RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 *serverrpc3)
 {
+	//this->WriteToRPCBuffer(NetworkRPCPlayerInfo, &data);
+	//Temp fix. Client should use rpc buffer and then send confirmation to the server.
+	//After that, server should send full update.
 	if (data.sessionkey != client.GetSessionKey())
 	{
 		return;
@@ -433,133 +404,570 @@ void NetworkManager::RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 
 
 void NetworkManager::RecieveClientDisconnection(NetworkPlayerDisconnectionData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.PlayerDisconnect(data.client);
+	this->WriteToRPCBuffer(NetworkRPCPlayerDisconnection, &data);
 }
 
 void NetworkManager::RecievePlayerFullUpdate(NetworkPlayerFullUpdateData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	//TODO: Do NOT load at connect, redo the whole thing.
-	gPlayer[data.index].model = data.model;
-	memcpy(gPlayer[data.index].position, data.position, sizeof(float) * 3);
-	gPlayer[data.index].angle = data.angle;
-	gPlayer[data.index].vehicleindex = data.vehicleindex;
-	gPlayer[data.index].seatindex = data.seatindex;
-	gPlayer[data.index].score = data.score;
-	gPlayer[data.index].health = data.health;
-	gPlayer[data.index].armor = data.armor;
-	gPlayer[data.index].room = data.room;
-	memcpy(gPlayer[data.index].weapons, data.weapons, sizeof(char) * 8);
-	memcpy(gPlayer[data.index].ammo, data.ammo, sizeof(short) * 8);
-	memcpy(gPlayer[data.index].color, data.color, sizeof(unsigned char) * 4);
-
-	Log("Player full update. Name is %s", data.name);
-	HOOK.PlayerConnect(data.name, data.index, gPlayer[data.index].model, gPlayer[data.index].position[0], gPlayer[data.index].position[1], gPlayer[data.index].position[2]);
+	this->WriteToRPCBuffer(NetworkRPCPlayerFullUpdate, &data);
 }
 
 void NetworkManager::RecieveVehicleFullUpdate(NetworkVehicleFullUpdateData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	//TODO: Do NOT load at connect, redo the whole thing.
-	HOOK.CreateCar(data.index, data.model, data.position[0], data.position[1], data.position[2], data.angle, data.color[0], data.color[2]);
+	this->WriteToRPCBuffer(NetworkRPCVehicleFullUpdate, &data);
 }
 
 void NetworkManager::RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	if(gPlayer[data.client].vehicleindex != -1)
-	{
-		memcpy(gCar[gPlayer[data.client].vehicleindex].position, data.position, sizeof(float) * 3);
-		gCar[gPlayer[data.client].vehicleindex].angle = data.angle;
-	}
-
-	memcpy(gPlayer[data.client].position, data.position, sizeof(float) * 3);
-	gPlayer[data.client].angle = data.angle;
-
-	HOOK.PlayerMove(data.client, data.position[0], data.position[1], data.position[2], data.speed);
+	this->WriteToRPCBuffer(NetworkRPCPlayerMove, &data);
 }
 
 void NetworkManager::RecievePlayerJump(NetworkPlayerJumpData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.Jump(data.client);
+	this->WriteToRPCBuffer(NetworkRPCPlayerJump, &data);
 }
 
 void NetworkManager::RecievePlayerDuck(NetworkPlayerDuckData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.Duck(data.client, data.shouldduck);
+	this->WriteToRPCBuffer(NetworkRPCPlayerDuck, &data);
 }
 
 void NetworkManager::RecievePlayerEntranceInVehicle(NetworkPlayerEntranceInVehicleData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.EnterInVehicle(data.client, data.vehicleindex, data.seat);
+	this->WriteToRPCBuffer(NetworkRPCPlayerEntranceInVehicle, &data);
 }
 
 void NetworkManager::RecievePlayerCancelEntranceInVehicle(NetworkPlayerCancelEntranceInVehicleData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.CancelEnterInVehicle(data.client);
+	this->WriteToRPCBuffer(NetworkRPCPlayerCancelEntranceInVehicle, &data);
 }
 
 void NetworkManager::RecievePlayerExitFromVehicle(NetworkPlayerExitFromVehicleData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.ExitFromVehicle(data.client);
+	this->WriteToRPCBuffer(NetworkRPCPlayerExitFromVehicle, &data);
 }
 
 void NetworkManager::RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.PlayerFireAim(data.client, data.weapon, data.time, data.position[0], data.position[1], data.position[2], 1);
+	this->WriteToRPCBuffer(NetworkRPCPlayerFire, &data);
 }
 
 void NetworkManager::RecievePlayerAim(NetworkPlayerAimData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.PlayerFireAim(data.client, data.weapon, data.time, data.position[0], data.position[1], data.position[2], 0);
+	this->WriteToRPCBuffer(NetworkRPCPlayerAim, &data);
 }
 
 void NetworkManager::RecievePlayerWeaponChange(NetworkPlayerWeaponChangeData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.PlayerSwapGun(data.client, data.weapon);
+	this->WriteToRPCBuffer(NetworkRPCPlayerWeaponChange, &data);
 }
 
 void NetworkManager::RecievePlayerHealthAndArmorChange(NetworkPlayerHealthAndArmorChangeData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	// ... Do it ...
+	this->WriteToRPCBuffer(NetworkRPCPlayerHealthAndArmorChange, &data);
 }
 
 void NetworkManager::RecievePlayerSpawn(NetworkPlayerSpawnData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.xPlayerSpawn(data);
+	this->WriteToRPCBuffer(NetworkRPCPlayerSpawn, &data);
 }
 
 void NetworkManager::RecievePlayerModelChange(NetworkPlayerModelChangeData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.PlayerSyncSkin(data.client, data.model);
+	this->WriteToRPCBuffer(NetworkRPCPlayerModelChange, &data);
 }
 
 void NetworkManager::RecievePlayerComponentsChange(NetworkPlayerComponentsChangeData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.PlayerSyncSkinVariation(data.client, data.compD, data.compT);
+	this->WriteToRPCBuffer(NetworkRPCPlayerComponentsChange, &data);
 }
 
 void NetworkManager::RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	AddChatMessage(data.msg, COLOR(data.color[0], data.color[1], data.color[2]), data.client);
+	this->WriteToRPCBuffer(NetworkRPCPlayerChat, &data);
 }
 
 void NetworkManager::RecieveNewVehicle(NetworkVehicleFullUpdateData data, RakNet::RPC3 *serverrpc3)
 {
-	LastUpdate = GetTickCount();
-	HOOK.CreateCar(data.index, data.model, data.position[0], data.position[1], data.position[2], data.angle, data.color[0], data.color[2]);
+	this->WriteToRPCBuffer(NetworkRPCNewVehicle, &data);
+}
+
+template <typename DATATYPE>
+void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type, const DATATYPE *data)
+{
+	if (rpcbuffersize == maxrpcbuffersize)
+	{
+		return;
+	}
+	EnterCriticalSection(&rpcbuffersection);
+	if (!ResizeBuffer<NetworkRPCData *>(rpcbuffer, rpcbuffersize + 1))
+	{
+		return;
+	}
+	rpcbuffer[rpcbuffersize].type = type;
+	switch (type)
+	{
+	case NetworkRPCPlayerConnection:
+		{
+			rpcbuffer[rpcbuffersize].data.playerconnection = (NetworkPlayerFullUpdateData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerconnection, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerConnectionError:
+		{
+			rpcbuffer[rpcbuffersize].data.playerconnectionerror = (NetworkPlayerConnectionErrorData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerconnectionerror, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerInfo:
+		{
+			rpcbuffer[rpcbuffersize].data.playerinfo = (NetworkPlayerInfoData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerinfo, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerDisconnection:
+		{
+			rpcbuffer[rpcbuffersize].data.playerdisconnection = (NetworkPlayerDisconnectionData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerdisconnection, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerFullUpdate:
+		{
+			rpcbuffer[rpcbuffersize].data.playerfullupdate = (NetworkPlayerFullUpdateData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerfullupdate, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCVehicleFullUpdate:
+		{
+			rpcbuffer[rpcbuffersize].data.vehiclefullupdate = (NetworkVehicleFullUpdateData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.vehiclefullupdate, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerMove:
+		{
+			rpcbuffer[rpcbuffersize].data.playermove = (NetworkPlayerMoveData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playermove, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerJump:
+		{
+			rpcbuffer[rpcbuffersize].data.playerjump = (NetworkPlayerJumpData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerjump, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerDuck:
+		{
+			rpcbuffer[rpcbuffersize].data.playerduck = (NetworkPlayerDuckData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerduck, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerEntranceInVehicle:
+		{
+			rpcbuffer[rpcbuffersize].data.playerentranceinvehicle = (NetworkPlayerEntranceInVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerentranceinvehicle, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerCancelEntranceInVehicle:
+		{
+			rpcbuffer[rpcbuffersize].data.playercancelentranceinvehicle = (NetworkPlayerCancelEntranceInVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playercancelentranceinvehicle, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerExitFromVehicle:
+		{
+			rpcbuffer[rpcbuffersize].data.playerexitfromvehicle = (NetworkPlayerExitFromVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerexitfromvehicle, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerFire:
+		{
+			rpcbuffer[rpcbuffersize].data.playerfire = (NetworkPlayerFireData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerfire, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerAim:
+		{
+			rpcbuffer[rpcbuffersize].data.playeraim = (NetworkPlayerAimData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playeraim, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerWeaponChange:
+		{
+			rpcbuffer[rpcbuffersize].data.playerweaponchange = (NetworkPlayerWeaponChangeData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerweaponchange, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerHealthAndArmorChange:
+		{
+			rpcbuffer[rpcbuffersize].data.playerhealthandarmorchange = (NetworkPlayerHealthAndArmorChangeData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerhealthandarmorchange, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerSpawn:
+		{
+			rpcbuffer[rpcbuffersize].data.playerspawn = (NetworkPlayerSpawnData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerspawn, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerModelChange:
+		{
+			rpcbuffer[rpcbuffersize].data.playermodelchange = (NetworkPlayerModelChangeData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playermodelchange, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerComponentsChange:
+		{
+			rpcbuffer[rpcbuffersize].data.playercomponentschange = (NetworkPlayerComponentsChangeData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playercomponentschange, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerChat:
+		{
+			rpcbuffer[rpcbuffersize].data.playerchat = (NetworkPlayerChatData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerchat, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCNewVehicle:
+		{
+			rpcbuffer[rpcbuffersize].data.newvehicle = (NetworkVehicleFullUpdateData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.newvehicle, data, sizeof(DATATYPE));
+			break;
+		}
+	}
+	rpcbuffersize++;
+	LeaveCriticalSection(&rpcbuffersection);
+}
+
+void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUnion *data)
+{
+	if (data == NULL)
+	{
+		return;
+	}
+	switch (type)
+	{
+	case NetworkRPCPlayerConnection:
+		{
+			Log("New player connection. Name is %s", data->playerconnection->name);
+			gPlayer[data->playerconnection->index].model = data->playerconnection->model;
+			memcpy(gPlayer[data->playerconnection->index].position, data->playerconnection->position, sizeof(float) * 3);
+			gPlayer[data->playerconnection->index].angle = data->playerconnection->angle;
+			gPlayer[data->playerconnection->index].vehicleindex = data->playerconnection->vehicleindex;
+			gPlayer[data->playerconnection->index].seatindex = data->playerconnection->seatindex;
+			gPlayer[data->playerconnection->index].score = data->playerconnection->score;
+			gPlayer[data->playerconnection->index].health = data->playerconnection->health;
+			gPlayer[data->playerconnection->index].armor = data->playerconnection->armor;
+			gPlayer[data->playerconnection->index].room = data->playerconnection->room;
+			memcpy(gPlayer[data->playerconnection->index].weapons, data->playerconnection->weapons, sizeof(char) * 8);
+			memcpy(gPlayer[data->playerconnection->index].ammo, data->playerconnection->ammo, sizeof(short) * 8);
+			memcpy(gPlayer[data->playerconnection->index].color, data->playerconnection->color, sizeof(unsigned char) * 4);
+			HOOK.PlayerConnect(data->playerconnection->name, data->playerconnection->index, gPlayer[data->playerconnection->index].model, gPlayer[data->playerconnection->index].position[0], gPlayer[data->playerconnection->index].position[1], gPlayer[data->playerconnection->index].position[2]);
+			delete data->playerconnection;
+			break;
+		}
+	case NetworkRPCPlayerConnectionError:
+		{
+			switch (data->playerconnectionerror->error)
+			{
+			case NetworkPlayerConnectionErrorServerFull:
+				{
+					PrintToConsole("Connection error: Server is full.");
+					break;
+				}
+			case NetworkPlayerConnectionErrorInvalidProtocol:
+				{
+					PrintToConsole("Connection error: Server is using different protocol.");
+					break;
+				}
+			case NetworkPlayerConnectionErrorInvalidName:
+				{
+					PrintToConsole("Connection error: Invalid user name.");
+					break;
+				}
+			case NetworkPlayerConnectionErrorAlreadyConnected:
+				{
+					PrintToConsole("Connection error: You are already connected.");
+					break;
+				}
+			case NetworkPlayerConnectionErrorAllocationError:
+				{
+					PrintToConsole("Connection error: Server was unable to allocate player resources.");
+					break;
+				}
+			case NetworkPlayerConnectionErrorScriptLock:
+				{
+					PrintToConsole("Connection error: Connection has been refused by a server script.");
+					break;
+				}
+			}
+			delete data->playerconnectionerror;
+			break;
+		}
+	case NetworkRPCPlayerInfo:
+		{
+			if (data->playerinfo->sessionkey != client.GetSessionKey())
+			{
+				return;
+			}
+			clientid.localSystemAddress = data->playerinfo->index + 1;
+			this->SetNetworkID(clientid);
+			client.SetIndex(data->playerinfo->index);
+			delete data->playerinfo;
+			break;
+		}
+	case NetworkRPCPlayerDisconnection:
+		{
+			HOOK.PlayerDisconnect(data->playerdisconnection->client);
+			delete data->playerdisconnection;
+			break;
+		}
+	case NetworkRPCPlayerFullUpdate:
+		{
+			//TODO: Do NOT load at connect, redo the whole thing.
+			gPlayer[data->playerfullupdate->index].model = data->playerfullupdate->model;
+			memcpy(gPlayer[data->playerfullupdate->index].position, data->playerfullupdate->position, sizeof(float) * 3);
+			gPlayer[data->playerfullupdate->index].angle = data->playerfullupdate->angle;
+			gPlayer[data->playerfullupdate->index].vehicleindex = data->playerfullupdate->vehicleindex;
+			gPlayer[data->playerfullupdate->index].seatindex = data->playerfullupdate->seatindex;
+			gPlayer[data->playerfullupdate->index].score = data->playerfullupdate->score;
+			gPlayer[data->playerfullupdate->index].health = data->playerfullupdate->health;
+			gPlayer[data->playerfullupdate->index].armor = data->playerfullupdate->armor;
+			gPlayer[data->playerfullupdate->index].room = data->playerfullupdate->room;
+			memcpy(gPlayer[data->playerfullupdate->index].weapons, data->playerfullupdate->weapons, sizeof(char) * 8);
+			memcpy(gPlayer[data->playerfullupdate->index].ammo, data->playerfullupdate->ammo, sizeof(short) * 8);
+			memcpy(gPlayer[data->playerfullupdate->index].color, data->playerfullupdate->color, sizeof(unsigned char) * 4);
+
+			Log("Player full update. Name is %s", data->playerfullupdate->name);
+			HOOK.PlayerConnect(data->playerfullupdate->name, data->playerfullupdate->index, gPlayer[data->playerfullupdate->index].model, gPlayer[data->playerfullupdate->index].position[0], gPlayer[data->playerfullupdate->index].position[1], gPlayer[data->playerfullupdate->index].position[2]);
+			delete data->playerfullupdate;
+			break;
+		}
+	case NetworkRPCVehicleFullUpdate:
+		{
+			//TODO: Do NOT load at connect, redo the whole thing.
+			HOOK.CreateCar(data->vehiclefullupdate->index, data->vehiclefullupdate->model, data->vehiclefullupdate->position[0], data->vehiclefullupdate->position[1], data->vehiclefullupdate->position[2], data->vehiclefullupdate->angle, data->vehiclefullupdate->color[0], data->vehiclefullupdate->color[2]);
+			delete data->vehiclefullupdate;
+			break;
+		}
+	case NetworkRPCPlayerMove:
+		{
+			if(gPlayer[data->playermove->client].vehicleindex != -1)
+			{
+				memcpy(gCar[gPlayer[data->playermove->client].vehicleindex].position, data->playermove->position, sizeof(float) * 3);
+				gCar[gPlayer[data->playermove->client].vehicleindex].angle = data->playermove->angle;
+			}
+
+			memcpy(gPlayer[data->playermove->client].position, data->playermove->position, sizeof(float) * 3);
+			gPlayer[data->playermove->client].angle = data->playermove->angle;
+
+			HOOK.PlayerMove(data->playermove->client, data->playermove->position[0], data->playermove->position[1], data->playermove->position[2], data->playermove->speed);
+			delete data->playermove;
+			break;
+		}
+	case NetworkRPCPlayerJump:
+		{
+			HOOK.Jump(data->playerjump->client);
+			delete data->playerjump;
+			break;
+		}
+	case NetworkRPCPlayerDuck:
+		{
+			HOOK.Duck(data->playerduck->client, data->playerduck->shouldduck);
+			delete data->playerduck;
+			break;
+		}
+	case NetworkRPCPlayerEntranceInVehicle:
+		{
+			HOOK.EnterInVehicle(data->playerentranceinvehicle->client, data->playerentranceinvehicle->vehicleindex, data->playerentranceinvehicle->seat);
+			delete data->playerentranceinvehicle;
+			break;
+		}
+	case NetworkRPCPlayerCancelEntranceInVehicle:
+		{
+			HOOK.CancelEnterInVehicle(data->playercancelentranceinvehicle->client);
+			delete data->playercancelentranceinvehicle;
+			break;
+		}
+	case NetworkRPCPlayerExitFromVehicle:
+		{
+			HOOK.ExitFromVehicle(data->playerexitfromvehicle->client);
+			delete data->playerexitfromvehicle;
+			break;
+		}
+	case NetworkRPCPlayerFire:
+		{
+			HOOK.PlayerFireAim(data->playerfire->client, data->playerfire->weapon, data->playerfire->time, data->playerfire->position[0], data->playerfire->position[1], data->playerfire->position[2], 1);
+			delete data->playerfire;
+			break;
+		}
+	case NetworkRPCPlayerAim:
+		{
+			HOOK.PlayerFireAim(data->playeraim->client, data->playeraim->weapon, data->playeraim->time, data->playeraim->position[0], data->playeraim->position[1], data->playeraim->position[2], 0);
+			delete data->playeraim;
+			break;
+		}
+	case NetworkRPCPlayerWeaponChange:
+		{
+			HOOK.PlayerSwapGun(data->playerweaponchange->client, data->playerweaponchange->weapon);
+			delete data->playerweaponchange;
+			break;
+		}
+	case NetworkRPCPlayerHealthAndArmorChange:
+		{
+			delete data->playerhealthandarmorchange;
+			break;
+		}
+	case NetworkRPCPlayerSpawn:
+		{
+			HOOK.xPlayerSpawn(*(data->playerspawn));
+			delete data->playerspawn;
+			break;
+		}
+	case NetworkRPCPlayerModelChange:
+		{
+			HOOK.PlayerSyncSkin(data->playermodelchange->client, data->playermodelchange->model);
+			delete data->playermodelchange;
+			break;
+		}
+	case NetworkRPCPlayerComponentsChange:
+		{
+			HOOK.PlayerSyncSkinVariation(data->playercomponentschange->client, data->playercomponentschange->compD, data->playercomponentschange->compT);
+			delete data->playercomponentschange;
+			break;
+		}
+	case NetworkRPCPlayerChat:
+		{
+			AddChatMessage(data->playerchat->msg, COLOR(data->playerchat->color[0], data->playerchat->color[1], data->playerchat->color[2]), data->playerchat->client);
+			delete data->playerchat;
+			break;
+		}
+	case NetworkRPCNewVehicle:
+		{
+			HOOK.CreateCar(data->newvehicle->index, data->newvehicle->model, data->newvehicle->position[0], data->newvehicle->position[1], data->newvehicle->position[2], data->newvehicle->angle, data->newvehicle->color[0], data->newvehicle->color[2]);
+			delete data->newvehicle;
+			break;
+		}
+	}
+}
+
+void NetworkManager::FreeRPCBuffer(void)
+{
+	if (rpcbuffer == NULL)
+	{
+		return;
+	}
+	for (int i = 0; i < rpcbuffersize; i++)
+	{
+		switch (rpcbuffer[i].type)
+		{
+		case NetworkRPCPlayerConnection:
+			{
+				delete rpcbuffer[i].data.playerconnection;
+				break;
+			}
+		case NetworkRPCPlayerConnectionError:
+			{
+				delete rpcbuffer[i].data.playerconnectionerror;
+				break;
+			}
+		case NetworkRPCPlayerInfo:
+			{
+				delete rpcbuffer[i].data.playerinfo;
+				break;
+			}
+		case NetworkRPCPlayerDisconnection:
+			{
+				delete rpcbuffer[i].data.playerdisconnection;
+				break;
+			}
+		case NetworkRPCPlayerFullUpdate:
+			{
+				delete rpcbuffer[i].data.playerfullupdate;
+				break;
+			}
+		case NetworkRPCVehicleFullUpdate:
+			{
+				delete rpcbuffer[i].data.vehiclefullupdate;
+				break;
+			}
+		case NetworkRPCPlayerMove:
+			{
+				delete rpcbuffer[i].data.playermove;
+				break;
+			}
+		case NetworkRPCPlayerJump:
+			{
+				delete rpcbuffer[i].data.playerjump;
+				break;
+			}
+		case NetworkRPCPlayerDuck:
+			{
+				delete rpcbuffer[i].data.playerduck;
+				break;
+			}
+		case NetworkRPCPlayerEntranceInVehicle:
+			{
+				delete rpcbuffer[i].data.playerentranceinvehicle;
+				break;
+			}
+		case NetworkRPCPlayerCancelEntranceInVehicle:
+			{
+				delete rpcbuffer[i].data.playercancelentranceinvehicle;
+				break;
+			}
+		case NetworkRPCPlayerExitFromVehicle:
+			{
+				delete rpcbuffer[i].data.playerexitfromvehicle;
+				break;
+			}
+		case NetworkRPCPlayerFire:
+			{
+				delete rpcbuffer[i].data.playerfire;
+				break;
+			}
+		case NetworkRPCPlayerAim:
+			{
+				delete rpcbuffer[i].data.playeraim;
+				break;
+			}
+		case NetworkRPCPlayerWeaponChange:
+			{
+				delete rpcbuffer[i].data.playerweaponchange;
+				break;
+			}
+		case NetworkRPCPlayerHealthAndArmorChange:
+			{
+				delete rpcbuffer[i].data.playerhealthandarmorchange;
+				break;
+			}
+		case NetworkRPCPlayerSpawn:
+			{
+				delete rpcbuffer[i].data.playerspawn;
+				break;
+			}
+		case NetworkRPCPlayerModelChange:
+			{
+				delete rpcbuffer[i].data.playermodelchange;
+				break;
+			}
+		case NetworkRPCPlayerComponentsChange:
+			{
+				delete rpcbuffer[i].data.playercomponentschange;
+				break;
+			}
+		case NetworkRPCPlayerChat:
+			{
+				delete rpcbuffer[i].data.playerchat;
+				break;
+			}
+		case NetworkRPCNewVehicle:
+			{
+				delete rpcbuffer[i].data.newvehicle;
+				break;
+			}
+		}
+	}
+	free(rpcbuffer);
+	rpcbuffer = NULL;
+	rpcbuffersize = 0;
 }
