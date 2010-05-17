@@ -105,23 +105,19 @@ void LoadConfig()
 	Conf.NumSkins = 0;
 }
 
-void FMPHook::CreateCar(int id, int model, float x, float y, float z, float r, int color1, int color2)
+void FMPHook::CreateCar(short index, unsigned int model, float position[3], float angle, unsigned char color[2])
 {
-	Log("CREATE CAR %d", id);
-
+	Log("CREATE CAR %d", index);
 	Natives::RequestModel((eModel)model);
 	while(!Natives::HasModelLoaded((eModel)model)) wait(0);
 	Log("Model LOADED");
-	Natives::CreateCar(model, x, y, z, &gCar[id].CarID, 1);
-	Natives::SetCarHeading(gCar[id].CarID, r);
-	gCar[id].exist = 1;
-	gCar[id].model = model;
-	gCar[id].position[0] = x;
-	gCar[id].position[1] = y;
-	gCar[id].position[2] = z;
-	gCar[id].angle = r;
-	gCar[id].color[0] = color1;
-	gCar[id].color[1] = color2;
+	Natives::CreateCar(model, position[0], position[1], position[2], &gCar[index].CarID, 1);
+	Natives::SetCarHeading(gCar[index].CarID, angle);
+	gCar[index].exist = 1;
+	gCar[index].model = model;
+	memcpy(gCar[index].position, position, sizeof(float) * 3);
+	gCar[index].angle = angle;
+	memcpy(gCar[index].color, color, sizeof(unsigned char) * 2);
 }
 
 Ped FMPHook::_GetPlayerPed()
@@ -317,53 +313,6 @@ void FMPHook::GameThread()
 	while(IsThreadAlive() && clientstate.game != GameStateExiting)
 	{
 		nm.Tick();
-		// Sync
-		/*for(short i = 0; i < MAX_PLAYERS; i++)
-		{
-			if(!gPlayer[i].connected) continue;
-			if ((gPlayer[i].PedID == 0) && (gPlayer[i].model != 0))
-			{
-				Natives::RequestModel((eModel)gPlayer[i].model);
-				while(!Natives::HasModelLoaded((eModel)gPlayer[i].model)) wait(1);
-
-				if(i == client.GetIndex())
-				{
-					Log("Change me");
-					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[i].model);
-					
-					Natives::GetPlayerChar(_GetPlayer(), &gPlayer[i].PedID);
-					Natives::SetCharDefaultComponentVariation(gPlayer[i].PedID);
-					Natives::SetCharCoordinates(gPlayer[i].PedID, gPlayer[i].position[0], gPlayer[i].position[1], gPlayer[i].position[2]);
-				}
-				else
-				{
-					Log("Create player");
-					Natives::CreateChar(1, (eModel)gPlayer[i].model, gPlayer[i].position[0], gPlayer[i].position[1], 
-						gPlayer[i].position[2], &gPlayer[i].PedID, 1);
-
-					while(!Natives::DoesCharExist(gPlayer[i].PedID)) wait(1);
-
-					Natives::SetCharDefaultComponentVariation(gPlayer[i].PedID);
-					Natives::GivePedFakeNetworkName(gPlayer[i].PedID, gPlayer[i].name, gPlayer[i].color[1],
-						gPlayer[i].color[2], gPlayer[i].color[3], gPlayer[i].color[0]);
-				}
-			}
-		}
-
-		for(int i = 0; i < MAX_CARS; i++)
-		{
-			if(gCar[i].exist && gCar[i].CarID == 0)
-			{
-				Log("Create car");
-				Natives::RequestModel((eModel)gCar[i].model);
-				while(!Natives::HasModelLoaded((eModel)gCar[i].model)) wait(1);
-
-				Natives::CreateCar(gCar[i].model, gCar[i].position[0], gCar[i].position[1], gCar[i].position[2], &gCar[i].CarID, 1);
-				Natives::SetCarHeading(gCar[i].CarID, gCar[i].angle);
-			}
-		}*/
-
-
 		switch (clientstate.game)
 		{
 		case GameStateOffline:

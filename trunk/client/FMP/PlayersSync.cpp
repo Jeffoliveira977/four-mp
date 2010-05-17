@@ -17,10 +17,10 @@ void SetActiveThread(scrThread* thread);
 extern ClientCore client;
 extern FMPHook HOOK;
 
-void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float x, float y, float z)
+void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float position[3])
 {
 	Debug("PlayerConnect: %s", "Start");
-	Log("ConnectInfo: %s %d 0x%x %f %f %f", name, index, model, x, y, z);
+	Log("ConnectInfo: %s %d 0x%x %f %f %f", name, index, model, position[0], position[1], position[2]);
 	if(client.GetIndex() == index) // My connect
 	{
 		Debug("Our PlayerConnect");
@@ -28,13 +28,13 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float x
 		Log("Local player %d", Natives::IsThisModelAPed((eModel)model));
 		Natives::RequestModel((eModel)model);
 		Debug("PlayerConnect: %s", "RequestModel");
-		while(!Natives::HasModelLoaded((eModel)model)) Sleep(1);
+		while(!Natives::HasModelLoaded((eModel)model)) wait(1);
 		Debug("PlayerConnect: %s", "ModelLoaded");
 		Natives::ChangePlayerModel(_GetPlayer(), (eModel)model);
 		Debug("PlayerConnect: %s", "ChangeModel");
 		Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
 		Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
-		Natives::SetCharCoordinates(gPlayer[index].PedID, x, y, z);
+		Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
 		Debug("PlayerConnect: %s", "SetCoords");
 		clientstate.game = GameStateInGame;
 		clientstate.input = InputStateGame;
@@ -47,8 +47,8 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float x
 		Debug("PlayerConnect: %s", "RequestModel");
 		while(!Natives::HasModelLoaded((eModel)model)) wait(1);
 		Debug("PlayerConnect: %s", "ModelLoaded");
-		Natives::CreateChar(1, (eModel)model, x, y, z, &gPlayer[index].PedID, 1);
-		while(Natives::DoesCharExist(gPlayer[index].PedID)) wait(1);
+		Natives::CreateChar(1, (eModel)model, position[0], position[1], position[2], &gPlayer[index].PedID, 1);
+		while(!Natives::DoesCharExist(gPlayer[index].PedID)) wait(1);
 		Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
 		Log("MovePlayer %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID),gPlayer[index].PedID);
 		Debug("PlayerConnect: %s", "CreateChar");
@@ -57,9 +57,7 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float x
 	}
 	Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
 	gPlayer[index].model = model;
-	gPlayer[index].position[0] = x;
-	gPlayer[index].position[1] = y;
-	gPlayer[index].position[2] = z;
+	memcpy(gPlayer[index].position, position, sizeof(float) * 3);
 
 	if(gPlayer[index].vehicleindex != -1)
 	{
