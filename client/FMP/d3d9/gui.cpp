@@ -6,7 +6,7 @@
 #include "../log.h"
 #include "../ConsoleWindow.h"
 #include "../Hook/classes.h"
-#include "../NetworkManager.h"
+#include "../../Shared/NetworkManager.h"
 
 #include <vector>
 

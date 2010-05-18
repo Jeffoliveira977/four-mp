@@ -8,7 +8,7 @@
 #include "functions.h"
 #include "structs.h"
 #include "main.h"
-#include "ClientCore.h"
+#include "../Shared/ClientCore.h"
 #include "hook\classes.h"
 
 scrThread* GetActiveThread();

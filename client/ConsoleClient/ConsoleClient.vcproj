@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="..\..\Shared\Boost; ..\..\Shared\RakNet"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;FMP_CONSOLE_CLIENT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -117,7 +117,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="..\..\Shared\Boost; ..\..\Shared\RakNet"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;FMP_CONSOLE_CLIENT"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -195,7 +195,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\NetworkManager.cpp"
+				RelativePath="..\Shared\NetworkManager.cpp"
 				>
 			</File>
 			<File
@@ -209,7 +209,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\ClientCore.h"
+				RelativePath="..\Shared\ClientCore.h"
 				>
 			</File>
 			<File
@@ -225,7 +225,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\NetworkManager.h"
+				RelativePath="..\Shared\NetworkManager.h"
 				>
 			</File>
 			<File

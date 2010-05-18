@@ -7,7 +7,7 @@
 
 #define DEBUG_ON
 #define LOGGING_ON
-#define PRINT_TO_CONSOLE
+//#define PRINT_TO_CONSOLE
 
 void InitLogs();
 void CloseLogs();

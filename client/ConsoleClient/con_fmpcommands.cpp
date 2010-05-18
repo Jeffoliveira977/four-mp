@@ -7,7 +7,7 @@
 
 #include "con_fmpcommands.h"
 #include "ClientCore.h"
-#include "NetworkManager.h"
+#include "../Shared/NetworkManager.h"
 
 extern ClientCore client;
 extern NetworkManager nm;

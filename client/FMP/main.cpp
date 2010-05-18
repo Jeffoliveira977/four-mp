@@ -22,8 +22,8 @@
 #include "Hook\scripting.h"
 #include "functions.h"
 #include "main.h"
-#include "ClientCore.h"
-#include "NetworkManager.h"
+#include "../Shared/ClientCore.h"
+#include "../Shared/NetworkManager.h"
 #include "Check\check.h"
 #include "..\..\Shared\Console\ConsoleCore.h"
 #include "d3d9/d3d9hook.h"
@@ -66,44 +66,6 @@ extern DWORD dwGameVersion;
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                           F U N C T I O N S                                           */
 /* ----------------------------------------------------------------------------------------------------- */
-
-void trim(char *a)
-{
-	int nxt = 0;
-	int len = strlen(a);
-	for(int i=0; i<len; i++)
-	{
-		Debug("%d = %d '%c'", i, a[i], a[i]);
-		if(a[i] > 32)
-		{
-			a[nxt] = a[i];
-			nxt++;
-		}
-	}
-	while(nxt < len)
-	{
-		a[nxt] = '\0';
-		nxt++;
-	}
-}
-
-void LoadConfig()
-{
-	FILE *f = fopen("FMP\\fmp.ini", "r");
-	char buff[32];
-	fgets(buff, 32, f);
-	strcpy(Conf.server, buff);
-	trim(Conf.server);
-	fgets(buff, 32, f);
-	Conf.port = atoi(buff);
-	fgets(buff, 32, f);
-	strcpy(Conf.Name, buff);
-	fclose(f);
-
-	Conf.SkinSelect = 0;
-	Conf.ComponentSelect = 0;
-	Conf.NumSkins = 0;
-}
 
 void FMPHook::CreateCar(short index, unsigned int model, float position[3], float angle, unsigned char color[2])
 {
@@ -473,13 +435,12 @@ void GetMyPos(ConsoleCore *concore, const unsigned char numargs)
 void MainThread(void* dummy)
 {
 	Debug("MainThread (0x%x)", dwLoadOffset);
-	LoadConfig();
 	clientstate.input = InputStateGame;
 	concore.AddConCmd("getmypos", GetMyPos);
 	concore.AddConCmd("getpos", GetMyPos);
 
 	HOOK.AttachGtaThread("FOURMP");
-	Debug("Atached");
+	Debug("Attached");
 
 	CloseHandle(MainThreadHandle);
 	MainThreadHandle = NULL;

@@ -3,7 +3,7 @@
 
 #include "log.h"
 #include "main.h"
-#include "NetworkManager.h"
+#include "../Shared/NetworkManager.h"
 
 extern NetworkManager nm;
 

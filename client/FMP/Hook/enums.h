@@ -2735,29 +2735,3 @@
 	typedef ePedMoveState eCharMoveState;
 
 	typedef unsigned int eColour; // Should use ColourIndex instead!
-
-	enum RPCErrorCodes
-	{
-		/// RPC3::SetNetworkIDManager() was not called, and it must be called to call a C++ object member
-		RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE,
-
-		/// Cannot execute C++ object member call because the object specified by SetRecipientObject() does not exist on this system
-		RPC_ERROR_OBJECT_DOES_NOT_EXIST,
-
-		/// Internal error, index optimization for function lookup does not exist
-		RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE,
-
-		/// Named function was not registered with RegisterFunction(). Check your spelling.
-		RPC_ERROR_FUNCTION_NOT_REGISTERED,
-
-		/// Named function was registered, but later unregistered with UnregisterFunction() and can no longer be called.
-		RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED,
-
-		/// SetRecipientObject() was not called before Call(), but the registered pointer is a class member
-		/// If you intended to call a class member function, call SetRecipientObject() with a valid object first.
-		RPC_ERROR_CALLING_CPP_AS_C,
-
-		/// SetRecipientObject() was called before Call(), but RegisterFunction() was called with isObjectMember=false
-		/// If you intended to call a C function, call SetRecipientObject(UNASSIGNED_NETWORK_ID) first.
-		RPC_ERROR_CALLING_C_AS_CPP,
-	};
