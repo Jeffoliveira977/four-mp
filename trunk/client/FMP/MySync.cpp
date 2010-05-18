@@ -5,12 +5,12 @@ Syncronizashion this player
 
 #include "log.h"
 #include "main.h"
-#include "ClientCore.h"
+#include "../Shared/ClientCore.h"
 #include "Hook\classes.h"
 #include "Hook\scripting.h"
 #include "functions.h"
 
-#include "NetworkManager.h"
+#include "../Shared/NetworkManager.h"
 
 extern ClientCore client;
 extern NetworkManager nm;

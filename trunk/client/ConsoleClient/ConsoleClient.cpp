@@ -5,7 +5,7 @@
 #include "ClientCore.h"
 #include "../../Shared/Console/ConsoleCore.h"
 #include "../../Shared/Console/ConsoleScreen.h"
-#include "NetworkManager.h"
+#include "../Shared/NetworkManager.h"
 
 ClientCore client;
 ConsoleCore concore;

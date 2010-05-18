@@ -3,22 +3,29 @@
 #include "GetTime.h"
 
 #include "NetworkManager.h"
-#include "main.h"
-#include "../../Shared/Console/common.h"
-#include "log.h"
 #include "ClientCore.h"
-#include "Hook/classes.h"
-#include "masterserver.h"
-#include "chat.h"
-#include "d3d9/gui.h"
+#include "../../Shared/Console/common.h"
+#if defined (FMP_CLIENT)
+#include "../FMP/main.h"
+#include "../FMP/log.h"
+#include "../FMP/Hook/classes.h"
+#include "../FMP/masterserver.h"
+#include "../FMP/chat.h"
+#include "../FMP/d3d9/gui.h"
+#elif defined (FMP_CONSOLE_CLIENT)
+#include "../ConsoleClient/logging.h"
+#include "../../Shared/Console/ConsoleScreen.h"
+#endif
 
 extern ClientCore client;
+#if defined (FMP_CLIENT)
 extern FMPHook HOOK;
 extern FMPGUI Gui;
 
 extern ClientState clientstate;
 extern unsigned char selectedplayerclass;
 extern char enterMsg[256];
+#endif
 
 NetworkManager::NetworkManager(void)
 {
@@ -91,53 +98,66 @@ void NetworkManager::Tick(void)
 	static Packet *pack;
 	for (pack = net->Receive(); pack; net->DeallocatePacket(pack), pack = net->Receive())
 	{
-		Debug("Pack: %s[%d], %s", pack->data, pack->data[0], pack->systemAddress.ToString());
 		switch(pack->data[0])
 		{
 		case ID_CONNECTION_REQUEST_ACCEPTED:
 			{
-				Log("RakNet: Connection accepted. Sending client info...");
+				PrintToConsole("Connection accepted. Sending client info...");
 				this->SendClientConnectionRequest();
 			} break;
 		case ID_ALREADY_CONNECTED:
 			{
-				Log("RakNet: Already connected");
-				clientstate.game = GameStateInGame;	
+				PrintToConsole("Already connected");
+				//clientstate.game = GameStateInGame;	
 			} break;
 		case ID_NO_FREE_INCOMING_CONNECTIONS:
 			{
-				Log("RakNet: No free connections");
+				PrintToConsole("No free connections");
+#if defined (FMP_CLIENT)
 				clientstate.game = GameStateOffline;
+#endif
 			} break;
 		case ID_DISCONNECTION_NOTIFICATION:
 			{
-				Log("RakNet: Disconnect (Close connection)");
+				PrintToConsole("You have been kicked from the server.");
+#if defined (FMP_CLIENT)
 				clientstate.game = GameStateOffline;
+#endif
 			} break;
 		case ID_CONNECTION_LOST:
 			{
-				Log("RakNet: Disconnect (Connection lost)");
+				PrintToConsole("Lost connection to the server.");
+#if defined (FMP_CLIENT)
 				clientstate.game = GameStateOffline;
+#endif
 			} break;
 		case ID_CONNECTION_BANNED:
 			{
-				Log("RakNet: Disconnect (Connection banned)");
+				PrintToConsole("You are banned from the server.");
+#if defined (FMP_CLIENT)
 				clientstate.game = GameStateOffline;
+#endif
 			} break;
 		case ID_INVALID_PASSWORD:
 			{
-				Log("RakNet: Invalid password");
+				PrintToConsole("Invalid password");
+#if defined (FMP_CLIENT)
+				clientstate.game = GameStateOffline;
+#endif
 			} break;
 		case ID_CONNECTION_ATTEMPT_FAILED:
 			{
-				Log("RakNet: Connection failed");
+				PrintToConsole("Connection failed");
+#if defined (FMP_CLIENT)
 				clientstate.game = GameStateOffline;
 				char str[128];
 				sprintf(str, "Can't connect to %s", pack->systemAddress.ToString());
 				Gui.Message(str);
+#endif
 			} break;
 		case ID_PONG:
 			{
+#if defined (FMP_CLIENT)
 				Log("RakNet: Pong");
 				RakNetTime time, dataLength;
 				RakNet::BitStream pong( pack->data+1, sizeof(RakNetTime), false);
@@ -159,38 +179,39 @@ void NetworkManager::Tick(void)
 				strcpy_s(tmp_msi->ip, 64, pack->systemAddress.ToString(0));
 				tmp_msi->port = pack->systemAddress.port;
 				Gui.UpdateServer(tmp_msi);
+#endif
 			} break;
 		case ID_RPC_REMOTE_ERROR:
 			{
-				Log("RakNet: RPC remote error");
+				PrintToConsole("RakNet: RPC remote error");
 				switch (pack->data[1])
 				{
-				case RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
-					Log("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
+				case RakNet::RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
+					PrintToConsole("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
 					break;
-				case RPC_ERROR_OBJECT_DOES_NOT_EXIST:
-					Log("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
+				case RakNet::RPC_ERROR_OBJECT_DOES_NOT_EXIST:
+					PrintToConsole("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
 					break;
-				case RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
-					Log("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
+				case RakNet::RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
+					PrintToConsole("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
 					break;
-				case RPC_ERROR_FUNCTION_NOT_REGISTERED:
-					Log("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
+				case RakNet::RPC_ERROR_FUNCTION_NOT_REGISTERED:
+					PrintToConsole("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
 					break;
-				case RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
-					Log("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
+				case RakNet::RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
+					PrintToConsole("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
 					break;
-				case RPC_ERROR_CALLING_CPP_AS_C:
-					Log("RPC_ERROR_CALLING_CPP_AS_C\n");
+				case RakNet::RPC_ERROR_CALLING_CPP_AS_C:
+					PrintToConsole("RPC_ERROR_CALLING_CPP_AS_C\n");
 					break;
-				case RPC_ERROR_CALLING_C_AS_CPP:
-					Log("RPC_ERROR_CALLING_C_AS_CPP\n");
+				case RakNet::RPC_ERROR_CALLING_C_AS_CPP:
+					PrintToConsole("RPC_ERROR_CALLING_C_AS_CPP\n");
 					break;
 				}
 			} break;
 		default:
 			{
-				Log("RakNet: Unknown message (0x%x) [%s]", pack->data[0], pack->data);
+				PrintToConsole("RakNet: Unknown message (0x%x) [%s]", pack->data[0], pack->data);
 			} break;
 		}
 	}
@@ -236,6 +257,7 @@ void NetworkManager::Ping(const char *hostname, const unsigned short port)
 
 void NetworkManager::ConnectToServer(const char *hostname, const unsigned short port)
 {
+#if defined (FMP_CLIENT)
 	Log("Connecting to server...");
 	if(clientstate.game == GameStateOffline)
 	{
@@ -256,15 +278,26 @@ void NetworkManager::ConnectToServer(const char *hostname, const unsigned short 
 	{
 		net->Connect(serveraddress.ToString(0), serveraddress.port, 0, 0, 0);
 	}
-
 	clientstate.game = GameStateConnecting;
+#elif defined (FMP_CONSOLE_CLIENT)
+	net->Connect(hostname, port, 0, 0, 0);
+	serveraddress.SetBinaryAddress(hostname);
+	serveraddress.port = port;
+	PrintToConsole("Connecting to server...");
+#endif
 }
 
 void NetworkManager::SendClientConnectionRequest(void)
 {
 	NetworkPlayerConnectionRequestData data;
 	data.protocol = PROTOCOL_VERSION;
+#if defined (FMP_CLIENT)
 	strcpy(data.name, Conf.Name);
+#elif defined (FMP_CONSOLE_CLIENT)
+	char *name = client.GetName();
+	strcpy(data.name, name);
+	free(name);
+#endif
 	data.sessionkey = client.GetSessionKey();
 	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionRequest", serverid, data, rpc3);
 }
@@ -272,9 +305,11 @@ void NetworkManager::SendClientConnectionRequest(void)
 void NetworkManager::SendPlayerMove(const float speed)
 {
 	NetworkPlayerMoveData data;
+#if defined (FMP_CLIENT)
 	memcpy(data.position, gPlayer[client.GetIndex()].position, sizeof(float) * 3);
 	data.angle = gPlayer[client.GetIndex()].angle;
 	data.speed = speed;
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerMove", serverid, data, rpc3);
 }
 
@@ -287,15 +322,19 @@ void NetworkManager::SendPlayerJump(void)
 void NetworkManager::SendPlayerDuck(void)
 {
 	NetworkPlayerDuckData data;
+#if defined (FMP_CLIENT)
 	data.shouldduck = gPlayer[client.GetIndex()].isducking;
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerDuck", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerEntranceInVehicle(const char seat)
 {
 	NetworkPlayerEntranceInVehicleData data;
+#if defined (FMP_CLIENT)
 	data.vehicleindex = gPlayer[client.GetIndex()].vehicleindex;
 	data.seat = seat;
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerEntranceInVehicle", serverid, data, rpc3);
 }
 
@@ -314,67 +353,81 @@ void NetworkManager::SendPlayerExitFromVehicle(void)
 void NetworkManager::SendPlayerFire(const float position[3], const int time, const short target, const unsigned int health, const unsigned int armor)
 {
 	NetworkPlayerFireData data;
+#if defined (FMP_CLIENT)
 	memcpy(data.position, position, sizeof(float) * 3);
 	data.weapon = gPlayer[client.GetIndex()].currentweapon;
 	data.time = time;
 	data.target = target;
 	data.health = health;
 	data.armor = armor;
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerFire", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerAim(const float position[3], const int time)
 {
 	NetworkPlayerAimData data;
+#if defined (FMP_CLIENT)
 	memcpy(data.position, position, sizeof(float) * 3);
 	data.weapon = gPlayer[client.GetIndex()].currentweapon;
 	data.time = time;
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerAim", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerWeaponChange(void)
 {
 	NetworkPlayerWeaponChangeData data;
+#if defined (FMP_CLIENT)
 	data.weapon = gPlayer[client.GetIndex()].currentweapon;
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerWeaponChange", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerHealthAndArmorChange(void)
 {
 	NetworkPlayerHealthAndArmorChangeData data;
+#if defined (FMP_CLIENT)
 	data.health = gPlayer[client.GetIndex()].health;
 	data.armor = gPlayer[client.GetIndex()].armor;
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerHealthAndArmorChange", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerSpawnRequest(void)
 {
 	NetworkPlayerSpawnRequestData data;
+#if defined (FMP_CLIENT)
 	data.playerclassindex = selectedplayerclass;
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerSpawnRequest", serverid, data, rpc3);
-	Log("Player spawn request has been sent.");
 }
 
 void NetworkManager::SendPlayerModelChange(void)
 {
 	NetworkPlayerModelChangeData data;
+#if defined (FMP_CLIENT)
 	data.model = gPlayer[client.GetIndex()].model;
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerModelChange", serverid, data, rpc3);
-	Log("Player model change has been sent.");
 }
 
 void NetworkManager::SendPlayerComponentsChange(void)
 {
 	NetworkPlayerComponentsChangeData data;
+#if defined (FMP_CLIENT)
 	memcpy(data.compD, gPlayer[client.GetIndex()].compD, sizeof(int) * 11);
 	memcpy(data.compT, gPlayer[client.GetIndex()].compT, sizeof(int) * 11);
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerComponentsChange", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerChat(void)
 {
 	NetworkPlayerChatData data;
+#if defined (FMP_CLIENT)
 	strcpy(data.msg, enterMsg);
+#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerChat", serverid, data, rpc3);
 }
 
@@ -648,6 +701,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 	{
 	case NetworkRPCPlayerConnection:
 		{
+#if defined (FMP_CLIENT)
 			Log("New player connection. Name is %s", data->playerconnection->name);
 			gPlayer[data->playerconnection->index].model = data->playerconnection->model;
 			memcpy(gPlayer[data->playerconnection->index].position, data->playerconnection->position, sizeof(float) * 3);
@@ -662,6 +716,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			memcpy(gPlayer[data->playerconnection->index].ammo, data->playerconnection->ammo, sizeof(short) * 8);
 			memcpy(gPlayer[data->playerconnection->index].color, data->playerconnection->color, sizeof(unsigned char) * 4);
 			HOOK.PlayerConnect(data->playerconnection->name, data->playerconnection->index, gPlayer[data->playerconnection->index].model, gPlayer[data->playerconnection->index].position);
+#endif
 			delete data->playerconnection;
 			break;
 		}
@@ -717,12 +772,15 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		}
 	case NetworkRPCPlayerDisconnection:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.PlayerDisconnect(data->playerdisconnection->client);
+#endif
 			delete data->playerdisconnection;
 			break;
 		}
 	case NetworkRPCPlayerFullUpdate:
 		{
+#if defined (FMP_CLIENT)
 			//TODO: Do NOT load at connect, redo the whole thing.
 			gPlayer[data->playerfullupdate->index].model = data->playerfullupdate->model;
 			memcpy(gPlayer[data->playerfullupdate->index].position, data->playerfullupdate->position, sizeof(float) * 3);
@@ -739,18 +797,22 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 
 			Log("Player full update. Name is %s", data->playerfullupdate->name);
 			HOOK.PlayerConnect(data->playerfullupdate->name, data->playerfullupdate->index, gPlayer[data->playerfullupdate->index].model, gPlayer[data->playerfullupdate->index].position);
+#endif
 			delete data->playerfullupdate;
 			break;
 		}
 	case NetworkRPCVehicleFullUpdate:
 		{
+#if defined (FMP_CLIENT)
 			//TODO: Do NOT load at connect, redo the whole thing.
 			HOOK.CreateCar(data->vehiclefullupdate->index, data->vehiclefullupdate->model, data->vehiclefullupdate->position, data->vehiclefullupdate->angle, data->vehiclefullupdate->color);
+#endif
 			delete data->vehiclefullupdate;
 			break;
 		}
 	case NetworkRPCPlayerMove:
 		{
+#if defined (FMP_CLIENT)
 			if(gPlayer[data->playermove->client].vehicleindex != -1)
 			{
 				memcpy(gCar[gPlayer[data->playermove->client].vehicleindex].position, data->playermove->position, sizeof(float) * 3);
@@ -761,89 +823,118 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			gPlayer[data->playermove->client].angle = data->playermove->angle;
 
 			HOOK.PlayerMove(data->playermove->client, data->playermove->position, data->playermove->speed);
+#endif
 			delete data->playermove;
 			break;
 		}
 	case NetworkRPCPlayerJump:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.Jump(data->playerjump->client);
+#endif
 			delete data->playerjump;
 			break;
 		}
 	case NetworkRPCPlayerDuck:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.Duck(data->playerduck->client, data->playerduck->shouldduck);
+#endif
 			delete data->playerduck;
 			break;
 		}
 	case NetworkRPCPlayerEntranceInVehicle:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.EnterInVehicle(data->playerentranceinvehicle->client, data->playerentranceinvehicle->vehicleindex, data->playerentranceinvehicle->seat);
+#endif
 			delete data->playerentranceinvehicle;
 			break;
 		}
 	case NetworkRPCPlayerCancelEntranceInVehicle:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.CancelEnterInVehicle(data->playercancelentranceinvehicle->client);
+#endif
 			delete data->playercancelentranceinvehicle;
 			break;
 		}
 	case NetworkRPCPlayerExitFromVehicle:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.ExitFromVehicle(data->playerexitfromvehicle->client);
+#endif
 			delete data->playerexitfromvehicle;
 			break;
 		}
 	case NetworkRPCPlayerFire:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.PlayerFireAim(data->playerfire->client, data->playerfire->weapon, data->playerfire->time, data->playerfire->position[0], data->playerfire->position[1], data->playerfire->position[2], 1);
+#endif
 			delete data->playerfire;
 			break;
 		}
 	case NetworkRPCPlayerAim:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.PlayerFireAim(data->playeraim->client, data->playeraim->weapon, data->playeraim->time, data->playeraim->position[0], data->playeraim->position[1], data->playeraim->position[2], 0);
+#endif
 			delete data->playeraim;
 			break;
 		}
 	case NetworkRPCPlayerWeaponChange:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.PlayerSwapGun(data->playerweaponchange->client, data->playerweaponchange->weapon);
+#endif
 			delete data->playerweaponchange;
 			break;
 		}
 	case NetworkRPCPlayerHealthAndArmorChange:
 		{
+#if defined (FMP_CLIENT)
+#endif
 			delete data->playerhealthandarmorchange;
 			break;
 		}
 	case NetworkRPCPlayerSpawn:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.xPlayerSpawn(*(data->playerspawn));
+#endif
 			delete data->playerspawn;
 			break;
 		}
 	case NetworkRPCPlayerModelChange:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.PlayerSyncSkin(data->playermodelchange->client, data->playermodelchange->model);
+#endif
 			delete data->playermodelchange;
 			break;
 		}
 	case NetworkRPCPlayerComponentsChange:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.PlayerSyncSkinVariation(data->playercomponentschange->client, data->playercomponentschange->compD, data->playercomponentschange->compT);
+#endif
 			delete data->playercomponentschange;
 			break;
 		}
 	case NetworkRPCPlayerChat:
 		{
+#if defined (FMP_CLIENT)
 			AddChatMessage(data->playerchat->msg, COLOR(data->playerchat->color[0], data->playerchat->color[1], data->playerchat->color[2]), data->playerchat->client);
+#endif
 			delete data->playerchat;
 			break;
 		}
 	case NetworkRPCNewVehicle:
 		{
+#if defined (FMP_CLIENT)
 			HOOK.CreateCar(data->newvehicle->index, data->newvehicle->model, data->newvehicle->position, data->newvehicle->angle, data->newvehicle->color);
+#endif
 			delete data->newvehicle;
 			break;
 		}

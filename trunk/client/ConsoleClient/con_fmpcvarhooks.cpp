@@ -7,13 +7,9 @@
 #include <stdlib.h>
 
 #include "con_fmpcvarhooks.h"
-
 #include "ClientCore.h"
-#include "../../Shared/Console/common.h"
-#include "NetworkManager.h"
 
 extern ClientCore client;
-extern NetworkManager nm;
 
 void ConVarHookName(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue)
 {

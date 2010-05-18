@@ -7,7 +7,7 @@
 #include "../../Shared/Console/ConsoleScreen.h"
 #include "con_fmpcommands.h"
 #include "con_fmpcvarhooks.h"
-#include "NetworkManager.h"
+#include "../Shared/NetworkManager.h"
 
 extern ConsoleCore concore;
 extern ConsoleScreen conscreen;
