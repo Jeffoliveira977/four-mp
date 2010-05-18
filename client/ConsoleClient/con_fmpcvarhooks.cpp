@@ -7,7 +7,7 @@
 #include <stdlib.h>
 
 #include "con_fmpcvarhooks.h"
-#include "ClientCore.h"
+#include "../Shared/ClientCore.h"
 
 extern ClientCore client;
 
