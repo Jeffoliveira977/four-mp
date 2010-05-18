@@ -30,6 +30,7 @@ ConsoleWindow::~ConsoleWindow(void)
 
 void ConsoleWindow::Load(void)
 {
+	EnterCriticalSection(&cs_gui);
 	mainwindow = new CWindow(Gui.m_Gui, 412, 25, 587, 568, "Console");
 	outputbox = new CTextBox(Gui.m_Gui, 8, 8, 571, 492);
 	outputbox->ShowSlider(true);
@@ -40,6 +41,7 @@ void ConsoleWindow::Load(void)
 	mainwindow->AddElement(submitbutton);
 	concore.SetOutputFunction(PrintToConsole);
 	IsLoaded = true;
+	LeaveCriticalSection(&cs_gui);
 }
 
 bool ConsoleWindow::IsVisible(void)

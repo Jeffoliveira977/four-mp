@@ -27,12 +27,6 @@ enum ThreadStates
 	ThreadState4
 };
 
-struct MemBack
-{
-	BYTE a;
-	DWORD b;
-};
-
 struct scrThreadContext
 {
 	DWORD nThreadId;
@@ -73,6 +67,7 @@ public:
 	virtual ThreadStates Reset(unsigned int hash,int v2,int i3) = 0;
 	virtual ThreadStates Run(int i1) = 0;
 	virtual ThreadStates Tick(unsigned int msec) = 0;
+	virtual void Kill() = 0;
 	
 	scrThreadContext *RetContext() { return &m_context; }
 };

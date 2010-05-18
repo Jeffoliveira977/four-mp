@@ -27,6 +27,7 @@ DWORD GAME_NAME = 0x0;
 DWORD MOUSE_POS_X = 0x0;
 DWORD MOUSE_POS_Y = 0x0;
 
+
 FMPHook::FMPHook(): FMPThread()
 {
 	m_pPrimaryFiber = NULL;
@@ -112,7 +113,11 @@ void FMPHook::wait(unsigned int timeMS)
 void FMPHook::Kill()
 {
 	Debug("FMPHook::Kill called");
-	if (GetCurrentFiber() != m_pPrimaryFiber) return;
+	if (GetCurrentFiber() != m_pPrimaryFiber) 
+	{
+		Debug("FMPHook::Kill exited");
+		return;
+	}
 
 	DeleteFiber(m_pScriptFiber);
 
