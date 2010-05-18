@@ -31,3 +31,5 @@ public:
 	DWORD GetWidth();
 	DWORD GetHeight();
 };
+
+extern CRITICAL_SECTION cs_gui;

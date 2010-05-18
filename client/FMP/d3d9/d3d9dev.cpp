@@ -243,8 +243,10 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 		}
 	case InputStateGui:
 		{
+			EnterCriticalSection(&cs_gui);
 			Gui.MoveMouse(MouseX, MouseY);
 			Gui.Draw();
+			LeaveCriticalSection(&cs_gui);
 		} break;
 	}
 	return m_pD3Ddev->EndScene();

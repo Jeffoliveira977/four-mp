@@ -13,6 +13,8 @@
 extern ConsoleWindow conwindow;
 extern NetworkManager nm;
 
+CRITICAL_SECTION cs_gui;
+
 // Windows
 CWindow * fServBrowser;
 CWindow * fChat;
@@ -455,10 +457,13 @@ FMPGUI::FMPGUI()
 	GuiReady = 0;
 	s_iWidth = 800;
 	s_iHeight = 600;
+
+	InitializeCriticalSection(&cs_gui);
 }
 
 void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 {
+	EnterCriticalSection(&cs_gui);
 	Debug("FMPGUI::Load called");
 	fmpms.Load();
 	Debug("FMPGUI::Load >> Master Server");
@@ -658,17 +663,20 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	sbTab[tab]->SetEnabled(0);
 	GuiReady = 1;
 	Debug("FMPGUI::Load complete");
+	LeaveCriticalSection(&cs_gui);
 }
 
 void FMPGUI::HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 	if( GuiReady )
 	{
+		EnterCriticalSection(&cs_gui);
 		CMouse *mouse = m_Gui->GetMouse();
 		if(mouse) mouse->HandleMessage(Msg, wParam, lParam);
 
 		CKeyboard *keybd = m_Gui->GetKeyboard();
 		if(keybd) keybd->HandleMessage(Msg, wParam, lParam);
+		LeaveCriticalSection(&cs_gui);
 	}
 }
 
@@ -676,6 +684,7 @@ void FMPGUI::MoveMouse(int x, int y)
 {
 	if( GuiReady )
 	{
+		EnterCriticalSection(&cs_gui);
 		m_Gui->GetMouse()->SetPos(x, y);
 		m_Gui->MouseMove(m_Gui->GetMouse());
 
@@ -701,12 +710,15 @@ void FMPGUI::MoveMouse(int x, int y)
 
 		if(mouse)
 			m_Gui->KeyEvent( SKey( 0, (GetAsyncKeyState(1)||GetAsyncKeyState(2)||GetAsyncKeyState(3)) && 1 ) );
+		LeaveCriticalSection(&cs_gui);
 	}
 }
 
 void FMPGUI::Draw()
 {
+	EnterCriticalSection(&cs_gui);
 	if( GuiReady ) m_Gui->Draw();
+	LeaveCriticalSection(&cs_gui);
 }
 
 DWORD FMPGUI::GetWidth()
@@ -731,6 +743,7 @@ bool FMPGUI::IsLogged()
 
 void FMPGUI::UpdateServer(MasterServerInfo *msi)
 {
+	EnterCriticalSection(&cs_gui);
 	int index = -1;
 	char tmp[32];
 
@@ -759,10 +772,13 @@ void FMPGUI::UpdateServer(MasterServerInfo *msi)
 		//delete server_list[index];
 		server_list[index] = msi;
 	}
+	LeaveCriticalSection(&cs_gui);
 }
 
 void FMPGUI::Message(char *data)
 {
+	EnterCriticalSection(&cs_gui);
 	fInfo->GetElementByString("INFO_TEXT", 1)->SetString(data);
 	fInfo->SetVisible(1);
+	LeaveCriticalSection(&cs_gui);
 }

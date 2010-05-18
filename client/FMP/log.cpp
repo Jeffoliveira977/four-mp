@@ -63,7 +63,7 @@ void Debug(const char *string, ...)
 	EnterCriticalSection(&cs_debug);
 	if(!f_debug) return;
 
-	char buff[512];
+	char *buff = new char[512];
 	va_list arglist; 
     va_start(arglist, string); 
 	vsprintf_s(buff,512,string,arglist);
@@ -80,6 +80,7 @@ void Debug(const char *string, ...)
 	fflush(f_debug);
     va_end(arglist); 
 	
+	delete buff;
 	LeaveCriticalSection(&cs_debug);
 	#endif
 }
@@ -91,7 +92,7 @@ void Log(const char *string, ...)
 	EnterCriticalSection(&cs_log);
 	if(!f_log) return;
 
-	char buff[512];
+	char *buff = new char[512];
 	va_list arglist; 
     va_start(arglist, string); 
 	vsprintf_s(buff,512,string,arglist);
@@ -108,6 +109,7 @@ void Log(const char *string, ...)
 	fflush(f_log);
     va_end(arglist); 
 
+	delete buff;
 	LeaveCriticalSection(&cs_log);
 	#endif
 }

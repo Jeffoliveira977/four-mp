@@ -67,7 +67,7 @@ void CTextBox::AddString( std::string sString )
 		return;
 
 	EnterCriticalSection(&cs);
-	std::vector<std::string> vPending;
+	/*std::vector<std::string> vPending;
 	int iLength = static_cast<int>( sString.length() );
 	for( int i = iLength - 1; i > 0; i-- )
 	{
@@ -86,14 +86,17 @@ void CTextBox::AddString( std::string sString )
 					vPending.push_back( &sString.c_str()[ i + 1 ] );
 			}
 		}
-	}
+	}*/
 
 	m_vStrings.insert( m_vStrings.begin(), sString );
 
 	if((int)m_vStrings.size() >= m_iLimit) 
+	{
 		RemoveStrings(m_iLimit, 0);
-
-	pSlider->SetMaxValue( m_vStrings.size()-1 );
+		pSlider->SetMaxValue( m_iLimit-1 );
+	}
+	else
+		pSlider->SetMaxValue( m_vStrings.size()-1 );
 
 	int iHeight = 0;
 	for( int i = pSlider->GetValue(); i <= pSlider->GetMaxValue(); i++ )
@@ -109,10 +112,10 @@ void CTextBox::AddString( std::string sString )
 			pSlider->SetValue( pSlider->GetValue() + iLines );
 			iHeight -= iTempHeight;
 		}
-	}
+	}/*
 
 	for( std::vector<std::string>::reverse_iterator iIter = vPending.rbegin(); iIter != vPending.rend(); iIter++ )
-		AddString( *iIter );
+		AddString( *iIter );*/
 
 	LeaveCriticalSection(&cs);
 }
