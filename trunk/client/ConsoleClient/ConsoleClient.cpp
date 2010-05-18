@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "ClientCore.h"
+#include "../Shared/ClientCore.h"
 #include "../../Shared/Console/ConsoleCore.h"
 #include "../../Shared/Console/ConsoleScreen.h"
 #include "../Shared/NetworkManager.h"

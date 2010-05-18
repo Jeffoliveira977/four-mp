@@ -1,7 +1,7 @@
 #define _CRT_RAND_S
 #include <stdlib.h>
 
-#include "ClientCore.h"
+#include "../Shared/ClientCore.h"
 #include "logging.h"
 #include "../../Shared/Console/ConsoleCore.h"
 #include "../../Shared/Console/ConsoleScreen.h"

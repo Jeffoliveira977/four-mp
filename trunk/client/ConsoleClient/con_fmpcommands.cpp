@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "con_fmpcommands.h"
-#include "ClientCore.h"
+#include "../Shared/ClientCore.h"
 #include "../Shared/NetworkManager.h"
 
 extern ClientCore client;
