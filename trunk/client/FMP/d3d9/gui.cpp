@@ -237,7 +237,7 @@ namespace CALLBACKS
 			fUserLogin->SetVisible(0);
 			fServBrowser->SetVisible(1);
 			Gui.Logged();
-			strcpy_s(Conf.Name, 32, login.c_str());
+			client.SetName(login.c_str());
 		}
 		else Gui.Message("Can't login");
 
@@ -374,7 +374,7 @@ namespace CALLBACKS
 			return;
 		}
 		
-		strcpy_s(Conf.Name, 32, n.c_str());
+		client.SetName(n.c_str());
 		fEnterNick->SetVisible(0);
 
 		if(!sbServList) return;
@@ -482,7 +482,10 @@ FMPGUI::~FMPGUI()
 	delete cc_bEnter;
 	delete sbServList;
 	delete sbPlayerList;
-	delete sbTab;
+	delete sbTab[0];
+	delete sbTab[1];
+	delete sbTab[2];
+	delete sbTab[3];
 	delete sbEnterIP;
 	delete sbEnterPort;
 	delete sbConnect;

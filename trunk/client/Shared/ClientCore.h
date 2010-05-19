@@ -39,6 +39,7 @@ public:
 	char *GetName(void);
 	short GetIndex(void);
 	bool SetGameState(const GameState state);
+	bool SetName(const char name[MAX_PLAYER_NAME_LENGTH]);
 	bool SetIndex(const short i);
 	unsigned int GetSessionKey(void);
 #if defined (FMP_CLIENT)

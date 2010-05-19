@@ -44,14 +44,9 @@ ConsoleWindow conwindow;
 
 bool myEnter = 0;
 bool cheats = 0;
-unsigned char selectedplayerclass = 0;
-
-char model_select_text[128];
 
 FPlayer gPlayer[MAX_PLAYERS];
 FVehicle gCar[MAX_CARS];
-FConfig Conf;
-PlayerClass pClass[MAX_PCLASS];
 CHATMSG mChat[64];
 
 int enterChat = -1;
@@ -290,50 +285,32 @@ void FMPHook::GameThread()
 				Natives::SetPlayerControl(_GetPlayer(), 0);
 				if(GetAsyncKeyState(VK_SHIFT) != 0)
 				{
-					gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;	
+					//gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;	
 					Natives::SetPlayerControl(_GetPlayer(), 1);
 					client.SetGameState(GameStateInGame);
-					if(Conf.ComponentSelect == 1) client.SetGameState(GameStateComponentSelect);
-
-					if(Conf.ComponentSelect == 0)
-					{
-						nm.SendPlayerSpawnRequest();
-					}
+					nm.SendPlayerSpawnRequest();
 				}
 				else if(GetAsyncKeyState(VK_RIGHT) != 0)
 				{
-					selectedplayerclass++;
-					if(selectedplayerclass == Conf.NumSkins)
-						selectedplayerclass = 0;
-					gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;
+					//selectedplayerclass++;
+					//gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;
 					nm.SendPlayerModelChange();
 					
 					Natives::RequestModel((eModel)gPlayer[client.GetIndex()].model);
 					while(!Natives::HasModelLoaded((eModel)gPlayer[client.GetIndex()].model)) wait(1);
 					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[client.GetIndex()].model);
 					Natives::SetCharDefaultComponentVariation(_GetPlayerPed());
-
-					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
 				}
 				else if(GetAsyncKeyState(VK_LEFT) != 0)
 				{
-					if (selectedplayerclass == 0)
-					{
-						selectedplayerclass = Conf.NumSkins - 1;
-					}
-					else
-					{
-						selectedplayerclass--;
-					}
-					gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;
+					//selectedplayerclass--;
+					//gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;
 					nm.SendPlayerModelChange();
 					
 					Natives::RequestModel((eModel)gPlayer[client.GetIndex()].model);
 					while(!Natives::HasModelLoaded((eModel)gPlayer[client.GetIndex()].model)) wait(1);
 					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[client.GetIndex()].model);
 					Natives::SetCharDefaultComponentVariation(_GetPlayerPed());
-
-					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
 				}
 				break;
 			}
@@ -355,41 +332,36 @@ void FMPHook::GameThread()
 				}
 				else if(GetAsyncKeyState(VK_RIGHT) != 0)
 				{
-					int t = Natives::GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)+1;
-					int d = Natives::GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)+1;
+					//int t = Natives::GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)+1;
+					//int d = Natives::GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)+1;
 
-					Natives::SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass, t, d);
-
-					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
+					//Natives::SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass, t, d);
 				}
 				else if(GetAsyncKeyState(VK_LEFT) != 0)
 				{
-					int t = Natives::GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)-1;
-					if(t == -1) t = 0;
-					int d = Natives::GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)-1;
-					if(d == -1) t = 0;
+					//int t = Natives::GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)-1;
+					//if(t == -1) t = 0;
+					//int d = Natives::GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)-1;
+					//if(d == -1) t = 0;
 
-					Natives::SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass, t, d);
-					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
+					//Natives::SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass, t, d);
 				}
 				else if(GetAsyncKeyState(VK_DOWN) != 0)
 				{
-					selectedplayerclass++;
-					if(selectedplayerclass == 11)
-						selectedplayerclass = 0;
-					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
+					//selectedplayerclass++;
+					//if(selectedplayerclass == 11)
+					//	selectedplayerclass = 0;
 				}
 				else if(GetAsyncKeyState(VK_UP) != 0)
 				{
-					if (selectedplayerclass == 0)
-					{
-						selectedplayerclass = 10;
-					}
-					else
-					{
-						selectedplayerclass--;
-					}
-					sprintf(model_select_text, "Selected model id %d", selectedplayerclass);
+					//if (selectedplayerclass == 0)
+					//{
+					//	selectedplayerclass = 10;
+					//}
+					//else
+					//{
+					//	selectedplayerclass--;
+					//}
 				}
 				break;
 			}
