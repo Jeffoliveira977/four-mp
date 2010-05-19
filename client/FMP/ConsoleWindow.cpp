@@ -39,7 +39,6 @@ void ConsoleWindow::Load(void)
 	mainwindow->AddElement(outputbox);
 	mainwindow->AddElement(inputbox);
 	mainwindow->AddElement(submitbutton);
-	concore.SetOutputFunction(PrintToConsole);
 	IsLoaded = true;
 	LeaveCriticalSection(&cs_gui);
 }
