@@ -187,7 +187,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ClientCore.cpp"
+				RelativePath="..\Shared\ClientCore.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\con_sharedcommands.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\con_sharedcvarhooks.cpp"
 				>
 			</File>
 			<File
@@ -282,6 +290,14 @@
 			</File>
 			<File
 				RelativePath="..\Shared\ClientCore.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\con_sharedcommands.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Shared\con_sharedcvarhooks.h"
 				>
 			</File>
 			<File

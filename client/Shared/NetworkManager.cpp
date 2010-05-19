@@ -22,7 +22,6 @@ extern ClientCore client;
 extern FMPHook HOOK;
 extern FMPGUI Gui;
 
-extern ClientState clientstate;
 extern unsigned char selectedplayerclass;
 extern char enterMsg[256];
 #endif
@@ -114,42 +113,42 @@ void NetworkManager::Tick(void)
 			{
 				PrintToConsole("No free connections");
 #if defined (FMP_CLIENT)
-				clientstate.game = GameStateOffline;
+				client.SetGameState(GameStateOffline);
 #endif
 			} break;
 		case ID_DISCONNECTION_NOTIFICATION:
 			{
 				PrintToConsole("You have been kicked from the server.");
 #if defined (FMP_CLIENT)
-				clientstate.game = GameStateOffline;
+				client.SetGameState(GameStateOffline);
 #endif
 			} break;
 		case ID_CONNECTION_LOST:
 			{
 				PrintToConsole("Lost connection to the server.");
 #if defined (FMP_CLIENT)
-				clientstate.game = GameStateOffline;
+				client.SetGameState(GameStateOffline);
 #endif
 			} break;
 		case ID_CONNECTION_BANNED:
 			{
 				PrintToConsole("You are banned from the server.");
 #if defined (FMP_CLIENT)
-				clientstate.game = GameStateOffline;
+				client.SetGameState(GameStateOffline);
 #endif
 			} break;
 		case ID_INVALID_PASSWORD:
 			{
 				PrintToConsole("Invalid password");
 #if defined (FMP_CLIENT)
-				clientstate.game = GameStateOffline;
+				client.SetGameState(GameStateOffline);
 #endif
 			} break;
 		case ID_CONNECTION_ATTEMPT_FAILED:
 			{
 				PrintToConsole("Connection failed");
 #if defined (FMP_CLIENT)
-				clientstate.game = GameStateOffline;
+				client.SetGameState(GameStateOffline);
 				char str[128];
 				sprintf(str, "Can't connect to %s", pack->systemAddress.ToString());
 				Gui.Message(str);
@@ -257,11 +256,12 @@ void NetworkManager::Ping(const char *hostname, const unsigned short port)
 
 void NetworkManager::ConnectToServer(const char *hostname, const unsigned short port)
 {
+	PrintToConsole("Connecting to server...");
 #if defined (FMP_CLIENT)
-	Log("Connecting to server...");
-	if(clientstate.game == GameStateOffline)
+	GameState state = client.GetGameState();
+	if(state == GameStateOffline)
 	{
-		if(hostname[0] == 0 || port == 0)
+		if(hostname[0] == 0)
 		{
 			net->Connect(Conf.server, Conf.port, 0, 0, 0);
 			serveraddress.SetBinaryAddress(Conf.server);
@@ -274,16 +274,15 @@ void NetworkManager::ConnectToServer(const char *hostname, const unsigned short 
 			serveraddress.port = port;
 		}
 	}
-	else if(clientstate.game == GameStateConnecting)
+	else if(state == GameStateConnecting)
 	{
 		net->Connect(serveraddress.ToString(0), serveraddress.port, 0, 0, 0);
 	}
-	clientstate.game = GameStateConnecting;
+	client.SetGameState(GameStateConnecting);
 #elif defined (FMP_CONSOLE_CLIENT)
 	net->Connect(hostname, port, 0, 0, 0);
 	serveraddress.SetBinaryAddress(hostname);
 	serveraddress.port = port;
-	PrintToConsole("Connecting to server...");
 #endif
 }
 

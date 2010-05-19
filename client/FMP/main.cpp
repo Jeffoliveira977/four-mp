@@ -6,8 +6,6 @@
 // --------------------------------------------------
 // includes
 // --------------------------------------------------
-#include "masterserver.h"
-
 #include <windows.h>
 #include <process.h>
 #include <stdio.h>
@@ -24,6 +22,7 @@
 #include "main.h"
 #include "../Shared/ClientCore.h"
 #include "../Shared/NetworkManager.h"
+#include "masterserver.h"
 #include "Check\check.h"
 #include "..\..\Shared\Console\ConsoleCore.h"
 #include "d3d9/d3d9hook.h"
@@ -43,7 +42,6 @@ NetworkManager nm;
 FMPGUI Gui;
 ConsoleWindow conwindow;
 
-ClientState clientstate;
 bool myEnter = 0;
 bool cheats = 0;
 unsigned char selectedplayerclass = 0;
@@ -257,7 +255,6 @@ void FMPHook::GameThread()
 {
 	Debug("GameThread");
 	client.Load();
-	nm.Load();
 	Natives::AddHospitalRestart(0,0,0,0,1000);
 	Natives::AddHospitalRestart(0,0,100,0,1001);
 	Natives::AddHospitalRestart(0,0,0,90,1002);
@@ -266,16 +263,15 @@ void FMPHook::GameThread()
 	Natives::AddHospitalRestart(0,0,100,180,1005);
 	Natives::AddHospitalRestart(0,0,0,270,1006);
 	Natives::AddHospitalRestart(0,0,100,270,1007);
-
-	clientstate.input = InputStateGui;
 	InputFreeze(1);
 
 	RunMP();
 	
-	while(IsThreadAlive() && clientstate.game != GameStateExiting)
+	while(IsThreadAlive() && client.IsRunning())
 	{
-		nm.Tick();
-		switch (clientstate.game)
+		client.Tick();
+		static GameState state = client.GetGameState();
+		switch (state)
 		{
 		case GameStateOffline:
 			{
@@ -296,8 +292,8 @@ void FMPHook::GameThread()
 				{
 					gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;	
 					Natives::SetPlayerControl(_GetPlayer(), 1);
-					clientstate.game = GameStateInGame;
-					if(Conf.ComponentSelect == 1) clientstate.game = GameStateComponentSelect;
+					client.SetGameState(GameStateInGame);
+					if(Conf.ComponentSelect == 1) client.SetGameState(GameStateComponentSelect);
 
 					if(Conf.ComponentSelect == 0)
 					{
@@ -347,7 +343,7 @@ void FMPHook::GameThread()
 				if(GetAsyncKeyState(VK_SHIFT) != 0)
 				{
 					Natives::SetPlayerControl(_GetPlayer(), 1);
-					clientstate.game = GameStateInGame;
+					client.SetGameState(GameStateInGame);
 
 					for(int i = 0; i < 11; i++)
 					{
@@ -435,7 +431,7 @@ void GetMyPos(ConsoleCore *concore, const unsigned char numargs)
 void MainThread(void* dummy)
 {
 	Debug("MainThread (0x%x)", dwLoadOffset);
-	clientstate.input = InputStateGame;
+	client.SetInputState(InputStateGame);
 	concore.AddConCmd("getmypos", GetMyPos);
 	concore.AddConCmd("getpos", GetMyPos);
 
@@ -476,7 +472,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{
-		clientstate.game = GameStateExiting;
+		client.Shutdown();
 
 		if(MainThreadHandle != NULL)
 		{

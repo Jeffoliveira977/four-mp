@@ -1,12 +1,14 @@
 /*	Direct3D9 Device */
 
 #include <windows.h>
+#include "../../Shared/ClientCore.h"
 #include "../main.h"
 #include "d3d9hook.h"
 #include "gui.h"
 
 #define D3DHOOK_TEXTURES //comment this to disable texture hooking
 
+extern ClientCore client;
 extern DWORD dwLoadOffset;
 extern DWORD MOUSE_POS_X;
 extern DWORD MOUSE_POS_Y;
@@ -214,12 +216,13 @@ HRESULT APIENTRY hkIDirect3DDevice9::DrawTriPatch(UINT Handle, CONST float *pNum
 
 HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 {
-	MouseY = *(int*)MOUSE_POS_Y; 
 	MouseX = *(int*)MOUSE_POS_X;
+	MouseY = *(int*)MOUSE_POS_Y; 
 
-	RECT rc = {2, 2, 800, 600}; 
-	if(clientstate.input != InputStateGui && clientstate.game > GameStateConnecting)
-	{	
+	RECT rc = {2, 2, 800, 600};
+	InputState inputstate = client.GetInputState();
+	if ((inputstate != InputStateGui) && (client.GetGameState() > GameStateConnecting))
+	{
 		for(int i = 7; i >= 0; i--)
 		{
 			fChat->DrawText(0, mChat[i].msg, -1, &rc, DT_TOP|DT_LEFT, 
@@ -228,7 +231,7 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 		}
 	}
 
-	switch (clientstate.input)
+	switch (inputstate)
 	{
 	case InputStateChat:
 		{

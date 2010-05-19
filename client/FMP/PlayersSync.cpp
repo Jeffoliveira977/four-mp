@@ -36,8 +36,8 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float p
 		Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
 		Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
 		Debug("PlayerConnect: %s", "SetCoords");
-		clientstate.game = GameStateInGame;
-		clientstate.input = InputStateGame;
+		client.SetGameState(GameStateInGame);
+		client.SetInputState(InputStateGame);
 		HOOK.InputFreeze(0);
 	}
 	else // Other player connect
