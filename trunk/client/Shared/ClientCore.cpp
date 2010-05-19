@@ -32,6 +32,7 @@ ClientCore::~ClientCore(void)
 bool ClientCore::Load(void)
 {
 	rand_s(&sessionkey);
+	nm.Load();
 #if defined (FMP_CLIENT)
 	inputstate = InputStateGui;
 #elif defined (FMP_CONSOLE_CLIENT)
@@ -46,7 +47,6 @@ bool ClientCore::Load(void)
 	concore.AddConCmd("quit", ConCmdQuit, "Exit the engine.", 0);
 	concore.InterpretLine("exec autoexec.cfg");
 #endif
-	nm.Load();
 	gamestate = GameStateOffline;
 	return true;
 }
