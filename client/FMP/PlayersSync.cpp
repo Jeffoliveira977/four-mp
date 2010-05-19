@@ -54,6 +54,7 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float p
 		Debug("PlayerConnect: %s", "CreateChar");
 		Natives::GivePedFakeNetworkName(gPlayer[index].PedID, name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
 		Log("Player NAME: %s 0x%x%x%x alpha:%x",name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
+		Natives::SetBlockingOfNonTemporaryEvents(gPlayer[index].PedID, 1);
 	}
 	Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
 	gPlayer[index].model = model;
