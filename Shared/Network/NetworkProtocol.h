@@ -2,7 +2,7 @@
 
 #include "Limits.h"
 
-#define PROTOCOL_VERSION 5
+#define PROTOCOL_VERSION 6
 
 #define DEFAULT_SERVER_NETWORK_ID 0
 #define DEFAULT_CLIENT_NETWORK_ID 65534
@@ -134,7 +134,6 @@ struct NetworkPlayerHealthAndArmorChangeData
 struct NetworkPlayerSpawnRequestData
 {
 	short client;
-	unsigned char playerclassindex;
 };
 
 struct NetworkPlayerSpawnData

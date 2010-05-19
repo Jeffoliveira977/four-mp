@@ -33,6 +33,7 @@ private:
 	struct Player
 	{
 		char name[MAX_PLAYER_NAME_LENGTH]; ///< Holds the name of the player.
+		unsigned char classindex; ///< Holds the index of the player's class.
 		unsigned int model; ///< Holds the model hash of the player.
 		float position[3]; ///< Holds the position of the player.
 		float angle; ///< Holds the angle of the player.

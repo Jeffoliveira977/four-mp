@@ -344,6 +344,7 @@ bool PlayerManager::RegisterNewPlayer(const short index, char (&name)[MAX_PLAYER
 	}
 	playerbuffer[index] = new Player;
 	strcpy(playerbuffer[index]->name, name);
+	playerbuffer[index]->classindex = 0;
 	playerbuffer[index]->model = 0x98E29920;
 	playerbuffer[index]->position[0] = 0;
 	playerbuffer[index]->position[1] = 0;

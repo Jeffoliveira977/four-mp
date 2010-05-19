@@ -38,15 +38,6 @@ struct FPlayer
 	int compT[11], compD[11];
 };
 
-struct PlayerClass
-{
-	unsigned int model;
-	float position[3];
-	float angle;
-	char gun[3];
-	short ammo[3];
-};
-
 struct FVehicle
 {
 	Vehicle CarID;
@@ -60,17 +51,6 @@ struct FVehicle
 	bool doorlock[6];
 	float doorangle[6];
 	unsigned char color[2];
-};
-
-struct FConfig
-{
-	char server[32];
-	int port;
-	char Name[MAX_PLAYER_NAME_LENGTH];
-
-	bool ComponentSelect;
-	unsigned char NumSkins;
-	bool SkinSelect;
 };
 
 class COLOR

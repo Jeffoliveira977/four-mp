@@ -811,26 +811,16 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 				delete data->playerspawnrequest;
 				return;
 			}
-			if (data->playerspawnrequest->playerclassindex >= playm.classbuffersize)
-			{
-				delete data->playerspawnrequest;
-				return;
-			}
-			if (playm.classbuffer[data->playerspawnrequest->playerclassindex] == NULL)
-			{
-				delete data->playerspawnrequest;
-				return;
-			}
 			NetworkPlayerSpawnData data2;
 			data2.armor = 0;
 			data2.health = 200;
-			data2.model = playm.classbuffer[data->playerspawnrequest->playerclassindex]->model;
-			data2.angle = playm.classbuffer[data->playerspawnrequest->playerclassindex]->angle;
+			data2.model = playm.classbuffer[playm.playerbuffer[data->playerspawnrequest->client]->classindex]->model;
+			data2.angle = playm.classbuffer[playm.playerbuffer[data->playerspawnrequest->client]->classindex]->angle;
 			data2.room = 0;
-			memcpy(data2.position, playm.classbuffer[data->playerspawnrequest->playerclassindex]->position, sizeof(float) * 3);
+			memcpy(data2.position, playm.classbuffer[playm.playerbuffer[data->playerspawnrequest->client]->classindex]->position, sizeof(float) * 3);
 			memcpy(data2.compD, playm.playerbuffer[data->playerspawnrequest->client]->compD, sizeof(int) * 11);
 			memcpy(data2.compT, playm.playerbuffer[data->playerspawnrequest->client]->compT, sizeof(int) * 11);
-			vmm.OnPlayerSpawn(data->playerspawnrequest->client, data->playerspawnrequest->playerclassindex);
+			vmm.OnPlayerSpawn(data->playerspawnrequest->client, playm.playerbuffer[data->playerspawnrequest->client]->classindex);
 			data2.client = data->playerspawnrequest->client;
 			this->SendDataToAll("&NetworkManager::RecievePlayerSpawn", &data2);
 			delete data->playerspawnrequest;

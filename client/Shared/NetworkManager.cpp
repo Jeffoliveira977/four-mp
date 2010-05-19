@@ -22,7 +22,6 @@ extern ClientCore client;
 extern FMPHook HOOK;
 extern FMPGUI Gui;
 
-extern unsigned char selectedplayerclass;
 extern char enterMsg[256];
 #endif
 
@@ -256,18 +255,9 @@ void NetworkManager::ConnectToServer(const char *hostname, const unsigned short 
 	GameState state = client.GetGameState();
 	if(state == GameStateOffline)
 	{
-		if(hostname[0] == 0)
-		{
-			net->Connect(Conf.server, Conf.port, 0, 0, 0);
-			serveraddress.SetBinaryAddress(Conf.server);
-			serveraddress.port = Conf.port;
-		}
-		else
-		{
-			net->Connect(hostname, port, 0, 0, 0);
-			serveraddress.SetBinaryAddress(hostname);
-			serveraddress.port = port;
-		}
+		net->Connect(hostname, port, 0, 0, 0);
+		serveraddress.SetBinaryAddress(hostname);
+		serveraddress.port = port;
 	}
 	else if(state == GameStateConnecting)
 	{
@@ -285,13 +275,9 @@ void NetworkManager::SendClientConnectionRequest(void)
 {
 	NetworkPlayerConnectionRequestData data;
 	data.protocol = PROTOCOL_VERSION;
-#if defined (FMP_CLIENT)
-	strcpy(data.name, Conf.Name);
-#elif defined (FMP_CONSOLE_CLIENT)
 	char *name = client.GetName();
 	strcpy(data.name, name);
 	free(name);
-#endif
 	data.sessionkey = client.GetSessionKey();
 	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionRequest", serverid, data, rpc3);
 }
@@ -392,9 +378,6 @@ void NetworkManager::SendPlayerHealthAndArmorChange(void)
 void NetworkManager::SendPlayerSpawnRequest(void)
 {
 	NetworkPlayerSpawnRequestData data;
-#if defined (FMP_CLIENT)
-	data.playerclassindex = selectedplayerclass;
-#endif
 	rpc3->CallCPP("&NetworkManager::RecievePlayerSpawnRequest", serverid, data, rpc3);
 }
 

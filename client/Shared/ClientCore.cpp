@@ -102,6 +102,17 @@ bool ClientCore::SetGameState(const GameState state)
 	return true;
 }
 
+bool ClientCore::SetName(const char string[MAX_PLAYER_NAME_LENGTH])
+{
+	if (name == NULL)
+	{
+		return false;
+	}
+	strncpy(name, string, MAX_PLAYER_NAME_LENGTH - 1);
+	name[MAX_PLAYER_NAME_LENGTH-1] = '\0';
+	return true;
+}
+
 bool ClientCore::SetIndex(const short i)
 {
 	index = i;
