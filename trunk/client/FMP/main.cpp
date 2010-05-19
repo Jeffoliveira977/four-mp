@@ -384,7 +384,7 @@ void FMPHook::GameThread()
 		}
 		wait(100);
 	}
-	nm.Unload();
+	client.Unload();
 	Debug("Exit GameThread");
 }
 
@@ -403,7 +403,6 @@ void GetMyPos(ConsoleCore *concore, const unsigned char numargs)
 void MainThread(void* dummy)
 {
 	Debug("MainThread (0x%x)", dwLoadOffset);
-	client.SetInputState(InputStateGame);
 	concore.AddConCmd("getmypos", GetMyPos);
 	concore.AddConCmd("getpos", GetMyPos);
 
@@ -419,12 +418,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
 		InitLogs();
-
-		concore.RegisterStandardLibrary();
 		patchCode();
-
 		GetAddresses(dwGameVersion);
-
 		if(dwGameVersion == 0x1060 || dwGameVersion == 0x1051 || dwGameVersion == 0x1050)
 		{
 			Log("Skipping main menu");
