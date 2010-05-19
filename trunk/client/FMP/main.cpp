@@ -270,7 +270,7 @@ void FMPHook::GameThread()
 	while(IsThreadAlive() && client.IsRunning())
 	{
 		client.Tick();
-		static GameState state = client.GetGameState();
+		GameState state = client.GetGameState();
 		switch (state)
 		{
 		case GameStateOffline:

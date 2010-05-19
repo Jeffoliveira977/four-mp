@@ -164,15 +164,10 @@ void NetworkManager::Tick(void)
 				dataLength = pack->length - sizeof(unsigned char) - sizeof(RakNetTime);
 				MasterServerInfo *tmp_msi = new MasterServerInfo;
 				tmp_msi->ping = (unsigned int)(RakNet::GetTime()-time);
-				Debug("ID_PONG from SystemAddress:%u:%u.", pack->systemAddress.binaryAddress, pack->systemAddress.port);
-				Debug("Time is %i",time);
-				Debug("Ping is %i", tmp_msi->ping);
-				Debug("Data is %i bytes long.", dataLength);
 				if (dataLength > 0)
 				{
-					Debug("Data is %s\n", pack->data+sizeof(unsigned char)+sizeof(RakNetTime));
 					unsigned char *data = pack->data+sizeof(unsigned char)+sizeof(RakNetTime);
-					sscanf((char*)data, "%[^\1]\1%[^\1]\1%[^\1]\1%d\1%d\1%d\1%[^\1]\1", &tmp_msi->name, &tmp_msi->mode, &tmp_msi->loc, 
+					sscanf((char*)data, "%[^\1]\1%[^\1]\1%[^\1]\1%d\1%d\1%d\1%[^\1]\1\0", &tmp_msi->name, &tmp_msi->mode, &tmp_msi->loc, 
 					&tmp_msi->players, &tmp_msi->maxplayers, &tmp_msi->password, &tmp_msi->clan);
 				}
 				strcpy_s(tmp_msi->ip, 64, pack->systemAddress.ToString(0));
@@ -305,6 +300,7 @@ void NetworkManager::SendPlayerMove(const float speed)
 {
 	NetworkPlayerMoveData data;
 #if defined (FMP_CLIENT)
+	Debug("Sending player move");
 	memcpy(data.position, gPlayer[client.GetIndex()].position, sizeof(float) * 3);
 	data.angle = gPlayer[client.GetIndex()].angle;
 	data.speed = speed;
@@ -812,6 +808,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 	case NetworkRPCPlayerMove:
 		{
 #if defined (FMP_CLIENT)
+			Debug("Recieving player move");
 			if(gPlayer[data->playermove->client].vehicleindex != -1)
 			{
 				memcpy(gCar[gPlayer[data->playermove->client].vehicleindex].position, data->playermove->position, sizeof(float) * 3);

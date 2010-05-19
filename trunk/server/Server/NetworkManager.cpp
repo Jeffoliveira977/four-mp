@@ -187,7 +187,7 @@ void NetworkManager::UpdateServerInfo(void)
 	char *gamemode = vmm.GetGameModeName();
 	char *info = new char[512];
 	sprintf(info, "%s%c%s%c%s%c%d%c%d%c%d%c%s%c", hostname, 1, gamemode, 1, "World", 1, playm.numplayers, 1, playm.maxplayerbuffersize, 1, server.IsPasswordProtected(), 1, "", 1);
-	net->SetOfflinePingResponse(info, strlen(info));
+	net->SetOfflinePingResponse(info, strlen(info) + 1);
 	free(hostname);
 	free(gamemode);
 	delete info;
