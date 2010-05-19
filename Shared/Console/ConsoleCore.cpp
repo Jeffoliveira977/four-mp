@@ -32,24 +32,24 @@ ConsoleCore::~ConsoleCore(void)
 	unsigned short i;
 	for (i = 0; i < symbolbuffersize; i++)
 	{
-		switch (symbolbuffer[i].type)
+		switch (symbolbuffer[0].type)
 		{
 		case ConsoleSymbolTypeConVar:
 			{
-				delete symbolbuffer[i].ptr->convar;
+				delete symbolbuffer[0].ptr->convar;
 				break;
 			}
 		case ConsoleSymbolTypeConCmd:
 			{
-				for (unsigned char j = 0; j < symbolbuffer[i].numcmds; j++)
+				for (unsigned char j = 0; j < symbolbuffer[0].numcmds; j++)
 				{
-					delete symbolbuffer[i].ptr[0].concmd;
+					delete symbolbuffer[0].ptr[0].concmd;
 				}
 				break;
 			}
 		case ConsoleSymbolTypeConAlias:
 			{
-				delete symbolbuffer[i].ptr->conalias;
+				delete symbolbuffer[0].ptr->conalias;
 				break;
 			}
 		}
