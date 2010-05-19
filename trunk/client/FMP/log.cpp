@@ -69,7 +69,7 @@ void Debug(const char *string, ...)
 	vsprintf_s(buff,512,string,arglist);
 
 #ifdef PRINT_TO_CONSOLE
-	conwindow.Print(string);
+	conwindow.Print(buff);
 #endif
 
 	SYSTEMTIME time;
@@ -98,7 +98,7 @@ void Log(const char *string, ...)
 	vsprintf_s(buff,512,string,arglist);
 
 #ifdef PRINT_TO_CONSOLE
-	conwindow.Print(string);
+	conwindow.Print(buff);
 #endif
 
 	SYSTEMTIME time;
