@@ -175,15 +175,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\ClientCore.cpp"
+				RelativePath="..\Shared\ClientCore.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\con_fmpcommands.cpp"
+				RelativePath="..\Shared\con_sharedcommands.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\con_fmpcvarhooks.cpp"
+				RelativePath="..\Shared\con_sharedcvarhooks.cpp"
 				>
 			</File>
 			<File
@@ -213,11 +213,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\con_fmpcommands.h"
+				RelativePath="..\Shared\con_sharedcommands.h"
 				>
 			</File>
 			<File
-				RelativePath=".\con_fmpcvarhooks.h"
+				RelativePath="..\Shared\con_sharedcvarhooks.h"
 				>
 			</File>
 			<File

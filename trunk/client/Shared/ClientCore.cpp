@@ -1,23 +1,27 @@
 #define _CRT_RAND_S
 #include <stdlib.h>
 
-#include "../Shared/ClientCore.h"
-#include "logging.h"
+#include "ClientCore.h"
 #include "../../Shared/Console/ConsoleCore.h"
+#include "con_sharedcommands.h"
+#include "con_sharedcvarhooks.h"
+#include "NetworkManager.h"
+#if defined (FMP_CONSOLE_CLIENT)
+#include "../ConsoleClient/logging.h"
 #include "../../Shared/Console/ConsoleScreen.h"
-#include "con_fmpcommands.h"
-#include "con_fmpcvarhooks.h"
-#include "../Shared/NetworkManager.h"
+#endif
 
 extern ConsoleCore concore;
-extern ConsoleScreen conscreen;
 extern NetworkManager nm;
+#if defined (FMP_CONSOLE_CLIENT)
+extern ConsoleScreen conscreen;
+#endif
 
 ClientCore::ClientCore(void)
 {
+	gamestate = GameStateLoading;
 	strcpy(name, "unnamed");
 	index = -1; // Should be defined in PlayerManager.h
-	isrunning = false;
 	sessionkey = 0;
 }
 
@@ -27,6 +31,10 @@ ClientCore::~ClientCore(void)
 
 bool ClientCore::Load(void)
 {
+	rand_s(&sessionkey);
+#if defined (FMP_CLIENT)
+	inputstate = InputStateGui;
+#elif defined (FMP_CONSOLE_CLIENT)
 	concore.SetOutputFunction(PrintToConsole);
 	concore.SetExecPath("cfg/");
 	conscreen.SetCaption("FOUR-MP");
@@ -36,23 +44,25 @@ bool ClientCore::Load(void)
 	ConVar *namecvar = concore.AddConVar("name", "unnamed", "Current user name.", 0);
 	namecvar->HookChange(ConVarHookName);
 	concore.AddConCmd("quit", ConCmdQuit, "Exit the engine.", 0);
-	rand_s(&sessionkey);
-	nm.Load();
 	concore.InterpretLine("exec autoexec.cfg");
-	isrunning = true;
+#endif
+	nm.Load();
+	gamestate = GameStateOffline;
 	return true;
 }
 
 bool ClientCore::IsRunning(void)
 {
-	return isrunning;
+	return gamestate != GameStateUnloading;
 }
 
 void ClientCore::Tick(void)
 {
-	conscreen.CheckUserInput();
 	nm.Tick();
+#if defined (FMP_CONSOLE_CLIENT)
+	conscreen.CheckUserInput();
 	Sleep(100);
+#endif
 }
 
 void ClientCore::Unload(void)
@@ -62,7 +72,12 @@ void ClientCore::Unload(void)
 
 void ClientCore::Shutdown(void)
 {
-	isrunning = false;
+	gamestate = GameStateUnloading;
+}
+
+GameState ClientCore::GetGameState(void)
+{
+	return gamestate;
 }
 
 char *ClientCore::GetName(void)
@@ -81,6 +96,12 @@ short ClientCore::GetIndex(void)
 	return index;
 }
 
+bool ClientCore::SetGameState(const GameState state)
+{
+	gamestate = state;
+	return true;
+}
+
 bool ClientCore::SetIndex(const short i)
 {
 	index = i;
@@ -91,3 +112,16 @@ unsigned int ClientCore::GetSessionKey(void)
 {
 	return sessionkey;
 }
+
+#if defined (FMP_CLIENT)
+InputState ClientCore::GetInputState(void)
+{
+	return inputstate;
+}
+
+bool ClientCore::SetInputState(const InputState state)
+{
+	inputstate = state;
+	return true;
+}
+#endif

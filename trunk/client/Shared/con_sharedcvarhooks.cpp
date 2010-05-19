@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "con_fmpcvarhooks.h"
+#include "con_sharedcvarhooks.h"
 #include "../Shared/ClientCore.h"
 
 extern ClientCore client;

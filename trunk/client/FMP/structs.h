@@ -92,29 +92,3 @@ struct CHATMSG
 	char msg[MAX_CHAT_MESSAGE_LENGTH];
 	COLOR color;
 };
-
-/// \brief Indicates the global state of the game.
-enum GameState
-{
-	GameStateOffline, ///< Indicates that client is offline.
-	GameStateConnecting, ///< Indicates that client is connecting to the server.
-	GameStateInGame, ///< Indicates that client is connected to the server and is playing.
-	GameStateSkinSelect, ///< Indicates that client is connected to the server and is choosing their skin.
-	GameStateComponentSelect, ///< Indicates that client is connected to the server and is choosing their components (clothes).
-	GameStateExiting ///< Indicates that game is closing.
-};
-
-/// \brief Indicates the target that all keyboard and mouse input is redirected to.
-enum InputState
-{
-	InputStateGame, ///< Indicates that all input is going into the game itself.
-	InputStateChat, ///< Indicates that all input is going into the chat.
-	InputStateGui ///< Indicates that all input is going into the GUI.
-};
-
-/// \brief Indicates the global state of the client.
-struct ClientState
-{
-	GameState game; ///< Holds the current game state.
-	InputState input; ///< Holds the current input target.
-};

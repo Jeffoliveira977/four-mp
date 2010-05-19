@@ -2,11 +2,12 @@
 #include "../main.h"
 #include "window.h"
 #include "../chat.h"
+#include "../../Shared/ClientCore.h"
 #include "../Hook/classes.h"
 #include "../d3d9/Gui.h"
 #include "../ConsoleWindow.h"
 
-
+extern ClientCore client;
 extern FMPHook HOOK;
 extern FMPGUI Gui;
 extern ConsoleWindow conwindow;
@@ -16,7 +17,12 @@ WNDPROC gameProc;
 
 LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	switch (clientstate.input)
+	if (client.GetGameState() == GameStateLoading)
+	{
+		return CallWindowProc(gameProc, hWnd, Msg, wParam, lParam);
+	}
+	InputState state = client.GetInputState();
+	switch (state)
 	{
 	case InputStateGame:
 		{
@@ -26,20 +32,20 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 				{
 				case VK_F5:
 					{
-						clientstate.input = InputStateGui;
+						client.SetInputState(InputStateGui);
 						fServBrowser->SetVisible(1);
 						HOOK.InputFreeze(1);
 						break;
 					}
 				case VK_F6:
 					{
-						clientstate.input = InputStateChat;
+						client.SetInputState(InputStateChat);
 						HOOK.InputFreeze(1);
 						break;
 					}
 				case 192:
 					{
-						clientstate.input = InputStateGui;
+						client.SetInputState(InputStateGui);
 						HOOK.InputFreeze(1);
 						conwindow.Show();
 						break;
@@ -55,13 +61,13 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			{
 				if(wParam == VK_F6)
 				{
-					clientstate.input = InputStateGame; 
+					client.SetInputState(InputStateGame); 
 					HOOK.InputFreeze(0);
 					break; 
 				}
 				else if(wParam == VK_F5)
 				{
-					clientstate.input = InputStateGui;
+					client.SetInputState(InputStateGui);
 					HOOK.InputFreeze(0);
 					fChat->SetVisible(1);
 					break;
@@ -72,7 +78,7 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 					if(strlen(enterMsg) != 0)
 						SendChatMessage();
 
-					clientstate.input = InputStateGame; 
+					client.SetInputState(InputStateGame); 
 					HOOK.InputFreeze(0);
 				}
 				else if(wParam == 8)
@@ -110,21 +116,21 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 						//if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
 						//	if(!conwindow.IsVisible()) 
 						//	{
-						clientstate.input = InputStateGame;
+						client.SetInputState(InputStateGame);
 						HOOK.InputFreeze(0);
 						//	}
 						break;
 					}
 				case VK_F6:
 					{
-						if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
+						/*if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
 						{
 							Log("Chat in GUI not working");
 							if(!fChat->IsVisible())
 								fChat->SetVisible(1);
 							else
 								fChat->SetVisible(0);
-						}
+						}*/
 						break;
 					}
 				case 192:
@@ -132,7 +138,7 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 						if(conwindow.IsVisible())
 						{
 							conwindow.Hide();
-							clientstate.input = InputStateGame;
+							client.SetInputState(InputStateGame);
 							HOOK.InputFreeze(0);
 						}
 						else

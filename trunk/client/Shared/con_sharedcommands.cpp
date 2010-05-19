@@ -1,11 +1,12 @@
 /// \file
-/// \brief Source file that contains implementation of the four-mp console commands.
-/// \details See con_fmpcommands.h.
+/// \brief Source file that contains implementation of the four-mp client shared console
+/// commands.
+/// \details See con_sharedcommands.h.
 /// \author FaTony
 
 #include <string.h>
 
-#include "con_fmpcommands.h"
+#include "con_sharedcommands.h"
 #include "../Shared/ClientCore.h"
 #include "../Shared/NetworkManager.h"
 

@@ -1,15 +1,18 @@
-#include "../masterserver.h"
+#include <vector>
 #include <windows.h>
-#include "gui.h"
+
 #include "../../GUI/CGUI.h"
+
+#include "gui.h"
 #include "../main.h"
 #include "../log.h"
+#include "../../Shared/ClientCore.h"
 #include "../ConsoleWindow.h"
 #include "../Hook/classes.h"
 #include "../../Shared/NetworkManager.h"
+#include "../masterserver.h"
 
-#include <vector>
-
+extern ClientCore client;
 extern ConsoleWindow conwindow;
 extern NetworkManager nm;
 
@@ -388,13 +391,13 @@ namespace CALLBACKS
 	{
 		if(msg == END)
 		{
-			if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
+			if(client.GetGameState() > GameStateConnecting)
 			{
 				if(fChat->IsVisible()) fChat->SetVisible(0);
 
 				if(!conwindow.IsVisible()) 
 				{
-					clientstate.input = InputStateGame;
+					client.SetInputState(InputStateGame);
 					HOOK.InputFreeze(0);
 				}
 			}

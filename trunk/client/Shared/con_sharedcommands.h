@@ -1,5 +1,5 @@
 /// \file
-/// \brief Header file that describes the four-mp console commands.
+/// \brief Header file that describes the four-mp client shared console commands.
 /// \details This file describes only command callbacks. They all have syntax:
 /// void func(const ConsoleCore *concore, const unsigned char numargs);
 /// \author FaTony
