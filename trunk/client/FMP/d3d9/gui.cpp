@@ -454,6 +454,7 @@ namespace CALLBACKS
 
 FMPGUI::FMPGUI()
 {
+	Debug("FMPGUI::FMPGUI called");
 	g_Mouse[0] = 0;
 	g_Mouse[1] = 0;
 	g_Mouse[2] = 0;
@@ -462,6 +463,63 @@ FMPGUI::FMPGUI()
 	s_iHeight = 600;
 
 	InitializeCriticalSection(&cs_gui);
+	Debug("FMPGUI::FMPGUI completed");
+}
+
+FMPGUI::~FMPGUI()
+{
+	Debug("FMPGUI::~FMPGUI called");
+
+	delete fServBrowser;
+	delete fChat;
+	delete fOption;
+	delete fUserRegister;
+	delete fUserLogin;
+	delete fInfo;
+	delete fEnterNick;
+	delete cc_tChat;
+	delete cc_tEnter;
+	delete cc_bEnter;
+	delete sbServList;
+	delete sbPlayerList;
+	delete sbTab;
+	delete sbEnterIP;
+	delete sbEnterPort;
+	delete sbConnect;
+	delete sbRefresh;
+	delete sbAddToFav;
+	delete sbFltPing; 
+	delete sbFltNotFull;
+	delete sbFltNoPassword;
+	delete sbFltNotEmpty;
+	delete sbFltLocation;
+	delete sbFltMode;
+	delete urLogin;
+	delete urPass;
+	delete urConfirm;
+	delete urEmail;
+	delete urNick;
+	delete urLoginText;
+	delete urPassText;
+	delete urConfirmText;
+	delete urEmailText;
+	delete urNickText;
+	delete urInfoText;
+	delete urSendReg;
+	delete urCancelReg;
+	delete upLoginInfo;
+	delete upStrLogin;
+	delete upStrPass;
+	delete upLogin;
+	delete upPassword;
+	delete upSendLogin;
+	delete upShowRegister;
+	delete upRemeberMe;
+	delete enNick; 
+	delete enOK;
+
+	delete m_Gui;
+	Debug("FMPGUI::~FMPGUI completed");
 }
 
 void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
