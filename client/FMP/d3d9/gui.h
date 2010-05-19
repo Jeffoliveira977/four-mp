@@ -16,6 +16,7 @@ class FMPGUI
 	friend class ConsoleWindow;
 public:
 	FMPGUI();
+	~FMPGUI();
 
 	void Load(IDirect3DDevice9 * g_pDevice);
 	void HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam);

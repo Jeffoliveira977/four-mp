@@ -134,6 +134,8 @@ FMPThread::FMPThread()
 {
 	strcpy_s(ThreadName, "FMP");
 
+	memset((void*)(this+4), 0, sizeof(FMPThread)-4);
+
 	m_pOriginalThread = NULL;
 	m_nThreadIndex = -1;
 }
