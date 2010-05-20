@@ -14,15 +14,15 @@ extern ConsoleWindow conwindow;
 extern CWindow * fServBrowser;
 extern CWindow * fChat;
 WNDPROC gameProc;
-bool Minimized = 0;
+bool b_Minimized = 0;
 
 LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 
 	if(Msg == WM_ACTIVATEAPP)
 	{
-		if(wParam) Minimized = 1;
-		else Minimized = 0;
+		if(wParam) b_Minimized = 0;
+		else b_Minimized = 1;
 	}
 
 	if (client.GetGameState() == GameStateLoading)

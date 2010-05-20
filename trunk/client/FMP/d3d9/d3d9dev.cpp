@@ -13,6 +13,7 @@ extern DWORD dwLoadOffset;
 extern DWORD MOUSE_POS_X;
 extern DWORD MOUSE_POS_Y;
 extern FMPGUI Gui;
+extern bool b_Minimized;
 
 LPD3DXFONT fFMP = NULL;
 LPD3DXFONT fChat = NULL;
@@ -216,6 +217,8 @@ HRESULT APIENTRY hkIDirect3DDevice9::DrawTriPatch(UINT Handle, CONST float *pNum
 
 HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 {
+	if(b_Minimized) return m_pD3Ddev->EndScene();
+
 	MouseX = *(int*)MOUSE_POS_X;
 	MouseY = *(int*)MOUSE_POS_Y; 
 
@@ -226,25 +229,25 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 		for(int i = 7; i >= 0; i--)
 		{
 			fChat->DrawText(0, mChat[i].msg, -1, &rc, DT_TOP|DT_LEFT, 
-				D3DCOLOR_XRGB(mChat[i].color.r, mChat[i].color.g, mChat[i].color.b));
+			D3DCOLOR_XRGB(mChat[i].color.r, mChat[i].color.g, mChat[i].color.b));
 			rc.top += 11;
 		}
 	}
 
 	switch (inputstate)
 	{
-	case InputStateChat:
+		case InputStateChat:
 		{
 			//if(enterChat != -1)
 			//{
-				rc.top += 2;
-				fChat->DrawText(0, ">", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
-				rc.left += 10;
-				fChat->DrawText(0, enterMsg, -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 255));
+			rc.top += 2;
+			fChat->DrawText(0, ">", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 0));
+			rc.left += 10;
+			fChat->DrawText(0, enterMsg, -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 0));
 			//}
 			break;
 		}
-	case InputStateGui:
+		case InputStateGui:
 		{
 			EnterCriticalSection(&cs_gui);
 			Gui.MoveMouse(MouseX, MouseY);
@@ -309,7 +312,7 @@ HRESULT APIENTRY hkIDirect3DDevice9::GetDirect3D(IDirect3D9 **ppD3D9)
 {
 	HRESULT hRet = m_pD3Ddev->GetDirect3D(ppD3D9);
 	if( SUCCEEDED(hRet) )
-		*ppD3D9 = m_pD3Dint;
+	*ppD3D9 = m_pD3Dint;
 	return hRet;
 }
 
@@ -506,7 +509,7 @@ HRESULT APIENTRY hkIDirect3DDevice9::ProcessVertices(UINT SrcStartIndex,UINT Des
 ULONG APIENTRY hkIDirect3DDevice9::Release() 
 {
 	if( --m_refCount == 0 )
-		m_pManager->Release();
+	m_pManager->Release();
 
 	return m_pD3Ddev->Release();
 }
@@ -519,8 +522,8 @@ HRESULT APIENTRY hkIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresentationP
 
 	if( SUCCEEDED(hRet) )
 	{
-		m_PresentParam = *pPresentationParameters;
-		m_pManager->PostReset();
+	m_PresentParam = *pPresentationParameters;
+	m_pManager->PostReset();
 	}
 
 	return hRet;
@@ -653,12 +656,12 @@ HRESULT APIENTRY hkIDirect3DDevice9::SetStreamSourceFreq(UINT StreamNumber,UINT 
 
 HRESULT APIENTRY hkIDirect3DDevice9::SetTexture(DWORD Stage, IDirect3DBaseTexture9 *pTexture) 
 {
-#ifdef D3DHOOK_TEXTURES
+	#ifdef D3DHOOK_TEXTURES
 	IDirect3DDevice9 *dev = NULL;
 	if(pTexture != NULL && ((hkIDirect3DTexture9*)(pTexture))->GetDevice(&dev) == D3D_OK)
 	{
-		if(dev == this)
-			return m_pD3Ddev->SetTexture(Stage, ((hkIDirect3DTexture9*)(pTexture))->m_D3Dtex);
+	if(dev == this)
+		return m_pD3Ddev->SetTexture(Stage, ((hkIDirect3DTexture9*)(pTexture))->m_D3Dtex);
 	}
 #endif
 	
