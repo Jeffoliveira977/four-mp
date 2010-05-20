@@ -1,5 +1,10 @@
 #include "CGUI.h"
 
+CElement::~CElement()
+{
+	SAFE_DELETE(pFont);
+}
+
 void CElement::SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback, bool abs)
 {
 	InitializeCriticalSection(&cs);

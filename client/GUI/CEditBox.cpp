@@ -24,6 +24,15 @@ CEditBox::CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 		SetElementState( "Norm" );
 }
 
+CEditBox::~CEditBox()
+{
+	SAFE_DELETE(pString);
+	SAFE_DELETE(pCursor);
+	SAFE_DELETE(pEdit[0]);
+	SAFE_DELETE(pEdit[1]);
+	SAFE_DELETE(pEdit[2]);
+}
+
 void CEditBox::Draw()
 {
 	CPos Pos = *GetRelPos();

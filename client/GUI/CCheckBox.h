@@ -11,6 +11,7 @@ class CCheckBox : public CElement
 
 public:
 	CCheckBox( CGUI *Gui, int X, int Y, int Width, int Height, bool Checked = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	~CCheckBox();
 
 	bool GetChecked();
 	void SetChecked( bool bChecked );

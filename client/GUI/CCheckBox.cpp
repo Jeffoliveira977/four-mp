@@ -13,6 +13,13 @@ CCheckBox::CCheckBox( CGUI *Gui, int X, int Y, int Width, int Height, bool Check
 		SetElementState( "Norm" );
 }
 
+CCheckBox::~CCheckBox()
+{
+	SAFE_DELETE(pString);
+	SAFE_DELETE(tCheck);
+	SAFE_DELETE(tChecked);
+}
+
 bool CCheckBox::GetChecked()
 {
 	return m_bChecked;

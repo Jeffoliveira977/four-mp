@@ -16,6 +16,18 @@ CListBox::CListBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 		SetElementState( "Norm" );
 }
 
+CListBox::~CListBox()
+{
+	SAFE_DELETE(pSlider);
+
+	SAFE_DELETE(pInner);
+	SAFE_DELETE(pBorder);
+	SAFE_DELETE(pString);
+	SAFE_DELETE(pMouseOverString);
+	SAFE_DELETE(pSelInner);
+	SAFE_DELETE(pSelString);
+}
+
 void CListBox::Draw()
 {
 	CPos Pos = *GetRelPos();

@@ -15,6 +15,14 @@ CButton::CButton( CGUI *Gui, int X, int Y, int Width, int Height, const char * S
 		SetElementState( "Norm" );
 }
 
+CButton::~CButton()
+{
+	SAFE_DELETE(pButton[0]);
+	SAFE_DELETE(pButton[1]);
+	SAFE_DELETE(pButton[2]);
+	SAFE_DELETE(pString);
+}
+
 void CButton::Draw()
 {
 	CPos Pos = *GetRelPos();

@@ -16,6 +16,14 @@ CTextBox::CTextBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 
 }
 
+CTextBox::~CTextBox()
+{
+	SAFE_DELETE(pSlider);
+	SAFE_DELETE(pString);
+	SAFE_DELETE(pInner);
+	SAFE_DELETE(pBorder);
+}
+
 void CTextBox::Draw()
 {
 	EnterCriticalSection(&cs);

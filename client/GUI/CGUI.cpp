@@ -2,6 +2,8 @@
 
 CGUI::CGUI( IDirect3DDevice9 * pDevice )
 {
+	InitializeCriticalSection(&cs);
+
 	if( !pDevice )
 		MessageBoxA( 0, "pDevice invalid.", 0, 0 );
 
@@ -26,17 +28,52 @@ CGUI::CGUI( IDirect3DDevice9 * pDevice )
 CGUI::~CGUI()
 {
 	for( std::map<std::string,CVar*>::iterator iIter = Cvars.begin(); iIter != Cvars.end(); iIter++ )
-		SAFE_DELETE( iIter->second )
+		SAFE_DELETE( iIter->second );
 
-	SAFE_DELETE( m_pFont )
-	SAFE_DELETE( m_pMouse )
-	SAFE_DELETE( m_pKeyboard )
+	SAFE_DELETE( m_pFont );
+	SAFE_DELETE( m_pMouse );
+	SAFE_DELETE( m_pKeyboard );
 
-	SAFE_RELEASE( m_pSprite )
-	SAFE_RELEASE( m_pLine )
+	SAFE_RELEASE( m_pSprite );
+	SAFE_RELEASE( m_pLine );
 
+	SAFE_DELETE( m_wFocus );
+
+	for( int i = 0; i < (int)m_eLine[0].size(); i++ )
+		SAFE_DELETE( m_eLine[0][i] );
+	m_eLine[0].clear();
+
+	for( int i = 0; i < (int)m_eLine[1].size(); i++ )
+		SAFE_DELETE( m_eLine[1][i] );
+	m_eLine[1].clear();
+
+	for( int i = 0; i < (int)m_eBox[0].size(); i++ )
+		SAFE_DELETE( m_eBox[0][i] );
+	m_eBox[0].clear();
+
+	for( int i = 0; i < (int)m_eBox[1].size(); i++ )
+		SAFE_DELETE( m_eBox[1][i] );
+	m_eBox[1].clear();
+
+	for( int i = 0; i < (int)m_eText[0].size(); i++ )
+		SAFE_DELETE( m_eText[0][i] );
+	m_eText[0].clear();
+
+	for( int i = 0; i < (int)m_eText[1].size(); i++ )
+		SAFE_DELETE( m_eText[1][i] );
+	m_eText[1].clear();
+
+	for( int i = 0; i < (int)m_eImage[0].size(); i++ )
+		SAFE_DELETE( m_eImage[0][i] );
+	m_eImage[0].clear();
+
+	for( int i = 0; i < (int)m_eImage[1].size(); i++ )
+		SAFE_DELETE( m_eImage[1][i] );
+	m_eImage[1].clear();
+	
 	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
-		SAFE_DELETE( m_vWindows[i] )
+		SAFE_DELETE( m_vWindows[i] );
+	m_vWindows.clear();
 }
 
 void CGUI::LoadFont(int size, char *font)
@@ -283,14 +320,16 @@ void CGUI::DrawOutlinedBox( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3
 	DrawLine( iX + iWidth - 1,	iY,					iX + iWidth - 1,	iY + iHeight,		1, d3dBorderColor );
 }
 
-CWindow * CGUI::AddWindow( CWindow * pWindow ) 
+void CGUI::AddWindow( CWindow * pWindow ) 
 {
+	EnterCriticalSection(&cs);
 	m_vWindows.push_back( pWindow );
-	return m_vWindows.back();
+	LeaveCriticalSection(&cs);
 }
 
 void CGUI::BringToTop( CWindow * pWindow )
 {
+	EnterCriticalSection(&cs);
 	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
 	{
 		if(!m_vWindows[i]) continue;
@@ -305,10 +344,12 @@ void CGUI::BringToTop( CWindow * pWindow )
 
 	m_vWindows.insert(  m_vWindows.end(), pWindow );
 	m_wFocus = pWindow;
+	LeaveCriticalSection(&cs);
 }
 
 void CGUI::Draw()
 {
+	EnterCriticalSection(&cs);
 	if( !IsVisible() )
 		return;
 
@@ -348,10 +389,12 @@ void CGUI::Draw()
 		m_eImage[1][i]->Draw();
 
 	GetMouse()->Draw();
+	LeaveCriticalSection(&cs);
 }
 
 void CGUI::PreDraw()
 {
+	EnterCriticalSection(&cs);
 	if( !m_tPreDrawTimer.Running() )
 	{
 		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
@@ -365,10 +408,12 @@ void CGUI::PreDraw()
 
 		m_tPreDrawTimer.Start( 0.1f );
 	}
+	LeaveCriticalSection(&cs);
 }
 
 void CGUI::MouseMove( CMouse * pMouse )
 {
+	EnterCriticalSection(&cs);
 	CElement * pDragging = GetMouse()->GetDragging();
 
 	if( !pDragging )
@@ -403,10 +448,12 @@ void CGUI::MouseMove( CMouse * pMouse )
 	}
 	else
 		pDragging->MouseMove( pMouse );
+	LeaveCriticalSection(&cs);
 }
 
 bool CGUI::KeyEvent( SKey sKey )
 {
+	EnterCriticalSection(&cs);
 	bool bTop = false;
 
 	if( !sKey.m_vKey && ( sKey.m_bDown || ( GetMouse()->GetWheel() && !sKey.m_bDown ) ) )
@@ -476,7 +523,7 @@ bool CGUI::KeyEvent( SKey sKey )
 		if( !sKey.m_bDown )
 			bTop = false;
 	}
-
+	LeaveCriticalSection(&cs);
 	return bTop;
 }
 

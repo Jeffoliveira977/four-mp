@@ -83,6 +83,8 @@ class CGUI
 
 	typedef std::map<std::string, SElement*> tTheme;
 	std::map<std::string, tTheme> m_mThemes;
+
+	CRITICAL_SECTION cs;
 public:
 
 	CGUI( IDirect3DDevice9 * pDevice );
@@ -97,7 +99,7 @@ public:
 	void DrawLine( int iStartX, int iStartY, int iEndX, int iEndY, int iWidth, D3DCOLOR d3dColor );
 	void DrawOutlinedBox( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3dInnerColor, D3DCOLOR d3dBorderColor );
 
-	CWindow * AddWindow( CWindow * pWindow );
+	void AddWindow( CWindow * pWindow );
 	void BringToTop( CWindow * pWindow );
 
 	void Draw();

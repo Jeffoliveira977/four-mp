@@ -21,6 +21,7 @@ class CScrollBar : public CElement
 
 public:
 	CScrollBar( CGUI *Gui, CPos relPos, int iHeight );
+	~CScrollBar();
 
 	void Draw( CPos basePos );
 	void PreDraw();
