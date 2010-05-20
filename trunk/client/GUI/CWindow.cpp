@@ -49,8 +49,42 @@ CWindow::CWindow( CGUI *Gui, int X, int Y, int Width, int Height, const char * S
 
 CWindow::~CWindow()
 {
+	for( int i = 0; i < (int)m_eLine[0].size(); i++ )
+		SAFE_DELETE( m_eLine[0][i] );
+	m_eLine[0].clear();
+
+	for( int i = 0; i < (int)m_eLine[1].size(); i++ )
+		SAFE_DELETE( m_eLine[1][i] );
+	m_eLine[1].clear();
+
+	for( int i = 0; i < (int)m_eBox[0].size(); i++ )
+		SAFE_DELETE( m_eBox[0][i] );
+	m_eBox[0].clear();
+
+	for( int i = 0; i < (int)m_eBox[1].size(); i++ )
+		SAFE_DELETE( m_eBox[1][i] );
+	m_eBox[1].clear();
+
+	for( int i = 0; i < (int)m_eImage[0].size(); i++ )
+		SAFE_DELETE( m_eImage[0][i] );
+	m_eImage[0].clear();
+
+	for( int i = 0; i < (int)m_eImage[1].size(); i++ )
+		SAFE_DELETE( m_eImage[1][i] );
+	m_eImage[1].clear();
+
+	SAFE_DELETE( m_pFocussedElement );
+
+	SAFE_DELETE( pTitle );
+	SAFE_DELETE( pBody );
+	SAFE_DELETE( pTitlebar ); 
+	SAFE_DELETE( pButton );
+
+	for(int i = 0; i < 8; i++)
+		SAFE_DELETE( tBorder[i] );
+
 	for( int iIndex = 0; iIndex < static_cast<int>( m_vElements.size() ); iIndex++ )
-		SAFE_DELETE( m_vElements[ iIndex ] )
+		SAFE_DELETE( m_vElements[ iIndex ] );
 	m_vElements.clear();
 }
 

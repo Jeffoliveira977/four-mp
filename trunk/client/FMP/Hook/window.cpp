@@ -25,7 +25,7 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		else b_Minimized = 1;
 	}
 
-	if (client.GetGameState() == GameStateLoading)
+	if (client.GetGameState() == GameStateLoading || b_Minimized)
 	{
 		return CallWindowProc(gameProc, hWnd, Msg, wParam, lParam);
 	}

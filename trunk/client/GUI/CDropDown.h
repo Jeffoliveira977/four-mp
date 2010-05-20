@@ -25,6 +25,7 @@ class CDropDown : public CElement
 
 public:
 	CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	~CDropDown();
 
 	void Draw();
 	bool MouseMove( CMouse * pMouse, bool );

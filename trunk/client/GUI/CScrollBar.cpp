@@ -43,6 +43,14 @@ CScrollBar::CScrollBar( CGUI *Gui, CPos relPos, int inHeight )
 	SetValue( 0 );
 }
 
+CScrollBar::~CScrollBar()
+{
+	SAFE_DELETE(back);
+	SAFE_DELETE(pSlider);
+	SAFE_DELETE(pUpArrow);
+	SAFE_DELETE(pDownArrow);
+}
+
 int CScrollBar::GetWidth()
 {
 	return ibWidth;

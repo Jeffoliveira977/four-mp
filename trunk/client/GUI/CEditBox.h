@@ -18,6 +18,7 @@ class CEditBox : public CElement
 
 public:
 	CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	~CEditBox();
 
 	void Draw();
 

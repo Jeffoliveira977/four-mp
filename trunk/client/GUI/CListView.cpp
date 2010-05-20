@@ -38,6 +38,29 @@ CListView::CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Colum
 		SetElementState( "Norm" );
 }
 
+CListView::~CListView()
+{
+	for(int i = 0; i < Count; i++)
+	{
+		SAFE_DELETE(imgColumn[i].tFalse);
+		SAFE_DELETE(imgColumn[i].tTrue);
+		SAFE_DELETE(imgColumn[i].tTitle);
+	}
+
+	SAFE_DELETE(pSlider);
+
+	SAFE_DELETE(pInner);
+	SAFE_DELETE(pBorder);
+	SAFE_DELETE(pString);
+	SAFE_DELETE(pMouseOverString);
+	SAFE_DELETE(pSelInner);
+	SAFE_DELETE(pSelString);
+	SAFE_DELETE(pTitle);
+	SAFE_DELETE(pbTitle);
+	SAFE_DELETE(pbInner);
+	SAFE_DELETE(pTitleString);
+}
+
 void CListView::Draw()
 {
 	EnterCriticalSection(&cs);

@@ -14,6 +14,7 @@ class CTextBox : public CElement
 	CColor * pString, * pInner, * pBorder;
 public:
 	CTextBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	~CTextBox();
 
 	void Draw();
 	void PreDraw();

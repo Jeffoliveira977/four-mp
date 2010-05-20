@@ -12,6 +12,11 @@ CText::CText( CGUI *Gui, int X, int Y, int Width, int Height, const char * Strin
 		SetElementState( "Norm" );
 }
 
+CText::~CText()
+{
+	SAFE_DELETE(pString);
+}
+
 void CText::Draw()
 {
 	CPos Pos = *GetRelPos();

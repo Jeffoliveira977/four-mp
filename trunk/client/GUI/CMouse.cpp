@@ -19,6 +19,9 @@ CMouse::CMouse( CGUI *Gui, IDirect3DDevice9 * pDevice, ID3DXSprite * pSprite )
 
 CMouse::~CMouse()
 {
+	SAFE_DELETE(m_pInnerColor);
+	SAFE_DELETE(m_pBorderColor);
+	SAFE_DELETE(pCursor);
 }
 
 bool CMouse::HandleMessage( unsigned int uMsg, WPARAM wParam, LPARAM lParam )

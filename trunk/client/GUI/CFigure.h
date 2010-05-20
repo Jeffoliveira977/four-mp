@@ -12,6 +12,7 @@ class CLine
 	CWindow *wParent;
 public:
 	CLine( CGUI *Gui, int sX, int sY, int eX, int eY, int size, CColor *color, CWindow *eP = NULL);
+	~CLine();
 	void Draw();
 };
 
@@ -23,6 +24,7 @@ class CBox
 	CWindow *wParent;
 public:
 	CBox( CGUI *Gui, int iX, int iY, int iWidth, int iHeight, CColor *In, CColor *Bor, CWindow *eP = NULL);
+	~CBox();
 	void Draw();
 };
 
@@ -34,6 +36,7 @@ class CImage
 	CWindow *wParent;
 public:
 	CImage( CGUI *Gui, int iX, int iY, int iWidth, int iHeight, CTexture *iTxt, CWindow *eP = NULL);
+	~CImage();
 	void Draw();
 };
 

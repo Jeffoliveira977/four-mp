@@ -16,6 +16,18 @@ CDropDown::CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const char
 		SetElementState( "Norm" );
 }
 
+CDropDown::~CDropDown()
+{
+	SAFE_DELETE(pInner);
+	SAFE_DELETE(pBorder);
+	SAFE_DELETE(pString);
+	SAFE_DELETE(pSelectedInner);
+	SAFE_DELETE(pSelectedString);
+	SAFE_DELETE(pButton);
+	SAFE_DELETE(pLeft);
+	SAFE_DELETE(pMiddle);
+}
+
 void CDropDown::Draw()
 {
 	CPos Pos = *GetRelPos();

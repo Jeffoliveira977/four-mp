@@ -12,6 +12,11 @@ CLine::CLine( CGUI *Gui, int sX, int sY, int eX, int eY, int size, CColor *color
 	wParent = eP;
 }
 
+CLine::~CLine()
+{
+	SAFE_DELETE(color);
+}
+
 void CLine::Draw()
 {
 	CPos Pos = new CPos(0,0);
@@ -30,6 +35,12 @@ CBox::CBox( CGUI *Gui, int iX, int iY, int iWidth, int iHeight, CColor *In, CCol
 	wParent = eP;
 }
 
+CBox::~CBox()
+{
+	SAFE_DELETE(pInner);
+	SAFE_DELETE(pBorder);
+}
+
 void CBox::Draw()
 {
 	CPos Pos = new CPos(0,0);
@@ -45,6 +56,11 @@ CImage::CImage( CGUI *Gui, int iX, int iY, int iWidth, int iHeight, CTexture *cT
 	X = iX; Y= iY; Width = iWidth; Height = iHeight;
 	pImg = cTxt;
 	wParent = eP;
+}
+
+CImage::~CImage()
+{
+	SAFE_DELETE(pImg);
 }
 
 void CImage::Draw()
