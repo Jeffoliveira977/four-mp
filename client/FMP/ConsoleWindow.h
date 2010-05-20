@@ -7,8 +7,9 @@
 
 #include <windows.h>
 #include "..\GUI\CGUI.h"
+#include "log.h"
 
-class ConsoleWindow
+class ConsoleWindow : public Logger
 {
 public:
 	ConsoleWindow(void);
@@ -17,7 +18,7 @@ public:
 	bool IsVisible(void);
 	void Show(void);
 	void Hide(void);
-	void Print(const char *string, ...);
+	virtual void Log(const char *type, const char *string, char* = 0);
 private:
 	bool IsLoaded;
 	CWindow *mainwindow;
@@ -31,3 +32,4 @@ private:
 
 void InputBoxCallback(CElement *pElement, CMSG msg, int Param);
 void SubmitButtonCallback(CElement *pElement, CMSG msg, int Param);
+void PrintToConsole(const char *string, ...);

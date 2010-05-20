@@ -211,6 +211,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\logFile.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -310,6 +314,10 @@
 			</File>
 			<File
 				RelativePath=".\log.h"
+				>
+			</File>
+			<File
+				RelativePath=".\logFile.h"
 				>
 			</File>
 			<File

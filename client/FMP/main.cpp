@@ -14,6 +14,7 @@
 // our includes
 
 #include "log.h"
+#include "logFile.h"
 #include "Hook\types.h"
 #include "Hook\classes.h"
 #include "Hook\hook.h"
@@ -38,6 +39,7 @@ HANDLE MainThreadHandle;
 
 ConsoleCore concore;
 NetworkManager nm;
+LogFile fileLogger;
 
 FMPGUI Gui;
 ConsoleWindow conwindow;
@@ -62,10 +64,10 @@ extern DWORD dwGameVersion;
 
 void FMPHook::CreateCar(short index, unsigned int model, float position[3], float angle, unsigned char color[2])
 {
-	Log("CREATE CAR %d", index);
+	Log::Info("CREATE CAR %d", index);
 	Natives::RequestModel((eModel)model);
 	while(!Natives::HasModelLoaded((eModel)model)) wait(0);
-	Log("Model LOADED");
+	Log::Info("Model LOADED");
 	Natives::CreateCar(model, position[0], position[1], position[2], &gCar[index].CarID, 1);
 	Natives::SetCarHeading(gCar[index].CarID, angle);
 	gCar[index].exist = 1;
@@ -103,7 +105,7 @@ void FMPHook::InputFreeze(bool e)
 
 void FMPHook::RunMP()
 {
-	Log("Starting up multiplayer mode.");
+	Log::Info("Starting up multiplayer mode.");
 	//AllowEmergencyServices(0);
 	Natives::SetPedDensityMultiplier(0);
 	Natives::SetCarDensityMultiplier(0);
@@ -243,12 +245,12 @@ void FMPHook::RunMP()
 	Natives::SetTimeOfDay(12,0);
 	Natives::SetMaxWantedLevel(0);
 
-	Log("Multiplayer mode started.");
+	Log::Info("Multiplayer mode started.");
 }
 
 void FMPHook::GameThread()
 {
-	Debug("GameThread");
+	Log::Debug("GameThread");
 	client.Load();
 	Natives::AddHospitalRestart(0,0,0,0,1000);
 	Natives::AddHospitalRestart(0,0,100,0,1001);
@@ -385,14 +387,14 @@ void FMPHook::GameThread()
 		wait(100);
 	}
 	client.Unload();
-	Debug("Exit GameThread");
+	Log::Debug("Exit GameThread");
 }
 
 void FMPHook::GetMyPos()
 {
 	float x, y, z;
 	Natives::GetCharCoordinates(_GetPlayerPed(), &x, &y, &z);
-	Log("MY POS (%f; %f; %f)", x, y, z);
+	Log::Info("MY POS (%f; %f; %f)", x, y, z);
 }
 
 void GetMyPos(ConsoleCore *concore, const unsigned char numargs)
@@ -402,12 +404,12 @@ void GetMyPos(ConsoleCore *concore, const unsigned char numargs)
 
 void MainThread(void* dummy)
 {
-	Debug("MainThread (0x%x)", dwLoadOffset);
+	Log::Debug("MainThread (0x%x)", dwLoadOffset);
 	concore.AddConCmd("getmypos", GetMyPos);
 	concore.AddConCmd("getpos", GetMyPos);
 
 	HOOK.AttachGtaThread("FOURMP");
-	Debug("Attached");
+	Log::Debug("Attached");
 
 	CloseHandle(MainThreadHandle);
 	MainThreadHandle = NULL;
@@ -417,25 +419,31 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 {
 	if(ul_reason_for_call == DLL_PROCESS_ATTACH) 
 	{
-		InitLogs();
+		DisableThreadLibraryCalls(hModule);
+
+		Log::SetState( LOG_INFO|LOG_ERROR|LOG_WARNING|LOG_DEBUG );
+		Log::AddLogger( &fileLogger );
+		Log::AddLogger( &conwindow );
+
+		concore.RegisterStandardLibrary();
+
 		patchCode();
 		GetAddresses(dwGameVersion);
 		if(dwGameVersion == 0x1060 || dwGameVersion == 0x1051 || dwGameVersion == 0x1050)
 		{
-			Log("Skipping main menu");
+			Log::Info("Skipping main menu");
 			JmpHook(CGAME_PROCESS_SLEEP, CGAME_PROCESS_START_GAME);
 			SetString(GAME_NAME,"GTA IV: FOUR-MP");
 
-			Debug("Set DX9 Hook");
-			DisableThreadLibraryCalls(hModule);
+			Log::Debug("Set DX9 Hook");
 			DetourFunc((BYTE*)ADDRESS_CREATE_DEVICE,(BYTE*)hkDirect3DCreate9, 5);
 
-			Debug("Set script hook");
+			Log::Debug("Set script hook");
 			DWORD threadId = 0; 
 			MainThreadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&MainThread, 0, 0, (LPDWORD)&threadId);
 		}
 		else
-			Log("This version not supported (%x)", dwGameVersion);
+			Log::Info("This version not supported (%x)", dwGameVersion);
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{
@@ -446,8 +454,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 			TerminateThread(MainThreadHandle, 1);
 			CloseHandle(MainThreadHandle);
 		}
-		Debug("EXIT FMP");
-		CloseLogs();
+		Log::Debug("EXIT FMP");
 	}
 	return TRUE;
 }

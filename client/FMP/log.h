@@ -1,20 +1,27 @@
-/*
-*	Created:			26.10.09
-*	Created by:			009 & WNeZRoS
-*	Last Modifed:		28.10.09
-*/
 #pragma once
 
-#define DEBUG_ON
-#define LOGGING_ON
-#define PRINT_TO_CONSOLE
+#define LOG_NONE	0x0
+#define LOG_ON		0x1
+#define LOG_DEBUG	0x2
+#define LOG_INFO	0x4
+#define LOG_ERROR	0x8
+#define LOG_WARNING 0x10
 
-void InitLogs();
-void CloseLogs();
+class Logger
+{
+public:
+	virtual void Log(const char *type, const char *string, char*) = 0;
+};
 
-bool FileExists(const char *fname);
+namespace Log
+{
+	void AddLogger(Logger* iLog);
+	void SetState(unsigned int state);
 
-void PrintToConsole(const char *string, ...);
-
-void Debug(const char *string, ...);
-void Log(const char *string, ...);
+	void Debug(const char *string, ...);
+	void Info(const char *string, ...);
+	void Error(const char *string, ...);
+	void Warning(const char *string, ...);
+	void Other(const char *type, const char *string, ...);
+	void Void(const char *string, ...);
+}

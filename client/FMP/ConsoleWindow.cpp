@@ -4,7 +4,6 @@
 /// \author FaTony
 
 #include "ConsoleWindow.h"
-#include "log.h"
 #include "..\..\Shared\Console\ConsoleCore.h"
 #include "d3d9\gui.h"
 
@@ -58,7 +57,7 @@ void ConsoleWindow::Hide(void)
 	mainwindow->SetVisible(false);
 }
 
-void ConsoleWindow::Print(const char *string, ...)
+void ConsoleWindow::Log(const char *type, const char *string, va_list arglist)
 {
 	if (!IsLoaded)
 	{
@@ -68,19 +67,18 @@ void ConsoleWindow::Print(const char *string, ...)
 	{
 		return;
 	}
-	va_list arglist; 
-    va_start(arglist, string);
 	int stringsize = _vscprintf(string, arglist);
-	char *tempstring = (char *)calloc(stringsize + 1, sizeof(char));
-	vsprintf(tempstring, string, arglist);
-	va_end(arglist);
+	char *tempstring = (char *)calloc(stringsize + 1 + strlen(type), sizeof(char));
+	strcpy(tempstring, type);
+	tempstring[strlen(type)] = ' ';
+	vsprintf(tempstring+strlen(type)+1, string, arglist);
 	outputbox->AddString(tempstring);
 	free(tempstring);
 }
 
 void ConsoleWindow::SubmitText(void)
 {
-	this->Print("> %s", inputbox->GetString().c_str());
+	this->Log(">", inputbox->GetString().c_str());
 	concore.InterpretLine(inputbox->GetString().c_str());
 	inputbox->SetString("");
 }
@@ -104,4 +102,12 @@ void SubmitButtonCallback(CElement *pElement, CMSG msg, int Param)
 		return;
 	}
 	conwindow.SubmitText();
+}
+
+void PrintToConsole(const char *string, ...)
+{
+	va_list arglist; 
+	va_start(arglist, string);
+	conwindow.Log("", string, arglist);
+	va_end(arglist); 
 }

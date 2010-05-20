@@ -46,8 +46,8 @@ void FMPHook::MoveSync()
 			if(cs > speed) speed = cs;
 
 			int dr = 1;
-			if(!Natives::DoesVehicleExist(car)) { Debug("DOES"); }
-			if(Natives::IsCarStopped(car)) { Debug("STOP"); dr = 0; }
+			if(!Natives::DoesVehicleExist(car)) { Log::Debug("DOES"); }
+			if(Natives::IsCarStopped(car)) { Log::Debug("STOP"); dr = 0; }
 			Vector3 v;
 			Natives::GetCarSpeedVector(car, &v, 1);
 			float x = floor(v.X * 1000 + 0.5)/1000;
@@ -101,9 +101,9 @@ void FMPHook::CarDoSync()
 		{
 			short carid;
 			float x, y, z;
-			Log("PED");
+			Log::Info("PED");
 			Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &x, &y, &z);
-			Log("GETCOORD");
+			Log::Info("GETCOORD");
 			carid = _GetClosestCar(x, y, z, 10);
 			if(carid != -1)
 			{
@@ -119,14 +119,14 @@ void FMPHook::CarDoSync()
 	}
 	else if(GetAsyncKeyState(71) != 0 && !Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && myEnter == 0)
 	{
-		Log("GGGGG");
+		Log::Info("GGGGG");
 		short carid;
 		char seatid = 0; 
 		unsigned int max;
 		float x, y, z;
-		Log("CARPED");
+		Log::Info("CARPED");
 		Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &x, &y, &z);
-		Log("GETCOORD");
+		Log::Info("GETCOORD");
 		carid = _GetClosestCar(x, y, z, 10);
 		if(carid != -1)
 		{

@@ -74,12 +74,12 @@ HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 	if( SUCCEEDED(hRet) )
 	{
 		hkIDirect3DDevice9 *ret = new hkIDirect3DDevice9(ppReturnedDeviceInterface, pPresentationParameters, this);
-		Debug("Hooked Direct3D9 device: 0x%x -> 0x%x", ret->m_pD3Ddev, ret);
+		Log::Debug("Hooked Direct3D9 device: 0x%x -> 0x%x", ret->m_pD3Ddev, ret);
 
 		gameProc = (WNDPROC)GetWindowLong(hFocusWindow,GWL_WNDPROC);
 		SetWindowLong(hFocusWindow,GWL_WNDPROC,(LONG)DefWndProc);
 		Gui.Load(ret->m_pD3Ddev);
-		Debug("Save Device");
+		Log::Debug("Save Device");
 		//clientstate.input = InputStateGui;
 
 		if(fFMP == NULL)

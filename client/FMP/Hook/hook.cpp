@@ -38,13 +38,13 @@ FMPHook::FMPHook(): FMPThread()
 
 FMPHook::~FMPHook()
 {
-	Debug("FMPHook::~FMPHook called");
-	Debug("FMPHook::~FMPHook complete");
+	Log::Debug("FMPHook::~FMPHook called");
+	Log::Debug("FMPHook::~FMPHook complete");
 }
 
 ThreadStates FMPHook::Reset(unsigned int hash,int v2,int i3)
 {
-	Debug("FMPHook::reset called");
+	Log::Debug("FMPHook::reset called");
 	if (m_pScriptFiber)
 		DeleteFiber(m_pScriptFiber);
 
@@ -55,18 +55,18 @@ ThreadStates FMPHook::Reset(unsigned int hash,int v2,int i3)
 		Kill();
 		return m_context.eThreadState;
 	}
-	Debug("FMPHook::reset complete");
+	Log::Debug("FMPHook::reset complete");
 	return FMPThread::Reset(hash,v2,i3);
 }
 
 void FMPHook::FiberStart(void* parameter)
 {
-	Debug("FMPHook::FiberStart called");
+	Log::Debug("FMPHook::FiberStart called");
 	FMPHook* Thread = ptr_cast<FMPHook>(parameter);
 	Thread->GameThread();
 	Thread->m_bKillRequested = true;
 	SwitchToFiber(Thread->m_pPrimaryFiber);
-	Debug("FMPHook::FiberStart complete");
+	Log::Debug("FMPHook::FiberStart complete");
 }
 
 ThreadStates FMPHook::Run(int i1)
@@ -112,10 +112,10 @@ void FMPHook::wait(unsigned int timeMS)
 
 void FMPHook::Kill()
 {
-	Debug("FMPHook::Kill called");
+	Log::Debug("FMPHook::Kill called");
 	if (GetCurrentFiber() != m_pPrimaryFiber) 
 	{
-		Debug("FMPHook::Kill exited");
+		Log::Debug("FMPHook::Kill exited");
 		return;
 	}
 
@@ -126,7 +126,7 @@ void FMPHook::Kill()
 	m_bKillRequested = false;
 
 	FMPThread::Kill();
-	Debug("FMPHook::Kill complete");
+	Log::Debug("FMPHook::Kill complete");
 }
 
 bool FMPHook::IsThreadAlive()
@@ -136,13 +136,13 @@ bool FMPHook::IsThreadAlive()
 
 void FMPHook::TerminateThisScript()
 {
-	Debug("FMPHook::TerminateThisScript called");
+	Log::Debug("FMPHook::TerminateThisScript called");
 	if (GetCurrentFiber() != m_pScriptFiber)
 		return;
 
 	m_bKillRequested = true;	
 	SwitchToFiber(m_pPrimaryFiber);
-	Debug("FMPHook::TerminateThisScript complete");
+	Log::Debug("FMPHook::TerminateThisScript complete");
 }
 
 //-----------------------------------------------------------

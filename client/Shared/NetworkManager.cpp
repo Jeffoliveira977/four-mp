@@ -100,52 +100,52 @@ void NetworkManager::Tick(void)
 		{
 		case ID_CONNECTION_REQUEST_ACCEPTED:
 			{
-				PrintToConsole("Connection accepted. Sending client info...");
+				Log::Info("Connection accepted. Sending client info...");
 				this->SendClientConnectionRequest();
 			} break;
 		case ID_ALREADY_CONNECTED:
 			{
-				PrintToConsole("Already connected");
+				Log::Info("Already connected");
 				//clientstate.game = GameStateInGame;	
 			} break;
 		case ID_NO_FREE_INCOMING_CONNECTIONS:
 			{
-				PrintToConsole("No free connections");
+				Log::Info("No free connections");
 #if defined (FMP_CLIENT)
 				client.SetGameState(GameStateOffline);
 #endif
 			} break;
 		case ID_DISCONNECTION_NOTIFICATION:
 			{
-				PrintToConsole("You have been kicked from the server.");
+				Log::Info("You have been kicked from the server.");
 #if defined (FMP_CLIENT)
 				client.SetGameState(GameStateOffline);
 #endif
 			} break;
 		case ID_CONNECTION_LOST:
 			{
-				PrintToConsole("Lost connection to the server.");
+				Log::Info("Lost connection to the server.");
 #if defined (FMP_CLIENT)
 				client.SetGameState(GameStateOffline);
 #endif
 			} break;
 		case ID_CONNECTION_BANNED:
 			{
-				PrintToConsole("You are banned from the server.");
+				Log::Info("You are banned from the server.");
 #if defined (FMP_CLIENT)
 				client.SetGameState(GameStateOffline);
 #endif
 			} break;
 		case ID_INVALID_PASSWORD:
 			{
-				PrintToConsole("Invalid password");
+				Log::Info("Invalid password");
 #if defined (FMP_CLIENT)
 				client.SetGameState(GameStateOffline);
 #endif
 			} break;
 		case ID_CONNECTION_ATTEMPT_FAILED:
 			{
-				PrintToConsole("Connection failed");
+				Log::Info("Connection failed");
 #if defined (FMP_CLIENT)
 				client.SetGameState(GameStateOffline);
 				char str[128];
@@ -156,13 +156,19 @@ void NetworkManager::Tick(void)
 		case ID_PONG:
 			{
 #if defined (FMP_CLIENT)
-				Log("RakNet: Pong");
+				Log::Info("RakNet: Pong");
 				RakNetTime time, dataLength;
 				RakNet::BitStream pong( pack->data+1, sizeof(RakNetTime), false);
 				pong.Read(time);
 				dataLength = pack->length - sizeof(unsigned char) - sizeof(RakNetTime);
 				MasterServerInfo *tmp_msi = new MasterServerInfo;
 				tmp_msi->ping = (unsigned int)(RakNet::GetTime()-time);
+
+				Log::Debug("ID_PONG from SystemAddress:%u:%u.", pack->systemAddress.binaryAddress, pack->systemAddress.port);
+				Log::Debug("Time is %i",time);
+				Log::Debug("Ping is %i", tmp_msi->ping);
+				Log::Debug("Data is %i bytes long.", dataLength);
+
 				if (dataLength > 0)
 				{
 					unsigned char *data = pack->data+sizeof(unsigned char)+sizeof(RakNetTime);
@@ -176,35 +182,35 @@ void NetworkManager::Tick(void)
 			} break;
 		case ID_RPC_REMOTE_ERROR:
 			{
-				PrintToConsole("RakNet: RPC remote error");
+				Log::Info("RakNet: RPC remote error");
 				switch (pack->data[1])
 				{
 				case RakNet::RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
-					PrintToConsole("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
+					Log::Info("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
 					break;
 				case RakNet::RPC_ERROR_OBJECT_DOES_NOT_EXIST:
-					PrintToConsole("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
+					Log::Info("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
 					break;
 				case RakNet::RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
-					PrintToConsole("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
+					Log::Info("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
 					break;
 				case RakNet::RPC_ERROR_FUNCTION_NOT_REGISTERED:
-					PrintToConsole("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
+					Log::Info("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
 					break;
 				case RakNet::RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
-					PrintToConsole("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
+					Log::Info("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
 					break;
 				case RakNet::RPC_ERROR_CALLING_CPP_AS_C:
-					PrintToConsole("RPC_ERROR_CALLING_CPP_AS_C\n");
+					Log::Info("RPC_ERROR_CALLING_CPP_AS_C\n");
 					break;
 				case RakNet::RPC_ERROR_CALLING_C_AS_CPP:
-					PrintToConsole("RPC_ERROR_CALLING_C_AS_CPP\n");
+					Log::Info("RPC_ERROR_CALLING_C_AS_CPP\n");
 					break;
 				}
 			} break;
 		default:
 			{
-				PrintToConsole("RakNet: Unknown message (0x%x) [%s]", pack->data[0], pack->data);
+				Log::Info("RakNet: Unknown message (0x%x) [%s]", pack->data[0], pack->data);
 			} break;
 		}
 	}
@@ -250,7 +256,7 @@ void NetworkManager::Ping(const char *hostname, const unsigned short port)
 
 void NetworkManager::ConnectToServer(const char *hostname, const unsigned short port)
 {
-	PrintToConsole("Connecting to server...");
+	Log::Info("Connecting to server...");
 #if defined (FMP_CLIENT)
 	GameState state = client.GetGameState();
 	if(state == GameStateOffline)
@@ -286,7 +292,7 @@ void NetworkManager::SendPlayerMove(const float speed)
 {
 	NetworkPlayerMoveData data;
 #if defined (FMP_CLIENT)
-	Debug("Sending player move");
+	Log::Debug("Sending player move");
 	memcpy(data.position, gPlayer[client.GetIndex()].position, sizeof(float) * 3);
 	data.angle = gPlayer[client.GetIndex()].angle;
 	data.speed = speed;
@@ -680,7 +686,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 	case NetworkRPCPlayerConnection:
 		{
 #if defined (FMP_CLIENT)
-			Log("New player connection. Name is %s", data->playerconnection->name);
+			Log::Info("New player connection. Name is %s", data->playerconnection->name);
 			gPlayer[data->playerconnection->index].model = data->playerconnection->model;
 			memcpy(gPlayer[data->playerconnection->index].position, data->playerconnection->position, sizeof(float) * 3);
 			gPlayer[data->playerconnection->index].angle = data->playerconnection->angle;
@@ -704,32 +710,32 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			{
 			case NetworkPlayerConnectionErrorServerFull:
 				{
-					PrintToConsole("Connection error: Server is full.");
+					Log::Info("Connection error: Server is full.");
 					break;
 				}
 			case NetworkPlayerConnectionErrorInvalidProtocol:
 				{
-					PrintToConsole("Connection error: Server is using different protocol.");
+					Log::Info("Connection error: Server is using different protocol.");
 					break;
 				}
 			case NetworkPlayerConnectionErrorInvalidName:
 				{
-					PrintToConsole("Connection error: Invalid user name.");
+					Log::Info("Connection error: Invalid user name.");
 					break;
 				}
 			case NetworkPlayerConnectionErrorAlreadyConnected:
 				{
-					PrintToConsole("Connection error: You are already connected.");
+					Log::Info("Connection error: You are already connected.");
 					break;
 				}
 			case NetworkPlayerConnectionErrorAllocationError:
 				{
-					PrintToConsole("Connection error: Server was unable to allocate player resources.");
+					Log::Info("Connection error: Server was unable to allocate player resources.");
 					break;
 				}
 			case NetworkPlayerConnectionErrorScriptLock:
 				{
-					PrintToConsole("Connection error: Connection has been refused by a server script.");
+					Log::Info("Connection error: Connection has been refused by a server script.");
 					break;
 				}
 			}
@@ -773,7 +779,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			memcpy(gPlayer[data->playerfullupdate->index].ammo, data->playerfullupdate->ammo, sizeof(short) * 8);
 			memcpy(gPlayer[data->playerfullupdate->index].color, data->playerfullupdate->color, sizeof(unsigned char) * 4);
 
-			Log("Player full update. Name is %s", data->playerfullupdate->name);
+			Log::Info("Player full update. Name is %s", data->playerfullupdate->name);
 			HOOK.PlayerConnect(data->playerfullupdate->name, data->playerfullupdate->index, gPlayer[data->playerfullupdate->index].model, gPlayer[data->playerfullupdate->index].position);
 #endif
 			delete data->playerfullupdate;
@@ -791,7 +797,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 	case NetworkRPCPlayerMove:
 		{
 #if defined (FMP_CLIENT)
-			Debug("Recieving player move");
+			Log::Debug("Recieving player move");
 			if(gPlayer[data->playermove->client].vehicleindex != -1)
 			{
 				memcpy(gCar[gPlayer[data->playermove->client].vehicleindex].position, data->playermove->position, sizeof(float) * 3);

@@ -19,6 +19,8 @@ extern NetworkManager nm;
 extern ConsoleScreen conscreen;
 #endif
 
+void PrintToConsole(const char *string, ...);
+
 ClientCore::ClientCore(void)
 {
 	gamestate = GameStateLoading;

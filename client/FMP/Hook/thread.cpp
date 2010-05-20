@@ -25,7 +25,7 @@ void SetActiveThread(scrThread* thread)
 
 void FMPThread::AttachGtaThread(char *s_name)
 {
-	Debug("FMPThread::AttachGtaThread called");
+	Log::Debug("FMPThread::AttachGtaThread called");
 
 	while(*(PDWORD)ADDRESS_ACTIVE_THREAD == 0) Sleep(1);
 
@@ -73,12 +73,12 @@ void FMPThread::AttachGtaThread(char *s_name)
 	// Говорим игре что у нас есть ещё 1 скрипт 
 	*(PDWORD)ADDRESS_SCRIPTS_COUNT++;
 
-	Debug("FMPThread::AttachGtaThread complete");
+	Log::Debug("FMPThread::AttachGtaThread complete");
 }
 
 ThreadStates FMPThread::Reset(unsigned int hash,int v2,int i3)
 {
-	Debug("FMPThread::reset called");
+	Log::Debug("FMPThread::reset called");
 	m_context.dwOpcodeOff = 0;
 	m_context.field_10 = 0;
 	m_context.nStackOff = 0;
@@ -94,13 +94,13 @@ ThreadStates FMPThread::Reset(unsigned int hash,int v2,int i3)
 	m_pszExitMessage = "Normal exit";
 	m_bCanBePaused = true;
 
-	Debug("FMPThread::reset complete");
+	Log::Debug("FMPThread::reset complete");
 	return m_context.eThreadState;
 }
 
 ThreadStates FMPThread::Run(int i1)
 {
-	Debug("FMPThread::run called");
+	Log::Debug("FMPThread::run called");
 
 	scrThread* oldThread = GetActiveThread();
 	SetActiveThread(this);
@@ -111,7 +111,7 @@ ThreadStates FMPThread::Run(int i1)
 	}
 
 	SetActiveThread(oldThread);
-	Debug("FMPThread::run complete");
+	Log::Debug("FMPThread::run complete");
 	return m_context.eThreadState;
 }
 
@@ -142,14 +142,14 @@ FMPThread::FMPThread()
 
 FMPThread::~FMPThread()
 {
-	Debug("FMPThread::~FMPThread called");
+	Log::Debug("FMPThread::~FMPThread called");
 	if(m_pOriginalThread != NULL) Kill();
-	Debug("FMPThread::~FMPThread complete");
+	Log::Debug("FMPThread::~FMPThread complete");
 }
 
 void FMPThread::Kill()
 {
-	Debug("FMPThread::Kill called");
+	Log::Debug("FMPThread::Kill called");
 	sysArray<GtaThread>* nowThreads = GetThreadsArray();
 	nowThreads->pData[m_nThreadIndex] = m_pOriginalThread;
 
@@ -158,5 +158,5 @@ void FMPThread::Kill()
 
 	m_pOriginalThread = NULL;
 	m_nThreadIndex = -1;
-	Debug("FMPThread::Kill complete");
+	Log::Debug("FMPThread::Kill complete");
 }

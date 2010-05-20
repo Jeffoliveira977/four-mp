@@ -9,11 +9,11 @@ VirtualProtect((PVOID)(0x175B793+dwLoadOffset),2,PAGE_EXECUTE_READWRITE,&d);
 
 int __cdecl HOOK_getNativeAddress(unsigned int a1)
 {
-	Log("GetNativeAddress: 0x%x , natives count: %d",a1,*(DWORD*)(0x18DF6EC+dwLoadOffset));
+	Log::Info("GetNativeAddress: 0x%x , natives count: %d",a1,*(DWORD*)(0x18DF6EC+dwLoadOffset));
 
 	DWORD pointer1 = *(DWORD*)(0x18DF6E4+dwLoadOffset);
 	DWORD pointer2 = *(DWORD*)(0x18DF6E0+dwLoadOffset);
-	Log("pointers: [0x%x]:(%d),[0x%x]:(%d)",pointer1,pointer1,pointer2,pointer2);
+	Log::Info("pointers: [0x%x]:(%d),[0x%x]:(%d)",pointer1,pointer1,pointer2,pointer2);
 
 	unsigned int v2;
 	unsigned int v3;
@@ -22,7 +22,7 @@ int __cdecl HOOK_getNativeAddress(unsigned int a1)
 
 	if(!pointer1) 
 	{
-		Log("not find pointer");
+		Log::Info("not find pointer");
 		return 0;
 	}
 	// reset data
@@ -35,16 +35,16 @@ int __cdecl HOOK_getNativeAddress(unsigned int a1)
 		v4 = (v4 >> 1) + 1;
 		v3 = (v4 + v3) % pointer1;
 		hash_pointer = *(DWORD *)(pointer2 + 8 * v3);
-		Log("hash_pointer: 0x%x [%d]",hash_pointer,hash_pointer);
+		Log::Info("hash_pointer: 0x%x [%d]",hash_pointer,hash_pointer);
 		if((hash_pointer == 0)) break;
 	}
 	if(hash_pointer == 0)
 	{
-		Log("hash_pointer null");
+		Log::Info("hash_pointer null");
 		return 0;
 	}
 	int addr = (int)(*(DWORD*)(pointer2 + 8 * v3 + 4));
-	Log("addr = 0x%x",addr);
+	Log::Info("addr = 0x%x",addr);
 	return addr;
 /*
 	v3 = a1 % pointer1;
@@ -52,23 +52,23 @@ int __cdecl HOOK_getNativeAddress(unsigned int a1)
 	hash_pointer = *(DWORD *)(pointer2 + 8 * v3);
 	if (v2 != a1)
 	{
-		Log("v2 != a1");
+		Log::Info("v2 != a1");
 		do
 		{
 			v4 = (v4 >> 1) + 1;
 			v3 = (v4 + v3) % pointer1;
 			hash_pointer = *(DWORD *)(pointer2 + 8 * v3);
-			Log("hash_pointer: 0x%x [%d]",hash_pointer,hash_pointer);
+			Log::Info("hash_pointer: 0x%x [%d]",hash_pointer,hash_pointer);
 		}
 		while((hash_pointer != a1) && (hash_pointer != 0));
 		if(hash_pointer == 0)
 		{
-			Log("hash_pointer null");
+			Log::Info("hash_pointer null");
 			return 0;
 		}
 	}
 	int addr = (int)(*(DWORD*)(pointer2 + 8 * v3 + 4));
-	Log("addr = 0x%x",addr);
+	Log::Info("addr = 0x%x",addr);
 	return addr;
 */
 }
