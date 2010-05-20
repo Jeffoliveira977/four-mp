@@ -4,7 +4,6 @@
 #include <windows.h>
 #include "crc.h"
 #include "check.h"
-#include "../log.h"
 
 extern bool cheats;
 
@@ -94,14 +93,7 @@ void CheckASI(LPCTSTR fn)
 {
 	LPSTR path = "\0";
 	GetCurrentDirectory(MAX_PATH, path);
-	Debug("CD: %s", path);
-	char fmp[MAX_PATH];
-	sprintf(fmp, "%sFMP.asi", path);
-	if(strcmp(fn, fmp)!=0)
-	{
-		Debug(fn);
-		cheats = 1;
-	}
+	cheats = 1;
 }
 
 void CheckDLL(LPCTSTR fn)
@@ -126,6 +118,5 @@ void CheckDLL(LPCTSTR fn)
 	if(nt == 0)
 	{
 		cheats = 1;
-		Debug(fn);
 	}
 }

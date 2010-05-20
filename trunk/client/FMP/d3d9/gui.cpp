@@ -65,7 +65,7 @@ namespace CALLBACKS
 	void Refresh( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
-		Debug("CALLBACKS::Refresh called");
+		Log::Debug("CALLBACKS::Refresh called");
 
 		sbServList->Clear();
 
@@ -105,12 +105,12 @@ namespace CALLBACKS
 		{
 			nm.Ping("255.255.255.255");
 		}
-		Debug("CALLBACKS::Refresh complete");
+		Log::Debug("CALLBACKS::Refresh complete");
 	}
 	void GetLAN( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
-		Debug("CALLBACKS::GetLAN called");
+		Log::Debug("CALLBACKS::GetLAN called");
 
 		sbServList->Clear();
 		server_list.clear();
@@ -121,7 +121,7 @@ namespace CALLBACKS
 
 		nm.Ping("255.255.255.255");
 
-		Debug("CALLBACKS::GetLAN complete");
+		Log::Debug("CALLBACKS::GetLAN complete");
 	}
 	void GetInet( CElement * pElement, CMSG msg, int param )
 	{
@@ -133,7 +133,7 @@ namespace CALLBACKS
 			return;
 		}
 
-		Debug("CALLBACKS::GetInet called");
+		Log::Debug("CALLBACKS::GetInet called");
 
 		sbTab[tab]->SetEnabled(1);
 		tab = 0;
@@ -153,7 +153,7 @@ namespace CALLBACKS
 				nm.Ping(msi->ip, msi->port); 
 			}
 		}
-		Debug("CALLBACKS::GetInet complete");
+		Log::Debug("CALLBACKS::GetInet complete");
 	}
 	void GetVIP( CElement * pElement, CMSG msg, int param )
 	{
@@ -165,7 +165,7 @@ namespace CALLBACKS
 			return;
 		}
 
-		Debug("CALLBACKS::GetVIP called");
+		Log::Debug("CALLBACKS::GetVIP called");
 
 		sbTab[tab]->SetEnabled(1);
 		tab = 2;
@@ -186,7 +186,7 @@ namespace CALLBACKS
 					nm.Ping(msi->ip, msi->port); 
 			}
 		}
-		Debug("CALLBACKS::GetVIP complete");
+		Log::Debug("CALLBACKS::GetVIP complete");
 	}
 	void GetFavourite( CElement * pElement, CMSG msg, int param )
 	{
@@ -197,7 +197,7 @@ namespace CALLBACKS
 			fServBrowser->SetVisible(0);
 			return;
 		}*/
-		Debug("CALLBACKS::GetFavourite called");
+		Log::Debug("CALLBACKS::GetFavourite called");
 
 		sbServList->Clear();
 		server_list.clear();
@@ -217,14 +217,14 @@ namespace CALLBACKS
 			}
 		}
 
-		Debug("CALLBACKS::GetFavourite complete");
+		Log::Debug("CALLBACKS::GetFavourite complete");
 	}
 	void Login( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK && msg != END) return;
 		if((pElement == upLogin || pElement == upPassword) && msg == CLICK) return;
 
-		Debug("CALLBACKS::Login called");
+		Log::Debug("CALLBACKS::Login called");
 
 		std::string login = upLogin->GetString();
 		std::string pass = upPassword->GetString();
@@ -241,30 +241,30 @@ namespace CALLBACKS
 		}
 		else Gui.Message("Can't login");
 
-		Debug("CALLBACKS::Login complete");
+		Log::Debug("CALLBACKS::Login complete");
 	}
 	void ShowRegister( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
-		Debug("CALLBACKS::ShowRegister called");
+		Log::Debug("CALLBACKS::ShowRegister called");
 
 		fUserRegister->SetVisible(1);
 		fUserLogin->SetVisible(0);
-		Debug("CALLBACKS::ShowRegister complete");
+		Log::Debug("CALLBACKS::ShowRegister complete");
 	}
 	void HideRegister( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
-		Debug("CALLBACKS::HideRegister called");
+		Log::Debug("CALLBACKS::HideRegister called");
 
 		fUserRegister->SetVisible(0);
 		fUserLogin->SetVisible(1);
-		Debug("CALLBACKS::HideRegister complete");
+		Log::Debug("CALLBACKS::HideRegister complete");
 	}
 	void Register( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
-		Debug("CALLBACKS::Register called");
+		Log::Debug("CALLBACKS::Register called");
 
 		std::string login = urLogin->GetString();
 		std::string pass = urPass->GetString();
@@ -287,20 +287,20 @@ namespace CALLBACKS
 			fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Password != confirm password");
 
 		fInfo->SetVisible(1);
-		Debug("CALLBACKS::Register complete");
+		Log::Debug("CALLBACKS::Register complete");
 	}
 	void InfoOK( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
 
-		Debug("CALLBACKS::InfoOK called");
+		Log::Debug("CALLBACKS::InfoOK called");
 		fInfo->SetVisible(0);
-		Debug("CALLBACKS::IfoOK complete");
+		Log::Debug("CALLBACKS::IfoOK complete");
 	}
 	void Logout( CElement * pElement, CMSG msg, int param )
 	{
 		if(msg != CLICK) return;
-		Debug("CALLBACKS::Logout called");
+		Log::Debug("CALLBACKS::Logout called");
 		
 		bool r = fmpms.QueryUserLogout();
 		if(!r) fInfo->GetElementByString("INFO_TEXT", 1)->SetString("Logout failed");
@@ -310,27 +310,27 @@ namespace CALLBACKS
 			fUserLogin->SetVisible(1);
 		}
 		fInfo->SetVisible(1);
-		Debug("CALLBACKS::Logout complete");
+		Log::Debug("CALLBACKS::Logout complete");
 	}
 	void Chat(CElement *pElement, CMSG msg, int Param)
 	{
 		if(msg != SELECT && msg != END && msg != CLICK) return;
-		Debug("CALLBACKS::Chat called");
-		//Debug("Chat callback");
+		Log::Debug("CALLBACKS::Chat called");
+		//Log::Debug("Chat callback");
 		if(pElement == cc_tChat && msg == SELECT)
 		{
-			Debug("CALLBACKS::Chat >> Select");
+			Log::Debug("CALLBACKS::Chat >> Select");
 			// Select chat string
 		}
 		else if((pElement == cc_tEnter && msg == END) || (pElement == cc_bEnter && msg == CLICK))
 		{
 			// Send message
-			Debug("CALLBACKS::Chat >> Add");
+			Log::Debug("CALLBACKS::Chat >> Add");
 			cc_tChat->AddString(cc_tEnter->GetString());
-			Debug("CALLBACKS::Chat >> Add end");
+			Log::Debug("CALLBACKS::Chat >> Add end");
 		}
-		//Debug("Chat callback end");
-		Debug("CALLBACKS::Chat complete");
+		//Log::Debug("Chat callback end");
+		Log::Debug("CALLBACKS::Chat complete");
 	}
 	void ServerList(CElement *pElement, CMSG msg, int Param)
 	{
@@ -344,11 +344,11 @@ namespace CALLBACKS
 	{
 		if(msg != CLICK) return;
 
-		Debug("CALLBACKS::Connect called");
+		Log::Debug("CALLBACKS::Connect called");
 		if(!sbServList) return;
 
 		int sel = sbServList->GetSelected();
-		Debug("Selected %d (%d/%d)", sel, sbServList->GetSize(), server_list.size());
+		Log::Debug("Selected %d (%d/%d)", sel, sbServList->GetSize(), server_list.size());
 		if(sel >= 0)
 		{
 			if(!Gui.IsLogged())
@@ -357,10 +357,10 @@ namespace CALLBACKS
 				return;
 			}
 			MasterServerInfo *tmp_msi = server_list.at(sel);
-			Debug("FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
+			Log::Debug("FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
 			nm.ConnectToServer(tmp_msi->ip, tmp_msi->port);
 		}
-		Debug("CALLBACKS::Connect complete");
+		Log::Debug("CALLBACKS::Connect complete");
 	}
 	void EnterNick(CElement *pElement, CMSG msg, int Param)
 	{
@@ -383,7 +383,7 @@ namespace CALLBACKS
 		if(sel >= 0)
 		{
 			MasterServerInfo *tmp_msi = server_list.at(sel);
-			Debug("FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
+			Log::Debug("FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
 			nm.ConnectToServer(tmp_msi->ip, tmp_msi->port);
 		}
 	}
@@ -454,7 +454,7 @@ namespace CALLBACKS
 
 FMPGUI::FMPGUI()
 {
-	Debug("FMPGUI::FMPGUI called");
+	Log::Debug("FMPGUI::FMPGUI called");
 	g_Mouse[0] = 0;
 	g_Mouse[1] = 0;
 	g_Mouse[2] = 0;
@@ -463,12 +463,12 @@ FMPGUI::FMPGUI()
 	s_iHeight = 600;
 
 	InitializeCriticalSection(&cs_gui);
-	Debug("FMPGUI::FMPGUI completed");
+	Log::Debug("FMPGUI::FMPGUI completed");
 }
 
 FMPGUI::~FMPGUI()
 {
-	Debug("FMPGUI::~FMPGUI called");
+	Log::Debug("FMPGUI::~FMPGUI called");
 
 	delete fServBrowser;
 	delete fChat;
@@ -522,15 +522,15 @@ FMPGUI::~FMPGUI()
 	delete enOK;
 
 	delete m_Gui;
-	Debug("FMPGUI::~FMPGUI completed");
+	Log::Debug("FMPGUI::~FMPGUI completed");
 }
 
 void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 {
 	EnterCriticalSection(&cs_gui);
-	Debug("FMPGUI::Load called");
+	Log::Debug("FMPGUI::Load called");
 	fmpms.Load();
-	Debug("FMPGUI::Load >> Master Server");
+	Log::Debug("FMPGUI::Load >> Master Server");
 
 	D3DVIEWPORT9 vp;
 	g_pDevice->GetViewport(&vp);
@@ -540,7 +540,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	m_Gui = new CGUI( g_pDevice );
 	m_Gui->LoadInterfaceFromFile( "FMP\\GUITheme.xml" );
 
-	Debug("FMPGUI::Load >> Load Font");
+	Log::Debug("FMPGUI::Load >> Load Font");
 	m_Gui->LoadFont();
 	m_Gui->SetFontColors(0, 0, 0, 0, 255); // <!--black-->
 	m_Gui->SetFontColors(1, 255, 255, 255, 255); // <!--white-->
@@ -553,14 +553,14 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	m_Gui->SetFontColors(8, 255, 255, 0, 255); // <!--yellow-->
 	m_Gui->SetFontColors(9, 0, 0, 128, 255); // <!--dark blue-->
 
-	Debug("FMPGUI::Load >> Create server browser");
+	Log::Debug("FMPGUI::Load >> Create server browser");
 	// Create Servers Brouser
 	fServBrowser = new CWindow(m_Gui, s_iWidth/2-375, s_iHeight/2-250, 750, 500, "SERVER BROWSER", "SERVER_BROWSER", CALLBACKS::ServerBrowser);
-	Debug("FMPGUI::Load >> Server browser window has been created.");
+	Log::Debug("FMPGUI::Load >> Server browser window has been created.");
 	
 	int ServerWidth[6] = {16, 210, 60, 60, 100, 100};
 	sbServList = new CListView(m_Gui, 0, 29, ServerWidth, 350, 6, NULL, "SERVER_LIST", CALLBACKS::ServerList);
-	Debug("CListView 1 created");
+	Log::Debug("CListView 1 created");
 	sbServList->SetColumnImage(0, "FMPGUI/Pass.png", "FMPGUI/noPass.png", "FMPGUI/Pass.png", 16, 16);
 
 	sbServList->SetTitle("P");
@@ -572,7 +572,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	int PlayerWidth[2] = {128, 76};
 	sbPlayerList = new CListView(m_Gui, 546, 49, PlayerWidth, 200, 2, NULL, "PLAYER_LIST");
-	Debug("CListView 2 created");
+	Log::Debug("CListView 2 created");
 
 	sbPlayerList->SetTitle("Player");
 	sbPlayerList->SetTitle("Score");
@@ -581,73 +581,73 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	sbTab[1] = new CButton(m_Gui, 169, 0, 200, 0, "LAN", "TAB_LAN", CALLBACKS::GetLAN);
 	sbTab[2] = new CButton(m_Gui, 318, 0, 200, 0, "VIP", "TAB_VIP", CALLBACKS::GetVIP);
 	sbTab[3] = new CButton(m_Gui, 467, 0, 200, 0, "Favourite", "TAB_FAVOURITE", CALLBACKS::GetFavourite);
-	Debug("1111111");
+	Log::Debug("1111111");
 
 	sbEnterIP = new CEditBox(m_Gui, 600, 290, 120, 0, "127.0.0.1", "EDIT_IP");
 	sbEnterPort = new CEditBox(m_Gui, 625, 330, 60, 0, "7777", "EDIT_PORT");
-	Debug("2222222");
+	Log::Debug("2222222");
 	CText *sbTextIP = new CText(m_Gui, 560, 295, 100, 20, "IP", "TEXT_IP", NULL);
 	CText *sbTextPort = new CText(m_Gui, 560, 335, 100, 20, "Port", "TEXT_PORT", NULL);
-	Debug("3333333");
+	Log::Debug("3333333");
 	sbConnect = new CButton(m_Gui, 560, 380, 80, 0, "Connect", "MAN_CONNECT", CALLBACKS::Connect);
 	sbRefresh = new CButton(m_Gui, 660, 380, 80, 0, "Refresh", "MAN_REFRESH", CALLBACKS::Refresh);
 	sbAddToFav = new CButton(m_Gui, 600, 405, 120, 0, "Add to favourites", "MAN_ADDFAV", CALLBACKS::AddFav);
-	Debug("4444444");
+	Log::Debug("4444444");
 	sbFltPing = new CDropDown(m_Gui, 150, 380, 80, 20, "Ping", "FILTER_PING", CALLBACKS::FilterPing);
 	sbFltNotFull = new CCheckBox(m_Gui, 150, 410, 0, 0, 0, "", "FILTER_NOT_FULL");
 	sbFltLocation = new CEditBox(m_Gui, 305, 380, 80, 20, "", "FILTER_LOCATION");
 	sbFltMode = new CEditBox(m_Gui, 305, 410, 80, 20, "", "FILTER_MODE");
 	sbFltNotEmpty = new CCheckBox(m_Gui, 480, 385, 0, 0, 0, "", "FILTER_NOT_EMPTY");
 	sbFltNoPassword = new CCheckBox(m_Gui, 480, 410, 0, 0, 1, "", "FILTER_NO_PASSWORD");
-	Debug("5555555");
+	Log::Debug("5555555");
 	sbFltPing->AddElement("< 50", "50");
 	sbFltPing->AddElement("50 - 100", "50100");
 	sbFltPing->AddElement("100 - 200", "100200");
 	sbFltPing->AddElement("200 - 500", "200500");
 	sbFltPing->AddElement("> 500", "500");
-	Debug("6666666");
+	Log::Debug("6666666");
 	fServBrowser->AddElement(sbServList);
-	Debug("1");
+	Log::Debug("1");
 	fServBrowser->AddElement(sbPlayerList);
-	Debug("2");
+	Log::Debug("2");
 	fServBrowser->AddElement(sbTab[0]);
-	Debug("3");
+	Log::Debug("3");
 	fServBrowser->AddElement(sbTab[1]);
-	Debug("4");
+	Log::Debug("4");
 	fServBrowser->AddElement(sbTab[2]);
-	Debug("5");
+	Log::Debug("5");
 	fServBrowser->AddElement(sbTab[3]);
-	Debug("6");
+	Log::Debug("6");
 	fServBrowser->AddElement(sbEnterPort);
-	Debug("7");
+	Log::Debug("7");
 	fServBrowser->AddElement(sbEnterIP);
-	Debug("8");
+	Log::Debug("8");
 	fServBrowser->AddElement(sbTextIP);
-	Debug("9");
+	Log::Debug("9");
 	fServBrowser->AddElement(sbTextPort);
-	Debug("10");
+	Log::Debug("10");
 	fServBrowser->AddElement(sbConnect);
-	Debug("11");
+	Log::Debug("11");
 	fServBrowser->AddElement(sbRefresh);
-	Debug("12");
+	Log::Debug("12");
 	fServBrowser->AddElement(sbAddToFav);
-	Debug("13");
+	Log::Debug("13");
 	fServBrowser->AddElement(sbFltPing);
-	Debug("14");
+	Log::Debug("14");
 	fServBrowser->AddElement(sbFltLocation);
-	Debug("15");
+	Log::Debug("15");
 	fServBrowser->AddElement(sbFltMode);
-	Debug("16");
+	Log::Debug("16");
 	fServBrowser->AddElement(sbFltNotFull);
-	Debug("17");
+	Log::Debug("17");
 	fServBrowser->AddElement(sbFltNotEmpty);
-	Debug("18");
+	Log::Debug("18");
 	fServBrowser->AddElement(sbFltNoPassword);
-	Debug("19");
+	Log::Debug("19");
 	fServBrowser->SetVisible(0);
-	Debug("777777");
+	Log::Debug("777777");
 	// Create Chat
-	Debug("FMPGUI::Load >> Create chat");
+	Log::Debug("FMPGUI::Load >> Create chat");
 	fChat = new CWindow(m_Gui, 10, 10, 300, 400, "FOUR-MP CHAT");
 	cc_tChat = new CTextBox(m_Gui, 10, 10, 280, 320, NULL, NULL, CALLBACKS::Chat);
 	cc_tEnter = new CEditBox(m_Gui, 10, 330, 220, 0, NULL, NULL, CALLBACKS::Chat);
@@ -658,14 +658,14 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	fChat->SetVisible( 0 );
 
 	// Create Option
-	Debug("FMPGUI::Load >> Create options");
+	Log::Debug("FMPGUI::Load >> Create options");
 	fOption = new CWindow(m_Gui, 200, 200, 400, 300, "FOUR-MP OPTIONS");
 	CText * tInfo = new CText(m_Gui, 10, 10, 300, 100, "WAIT OR CREATE INTERFACE");
 	fOption->AddElement(tInfo);
 	fOption->SetVisible( 0 );
 
 	// Create login window
-	Debug("FMPGUI::Load >> Create login");
+	Log::Debug("FMPGUI::Load >> Create login");
 	fUserLogin = new CWindow(m_Gui, s_iWidth/2-150, s_iHeight/2-100, 300, 200, "USER LOGIN", "WND_USER_LOGIN", CALLBACKS::UserLogin);
 	upLoginInfo = new CText(m_Gui, 20, 15, 280, 40, "Please login or Regsiter", "UP_INFO");
 	upLogin = new CEditBox(m_Gui, 100, 45, 180, 0, "", "UP_LOGIN", CALLBACKS::Login);
@@ -687,7 +687,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	fUserLogin->AddElement(upRemeberMe);
 
 	// Create register window
-	Debug("FMPGUI::Load >> Create register");
+	Log::Debug("FMPGUI::Load >> Create register");
 	fUserRegister = new CWindow(m_Gui, s_iWidth/2-150, s_iHeight/2-140, 300, 280, "USER REGISTER", "WND_USER_REG");
 	urLogin = new CEditBox(m_Gui, 100, 50, 180, 0, "", "REG_LOGIN");
 	urPass = new CEditBox(m_Gui, 100, 80, 180, 0, "", "REG_PASSWORD");
@@ -723,7 +723,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	fUserRegister->SetCloseButton(0);
 
 	// Create messages window
-	Debug("FMPGUI::Load >> Create messages window");
+	Log::Debug("FMPGUI::Load >> Create messages window");
 	fInfo = new CWindow(m_Gui, s_iWidth/2-100, s_iHeight/2-50, 200, 100, "Information", "WND_INFO");
 	CText *iTxt = new CText(m_Gui, 10, 10, 180, 60, "INFO", "INFO_TEXT");
 	CButton *iBt = new CButton(m_Gui, 50, 45, 100, 0, "OK", "INFO_OK", CALLBACKS::InfoOK);
@@ -738,18 +738,18 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	fEnterNick->AddElement(enOK);
 	fEnterNick->SetVisible(0);
 
-	Debug("FMPGUI::Load >> Load console");
+	Log::Debug("FMPGUI::Load >> Load console");
 	conwindow.Load();
 	conwindow.Hide();
 
-	Debug("FMPGUI::Load >> Update GUI");
+	Log::Debug("FMPGUI::Load >> Update GUI");
 	m_Gui->SetVisible( true );
 	m_Gui->UpdateFromFile("FMP\\GUIStyle.xml");
-	Debug("FMPGUI::Load >> Disable tab");
+	Log::Debug("FMPGUI::Load >> Disable tab");
 
 	sbTab[tab]->SetEnabled(0);
 	GuiReady = 1;
-	Debug("FMPGUI::Load complete");
+	Log::Debug("FMPGUI::Load complete");
 	LeaveCriticalSection(&cs_gui);
 }
 

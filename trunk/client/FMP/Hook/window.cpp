@@ -14,9 +14,17 @@ extern ConsoleWindow conwindow;
 extern CWindow * fServBrowser;
 extern CWindow * fChat;
 WNDPROC gameProc;
+bool Minimized = 0;
 
 LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
+
+	if(Msg == WM_ACTIVATEAPP)
+	{
+		if(wParam) Minimized = 1;
+		else Minimized = 0;
+	}
+
 	if (client.GetGameState() == GameStateLoading)
 	{
 		return CallWindowProc(gameProc, hWnd, Msg, wParam, lParam);
@@ -125,7 +133,7 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 					{
 						/*if(clientstate.game != GameStateOffline && clientstate.game != GameStateConnecting)
 						{
-							Log("Chat in GUI not working");
+							Log::Info("Chat in GUI not working");
 							if(!fChat->IsVisible())
 								fChat->SetVisible(1);
 							else

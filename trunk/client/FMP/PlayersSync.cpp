@@ -19,41 +19,41 @@ extern FMPHook HOOK;
 
 void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float position[3])
 {
-	Debug("PlayerConnect: %s", "Start");
-	Log("ConnectInfo: %s %d 0x%x %f %f %f", name, index, model, position[0], position[1], position[2]);
+	Log::Debug("PlayerConnect: %s", "Start");
+	Log::Info("ConnectInfo: %s %d 0x%x %f %f %f", name, index, model, position[0], position[1], position[2]);
 	if(client.GetIndex() == index) // My connect
 	{
-		Debug("Our PlayerConnect");
+		Log::Debug("Our PlayerConnect");
 		gPlayer[index].model = model;
-		Log("Local player %d", Natives::IsThisModelAPed((eModel)model));
+		Log::Info("Local player %d", Natives::IsThisModelAPed((eModel)model));
 		Natives::RequestModel((eModel)model);
-		Debug("PlayerConnect: %s", "RequestModel");
+		Log::Debug("PlayerConnect: %s", "RequestModel");
 		while(!Natives::HasModelLoaded((eModel)model)) wait(1);
-		Debug("PlayerConnect: %s", "ModelLoaded");
+		Log::Debug("PlayerConnect: %s", "ModelLoaded");
 		Natives::ChangePlayerModel(_GetPlayer(), (eModel)model);
-		Debug("PlayerConnect: %s", "ChangeModel");
+		Log::Debug("PlayerConnect: %s", "ChangeModel");
 		Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
 		Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
 		Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
-		Debug("PlayerConnect: %s", "SetCoords");
+		Log::Debug("PlayerConnect: %s", "SetCoords");
 		client.SetGameState(GameStateInGame);
 		client.SetInputState(InputStateGame);
 		HOOK.InputFreeze(0);
 	}
 	else // Other player connect
 	{
-		Debug("Other player connect");
+		Log::Debug("Other player connect");
 		Natives::RequestModel((eModel)model);
-		Debug("PlayerConnect: %s", "RequestModel");
+		Log::Debug("PlayerConnect: %s", "RequestModel");
 		while(!Natives::HasModelLoaded((eModel)model)) wait(1);
-		Debug("PlayerConnect: %s", "ModelLoaded");
+		Log::Debug("PlayerConnect: %s", "ModelLoaded");
 		Natives::CreateChar(1, (eModel)model, position[0], position[1], position[2], &gPlayer[index].PedID, 1);
 		while(!Natives::DoesCharExist(gPlayer[index].PedID)) wait(1);
 		Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
-		Log("MovePlayer %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID),gPlayer[index].PedID);
-		Debug("PlayerConnect: %s", "CreateChar");
+		Log::Info("MovePlayer %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID),gPlayer[index].PedID);
+		Log::Debug("PlayerConnect: %s", "CreateChar");
 		Natives::GivePedFakeNetworkName(gPlayer[index].PedID, name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
-		Log("Player NAME: %s 0x%x%x%x alpha:%x",name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
+		Log::Info("Player NAME: %s 0x%x%x%x alpha:%x",name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
 		Natives::SetBlockingOfNonTemporaryEvents(gPlayer[index].PedID, 1);
 	}
 	Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
@@ -75,25 +75,25 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float p
 	strcpy(gPlayer[index].name, name);
 	gPlayer[index].last_active = GetTickCount();
 	gPlayer[index].connected = 1;
-	Debug("PlayerConnect: %s", "End");
+	Log::Debug("PlayerConnect: %s", "End");
 }
 
 void FMPHook::ReCreatePlayer(int player)
 {
 	Natives::RequestModel((eModel)gPlayer[player].model);
-	Log("REPlayerConnect: %s", "RequestModel");
+	Log::Info("REPlayerConnect: %s", "RequestModel");
 	while(!Natives::HasModelLoaded((eModel)gPlayer[player].model)) wait(1);
-	Log("REPlayerConnect: %s", "ModelLoaded");
+	Log::Info("REPlayerConnect: %s", "ModelLoaded");
 	Natives::CreateChar(1, (eModel)gPlayer[player].model, gPlayer[player].position[0], gPlayer[player].position[1], gPlayer[player].position[2], &gPlayer[player].PedID, 1);
 	wait(1);
-	Log("REMovePlayer %d(%d) = %d", player, Natives::DoesCharExist(gPlayer[player].PedID),gPlayer[player].PedID);
-	Log("REPlayerConnect: %s", "CreateChar");
+	Log::Info("REMovePlayer %d(%d) = %d", player, Natives::DoesCharExist(gPlayer[player].PedID),gPlayer[player].PedID);
+	Log::Info("REPlayerConnect: %s", "CreateChar");
 }
 
 void FMPHook::Jump(int player)
 {
 	if(gPlayer[player].connected == 0) return;
-	Log("Jump %d(%d) = %d", player,Natives::DoesCharExist(gPlayer[player].PedID),gPlayer[player].PedID);
+	Log::Info("Jump %d(%d) = %d", player,Natives::DoesCharExist(gPlayer[player].PedID),gPlayer[player].PedID);
 	Natives::TaskJump(gPlayer[player].PedID, 1);
 	gPlayer[player].last_active = GetTickCount();
 }
@@ -101,7 +101,7 @@ void FMPHook::Jump(int player)
 void FMPHook::Duck(int player, bool duck)
 {
 	if(gPlayer[player].connected == 0) return;
-	Log("Duck %d(%d) = %d", player,Natives::DoesCharExist(gPlayer[player].PedID),gPlayer[player].PedID);
+	Log::Info("Duck %d(%d) = %d", player,Natives::DoesCharExist(gPlayer[player].PedID),gPlayer[player].PedID);
 	Natives::TaskToggleDuck(gPlayer[player].PedID, duck);
 	gPlayer[player].last_active = GetTickCount();
 	gPlayer[player].isducking = duck;
@@ -109,18 +109,18 @@ void FMPHook::Duck(int player, bool duck)
 
 void FMPHook::PlayerMove(short index, float position[3], float speed)
 {
-	Log("PlayerMOVE HOOK");
-	Log("Index: %d, position: %f %f %f, speed: %f", index, position[0], position[1], position[2], speed);
+	Log::Info("PlayerMOVE HOOK");
+	Log::Info("Index: %d, position: %f %f %f, speed: %f", index, position[0], position[1], position[2], speed);
 	if(gPlayer[index].connected == 0) return;
 	float lx,ly,lz;
 	Natives::GetCharCoordinates(gPlayer[index].PedID, &lx, &ly, &lz);
-	Log("GETCOORD");
+	Log::Info("GETCOORD");
 	float d = GetDist(lx, ly, lz, position[0], position[1], position[2]);
 	if(gPlayer[index].vehicleindex == -1) // Если пешком
 	{
-		Log("MovePlayer (HOOK) %s", "Start");
+		Log::Info("MovePlayer (HOOK) %s", "Start");
 		int ms = 4;
-		Log("Before Move");
+		Log::Info("Before Move");
 		if(speed < 3)
 		{
 			ms = 2;
@@ -128,7 +128,7 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 			{
 				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
 				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
-				Log("PORTAL or TIMESHIFT");
+				Log::Info("PORTAL or TIMESHIFT");
 			}
 		}
 		else if(speed < 5)
@@ -138,7 +138,7 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 			{
 				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
 				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
-				Log("PORTAL or TIMESHIFT");
+				Log::Info("PORTAL or TIMESHIFT");
 			}
 		}
 		else
@@ -148,10 +148,10 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 			{
 				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
 				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
-				Log("PORTAL or TIMESHIFT");
+				Log::Info("PORTAL or TIMESHIFT");
 			}
 		}
-		Log("MOVE %f=(%f) %d", speed, d, ms);
+		Log::Info("MOVE %f=(%f) %d", speed, d, ms);
 		Natives::TaskGoStraightToCoord(gPlayer[index].PedID, position[0], position[1], position[2], ms, 45000);
 		wait(1);
 		memcpy(gPlayer[index].position, position, sizeof(float) * 3);
@@ -173,28 +173,28 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 
 void FMPHook::PlayerDisconnect(int id)
 {
-	Log("DELETE CHAR %d", id);
+	Log::Info("DELETE CHAR %d", id);
 	Natives::DeleteChar(&gPlayer[id].PedID);
 	gPlayer[id].connected = 0;
 }
 
 void FMPHook::CancelEnterInVehicle(int id)
 {
-	Log("CancelEnterInVehicle %d", id);
+	Log::Info("CancelEnterInVehicle %d", id);
 	Natives::ClearCharTasks(gPlayer[id].PedID);
 	gPlayer[id].vehicleindex = -1;
 }
 
 void FMPHook::ExitFromVehicle(int id)
 {
-	Log("ExitFromVehicle %d", id);
+	Log::Info("ExitFromVehicle %d", id);
 	Natives::TaskLeaveAnyCar(gPlayer[id].PedID);
 	gPlayer[id].vehicleindex = -1;
 }
 
 void FMPHook::EnterInVehicle(int id, int car, int seat)
 {
-	Log("EnterInVehicle %d, %d, %d", id, car, seat);
+	Log::Info("EnterInVehicle %d, %d, %d", id, car, seat);
 	if(seat == 0) Natives::TaskEnterCarAsDriver(gPlayer[id].PedID, gCar[car].CarID, -1);
 	else Natives::TaskEnterCarAsPassenger(gPlayer[id].PedID, gCar[car].CarID, -1, seat);
 	gPlayer[id].vehicleindex = car;
@@ -222,7 +222,7 @@ void FMPHook::PlayerSwapGun(int player, int gun)
 
 void FMPHook::PlayerSyncSkin(int player, int skin)
 {
-	Log("Player Sync Skin START");
+	Log::Info("Player Sync Skin START");
 	//Totally bug here.
 	if(player == client.GetIndex())
 	{
@@ -236,34 +236,34 @@ void FMPHook::PlayerSyncSkin(int player, int skin)
 		while(!Natives::HasModelLoaded((eModel)skin)) wait(0);
 		Natives::ChangePlayerModel(_GetPlayer(), (eModel)skin);
 	}
-	Log("Player Sync Skin END");
+	Log::Info("Player Sync Skin END");
 }
 
 void FMPHook::PlayerSyncSkinVariation(int player, int sm[11], int st[11])
 {
-	Log("Player Sync Skin Variation START");
+	Log::Info("Player Sync Skin Variation START");
 	for(int i = 0; i < 11; i++)
 		Natives::SetCharComponentVariation(gPlayer[player].PedID, (ePedComponent)i, sm[i], st[i]); 
-	Log("Player Sync Skin Variantion END");
+	Log::Info("Player Sync Skin Variantion END");
 }
 
 void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 {
-	Log("Player Spawn START");
+	Log::Info("Player Spawn START");
 	unsigned int model;
 	Natives::GetCharModel(gPlayer[data.client].PedID, (eModel*)&model);
-	Log("Get Model");
+	Log::Info("Get Model");
 	if(data.model != model) PlayerSyncSkin(data.client, data.model);
-	Log("IF SPAWN MODEL");
+	Log::Info("IF SPAWN MODEL");
 
 	PlayerSyncSkinVariation(data.client, data.compD, data.compT);
 
-	Log("Set UP");
+	Log::Info("Set UP");
 	Natives::SetCharCoordinates(gPlayer[data.client].PedID, data.position[0], data.position[1], data.position[2]);
 	Natives::SetCharHeading(gPlayer[data.client].PedID, data.angle);
 	Natives::SetCharHealth(gPlayer[data.client].PedID, data.health);
 	Natives::AddArmourToChar(gPlayer[data.client].PedID, -1000);
 	Natives::AddArmourToChar(gPlayer[data.client].PedID, data.armor);
 	Natives::SetRoomForCharByKey(gPlayer[data.client].PedID, (eInteriorRoomKey)data.room);
-	Log("Player SPAWN END");
+	Log::Info("Player SPAWN END");
 }

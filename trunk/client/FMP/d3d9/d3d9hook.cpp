@@ -25,11 +25,11 @@ IDirect3D9 *APIENTRY hkDirect3DCreate9(UINT SDKVersion)
 	if( d3dint != NULL )
 	{
 		hkIDirect3D9 *ret = new hkIDirect3D9(&d3dint);
-		Debug("Direct3DCreate9(%i) succeeded...", SDKVersion);
-		Debug("Hooked Direct3D9 interface: 0x%x -> 0x%x", ret->m_pD3Dint, ret);
+		Log::Debug("Direct3DCreate9(%i) succeeded...", SDKVersion);
+		Log::Debug("Hooked Direct3D9 interface: 0x%x -> 0x%x", ret->m_pD3Dint, ret);
 	}
 	else
-		Debug("Direct3DCreate9(%i) failed...", SDKVersion);
+		Log::Debug("Direct3DCreate9(%i) failed...", SDKVersion);
 	
 	return d3dint;
 }

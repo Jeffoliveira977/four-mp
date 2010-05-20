@@ -20,48 +20,48 @@ void injectFunction (DWORD dwAddress, DWORD pfnReplacement)
 // #1: XWSAStartup
 extern "C"  int __stdcall XWSAStartup (WORD wVersionRequested, LPWSADATA lpWsaData) { 
 	lpWsaData->wVersion = 2;
-	Debug ("XWSAStartup ");
+	Log::Debug("XWSAStartup ");
 	return 0;
 }
 
 // #2: XWSACleanup
 extern "C"  void __stdcall XWSACleanup () {	// XWSACleanup
-	Debug ("XWSACleanup");
+	Log::Debug("XWSACleanup");
 }
 
 // #3: XCreateSocket
 extern "C"  SOCKET __stdcall XCreateSocket (int af, int type, int protocol) { 
-	Debug ("XCreateSocket (%d, %d, %d)", af, type, protocol);
+	Log::Debug("XCreateSocket (%d, %d, %d)", af, type, protocol);
 	return INVALID_SOCKET;
 }
 
 // #4: XSockeClose
 extern "C"  int __stdcall XSockeClose (SOCKET s) {	
-	Debug ("XSockeClose)");
+	Log::Debug("XSockeClose)");
 	return 0;
 }
 
 // #5: XSocketShutdown
 extern "C"  int __stdcall XSocketShutdown (SOCKET s, int how) {	
-	Debug ("XSocketShutdown");
+	Log::Debug("XSocketShutdown");
 	return 0;
 }
 
 // #6: XSocketIOCTLSocket
 extern "C"  int __stdcall XSocketIOCTLSocket (SOCKET s, long cmd, long * argp) {
-	Debug ("XSocketIOCTLSocket");
+	Log::Debug("XSocketIOCTLSocket");
 	return 0;
 }
 
 // #7: XSocketSetSockOpt
 extern "C"  int __stdcall XSocketSetSockOpt (SOCKET s, DWORD, DWORD, DWORD, DWORD) {
-	Debug ("XSocketSetSockOpt");
+	Log::Debug("XSocketSetSockOpt");
 	return 0;
 }
 
 // #9: XSocketGetSockName
 extern "C"  int __stdcall XSocketGetSockName (SOCKET s, sockaddr_in * name, int * namelen) {
-	Debug ("XSocketGetSockName");
+	Log::Debug("XSocketGetSockName");
 	if (namelen && name && *namelen == sizeof (sockaddr_in)) 
 		memset (name, 0, sizeof (sockaddr_in));
 	return 0;
@@ -69,31 +69,31 @@ extern "C"  int __stdcall XSocketGetSockName (SOCKET s, sockaddr_in * name, int 
 
 // #11: XSocketBind
 extern "C"  SOCKET __stdcall XSocketBind (SOCKET s, sockaddr_in * addr, int * addrlen) {
-	Debug ("XSocketBind");
+	Log::Debug("XSocketBind");
 	return INVALID_SOCKET;
 }
 
 // #12: XSocketConnect
 extern "C"  int __stdcall XSocketConnect (SOCKET s, sockaddr_in * addr, int * addrlen) {
-	Debug ("XSocketConnect");
+	Log::Debug("XSocketConnect");
 	return 0;
 }
 
 // #13: XSocketListen
 extern "C"  int __stdcall XSocketListen (SOCKET s, int backlog) { 
-	Debug ("XSocketListen");
+	Log::Debug("XSocketListen");
 	return 0;
 }
 
 // #14: XSocketAccept
 extern "C"  SOCKET __stdcall XSocketAccept (SOCKET s, sockaddr_in * addr, int * addrlen) { 
-	Debug ("XSocketAccept");
+	Log::Debug("XSocketAccept");
 	return INVALID_SOCKET;
 }
 
 // #15: XSocketSelect
 extern "C"  int __stdcall XSocketSelect (int n, void *, void *, void *, void *) { 
-	Debug ("XSocketSelect");
+	Log::Debug("XSocketSelect");
 	return 0;
 }
 
@@ -119,7 +119,7 @@ extern "C"  int __stdcall XSocketSendTo (SOCKET s, char * buf, int len, int flag
 
 // #26: XSocketInet_Addr
 extern "C"  int __stdcall XSocketInet_Addr (char *) { 
-	Debug ("XSocketInet_Addr");
+	Log::Debug("XSocketInet_Addr");
 	return 0;
 }
 
@@ -140,19 +140,19 @@ extern "C"  DWORD __stdcall XSocketNTOHL (DWORD n) {
 
 // #51: XNetStartup
 extern "C"  int __stdcall XNetStartup (void *) { // XNetStartup(XNetStartupParams *)
-	Debug ("XNetStartup");
+	Log::Debug("XNetStartup");
 	return 0;
 }
 
 // #52: XNetCleanup
 extern "C"  int __stdcall XNetCleanup () { 
-	Debug ("xlive_52: XNetCleanup");
+	Log::Debug("xlive_52: XNetCleanup");
 	return 0;
 }
 
 // #54: XNetCreateKey
 extern "C" int __stdcall XNetCreateKey (void * pxnkid, void * pxnkey) { 
-	Debug ("XNetCreateKey");
+	Log::Debug("XNetCreateKey");
 	return 0;
 }
 
@@ -194,7 +194,7 @@ extern "C" int __stdcall XNetConnect (DWORD) {
 
 // #66: XNetGetConnectStatus
 extern "C"  int __stdcall XNetGetConnectStatus (DWORD) { 
-	Debug ("XNetGetConnectStatus");
+	Log::Debug("XNetGetConnectStatus");
 	return 0;	
 }
 
@@ -220,14 +220,14 @@ extern "C"  DWORD __stdcall XNetQosRelease (DWORD) {
 
 // #73: XNetGetTitleXnAddr
 extern "C"  DWORD __stdcall XNetGetTitleXnAddr (DWORD * pAddr) {
-	// Debug ("xlive_73: XNetGetTitleXnAddr");	// don't uncomment, unless you want to get very long Debug log
+	// Log::Debug("xlive_73: XNetGetTitleXnAddr");	// don't uncomment, unless you want to get very long Debug log
 	*pAddr = 0x0100007F;	// 127.0.0.1
 	return 4; 
 }
 
 // #75: XNetGetEthernetLinkStatus
 extern "C"  DWORD __stdcall XNetGetEthernetLinkStatus () { 
-	// Debug ("xlive_75 (XNetGetEthernetLinkStatus)");	// don't uncomment, unless you want to get very long Debug log
+	// Log::Debug("xlive_75 (XNetGetEthernetLinkStatus)");	// don't uncomment, unless you want to get very long Debug log
 	return 1; 
 }
 
@@ -238,13 +238,13 @@ extern "C"  DWORD __stdcall XNetSetSystemLinkPort (DWORD) {
 
 // #473: XCustomGetLastActionPress
 extern "C" int __stdcall XCustomGetLastActionPress (DWORD, DWORD, DWORD) { 
-	Debug ("XCustomGetLastActionPress");
+	Log::Debug("XCustomGetLastActionPress");
 	return 0;
 }
 
 // #651: XNotifyGetNext
 extern "C"  int __stdcall XNotifyGetNext (HANDLE hNotification, DWORD dwMsgFilter, DWORD * pdwId, void * pParam) {
-//	Debug ("XNotifyGetNext");	// too noisy
+//	Log::Debug("XNotifyGetNext");	// too noisy
 	return 0;
 }
 
@@ -255,7 +255,7 @@ extern "C" DWORD __stdcall XNotifyPositionUI (DWORD dwPosition) {
 
 // #1082: XGetOverlappedExtendedError
 extern "C"  DWORD __stdcall XGetOverlappedExtendedError (void *) { 
-	Debug ("XGetOverlappedExtendedError");
+	Log::Debug("XGetOverlappedExtendedError");
 	return 0;
 }
 
@@ -263,19 +263,19 @@ extern "C"  DWORD __stdcall XGetOverlappedExtendedError (void *) {
 extern "C"  DWORD __stdcall XGetOverlappedResult (void *, DWORD * pResult, DWORD) { 
 	if (pResult)
 		*pResult = 0;	// 0 elements enumerated
-	Debug ("XGetOverlappedResult");
+	Log::Debug("XGetOverlappedResult");
 	return 0;
 }
 
 // #5000: XLiveInitialize
 extern "C"  int __stdcall XLiveInitialize (DWORD) {	// XLiveInitialize(struct _XLIVE_INITIALIZE_INFO *)
-	Debug ("XLiveInitialize");
+	Log::Debug("XLiveInitialize");
 	return 0;
 }
 
 // #5001: XLiveInput
 extern "C"  int __stdcall XLiveInput (DWORD * p) {
-	// Debug ("XLiveInput");
+	// Log::Debug("XLiveInput");
 	p[5] = 0;
 	return 1;	// -1 ?
 }
@@ -283,43 +283,43 @@ extern "C"  int __stdcall XLiveInput (DWORD * p) {
 
 // #5002: XLiveRender
 extern "C"  int __stdcall XLiveRender () {
-//	Debug ("XLiveRender");
+//	Log::Debug("XLiveRender");
 	return 0;
 }
 
 // #5003: XLiveUninitialize
 extern "C"  int __stdcall XLiveUninitialize () { 
-	Debug ("XLiveUninitialize");
+	Log::Debug("XLiveUninitialize");
 	return 0;
 }
 
 // #5005: XLiveOnCreateDevice
 extern "C"  int __stdcall XLiveOnCreateDevice (DWORD, DWORD) {
-	Debug ("XLiveOnCreateDevice");
+	Log::Debug("XLiveOnCreateDevice");
 	return 0;
 }
 
 // #5007: XLiveOnResetDevice
 extern "C"  int __stdcall XLiveOnResetDevice (DWORD) {
-	Debug ("XLiveOnResetDevice");
+	Log::Debug("XLiveOnResetDevice");
 	return 0;
 }
 
 // #5008: XHVCreateEngine
 extern "C"  int __stdcall XHVCreateEngine (DWORD, DWORD, DWORD) { 
-	Debug ("XHVCreateEngine");
+	Log::Debug("XHVCreateEngine");
 	return -1;	// disable live voice
 }
 
 // #5022: XLiveGetUpdateInformation
 extern "C"  int __stdcall XLiveGetUpdateInformation (DWORD) {
-	Debug ("XLiveGetUpdateInformation");
+	Log::Debug("XLiveGetUpdateInformation");
 	return -1; // no update
 }
 
 // #5024: XLiveUpdateSystem
 extern "C"  int __stdcall XLiveUpdateSystem (DWORD) {
-	Debug ("XLiveUpdateSystem");
+	Log::Debug("XLiveUpdateSystem");
 	return -1; // no update
 }
 
@@ -330,49 +330,49 @@ extern "C"  int __stdcall XLivePreTranslateMessage (DWORD) {
 
 // #5031 XLiveSetDebugLevel
 extern "C" int __stdcall XLiveSetDebugLevel (DWORD xdlLevel, DWORD * pxdlOldLevel) { 
-	Debug ("XLiveSetDebugLevel (%d)", xdlLevel);
+	Log::Debug("XLiveSetDebugLevel (%d)", xdlLevel);
 	return 0;
 }
 
 // #5214: XShowPlayerReviewUI
 extern "C"  int __stdcall XShowPlayerReviewUI (DWORD, DWORD, DWORD) {
-	Debug ("XShowPlayerReviewUI");
+	Log::Debug("XShowPlayerReviewUI");
 	return 0;
 }
 
 // #5215: XShowGuideUI
 extern "C"  int __stdcall XShowGuideUI (DWORD) {
-	Debug ("XShowGuideUI");
+	Log::Debug("XShowGuideUI");
 	return 1;
 }
 
 // #5216: XShowKeyboardUI
 extern "C" int __stdcall XShowKeyboardUI (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XShowKeyboardUI");
+	Log::Debug("XShowKeyboardUI");
 	return 0;
 }
 
 // #5251: XCloseHandle
 extern "C"  int __stdcall XCloseHandle (DWORD) {
-	Debug ("XCloseHandle");
+	Log::Debug("XCloseHandle");
 	return 0;
 }
 
 // #5252: XShowGamerCardUI
 extern "C"  int __stdcall XShowGamerCardUI (DWORD, DWORD, DWORD) {
-	Debug ("XShowGamerCardUI");
+	Log::Debug("XShowGamerCardUI");
 	return 0;
 }
 
 // #5254: XCancelOverlapped
 extern "C"  int __stdcall XCancelOverlapped (DWORD) {
-	Debug ("XCancelOverlapped");
+	Log::Debug("XCancelOverlapped");
 	return 0;
 }
 
 // #5256: XEnumerate
 extern "C"  int __stdcall XEnumerate (HANDLE hEnum, void * pvBuffer, DWORD cbBuffer, DWORD * pcItemsReturned, void * pOverlapped) { // XEnumerate
-	Debug ("XEnumerate");
+	Log::Debug("XEnumerate");
 	if (pcItemsReturned)
 		*pcItemsReturned = 0;
 	return 0;	// some error ? 
@@ -380,7 +380,7 @@ extern "C"  int __stdcall XEnumerate (HANDLE hEnum, void * pvBuffer, DWORD cbBuf
 
 // #5260: XShowSigninUI
 extern "C"  int __stdcall XShowSigninUI (DWORD, DWORD) { 
-	Debug ("XShowSigninUI");
+	Log::Debug("XShowSigninUI");
 	return 0;
 }
 
@@ -393,13 +393,13 @@ extern "C"  int __stdcall XUserGetXUID (DWORD, DWORD * pXuid) {
 
 // #5262: XUserGetSigninState
 extern "C"  int __stdcall XUserGetSigninState (DWORD dwUserIndex) {
-//	Debug ("xlive_5262: XUserGetSigninState (%d)", dwUserIndex);
+//	Log::Debug("xlive_5262: XUserGetSigninState (%d)", dwUserIndex);
 	return 1; // eXUserSigninState_SignedInLocally
 }
 
 // #5263: XUserGetName
 extern "C"  int __stdcall XUserGetName (DWORD dwUserId, char * pBuffer, DWORD dwBufLen) {
-	Debug ("xlive_5263: XUserGetName (%d, .. , %d)", dwUserId, dwBufLen);
+	Log::Debug("xlive_5263: XUserGetName (%d, .. , %d)", dwUserId, dwBufLen);
 	if (dwBufLen < 8)
 		return 1;
 	memcpy (pBuffer, "Player1", 8);
@@ -408,13 +408,13 @@ extern "C"  int __stdcall XUserGetName (DWORD dwUserId, char * pBuffer, DWORD dw
 
 // #5264: XUserAreUsersFriends
 extern "C"  int __stdcall XUserAreUsersFriends(DWORD, DWORD, DWORD, DWORD, DWORD) {
-	Debug ("XUserAreUsersFriends");
+	Log::Debug("XUserAreUsersFriends");
 	return 0;
 }
 
 // #5265: XUserCheckPrivilege
 extern "C"  int __stdcall XUserCheckPrivilege (DWORD user, DWORD priv, PBOOL b) {
-	Debug ("XUserCheckPrivilege (%d, %d, ..)", user, priv);
+	Log::Debug("XUserCheckPrivilege (%d, %d, ..)", user, priv);
 	*b = false;
 	return 0;
 }
@@ -432,7 +432,7 @@ struct XUSER_SIGNIN_INFO {
 
 // #5267: XUserGetSigninInfo
 extern "C"  int __stdcall XUserGetSigninInfo (DWORD dwUser, DWORD dwFlags, XUSER_SIGNIN_INFO * pInfo) {  
-//	Debug ("XUserGetSigninInfo (%d, %d, ...)", dwUser, dwFlags);
+//	Log::Debug("XUserGetSigninInfo (%d, %d, ...)", dwUser, dwFlags);
 	pInfo->xuidL = pInfo->xuidH = dwFlags != 1 ? (dwUser+1)*0x10001000 : 0; // some arbitrary id for offline user, INVALID_XUID for online user
 	if (dwFlags != 1) {
 		pInfo->dwInfoFlags = 1;
@@ -444,50 +444,50 @@ extern "C"  int __stdcall XUserGetSigninInfo (DWORD dwUser, DWORD dwFlags, XUSER
 
 // #5270: XNotifyCreateListener
 extern "C"  HANDLE __stdcall XNotifyCreateListener (DWORD l, DWORD h) {
-	Debug ("xlive_5270: XNotifyCreateListener (0x%08x%08x)", h, l);
+	Log::Debug("xlive_5270: XNotifyCreateListener (0x%08x%08x)", h, l);
 	return (HANDLE)1; // any non-zero value. (zero treated as fatal error)
 }
 
 // #5273: XUserReadGamerpictureByKey
 extern "C" int __stdcall XUserReadGamerpictureByKey (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XUserReadGamerpictureByKey");
+	Log::Debug("XUserReadGamerpictureByKey");
 	return 0;
 }
 
 // #5275: XShowFriendsUI
 extern "C" int __stdcall XShowFriendsUI (DWORD) {
-	Debug ("XShowFriendsUI");
+	Log::Debug("XShowFriendsUI");
 	return 0;
 }
 
 // #5276: XUserSetProperty
 extern "C"  int __stdcall XUserSetProperty (DWORD, DWORD, DWORD, DWORD) {
-	Debug ("XUserSetProperty");
+	Log::Debug("XUserSetProperty");
 	return 0;
 }
 
 // #5277: XUserSetContext
 extern "C"  int __stdcall XUserSetContext (DWORD, DWORD, DWORD) {
-	Debug ("XUserSetContext");
+	Log::Debug("XUserSetContext");
 	return 0;
 }
 
 // #5278: XUserWriteAchievements
 extern "C"  DWORD __stdcall XUserWriteAchievements (DWORD, DWORD, DWORD) {
-	Debug ("XUserWriteAchievements");
+	Log::Debug("XUserWriteAchievements");
 	return 0;
 }
 
 // #5280: XUserCreateAchievementEnumerator
 extern "C"  DWORD __stdcall XUserCreateAchievementEnumerator (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, PHANDLE phEnum) {
-	Debug ("XUserCreateAchievementEnumerator");
+	Log::Debug("XUserCreateAchievementEnumerator");
 	*phEnum = INVALID_HANDLE_VALUE;
 	return 0;
 }
 
 // #5281: XUserReadStats
 extern "C"  DWORD __stdcall XUserReadStats (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD * pcbResults, DWORD * pResults, void *) { 
-	Debug ("XUserReadStats");
+	Log::Debug("XUserReadStats");
 	if (pcbResults)	
 		*pcbResults = 4;
 	if (pResults)
@@ -497,167 +497,167 @@ extern "C"  DWORD __stdcall XUserReadStats (DWORD, DWORD, DWORD, DWORD, DWORD, D
 
 // #5284: XUserCreateStatsEnumeratorByRank
 extern "C"  DWORD __stdcall XUserCreateStatsEnumeratorByRank (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, PHANDLE phEnum) { 
-	Debug ("XUserCreateStatsEnumeratorByRank");
+	Log::Debug("XUserCreateStatsEnumeratorByRank");
 	*phEnum = INVALID_HANDLE_VALUE;
 	return 0;
 }
 
 // #5286: XUserCreateStatsEnumeratorByXuid
 extern "C"  DWORD __stdcall XUserCreateStatsEnumeratorByXuid (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, PHANDLE phEnum) { 
-	Debug ("XUserCreateStatsEnumeratorByXuid");
+	Log::Debug("XUserCreateStatsEnumeratorByXuid");
 	*phEnum = INVALID_HANDLE_VALUE;
 	return 0;
 }
 
 // #5292: XUserSetContextEx
 extern "C"  int __stdcall XUserSetContextEx (DWORD, DWORD, DWORD, DWORD) {
-	Debug ("XUserSetContextEx");
+	Log::Debug("XUserSetContextEx");
 	return 0;
 }
 
 // #5293: XUserSetPropertyEx
 extern "C" int __stdcall XUserSetPropertyEx (DWORD dwUserIndex, DWORD dwPropertyId, DWORD cbValue, void * pvValue, void * pOverlapped) { 
-	Debug ("XUserSetPropertyEx (%d, 0x%x, ...)", dwUserIndex, dwPropertyId);
+	Log::Debug("XUserSetPropertyEx (%d, 0x%x, ...)", dwUserIndex, dwPropertyId);
 	return 0;
 }
 
 // #5297: XLiveInitializeEx
 extern "C" int __stdcall XLiveInitializeEx (void * pXii, DWORD dwVersion) {
-	Debug ("XLiveInitializeEx");
+	Log::Debug("XLiveInitializeEx");
 	return 0;
 }
 	
 // #5300: XSessionCreate
 extern "C"  DWORD __stdcall XSessionCreate (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XSessionCreate");
+	Log::Debug("XSessionCreate");
 	return -1;
 }
 
 // #5303: XStringVerify
 extern "C"  DWORD __stdcall XStringVerify (DWORD, DWORD, DWORD, DWORD, DWORD, WORD * pResult, DWORD) { // XStringVerify
-	Debug ("XStringVerify");
+	Log::Debug("XStringVerify");
 	*pResult = 0;
 	return 0;
 }
 
 // #5305: XStorageUploadFromMemory
 extern "C"  DWORD __stdcall XStorageUploadFromMemory (DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XStorageUploadFromMemory");
+	Log::Debug("XStorageUploadFromMemory");
 	return 0;
 }
 
 // #5306: XStorageEnumerate
 extern "C" int __stdcall XStorageEnumerate (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD) { // XStorageEnumerate
-	Debug ("XStorageEnumerate");
+	Log::Debug("XStorageEnumerate");
 	return 0;
 }
 
 // #5310: XOnlineStartup
 extern "C"  int __stdcall XOnlineStartup () { 
-	Debug ("XOnlineStartup");
+	Log::Debug("XOnlineStartup");
 	return 0; 
 }
 
 // #5311: XOnlineCleanup
 extern "C"  int __stdcall XOnlineCleanup () {
-	Debug ("XOnlineCleanup");
+	Log::Debug("XOnlineCleanup");
 	return 0;
 }
 
 // #5312: XFriendsCreateEnumerator
 extern "C"  DWORD __stdcall XFriendsCreateEnumerator (DWORD, DWORD, DWORD, DWORD, HANDLE * phEnum) { 
-	Debug ("XFriendsCreateEnumerator");
+	Log::Debug("XFriendsCreateEnumerator");
 	*phEnum = INVALID_HANDLE_VALUE;
 	return 0; 
 }
 
 // #5314: XUserMuteListQuery
 extern "C"  int __stdcall XUserMuteListQuery (DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XUserMuteListQuery");
+	Log::Debug("XUserMuteListQuery");
 	return 0; 
 }
 
 // #5315: XInviteGetAcceptedInfo
 extern "C"  int __stdcall XInviteGetAcceptedInfo (DWORD, DWORD) { 
-	Debug ("XInviteGetAcceptedInfo");
+	Log::Debug("XInviteGetAcceptedInfo");
 	return 1; 
 }
 
 // #5316: XInviteSend
 extern "C"  int __stdcall XInviteSend (DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XInviteSend");
+	Log::Debug("XInviteSend");
 	return 0; 
 }
 
 // #5317: XSessionWriteStats
 extern "C"  DWORD __stdcall XSessionWriteStats (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XSessionWriteStats");
+	Log::Debug("XSessionWriteStats");
 	return 0; 
 }
 
 // #5318
 extern "C"  int __stdcall XSessionStart (DWORD, DWORD, DWORD) {
-	Debug ("XSessionStart");
+	Log::Debug("XSessionStart");
 	return 0;
 }
 
 // #5319: XSessionSearchEx
 extern "C"  DWORD __stdcall XSessionSearchEx (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XSessionSearchEx");
+	Log::Debug("XSessionSearchEx");
 	return 0; 
 }
 
 // #5322: XSessionModify
 extern "C"  DWORD __stdcall XSessionModify (DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XSessionModify");
+	Log::Debug("XSessionModify");
 	return 0; 
 }
 
 // #5323: XSessionMigrateHost
 extern "C"  DWORD __stdcall XSessionMigrateHost (DWORD, DWORD, DWORD, DWORD) {  
-	Debug ("XSessionMigrateHost");
+	Log::Debug("XSessionMigrateHost");
 	return 0; 
 }
 
 // #5324: XOnlineGetNatType
 extern "C"  int __stdcall XOnlineGetNatType () { 
-	Debug ("XOnlineGetNatType");
+	Log::Debug("XOnlineGetNatType");
 	return 0; 
 }
 
 // #5325: XSessionLeaveLocal
 extern "C"  DWORD __stdcall XSessionLeaveLocal (DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XSessionLeaveLocal");
+	Log::Debug("XSessionLeaveLocal");
 	return 0; 
 }
 
 // #5326: XSessionJoinRemote
 extern "C"  DWORD __stdcall XSessionJoinRemote (DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XSessionJoinRemote");
+	Log::Debug("XSessionJoinRemote");
 	return 0; 
 }
 
 // #5327: XSessionJoinLocal
 extern "C"  DWORD __stdcall XSessionJoinLocal (DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XSessionJoinLocal");
+	Log::Debug("XSessionJoinLocal");
 	return 0; 
 }
 
 // #5328: XSessionGetDetails
 extern "C"  DWORD __stdcall XSessionGetDetails (DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XSessionGetDetails");
+	Log::Debug("XSessionGetDetails");
 	return 0; 
 }
 
 // #5329: XSessionFlushStats
 extern "C"  int __stdcall XSessionFlushStats (DWORD, DWORD) { 
-	Debug ("XSessionFlushStats");
+	Log::Debug("XSessionFlushStats");
 	return 0; 
 }
 
 // #5330: XSessionDelete
 extern "C"  DWORD __stdcall XSessionDelete (DWORD, DWORD) { 
-	Debug ("XSessionDelete");
+	Log::Debug("XSessionDelete");
 	return 0; 
 }
 
@@ -669,7 +669,7 @@ struct XUSER_READ_PROFILE_SETTINGS {
 // #5331: XUserReadProfileSettings
 extern "C"  DWORD __stdcall XUserReadProfileSettings (DWORD dwTitleId, DWORD dwUserIndex, DWORD dwNumSettingIds, 
 					DWORD * pdwSettingIds, DWORD * pcbResults, XUSER_READ_PROFILE_SETTINGS * pResults, DWORD pOverlapped) {
-	Debug ("XUserReadProfileSettings (%d, %d, %d, ..., %d, ...)", dwTitleId, dwUserIndex, dwNumSettingIds, *pcbResults);
+	Log::Debug("XUserReadProfileSettings (%d, %d, %d, ..., %d, ...)", dwTitleId, dwUserIndex, dwNumSettingIds, *pcbResults);
 	if (*pcbResults < 1036) {
 		*pcbResults = 1036;	// TODO: make correct calculation by IDs.
 		return ERROR_INSUFFICIENT_BUFFER;
@@ -682,44 +682,44 @@ extern "C"  DWORD __stdcall XUserReadProfileSettings (DWORD dwTitleId, DWORD dwU
 
 // #5332: XSessionEnd
 extern "C"  int __stdcall XSessionEnd (DWORD, DWORD) {	
-	Debug ("XSessionEnd");
+	Log::Debug("XSessionEnd");
 	return 0;
 }
 
 // #5333: XSessionArbitrationRegister
 extern "C"  DWORD __stdcall XSessionArbitrationRegister (DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XSessionArbitrationRegister");
+	Log::Debug("XSessionArbitrationRegister");
 	return 0; 
 }
 
 // #5335: XTitleServerCreateEnumerator
 extern "C"  DWORD __stdcall XTitleServerCreateEnumerator (DWORD, DWORD, DWORD, PHANDLE phEnum) {
-	Debug ("XTitleServerCreateEnumerator");
+	Log::Debug("XTitleServerCreateEnumerator");
 	*phEnum = INVALID_HANDLE_VALUE;
 	return 0;
 }
 
 // #5336: XSessionLeaveRemote
 extern "C"  DWORD __stdcall XSessionLeaveRemote (DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XSessionLeaveRemote");
+	Log::Debug("XSessionLeaveRemote");
 	return 0; 
 }
 
 // #5337: XUserWriteProfileSettings
 extern "C"  DWORD __stdcall XUserWriteProfileSettings (DWORD, DWORD, DWORD, DWORD) {
-	Debug ("XUserWriteProfileSettings");
+	Log::Debug("XUserWriteProfileSettings");
 	return 0;
 }
 
 // #5339: XUserReadProfileSettingsByXuid
 extern "C" DWORD __stdcall XUserReadProfileSettingsByXuid (DWORD, DWORD, DWORD, DWORD,DWORD, DWORD,DWORD, DWORD,DWORD) {
-	Debug ("XUserReadProfileSettingsByXuid");
+	Log::Debug("XUserReadProfileSettingsByXuid");
 	return 0;
 }
 
 // #5343: XLiveCalculateSkill
 extern "C" DWORD __stdcall XLiveCalculateSkill (DWORD, DWORD, DWORD, DWORD, DWORD) { 
-	Debug ("XLiveCalculateSkill");
+	Log::Debug("XLiveCalculateSkill");
 	return 0;
 }
 
@@ -727,26 +727,26 @@ extern "C" DWORD __stdcall XLiveCalculateSkill (DWORD, DWORD, DWORD, DWORD, DWOR
 extern "C"  DWORD __stdcall XStorageBuildServerPath (DWORD dwUserIndex, DWORD StorageFacility, 
 		void * pvStorageFacilityInfo, DWORD dwStorageFacilityInfoSize, 
 		void * pwszItemName, void * pwszServerPath, DWORD * pdwServerPathLength) { 
-	Debug ("XStorageBuildServerPath");
+	Log::Debug("XStorageBuildServerPath");
 	return 0; 
 }
 
 // #5345: XStorageDownloadToMemory
 extern "C"  DWORD __stdcall XStorageDownloadToMemory (DWORD dwUserIndex, DWORD, DWORD, DWORD, DWORD, DWORD, void * ) { 
-	Debug ("XStorageDownloadToMemory");
+	Log::Debug("XStorageDownloadToMemory");
 	return 0; 
 }
 
 // #5349: XLiveProtectedVerifyFile
 extern "C" DWORD __stdcall XLiveProtectedVerifyFile (HANDLE hContentAccess, VOID * pvReserved, PCWSTR pszFilePath) {
-	Debug ("XLiveProtectedVerifyFile");
+	Log::Debug("XLiveProtectedVerifyFile");
 	return 0;
 }
 
 // #5350: XLiveContentCreateAccessHandle
 extern "C" DWORD __stdcall XLiveContentCreateAccessHandle (DWORD dwTitleId, void * pContentInfo, 
 	DWORD dwLicenseInfoVersion, void * xebBuffer, DWORD dwOffset, HANDLE * phAccess, void * pOverlapped) {
-	Debug ("XLiveContentCreateAccessHandle");
+	Log::Debug("XLiveContentCreateAccessHandle");
 	if (phAccess)
 		*phAccess = INVALID_HANDLE_VALUE;
 	return E_OUTOFMEMORY;	// TODO: fix it
@@ -754,7 +754,7 @@ extern "C" DWORD __stdcall XLiveContentCreateAccessHandle (DWORD dwTitleId, void
 
 // #5352: XLiveContentUninstall
 extern "C" DWORD __stdcall XLiveContentUninstall (void * pContentInfo, void * pxuidFor, void * pInstallCallbackParams) {
-	Debug ("XLiveContentUninstall");
+	Log::Debug("XLiveContentUninstall");
 	return 0;
 }
 
@@ -769,7 +769,7 @@ extern "C" DWORD __stdcall XLiveContentGetPath (DWORD dwUserIndex, void * pConte
 
 // #5360: XLiveContentCreateEnumerator
 extern "C" DWORD __stdcall XLiveContentCreateEnumerator (DWORD, void *, DWORD *pchBuffer, HANDLE * phContent) {
-	Debug ("XLiveContentCreateEnumerator");
+	Log::Debug("XLiveContentCreateEnumerator");
 	if (phContent)
 		*phContent = INVALID_HANDLE_VALUE;
 	return 0;
@@ -798,10 +798,10 @@ struct FakeProtectedBuffer {
 
 // #5016: XLivePBufferAllocate
 extern "C"  DWORD __stdcall XLivePBufferAllocate (int size, FakeProtectedBuffer ** pBuffer) {
-//	Debug ("xlive_5016: XLivePBufferAllocate (%d)", size);
+//	Log::Debug("xlive_5016: XLivePBufferAllocate (%d)", size);
 	*pBuffer = (FakeProtectedBuffer *)malloc (size+16);
 	if (!*pBuffer) {
-		Debug ("ERROR: XLivePBufferAllocate unable to allocate %d bytes", size);
+		Log::Debug("ERROR: XLivePBufferAllocate unable to allocate %d bytes", size);
 		return E_OUTOFMEMORY;
 	}
 
@@ -812,7 +812,7 @@ extern "C"  DWORD __stdcall XLivePBufferAllocate (int size, FakeProtectedBuffer 
 
 // #5017: XLivePBufferFree
 extern "C"  DWORD __stdcall XLivePBufferFree (FakeProtectedBuffer * pBuffer) {
-	// Debug ("xlive_5017: XLivePBufferFree");
+	// Log::Debug("xlive_5017: XLivePBufferFree");
 	if (pBuffer && pBuffer->dwMagick == 0xDEADDEAD)
 		free (pBuffer);
 	return 0;
@@ -868,7 +868,7 @@ extern "C" DWORD __stdcall XLivePBufferSetDWORD (FakeProtectedBuffer * pBuffer, 
 
 // #5036: XLiveCreateProtectedDataContext
 extern "C"  DWORD __stdcall XLiveCreateProtectedDataContext (DWORD * dwType, PHANDLE pHandle) {
-	Debug ("XLiveCreateProtectedDataContext");
+	Log::Debug("XLiveCreateProtectedDataContext");
 	if (pHandle)
 		*pHandle = (HANDLE)1;
 	return 0;
@@ -876,19 +876,19 @@ extern "C"  DWORD __stdcall XLiveCreateProtectedDataContext (DWORD * dwType, PHA
 
 // #5037: XLiveQueryProtectedDataInformation
 extern "C"  DWORD __stdcall XLiveQueryProtectedDataInformation (HANDLE h, DWORD * p) {
-	Debug ("XLiveQueryProtectedDataInformation");
+	Log::Debug("XLiveQueryProtectedDataInformation");
 	return 0;
 }
 
 // #5038: XLiveCloseProtectedDataContext
 extern "C"  DWORD __stdcall XLiveCloseProtectedDataContext (HANDLE h) {
-	Debug ("XLiveCloseProtectedDataContext");
+	Log::Debug("XLiveCloseProtectedDataContext");
 	return 0;
 }
 
 // #5035: XLiveUnprotectData
 extern "C"  DWORD __stdcall XLiveUnprotectData (BYTE * pInBuffer, DWORD dwInDataSize, BYTE * pOutBuffer, DWORD * pDataSize, HANDLE * ph) {
-	Debug ("XLiveUnprotectData (..., %d, ..., %d, %d)", dwInDataSize, *pDataSize, *(DWORD*)ph);
+	Log::Debug("XLiveUnprotectData (..., %d, ..., %d, %d)", dwInDataSize, *pDataSize, *(DWORD*)ph);
 	if (!pDataSize || !ph)	// invalid parameter
 		return E_FAIL;
 	*ph = (HANDLE)1;
@@ -905,7 +905,7 @@ extern "C"  DWORD __stdcall XLiveUnprotectData (BYTE * pInBuffer, DWORD dwInData
 
 // #5034: XLiveProtectData
 extern "C"  DWORD __stdcall XLiveProtectData (BYTE * pInBuffer, DWORD dwInDataSize, BYTE * pOutBuffer, DWORD * pDataSize, HANDLE h) {
-	Debug ("XLiveProtectData (..., %d, ..., %d, %d)", dwInDataSize, *pDataSize, (DWORD)h);
+	Log::Debug("XLiveProtectData (..., %d, ..., %d, %d)", dwInDataSize, *pDataSize, (DWORD)h);
 	*pDataSize = dwInDataSize;
 	if (*pDataSize >= dwInDataSize && pOutBuffer)
 		memcpy (pOutBuffer, pInBuffer, dwInDataSize);
@@ -950,7 +950,7 @@ void getSavefilePath (int __unused, char * pBuffer, char * pszSaveName)
 	if (attrs == INVALID_FILE_ATTRIBUTES) 
 		CreateDirectory (pBuffer, NULL);
 	else if (!(attrs & FILE_ATTRIBUTE_DIRECTORY)) {
-		Debug ("ERROR: unable to create directory '%s', file '%s' already exists", pBuffer);
+		Log::Debug("ERROR: unable to create directory '%s', file '%s' already exists", pBuffer);
 		strcpy (pBuffer, pszSaveName);
 		return;
 	}
@@ -968,11 +968,11 @@ void patch101 () {
 	DWORD oldProtect;
 	// enable write access to code and rdata
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x8D8000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Debug ("ERROR: unable to unprotect code seg");
+		Log::Debug("ERROR: unable to unprotect code seg");
 		return;
 	}
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x8D9000+0x400000), 0x1A8000, PAGE_READWRITE, &oldProtect)) 
-		Debug ("ERROR: unable to unprotect .rdata seg");
+		Log::Debug("ERROR: unable to unprotect .rdata seg");
 
 	// process patches
 	*(WORD *)(0x608C35+dwLoadOffset) = 0x9090; // NOP; NOP	- save file CRC32 check
@@ -990,7 +990,7 @@ void patch101 () {
 	// replace getSavefilePath
 	injectFunction (0x608660, (DWORD)getSavefilePath);
 
-	Debug ("Patching OK (1.0.1)");
+	Log::Debug("Patching OK (1.0.1)");
 }
 
 void patch103 () {
@@ -1000,12 +1000,12 @@ void patch103 () {
 	DWORD oldProtect;
 	// enable write access to code and rdata
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x8E4000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Debug ("ERROR: unable to unprotect code seg");
+		Log::Debug("ERROR: unable to unprotect code seg");
 		return;
 	}
 
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x8e5000+0x400000), 0x1B1000, PAGE_READWRITE, &oldProtect)) 
-		Debug ("ERROR: unable to unprotect .rdata seg");
+		Log::Debug("ERROR: unable to unprotect .rdata seg");
 
 
 	// process patches
@@ -1041,7 +1041,7 @@ void patch103 () {
 
 // B001C3 => 0xC301B090
 
-	Debug ("Patching OK (1.0.3)");
+	Log::Debug("Patching OK (1.0.3)");
 }
 
 void patch104 () {
@@ -1050,12 +1050,12 @@ void patch104 () {
 	DWORD oldProtect;
 	// enable write access to code and rdata
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x8E4000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Debug ("ERROR: unable to unprotect code seg");
+		Log::Debug("ERROR: unable to unprotect code seg");
 		return;
 	}
 
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x8e5000+0x400000), 0x1B1000, PAGE_READWRITE, &oldProtect)) 
-		Debug ("ERROR: unable to unprotect .rdata seg");
+		Log::Debug("ERROR: unable to unprotect .rdata seg");
 
 	// process patches
 	*(WORD *)(0x60C1A5+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
@@ -1090,7 +1090,7 @@ void patch104 () {
 	*(DWORD *)(0xA0D9F0+dwLoadOffset) = 0x90C301B0;
 	*(DWORD *)(0xA0DA20+dwLoadOffset) = 0x90C301B0;
 
-	Debug ("Patching OK (1.0.4)");
+	Log::Debug("Patching OK (1.0.4)");
 }
 
 void patch105 () {
@@ -1099,12 +1099,12 @@ void patch105 () {
 	DWORD oldProtect;
 	// enable write access to code and rdata
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x0915000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Debug ("ERROR: unable to unprotect code seg");
+		Log::Debug("ERROR: unable to unprotect code seg");
 		return;
 	}
 
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x0916000+0x400000), 0x01AA000, PAGE_READWRITE, &oldProtect)) 
-		Debug ("ERROR: unable to unprotect .rdata seg");
+		Log::Debug("ERROR: unable to unprotect .rdata seg");
 
 	// process patches
 	*(BYTE *)(0x7B82A0+dwLoadOffset) = 0xC3;	// RETN - enable debugger in error menu (don't load WER.dll)
@@ -1145,7 +1145,7 @@ void patch105 () {
 	*(DWORD *)(0xB3E1C0+dwLoadOffset) = 0x90C301B0;
 	*(DWORD *)(0xB3E1F0+dwLoadOffset) = 0x90C301B0;
 	
-	Debug ("Patching OK (1.0.0.4 - update 5)");
+	Log::Debug("Patching OK (1.0.0.4 - update 5)");
 }
 
 void patch106 () {
@@ -1154,12 +1154,12 @@ void patch106 () {
 	DWORD oldProtect;
 	// enable write access to code and rdata
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x094B000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Debug ("ERROR: unable to unprotect code seg");
+		Log::Debug("ERROR: unable to unprotect code seg");
 		return;
 	}
 
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x094C000+0x400000), 0x01BF000, PAGE_READWRITE, &oldProtect)) {
-		Debug ("ERROR: unable to unprotect .rdata seg");
+		Log::Debug("ERROR: unable to unprotect .rdata seg");
 		return;
 	}
 
@@ -1191,7 +1191,7 @@ void patch106 () {
 	*(DWORD *)(0xBABFE0+dwLoadOffset) = 0x90C301B0;
 	*(DWORD *)(0xBAC010+dwLoadOffset) = 0x90C301B0;
 
-	Debug ("Patching OK (1.0.6.0 - update 6)");
+	Log::Debug("Patching OK (1.0.6.0 - update 6)");
 }
 
 void patch106r () {
@@ -1200,12 +1200,12 @@ void patch106r () {
 	DWORD oldProtect;
 	// enable write access to code and rdata
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x094B000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Debug ("ERROR: unable to unprotect code seg");
+		Log::Debug("ERROR: unable to unprotect code seg");
 		return;
 	}
 
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x094C000+0x400000), 0x01BF000, PAGE_READWRITE, &oldProtect)) {
-		Debug ("ERROR: unable to unprotect .rdata seg");
+		Log::Debug("ERROR: unable to unprotect .rdata seg");
 		return;
 	}
 
@@ -1237,7 +1237,7 @@ void patch106r () {
 	*(DWORD *)(0xBAF600+dwLoadOffset) = 0x90C301B0;
 	*(DWORD *)(0xBAF630+dwLoadOffset) = 0x90C301B0;
 
-	Debug ("Patching OK (1.0.5.1 - update 6)");
+	Log::Debug("Patching OK (1.0.5.1 - update 6)");
 }
 
 void patch102 () {
@@ -1246,11 +1246,11 @@ void patch102 () {
 	DWORD oldProtect;
 	// enable write access to code and rdata
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x8D7000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Debug ("ERROR: unable to unprotect code seg");
+		Log::Debug("ERROR: unable to unprotect code seg");
 		return;
 	}
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x8D8000+0x400000), 0x19F000, PAGE_READWRITE, &oldProtect)) 
-		Debug ("ERROR: unable to unprotect .rdata seg");
+		Log::Debug("ERROR: unable to unprotect .rdata seg");
 
 	// process patches
 	*(WORD *)(0x6086B5+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
@@ -1275,7 +1275,7 @@ void patch102 () {
 	// replace getSavefilePath
 	injectFunction (0x6080E0, (DWORD)getSavefilePath);
 
-	Debug ("Patching OK (1.0.2)");
+	Log::Debug("Patching OK (1.0.2)");
 }
 
 void patchRFG () {
@@ -1283,18 +1283,18 @@ void patchRFG () {
 	DWORD	oldProtect;
 	// enable write access to code and rdata
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x06CC000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Debug ("ERROR: unable to unprotect code seg");
+		Log::Debug("ERROR: unable to unprotect code seg");
 		return;
 	}
 
 	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x6CD000+0x400000), 0xD2000, PAGE_READWRITE, &oldProtect)) 
-		Debug ("ERROR: unable to unprotect .rdata seg");
+		Log::Debug("ERROR: unable to unprotect .rdata seg");
 
 	// disable savegame check
 	*(WORD*)(0x522A38+dwLoadOffset) = 0x9090;
 	*(WORD*)(0x522A3E+dwLoadOffset) = 0x9090;
 	*(WORD*)(0x522A44+dwLoadOffset) = 0x9090;
-	Debug ("Patching OK (RF:G)");
+	Log::Debug("Patching OK (RF:G)");
 }
 
 
@@ -1318,6 +1318,6 @@ void patchCode () {
 	else if (signature == 0x108b1874)
 		patchRFG ();
 	else 
-		Debug ("Unknown game version, skipping patches (signature = 0x%08x)", signature);
+		Log::Debug("Unknown game version, skipping patches (signature = 0x%08x)", signature);
 }
 

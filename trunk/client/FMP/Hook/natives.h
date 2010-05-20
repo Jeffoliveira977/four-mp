@@ -84,11 +84,11 @@ private:
 
 	static inline void Invoke(NativeContext *cxt, unsigned int hash)
     {
-		//Debug("# Invoking native: 0x%x", hash);
+		//Log::Debug("# Invoking native: 0x%x", hash);
 		
         ptr fn = (ptr)GetNativeAddressByHash(hash);
 
-		//Debug("# Native address: 0x%x",fn);
+		//Log::Debug("# Native address: 0x%x",fn);
 		
         if(fn != 0)
         {
@@ -96,7 +96,7 @@ private:
             call(cxt);
         }
 
-		//Debug("# Call native complete");
+		//Log::Debug("# Call native complete");
     }
 public:
 	template <unsigned int Hash, typename R>

@@ -9,17 +9,17 @@ using namespace Natives;
 
 /*int FMPHook::GetCarDrive(Vehicle car)
 {
-	Debug("CraDrive %d", car);
-	if(!DoesVehicleExist(car)) { Debug("DOES"); return 1; }
-	Debug("CarDrive x%dx", 1);
-	if(IsCarStopped(car)) { Debug("STOP"); return 0; }
+	Log::Debug("CraDrive %d", car);
+	if(!DoesVehicleExist(car)) { Log::Debug("DOES"); return 1; }
+	Log::Debug("CarDrive x%dx", 1);
+	if(IsCarStopped(car)) { Log::Debug("STOP"); return 0; }
 	Vector3 v;
-	Debug("CarDrive x%dx", 2);
+	Log::Debug("CarDrive x%dx", 2);
 	GetCarSpeedVector(car, &v, 1);
-	Debug("CarDrive x%dx", 3);
+	Log::Debug("CarDrive x%dx", 3);
 	float x = floor(v.X * 1000 + 0.5)/1000;
 	float y = floor(v.Y * 1000 + 0.5)/1000;
-	Debug("CarDrive x%dx - %fx%f", x, y);
+	Log::Debug("CarDrive x%dx - %fx%f", x, y);
 	if(abs(x) > abs(y))
 	{
 		// ось движения Х (основная)
@@ -32,7 +32,7 @@ using namespace Natives;
 		if(y < 0)
 			return -1;
 	}
-	Debug("CarDrive x%dx", 5);
+	Log::Debug("CarDrive x%dx", 5);
 	return 1;
 }*/
 
@@ -56,24 +56,24 @@ void GetTarget(float ax, float az, float *x, float *y, float *z, float mn = 5)
 
 /*void FMPHook::GetCamTargetedCoords(float *x, float *y, float *z)
 {
-	Log("TARGET %d", 0);
+	Log::Info("TARGET %d", 0);
 	Camera cam;
 	float cx, cy, cz;
 	float ax, ay, az;
 	float a, b, c;
-	Log("TARGET %d", 1);
+	Log::Info("TARGET %d", 1);
 	GetGameCam(&cam);
-	Log("TARGET %d", 11);
+	Log::Info("TARGET %d", 11);
 	GetCamPos(cam, &cx, &cy, &cz);
-	Log("TARGET %d", 12);
+	Log::Info("TARGET %d", 12);
 	GetCamRot(cam, &ax, &ay, &az);
-	Log("TARGET %d", 2);
+	Log::Info("TARGET %d", 2);
 	GetTarget(ax, az, &a, &b, &c);
-	Log("TARGET %d", 3);
+	Log::Info("TARGET %d", 3);
 	*x = a + cx;
 	*y = b + cy;
 	*z = c + cz;
-	Log("TARGET %d", 4);
+	Log::Info("TARGET %d", 4);
 }*/
 
 float GetDist(float x1,float y1,float z1,float x2, float y2, float z2)
