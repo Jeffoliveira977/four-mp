@@ -1,4 +1,6 @@
 #include "CGUI.h"
+#include <stdarg.h>
+#include <stdio.h>
 
 CGUI::CGUI( IDirect3DDevice9 * pDevice )
 {
@@ -22,11 +24,12 @@ CGUI::CGUI( IDirect3DDevice9 * pDevice )
 	Cvars[ "$MinValue" ] = new CVar( MinValue );
 
 	SetVisible( false );
-	m_bReload = false;
 }
 
 CGUI::~CGUI()
 {
+	EnterCriticalSection(&cs);
+
 	for( std::map<std::string,CVar*>::iterator iIter = Cvars.begin(); iIter != Cvars.end(); iIter++ )
 		SAFE_DELETE( iIter->second );
 
@@ -74,6 +77,9 @@ CGUI::~CGUI()
 	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
 		SAFE_DELETE( m_vWindows[i] );
 	m_vWindows.clear();
+	
+	LeaveCriticalSection(&cs);
+	DeleteCriticalSection(&cs);
 }
 
 void CGUI::LoadFont(int size, char *font)
@@ -108,7 +114,7 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
 	if( !Document.LoadFile( pszFilePath ) )
 	{
 		MessageBoxA( 0, Document.ErrorDesc(), "XML Error", 0 );
-		return;
+			return;
 	}
 	
 	TiXmlHandle hDoc( &Document );
@@ -168,7 +174,7 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
 								continue;
 
 							pState->mInts[ pszString ] = atoi(pIntElement->Attribute("value"));
-						}
+					}
 
 						m_mThemes[ pThemeElement->Value() ][ pElementElement->Value() ] = sCurElement;
 					}
@@ -185,7 +191,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 	{
 		MessageBoxA(NULL, Document.ErrorDesc(), "UpdateGUI", MB_OK);
 		return;
-	}
+}
 
 	TiXmlHandle hDoc( &Document );
 
@@ -194,7 +200,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 	{
 		MessageBoxA(NULL, "XML Error", "UpdateGUI", MB_OK);
 		return;
-	}
+}
 
 	for( TiXmlElement * pThemeElement = pGUI->FirstChildElement(); pThemeElement; pThemeElement = pThemeElement->NextSiblingElement() )
 	{
@@ -231,7 +237,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 						Element->SetThemeElement( GetThemeElement( value ), atoi(pElem->Attribute("number")));
 						Element->SetElementState("Norm", atoi(pElem->Attribute("number")));
 					}
-				}
+			}
 
 				TiXmlElement * pElem = pElementElement->FirstChildElement( "Font" );
 				if(pElem)
@@ -335,7 +341,7 @@ void CGUI::BringToTop( CWindow * pWindow )
 		if(!m_vWindows[i]) continue;
 		if( m_vWindows[i] == pWindow )
 			m_vWindows.erase( m_vWindows.begin() + i );
-	}
+}
 
 	if(m_wFocus)
 		m_wFocus->LostFocus();
@@ -349,24 +355,31 @@ void CGUI::BringToTop( CWindow * pWindow )
 
 void CGUI::Draw()
 {
-	EnterCriticalSection(&cs);
 	if( !IsVisible() )
-		return;
+	{
+			return;
+}
 
+	EnterCriticalSection(&cs);
 	PreDraw();
 
+	
 	for(int i = 0; i < (int)m_eLine[0].size(); i++)
 		m_eLine[0][i]->Draw();
 
+	
 	for(int i = 0; i < (int)m_eBox[0].size(); i++)
 		m_eBox[0][i]->Draw();
 
+	
 	for(int i = 0; i < (int)m_eText[0].size(); i++)
 		m_eText[0][i]->Draw();
 
+	
 	for(int i = 0; i < (int)m_eImage[0].size(); i++)
 		m_eImage[0][i]->Draw();
 
+	
 	for( int iIndex = 0; iIndex < static_cast<int>( m_vWindows.size() ); iIndex++ )
 	{
 		if(!m_vWindows[ iIndex ]) continue;
@@ -374,27 +387,32 @@ void CGUI::Draw()
 			continue;
 
 		m_vWindows[ iIndex ]->Draw();
-	}
+}
+
 	
 	for(int i = 0; i < (int)m_eLine[1].size(); i++)
 		m_eLine[1][i]->Draw();
 
+	
 	for(int i = 0; i < (int)m_eBox[1].size(); i++)
 		m_eBox[1][i]->Draw();
 
+	
 	for(int i = 0; i < (int)m_eText[1].size(); i++)
 		m_eText[1][i]->Draw();
 
+	
 	for(int i = 0; i < (int)m_eImage[1].size(); i++)
 		m_eImage[1][i]->Draw();
 
+	
 	GetMouse()->Draw();
 	LeaveCriticalSection(&cs);
+
 }
 
 void CGUI::PreDraw()
 {
-	EnterCriticalSection(&cs);
 	if( !m_tPreDrawTimer.Running() )
 	{
 		for( int iIndex = static_cast<int>( m_vWindows.size() ) - 1; iIndex >= 0; iIndex-- )
@@ -404,11 +422,10 @@ void CGUI::PreDraw()
 				continue;
 
 			m_vWindows[ iIndex ]->PreDraw();
-		}
+	}
 
 		m_tPreDrawTimer.Start( 0.1f );
 	}
-	LeaveCriticalSection(&cs);
 }
 
 void CGUI::MouseMove( CMouse * pMouse )
@@ -492,7 +509,7 @@ bool CGUI::KeyEvent( SKey sKey )
 				m_vWindows[ iIndex ]->KeyEvent( sKey );
 				pMouse->LoadPos();
 			}*/
-		}
+	}
 
 		/*for( int iIndex = 0; iIndex < static_cast<int>( vRepeat.size() ); iIndex++ )
 		{
@@ -529,24 +546,54 @@ bool CGUI::KeyEvent( SKey sKey )
 
 void CGUI::OnLostDevice()
 {
-	m_pDevice = 0;
+	//m_pDevice = 0;
 
 	if( GetFont() )
 		GetFont()->OnLostDevice();
+
 	GetSprite()->OnLostDevice();
 	
 	m_pLine->OnLostDevice();
+	m_pMouse->OnLostDevice();
+
+	for(int i = 0; i < (int)m_eImage[0].size(); i++)
+		m_eImage[0][i]->OnLostDevice();
+
+	for(int i = 0; i < (int)m_eImage[1].size(); i++)
+		m_eImage[1][i]->OnLostDevice();
+
+	
+	for (std::map<std::string, tTheme>::const_iterator p = m_mThemes.begin(); p != m_mThemes.end(); ++p)
+		for (tTheme::const_iterator x = p->second.begin(); x != p->second.end(); ++x)
+			for(std::map<std::string, SElementState*>::const_iterator y = x->second->m_mStates.begin(); y != x->second->m_mStates.end(); ++y)
+				for(std::map<std::string, CTexture*>::const_iterator z = y->second->mTextures.begin(); z != y->second->mTextures.end(); ++z)
+					z->second->OnLostDevice();			
+
 }
 
-void CGUI::OnResetDevice( IDirect3DDevice9 * pDevice )
+void CGUI::OnResetDevice()
 {
-	m_pDevice = pDevice;
+	//m_pDevice = pDevice;
 
 	if( GetFont() )
-		GetFont()->OnResetDevice( pDevice );
+		GetFont()->OnResetDevice(  );
 	GetSprite()->OnResetDevice();
 	
 	m_pLine->OnResetDevice();
+	m_pMouse->OnResetDevice();
+
+	for(int i = 0; i < (int)m_eImage[0].size(); i++)
+		m_eImage[0][i]->OnResetDevice();
+
+	for(int i = 0; i < (int)m_eImage[1].size(); i++)
+		m_eImage[1][i]->OnResetDevice();
+
+	for (std::map<std::string, tTheme>::const_iterator p = m_mThemes.begin(); p != m_mThemes.end(); ++p)
+		for (tTheme::const_iterator x = p->second.begin(); x != p->second.end(); ++x)
+			for(std::map<std::string, SElementState*>::const_iterator y = x->second->m_mStates.begin(); y != x->second->m_mStates.end(); ++y)
+				for(std::map<std::string, CTexture*>::const_iterator z = y->second->mTextures.begin(); z != y->second->mTextures.end(); ++z)
+					z->second->OnResetDevice();	
+
 }
 
 CMouse * CGUI::GetMouse()
@@ -596,16 +643,6 @@ void CGUI::SetVisible( bool bVisible )
 bool CGUI::IsVisible()
 {
 	return m_bVisible;
-}
-
-bool CGUI::ShouldReload()
-{
-	return m_bReload;
-}
-
-void CGUI::Reload()
-{
-	m_bReload = true;
 }
 
 bool CGUI::IsFocus(CWindow * w)

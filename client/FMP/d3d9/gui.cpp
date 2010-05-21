@@ -469,59 +469,10 @@ FMPGUI::FMPGUI()
 FMPGUI::~FMPGUI()
 {
 	Log::Debug("FMPGUI::~FMPGUI called");
-
-	delete fServBrowser;
-	delete fChat;
-	delete fOption;
-	delete fUserRegister;
-	delete fUserLogin;
-	delete fInfo;
-	delete fEnterNick;
-	delete cc_tChat;
-	delete cc_tEnter;
-	delete cc_bEnter;
-	delete sbServList;
-	delete sbPlayerList;
-	delete sbTab[0];
-	delete sbTab[1];
-	delete sbTab[2];
-	delete sbTab[3];
-	delete sbEnterIP;
-	delete sbEnterPort;
-	delete sbConnect;
-	delete sbRefresh;
-	delete sbAddToFav;
-	delete sbFltPing; 
-	delete sbFltNotFull;
-	delete sbFltNoPassword;
-	delete sbFltNotEmpty;
-	delete sbFltLocation;
-	delete sbFltMode;
-	delete urLogin;
-	delete urPass;
-	delete urConfirm;
-	delete urEmail;
-	delete urNick;
-	delete urLoginText;
-	delete urPassText;
-	delete urConfirmText;
-	delete urEmailText;
-	delete urNickText;
-	delete urInfoText;
-	delete urSendReg;
-	delete urCancelReg;
-	delete upLoginInfo;
-	delete upStrLogin;
-	delete upStrPass;
-	delete upLogin;
-	delete upPassword;
-	delete upSendLogin;
-	delete upShowRegister;
-	delete upRemeberMe;
-	delete enNick; 
-	delete enOK;
-
+	EnterCriticalSection(&cs_gui);
 	delete m_Gui;
+	LeaveCriticalSection(&cs_gui);
+	DeleteCriticalSection(&cs_gui);
 	Log::Debug("FMPGUI::~FMPGUI completed");
 }
 
@@ -806,6 +757,16 @@ void FMPGUI::Draw()
 	EnterCriticalSection(&cs_gui);
 	if( GuiReady ) m_Gui->Draw();
 	LeaveCriticalSection(&cs_gui);
+}
+
+void FMPGUI::OnResetDevice()
+{
+	m_Gui->OnResetDevice (  );
+}
+
+void FMPGUI::OnLostDevice()
+{
+	m_Gui->OnLostDevice (  );
 }
 
 DWORD FMPGUI::GetWidth()

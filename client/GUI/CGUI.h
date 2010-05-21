@@ -58,7 +58,7 @@ class CListBox;
 
 class CGUI
 {
-	bool m_bVisible, m_bReload;
+	bool m_bVisible;
 
 	CMouse * m_pMouse;
 	CKeyboard * m_pKeyboard;
@@ -108,7 +108,7 @@ public:
 	bool KeyEvent( SKey sKey );
 
 	void OnLostDevice();
-	void OnResetDevice( IDirect3DDevice9 * pDevice );
+	void OnResetDevice();
 
 	CMouse * GetMouse();
 	CKeyboard * GetKeyboard();
@@ -123,9 +123,6 @@ public:
 
 	void SetVisible( bool bVisible );
 	bool IsVisible();
-
-	bool ShouldReload();
-	void Reload();
 
 	void SetVarString(const char *name, std::string value);
 	void SetVarInt(const char *name, int value);

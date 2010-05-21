@@ -22,6 +22,8 @@ public:
 	void HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
 	void MoveMouse(int x, int y);
 	void Draw();
+	void OnResetDevice();
+	void OnLostDevice();
 
 	bool IsLogged();
 	void Logged();

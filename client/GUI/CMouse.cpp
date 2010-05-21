@@ -249,3 +249,13 @@ int CMouse::GetSize()
 {
 	return size;
 }
+
+void CMouse::OnLostDevice()
+{
+	pCursor->OnLostDevice();
+}
+
+void CMouse::OnResetDevice()
+{
+	pCursor->OnResetDevice();
+}

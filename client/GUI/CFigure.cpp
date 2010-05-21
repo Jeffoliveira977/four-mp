@@ -63,6 +63,15 @@ CImage::~CImage()
 	SAFE_DELETE(pImg);
 }
 
+void CImage::OnLostDevice()
+{
+	pImg->OnLostDevice();
+}
+void CImage::OnResetDevice()
+{
+	pImg->OnResetDevice();
+}
+
 void CImage::Draw()
 {
 	CPos Pos = new CPos(0,0);

@@ -10,6 +10,7 @@ LogFile::LogFile()
 LogFile::~LogFile()
 {
 	if(fileHandle) fclose(fileHandle);
+	DeleteCriticalSection(&critSect);
 }
 
 void LogFile::Log(const char *type, const char *string, char *arglist)

@@ -18,7 +18,7 @@ public:
 	~CFont();
 
 	void OnLostDevice();
-	void OnResetDevice( IDirect3DDevice9 * pDevice );
+	void OnResetDevice();
 
 	void DrawString( int iX, int iY, DWORD dwFlags, CColor * pColor, std::string sString, int iWidth = 0 );
 

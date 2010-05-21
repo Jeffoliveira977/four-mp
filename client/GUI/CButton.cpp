@@ -99,3 +99,5 @@ void CButton::UpdateTheme( int iIndex )
 	SetHeight( pState->GetInt( "Height" ) );
 	SizeEdge = pState->GetInt("SizeEdge");
 }
+
+
