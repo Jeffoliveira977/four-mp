@@ -14,18 +14,18 @@ extern ConsoleWindow conwindow;
 extern CWindow * fServBrowser;
 extern CWindow * fChat;
 WNDPROC gameProc;
-bool b_Minimized = 0;
+DWORD g_iMinimized = 1;
 
 LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
 
 	if(Msg == WM_ACTIVATEAPP)
 	{
-		if(wParam) b_Minimized = 0;
-		else b_Minimized = 1;
+		if(wParam) g_iMinimized = GetTickCount();
+		else g_iMinimized = 0;
 	}
 
-	if (client.GetGameState() == GameStateLoading || b_Minimized)
+	if (client.GetGameState() == GameStateLoading || g_iMinimized != 1)
 	{
 		return CallWindowProc(gameProc, hWnd, Msg, wParam, lParam);
 	}
@@ -157,7 +157,7 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 					}
 				}
 			}
-			Gui.HandleMessage(Msg, wParam, lParam);
+			if(client.IsRunning()) Gui.HandleMessage(Msg, wParam, lParam);
 			break;
 		}
 	}

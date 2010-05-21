@@ -20,10 +20,8 @@ void CFont::OnLostDevice()
 	m_pFont->OnLostDevice();
 }
 
-void CFont::OnResetDevice( IDirect3DDevice9 * pDevice )
+void CFont::OnResetDevice()
 {
-	pDevice; // C4100: 'pDevice' : unreferenced formal parameter
-
 	m_pFont->OnResetDevice();
 }
 

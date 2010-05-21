@@ -13,12 +13,13 @@ extern DWORD dwLoadOffset;
 extern DWORD MOUSE_POS_X;
 extern DWORD MOUSE_POS_Y;
 extern FMPGUI Gui;
-extern bool b_Minimized;
+extern DWORD g_iMinimized;
 
 LPD3DXFONT fFMP = NULL;
 LPD3DXFONT fChat = NULL;
 
 int MouseX, MouseY;
+bool g_bDeviceLost;
 
 //LPDIRECT3DTEXTURE9 g_Texture;
 //ID3DXSprite *g_Sprite;
@@ -217,14 +218,18 @@ HRESULT APIENTRY hkIDirect3DDevice9::DrawTriPatch(UINT Handle, CONST float *pNum
 
 HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 {
-	if(b_Minimized) return m_pD3Ddev->EndScene();
+	if(g_iMinimized == 0) return m_pD3Ddev->EndScene();
+	else if(g_iMinimized > 1)
+		if(g_iMinimized + 3000 < GetTickCount()) g_iMinimized = 1;
+		else return m_pD3Ddev->EndScene();
+	if(g_bDeviceLost) return m_pD3Ddev->EndScene();
 
 	MouseX = *(int*)MOUSE_POS_X;
 	MouseY = *(int*)MOUSE_POS_Y; 
 
 	RECT rc = {2, 2, 800, 600};
 	InputState inputstate = client.GetInputState();
-	if ((inputstate != InputStateGui) && (client.GetGameState() > GameStateConnecting))
+	if (client.IsRunning() && (inputstate != InputStateGui) && (client.GetGameState() > GameStateConnecting))
 	{
 		for(int i = 7; i >= 0; i--)
 		{
@@ -249,10 +254,8 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 		}
 		case InputStateGui:
 		{
-			EnterCriticalSection(&cs_gui);
 			Gui.MoveMouse(MouseX, MouseY);
 			Gui.Draw();
-			LeaveCriticalSection(&cs_gui);
 		} break;
 	}
 	return m_pD3Ddev->EndScene();
@@ -498,7 +501,10 @@ HRESULT APIENTRY hkIDirect3DDevice9::MultiplyTransform(D3DTRANSFORMSTATETYPE Sta
 
 HRESULT APIENTRY hkIDirect3DDevice9::Present(CONST RECT *pSourceRect, CONST RECT *pDestRect, HWND hDestWindowOverride, CONST RGNDATA *pDirtyRegion) 
 {	
-	return m_pD3Ddev->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+	HRESULT hr = m_pD3Ddev->Present(pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+	if(hr == D3DERR_DEVICELOST) g_bDeviceLost = 1;
+
+	return hr;
 }
 
 HRESULT APIENTRY hkIDirect3DDevice9::ProcessVertices(UINT SrcStartIndex,UINT DestIndex,UINT VertexCount,IDirect3DVertexBuffer9* pDestBuffer,IDirect3DVertexDeclaration9* pVertexDecl,DWORD Flags) 
@@ -516,14 +522,15 @@ ULONG APIENTRY hkIDirect3DDevice9::Release()
 
 HRESULT APIENTRY hkIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresentationParameters) 
 {
-	m_pManager->PreReset();
+	Gui.OnLostDevice();
 
 	HRESULT hRet = m_pD3Ddev->Reset(pPresentationParameters);
 
 	if( SUCCEEDED(hRet) )
 	{
-	m_PresentParam = *pPresentationParameters;
-	m_pManager->PostReset();
+		m_PresentParam = *pPresentationParameters;
+		Gui.OnResetDevice();
+		g_bDeviceLost = 0;
 	}
 
 	return hRet;

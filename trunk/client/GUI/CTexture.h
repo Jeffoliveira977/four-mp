@@ -10,6 +10,7 @@ class CTexture
 	ID3DXSprite * m_pSprite;
 	IDirect3DDevice9 * m_pDevice;
 	CColor *m_pColor;
+	char *tPath;
 public:
 	~CTexture();
 	CTexture( ID3DXSprite * pSprite, const char * szPath );
@@ -19,6 +20,9 @@ public:
 	{
 		return m_pTexture;
 	}
+
+	void OnLostDevice();
+	void OnResetDevice();
 
 	void SetColor(CColor *color);
 	CColor *GetColor();

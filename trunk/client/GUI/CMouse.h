@@ -50,4 +50,7 @@ public:
 
 	void SetSize(int);
 	int GetSize();
+
+	void OnLostDevice();
+	void OnResetDevice();
 };

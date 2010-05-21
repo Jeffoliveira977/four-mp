@@ -38,5 +38,7 @@ public:
 	CImage( CGUI *Gui, int iX, int iY, int iWidth, int iHeight, CTexture *iTxt, CWindow *eP = NULL);
 	~CImage();
 	void Draw();
+	void OnLostDevice();
+	void OnResetDevice();
 };
 

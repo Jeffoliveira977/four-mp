@@ -1,5 +1,4 @@
 #include <stdarg.h>
-#include <windows.h>
 #include <vector>
 
 #include "log.h"
