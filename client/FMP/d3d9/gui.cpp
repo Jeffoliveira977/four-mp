@@ -511,7 +511,6 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	
 	int ServerWidth[6] = {16, 210, 60, 60, 100, 100};
 	sbServList = new CListView(m_Gui, 0, 29, ServerWidth, 350, 6, NULL, "SERVER_LIST", CALLBACKS::ServerList);
-	Log::Debug("CListView 1 created");
 	sbServList->SetColumnImage(0, "FMPGUI/Pass.png", "FMPGUI/noPass.png", "FMPGUI/Pass.png", 16, 16);
 
 	sbServList->SetTitle("P");
@@ -523,8 +522,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 
 	int PlayerWidth[2] = {128, 76};
 	sbPlayerList = new CListView(m_Gui, 546, 49, PlayerWidth, 200, 2, NULL, "PLAYER_LIST");
-	Log::Debug("CListView 2 created");
-
+	
 	sbPlayerList->SetTitle("Player");
 	sbPlayerList->SetTitle("Score");
 
@@ -532,14 +530,13 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	sbTab[1] = new CButton(m_Gui, 169, 0, 200, 0, "LAN", "TAB_LAN", CALLBACKS::GetLAN);
 	sbTab[2] = new CButton(m_Gui, 318, 0, 200, 0, "VIP", "TAB_VIP", CALLBACKS::GetVIP);
 	sbTab[3] = new CButton(m_Gui, 467, 0, 200, 0, "Favourite", "TAB_FAVOURITE", CALLBACKS::GetFavourite);
-	Log::Debug("1111111");
-
+	
 	sbEnterIP = new CEditBox(m_Gui, 600, 290, 120, 0, "127.0.0.1", "EDIT_IP");
 	sbEnterPort = new CEditBox(m_Gui, 625, 330, 60, 0, "7777", "EDIT_PORT");
-	Log::Debug("2222222");
+	
 	CText *sbTextIP = new CText(m_Gui, 560, 295, 100, 20, "IP", "TEXT_IP", NULL);
 	CText *sbTextPort = new CText(m_Gui, 560, 335, 100, 20, "Port", "TEXT_PORT", NULL);
-	Log::Debug("3333333");
+	
 	sbConnect = new CButton(m_Gui, 560, 380, 80, 0, "Connect", "MAN_CONNECT", CALLBACKS::Connect);
 	sbRefresh = new CButton(m_Gui, 660, 380, 80, 0, "Refresh", "MAN_REFRESH", CALLBACKS::Refresh);
 	sbAddToFav = new CButton(m_Gui, 600, 405, 120, 0, "Add to favourites", "MAN_ADDFAV", CALLBACKS::AddFav);
@@ -550,53 +547,33 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	sbFltMode = new CEditBox(m_Gui, 305, 410, 80, 20, "", "FILTER_MODE");
 	sbFltNotEmpty = new CCheckBox(m_Gui, 480, 385, 0, 0, 0, "", "FILTER_NOT_EMPTY");
 	sbFltNoPassword = new CCheckBox(m_Gui, 480, 410, 0, 0, 1, "", "FILTER_NO_PASSWORD");
-	Log::Debug("5555555");
+	
 	sbFltPing->AddElement("< 50", "50");
 	sbFltPing->AddElement("50 - 100", "50100");
 	sbFltPing->AddElement("100 - 200", "100200");
 	sbFltPing->AddElement("200 - 500", "200500");
 	sbFltPing->AddElement("> 500", "500");
-	Log::Debug("6666666");
+	
 	fServBrowser->AddElement(sbServList);
-	Log::Debug("1");
 	fServBrowser->AddElement(sbPlayerList);
-	Log::Debug("2");
 	fServBrowser->AddElement(sbTab[0]);
-	Log::Debug("3");
 	fServBrowser->AddElement(sbTab[1]);
-	Log::Debug("4");
 	fServBrowser->AddElement(sbTab[2]);
-	Log::Debug("5");
 	fServBrowser->AddElement(sbTab[3]);
-	Log::Debug("6");
 	fServBrowser->AddElement(sbEnterPort);
-	Log::Debug("7");
 	fServBrowser->AddElement(sbEnterIP);
-	Log::Debug("8");
 	fServBrowser->AddElement(sbTextIP);
-	Log::Debug("9");
 	fServBrowser->AddElement(sbTextPort);
-	Log::Debug("10");
 	fServBrowser->AddElement(sbConnect);
-	Log::Debug("11");
 	fServBrowser->AddElement(sbRefresh);
-	Log::Debug("12");
 	fServBrowser->AddElement(sbAddToFav);
-	Log::Debug("13");
 	fServBrowser->AddElement(sbFltPing);
-	Log::Debug("14");
 	fServBrowser->AddElement(sbFltLocation);
-	Log::Debug("15");
 	fServBrowser->AddElement(sbFltMode);
-	Log::Debug("16");
 	fServBrowser->AddElement(sbFltNotFull);
-	Log::Debug("17");
 	fServBrowser->AddElement(sbFltNotEmpty);
-	Log::Debug("18");
 	fServBrowser->AddElement(sbFltNoPassword);
-	Log::Debug("19");
 	fServBrowser->SetVisible(0);
-	Log::Debug("777777");
 	// Create Chat
 	Log::Debug("FMPGUI::Load >> Create chat");
 	fChat = new CWindow(m_Gui, 10, 10, 300, 400, "FOUR-MP CHAT");
