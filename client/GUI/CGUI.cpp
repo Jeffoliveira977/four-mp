@@ -186,7 +186,7 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
 void LOG(const char *s, int i = 0) 
 { 
 	FILE *fi = fopen("gui.log", "a");
-	fprintf(fi, "%s %d", s, i);
+	fprintf(fi, "%s %d\n", s, i);
 	fclose(fi);
 }
 
@@ -197,7 +197,11 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 
 	LOG("0");
 
-	if( !Document.LoadFile( pszFilePath ) )
+	bool bbb = Document.LoadFile( pszFilePath );
+
+	LOG("0.5");
+
+	if( !bbb )
 	{
 		LOG("NOT LOAD");
 		MessageBoxA(NULL, Document.ErrorDesc(), "UpdateGUI", MB_OK);
