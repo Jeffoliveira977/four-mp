@@ -59,4 +59,7 @@ public:
 	bool GetTitleVisible();
 
 	int GetTitleBarHeight();
+
+	virtual void OnLostDevice();
+	virtual void OnResetDevice();
 };
