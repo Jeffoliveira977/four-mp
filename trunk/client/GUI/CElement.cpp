@@ -272,3 +272,15 @@ bool CElement::GetEnabled()
 {
 	return m_bEnabled;
 }
+
+void CElement::OnLostDevice()
+{
+	if(pFont != pGui->GetFont())
+		pFont->OnLostDevice();
+}
+
+void CElement::OnResetDevice()
+{
+	if(pFont != pGui->GetFont())
+		pFont->OnResetDevice();
+}

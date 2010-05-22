@@ -191,7 +191,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 	{
 		MessageBoxA(NULL, Document.ErrorDesc(), "UpdateGUI", MB_OK);
 		return;
-}
+	}
 
 	TiXmlHandle hDoc( &Document );
 
@@ -200,7 +200,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 	{
 		MessageBoxA(NULL, "XML Error", "UpdateGUI", MB_OK);
 		return;
-}
+	}
 
 	for( TiXmlElement * pThemeElement = pGUI->FirstChildElement(); pThemeElement; pThemeElement = pThemeElement->NextSiblingElement() )
 	{
@@ -217,32 +217,32 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 
 			if(strcmp(Element, "Element") == 0)
 			{
-				CElement *Element;
+				CElement *pElement;
 				if(wParent == NULL)
-					Element = GetWindowByString(pElementElement->Attribute("name"), 1);
+					pElement = GetWindowByString(pElementElement->Attribute("name"), 1);
 				else
-					Element = wParent->GetElementByString(pElementElement->Attribute("name"), 1);
-				
+					pElement = wParent->GetElementByString(pElementElement->Attribute("name"), 1);
+			
 				for(TiXmlElement * pElem = pElementElement->FirstChildElement( "Base" ); pElem; pElem = pElem->NextSiblingElement( "Base" ))
 				{
 					const char *name = pElem->Attribute("string");
 					const char *value = pElem->Attribute("value");
-					if(strcmp(name, "height") == 0) Element->SetHeight(atoi(value));
-					else if(strcmp(name, "width") == 0) Element->SetWidth(atoi(value));
-					else if(strcmp(name, "name") == 0) Element->SetString(value);
-					else if(strcmp(name, "x") == 0) Element->SetRelPos(atoi(value), -1);
-					else if(strcmp(name, "y") == 0) Element->SetRelPos(-1, atoi(value));
+					if(strcmp(name, "height") == 0) pElement->SetHeight(atoi(value));
+					else if(strcmp(name, "width") == 0) pElement->SetWidth(atoi(value));
+					else if(strcmp(name, "name") == 0) pElement->SetString(value);
+					else if(strcmp(name, "x") == 0) pElement->SetRelPos(atoi(value), -1);
+					else if(strcmp(name, "y") == 0) pElement->SetRelPos(-1, atoi(value));
 					else if(strcmp(name, "style") == 0) 
 					{
-						Element->SetThemeElement( GetThemeElement( value ), atoi(pElem->Attribute("number")));
-						Element->SetElementState("Norm", atoi(pElem->Attribute("number")));
+						pElement->SetThemeElement( GetThemeElement( value ), atoi(pElem->Attribute("number")));
+						pElement->SetElementState("Norm", atoi(pElem->Attribute("number")));
 					}
-			}
+				}
 
 				TiXmlElement * pElem = pElementElement->FirstChildElement( "Font" );
 				if(pElem)
 				{
-					Element->SetFont(atoi(pElem->Attribute("size")), (char*)pElem->Attribute("name"), 
+					pElement->SetFont(atoi(pElem->Attribute("size")), (char*)pElem->Attribute("name"), 
 						pElem->Attribute("bold")[0]=='1', pElem->Attribute("italic")[0]=='1');
 				}
 			}
@@ -562,6 +562,9 @@ void CGUI::OnLostDevice()
 	for(int i = 0; i < (int)m_eImage[1].size(); i++)
 		m_eImage[1][i]->OnLostDevice();
 
+	for(int i = 0; i < (int)m_vWindows.size(); i++)
+		m_vWindows[i]->OnLostDevice();
+
 	
 	for (std::map<std::string, tTheme>::const_iterator p = m_mThemes.begin(); p != m_mThemes.end(); ++p)
 		for (tTheme::const_iterator x = p->second.begin(); x != p->second.end(); ++x)
@@ -587,6 +590,9 @@ void CGUI::OnResetDevice()
 
 	for(int i = 0; i < (int)m_eImage[1].size(); i++)
 		m_eImage[1][i]->OnResetDevice();
+
+	for(int i = 0; i < (int)m_vWindows.size(); i++)
+		m_vWindows[i]->OnResetDevice();
 
 	for (std::map<std::string, tTheme>::const_iterator p = m_mThemes.begin(); p != m_mThemes.end(); ++p)
 		for (tTheme::const_iterator x = p->second.begin(); x != p->second.end(); ++x)

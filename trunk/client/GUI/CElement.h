@@ -88,6 +88,9 @@ public:
 	virtual bool MouseMove( CMouse * pMouse, bool over = 1 );
 	virtual bool KeyEvent( SKey sKey );
 
+	virtual void OnLostDevice();
+	virtual void OnResetDevice();
+
 	CFont * GetFont();
 	void SetFont(int size, char *name, bool bold, bool italic);
 	void SetFont(CFont *font);

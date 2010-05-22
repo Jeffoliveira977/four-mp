@@ -417,3 +417,19 @@ int CWindow::GetTitleBarHeight()
 {
 	return hTitleBar;
 }
+
+void CWindow::OnLostDevice()
+{
+	for(int i = 0; i < (int)m_vElements.size(); i++)
+		m_vElements[i]->OnLostDevice();
+
+	CElement::OnLostDevice();
+}
+
+void CWindow::OnResetDevice()
+{
+	for(int i = 0; i < (int)m_vElements.size(); i++)
+		m_vElements[i]->OnResetDevice();
+
+	CElement::OnResetDevice();
+}
