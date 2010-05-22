@@ -192,10 +192,14 @@ void LOG(const char *s, int i = 0)
 
 void CGUI::UpdateFromFile( const char * pszFilePath )
 {
+	LOG("-1");
 	TiXmlDocument Document;
+
+	LOG("0");
 
 	if( !Document.LoadFile( pszFilePath ) )
 	{
+		LOG("NOT LOAD");
 		MessageBoxA(NULL, Document.ErrorDesc(), "UpdateGUI", MB_OK);
 		return;
 	}
