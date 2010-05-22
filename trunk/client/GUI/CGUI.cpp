@@ -614,6 +614,7 @@ bool CGUI::KeyEvent( SKey sKey )
 void CGUI::OnLostDevice()
 {
 	//m_pDevice = 0;
+	EnterCriticalSection(&cs);
 
 	if( GetFont() )
 		GetFont()->OnLostDevice();
@@ -639,11 +640,14 @@ void CGUI::OnLostDevice()
 				for(std::map<std::string, CTexture*>::const_iterator z = y->second->mTextures.begin(); z != y->second->mTextures.end(); ++z)
 					z->second->OnLostDevice();			
 
+	LeaveCriticalSection(&cs);
 }
 
 void CGUI::OnResetDevice()
 {
 	//m_pDevice = pDevice;
+
+	EnterCriticalSection(&cs);
 
 	if( GetFont() )
 		GetFont()->OnResetDevice(  );
@@ -666,7 +670,8 @@ void CGUI::OnResetDevice()
 			for(std::map<std::string, SElementState*>::const_iterator y = x->second->m_mStates.begin(); y != x->second->m_mStates.end(); ++y)
 				for(std::map<std::string, CTexture*>::const_iterator z = y->second->mTextures.begin(); z != y->second->mTextures.end(); ++z)
 					z->second->OnResetDevice();	
-
+	
+	LeaveCriticalSection(&cs);
 }
 
 CMouse * CGUI::GetMouse()
@@ -710,7 +715,9 @@ SElement * CGUI::GetThemeElement( std::string sElement )
 
 void CGUI::SetVisible( bool bVisible )
 {
+	EnterCriticalSection(&cs);
 	m_bVisible = bVisible;
+	LeaveCriticalSection(&cs);
 }
 
 bool CGUI::IsVisible()

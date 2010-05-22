@@ -671,12 +671,15 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	conwindow.Hide();
 
 	Log::Debug("FMPGUI::Load >> Update GUI");
-	m_Gui->SetVisible( true );
 	m_Gui->UpdateFromFile("FMP\\GUIStyle.xml");
-	Log::Debug("FMPGUI::Load >> Disable tab");
 
+	Log::Debug("FMPGUI::Load >> Disable tab");
 	sbTab[tab]->SetEnabled(0);
 	GuiReady = 1;
+
+	Log::Debug("FMPGUI::Load >> Set Visible");
+	m_Gui->SetVisible( true );
+
 	Log::Debug("FMPGUI::Load complete");
 	LeaveCriticalSection(&cs_gui);
 }
