@@ -100,57 +100,77 @@ void NetworkManager::Tick(void)
 		{
 		case ID_CONNECTION_REQUEST_ACCEPTED:
 			{
+#if defined (FMP_CLIENT)
 				Log::Info("Connection accepted. Sending client info...");
+#elif defined (FMP_CONSOLE_CLIENT)
+				PrintToConsole("Connection accepted. Sending client info...");
+#endif
 				this->SendClientConnectionRequest();
 			} break;
 		case ID_ALREADY_CONNECTED:
 			{
+#if defined (FMP_CLIENT)
 				Log::Info("Already connected");
-				//clientstate.game = GameStateInGame;	
+				//clientstate.game = GameStateInGame;
+#elif defined (FMP_CONSOLE_CLIENT)
+				PrintToConsole("Already connected");
+#endif
 			} break;
 		case ID_NO_FREE_INCOMING_CONNECTIONS:
 			{
-				Log::Info("No free connections");
 #if defined (FMP_CLIENT)
+				Log::Info("No free connections");
 				client.SetGameState(GameStateOffline);
+#elif defined (FMP_CONSOLE_CLIENT)
+				PrintToConsole("No free connections");
 #endif
 			} break;
 		case ID_DISCONNECTION_NOTIFICATION:
 			{
-				Log::Info("You have been kicked from the server.");
 #if defined (FMP_CLIENT)
+				Log::Info("You have been kicked from the server.");
 				client.SetGameState(GameStateOffline);
+#elif defined (FMP_CONSOLE_CLIENT)
+				PrintToConsole("You have been kicked from the server.");
 #endif
 			} break;
 		case ID_CONNECTION_LOST:
 			{
-				Log::Info("Lost connection to the server.");
 #if defined (FMP_CLIENT)
+				Log::Info("Lost connection to the server.");
 				client.SetGameState(GameStateOffline);
+#elif defined (FMP_CONSOLE_CLIENT)
+				PrintToConsole("Lost connection to the server.");
 #endif
 			} break;
 		case ID_CONNECTION_BANNED:
 			{
-				Log::Info("You are banned from the server.");
 #if defined (FMP_CLIENT)
+				Log::Info("You are banned from the server.");
 				client.SetGameState(GameStateOffline);
+#elif defined (FMP_CONSOLE_CLIENT)
+				PrintToConsole("You are banned from the server.");
 #endif
 			} break;
 		case ID_INVALID_PASSWORD:
 			{
-				Log::Info("Invalid password");
 #if defined (FMP_CLIENT)
+				Log::Info("Invalid password");
 				client.SetGameState(GameStateOffline);
+#elif defined (FMP_CONSOLE_CLIENT)
+				PrintToConsole("Invalid password");
 #endif
 			} break;
 		case ID_CONNECTION_ATTEMPT_FAILED:
 			{
-				Log::Info("Connection failed");
 #if defined (FMP_CLIENT)
+				Log::Info("Connection failed");
 				client.SetGameState(GameStateOffline);
 				char str[128];
 				sprintf(str, "Can't connect to %s", pack->systemAddress.ToString());
 				Gui.Message(str);
+#elif defined (FMP_CONSOLE_CLIENT)
+				PrintToConsole("Connection failed");
 #endif
 			} break;
 		case ID_PONG:
@@ -182,6 +202,7 @@ void NetworkManager::Tick(void)
 			} break;
 		case ID_RPC_REMOTE_ERROR:
 			{
+#if defined (FMP_CLIENT)
 				Log::Info("RakNet: RPC remote error");
 				switch (pack->data[1])
 				{
@@ -207,10 +228,15 @@ void NetworkManager::Tick(void)
 					Log::Info("RPC_ERROR_CALLING_C_AS_CPP\n");
 					break;
 				}
+#endif
 			} break;
 		default:
 			{
-				Log::Info("RakNet: Unknown message (0x%x) [%s]", pack->data[0], pack->data);
+#if defined (FMP_CLIENT)
+				Log::Info("RakNet: Unknown message (0x%x)", pack->data[0]);
+#elif defined (FMP_CONSOLE_CLIENT)
+				PrintToConsole("RakNet: Unknown message (0x%x)", pack->data[0]);
+#endif
 			} break;
 		}
 	}
@@ -256,8 +282,8 @@ void NetworkManager::Ping(const char *hostname, const unsigned short port)
 
 void NetworkManager::ConnectToServer(const char *hostname, const unsigned short port)
 {
-	Log::Info("Connecting to server...");
 #if defined (FMP_CLIENT)
+	Log::Info("Connecting to server...");
 	GameState state = client.GetGameState();
 	if(state == GameStateOffline)
 	{
@@ -271,6 +297,7 @@ void NetworkManager::ConnectToServer(const char *hostname, const unsigned short 
 	}
 	client.SetGameState(GameStateConnecting);
 #elif defined (FMP_CONSOLE_CLIENT)
+	PrintToConsole("Connecting to server...");
 	net->Connect(hostname, port, 0, 0, 0);
 	serveraddress.SetBinaryAddress(hostname);
 	serveraddress.port = port;
@@ -710,32 +737,56 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			{
 			case NetworkPlayerConnectionErrorServerFull:
 				{
+#if defined (FMP_CLIENT)
 					Log::Info("Connection error: Server is full.");
+#elif defined (FMP_CONSOLE_CLIENT)
+					PrintToConsole("Connection error: Server is full.");
+#endif
 					break;
 				}
 			case NetworkPlayerConnectionErrorInvalidProtocol:
 				{
+#if defined (FMP_CLIENT)
 					Log::Info("Connection error: Server is using different protocol.");
+#elif defined (FMP_CONSOLE_CLIENT)
+					PrintToConsole("Connection error: Server is using different protocol.");
+#endif
 					break;
 				}
 			case NetworkPlayerConnectionErrorInvalidName:
 				{
+#if defined (FMP_CLIENT)
 					Log::Info("Connection error: Invalid user name.");
+#elif defined (FMP_CONSOLE_CLIENT)
+					PrintToConsole("Connection error: Invalid user name.");
+#endif
 					break;
 				}
 			case NetworkPlayerConnectionErrorAlreadyConnected:
 				{
+#if defined (FMP_CLIENT)
 					Log::Info("Connection error: You are already connected.");
+#elif defined (FMP_CONSOLE_CLIENT)
+					PrintToConsole("Connection error: You are already connected.");
+#endif
 					break;
 				}
 			case NetworkPlayerConnectionErrorAllocationError:
 				{
+#if defined (FMP_CLIENT)
 					Log::Info("Connection error: Server was unable to allocate player resources.");
+#elif defined (FMP_CONSOLE_CLIENT)
+					PrintToConsole("Connection error: Server was unable to allocate player resources.");
+#endif
 					break;
 				}
 			case NetworkPlayerConnectionErrorScriptLock:
 				{
+#if defined (FMP_CLIENT)
 					Log::Info("Connection error: Connection has been refused by a server script.");
+#elif defined (FMP_CONSOLE_CLIENT)
+					PrintToConsole("Connection error: Connection has been refused by a server script.");
+#endif
 					break;
 				}
 			}
@@ -781,6 +832,9 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 
 			Log::Info("Player full update. Name is %s", data->playerfullupdate->name);
 			HOOK.PlayerConnect(data->playerfullupdate->name, data->playerfullupdate->index, gPlayer[data->playerfullupdate->index].model, gPlayer[data->playerfullupdate->index].position);
+#elif defined (FMP_CONSOLE_CLIENT)
+			PrintToConsole("Player full update. Name is %s", data->playerfullupdate->name);
+			PrintToConsole("Position is %f %f %f", data->playerfullupdate->position[0], data->playerfullupdate->position[1], data->playerfullupdate->position[2]);
 #endif
 			delete data->playerfullupdate;
 			break;
