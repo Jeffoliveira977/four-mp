@@ -94,6 +94,7 @@ void FMPHook::CarDoSync()
 	else if(!Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && gPlayer[client.GetIndex()].vehicleindex != -1)
 	{
 		gPlayer[client.GetIndex()].vehicleindex = -1;
+		nm.SendPlayerExitFromVehicle();
 	}
 	if(myEnter == 0 && GetAsyncKeyState(70) != 0)
 	{
@@ -107,12 +108,16 @@ void FMPHook::CarDoSync()
 			carid = _GetClosestCar(x, y, z, 10);
 			if(carid != -1)
 			{
+				gPlayer[client.GetIndex()].vehicleindex = carid;
+				gPlayer[client.GetIndex()].seatindex = 0;
 				nm.SendPlayerEntranceInVehicle(0);
 				myEnter = 1;
 			}
 		} 
 		else 
 		{
+			gPlayer[client.GetIndex()].vehicleindex = -1;
+			gPlayer[client.GetIndex()].seatindex = -1;
 			myEnter = 0;
 			nm.SendPlayerExitFromVehicle();
 		}
@@ -163,6 +168,8 @@ void FMPHook::CarDoSync()
 			}
 			if(seatid >= 0)
 			{
+				gPlayer[client.GetIndex()].vehicleindex = carid;
+				gPlayer[client.GetIndex()].seatindex = seatid+1;
 				Natives::TaskEnterCarAsPassenger(gPlayer[client.GetIndex()].PedID, gCar[carid].CarID, -1, seatid);
 				nm.SendPlayerEntranceInVehicle(seatid+1);
 			}
@@ -186,6 +193,8 @@ void FMPHook::CarDoSync()
 			if(control != 0)
 			{
 				myEnter = 0;
+				gPlayer[client.GetIndex()].vehicleindex = -1;
+				gPlayer[client.GetIndex()].seatindex = -1;
 				nm.SendPlayerCancelEntranceInVehicle();
 			}
 		}
