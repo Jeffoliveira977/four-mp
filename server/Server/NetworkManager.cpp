@@ -1,3 +1,5 @@
+#include "../../Shared/RPC3/RPC3.h"
+#include "RakPeerInterface.h"
 #include "RakNetworkFactory.h"
 #include "MessageIdentifiers.h"
 

@@ -2,6 +2,7 @@
 #include "../../Shared/RakNet/RakPeerInterface.h"
 #include "../../Shared/RakNet/TCPInterface.h"
 #include "../../Shared/RakNet/HTTPConnection.h"
+#include "../../Shared/RakNet/RakString.h"
 #include "../../Shared/RakNet/MessageIdentifiers.h"
 #include "../../Shared/RakNet/GetTime.h"
 

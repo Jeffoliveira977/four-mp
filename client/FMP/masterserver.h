@@ -1,8 +1,11 @@
 #include <vector>
-#include "RakString.h"
 
 class TCPInterface;
 class HTTPConnection;
+namespace RakNet
+{
+	class RakString;
+}
 
 #define MASTER_HOST "master.four-mp.com"
 #define MASTER_PATH "/"

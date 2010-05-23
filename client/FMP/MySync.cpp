@@ -3,6 +3,8 @@ Syncronizashion this player
 (c) WNeZRoS 2009
 *****************************************************************/
 
+#include <math.h>
+
 #include "log.h"
 #include "main.h"
 #include "../Shared/ClientCore.h"

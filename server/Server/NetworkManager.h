@@ -6,15 +6,17 @@
 #pragma once
 
 #include "NetworkIDObject.h"
-#include "NetworkIDManager.h"
-#include "../../Shared/RPC3/RPC3.h"
-#include "RakPeerInterface.h"
 
 #include "../../Shared/Network/NetworkProtocol.h"
 
 #ifdef WIN32
 #include <windows.h>
 #endif
+
+namespace RakNet
+{
+	class RPC3;
+}
 
 /// \brief A network manager. It handles all network traffic.
 /// \details TODO:
