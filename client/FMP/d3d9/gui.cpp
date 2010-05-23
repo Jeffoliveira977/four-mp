@@ -469,11 +469,19 @@ FMPGUI::FMPGUI()
 FMPGUI::~FMPGUI()
 {
 	Log::Debug("FMPGUI::~FMPGUI called");
+	if(GuiReady) Release();
+	Log::Debug("FMPGUI::~FMPGUI completed");
+}
+
+void FMPGUI::Release()
+{
+	Log::Debug("FMPGUI::Release called");
 	EnterCriticalSection(&cs_gui);
 	delete m_Gui;
 	LeaveCriticalSection(&cs_gui);
 	DeleteCriticalSection(&cs_gui);
-	Log::Debug("FMPGUI::~FMPGUI completed");
+	GuiReady = 0;
+	Log::Debug("FMPGUI::Release completed");
 }
 
 void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
@@ -670,16 +678,16 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	conwindow.Load();
 	conwindow.Hide();
 
-	Log::Debug("FMPGUI::Load >> Update GUI");
-	m_Gui->UpdateFromFile("FMP\\GUIStyle.xml");
-
 	Log::Debug("FMPGUI::Load >> Disable tab");
 	sbTab[tab]->SetEnabled(0);
-	GuiReady = 1;
 
 	Log::Debug("FMPGUI::Load >> Set Visible");
 	m_Gui->SetVisible( true );
 
+	Log::Debug("FMPGUI::Load >> Update GUI");
+	m_Gui->UpdateFromFile("FMP\\GUIStyle.xml");
+
+	GuiReady = 1;
 	Log::Debug("FMPGUI::Load complete");
 	LeaveCriticalSection(&cs_gui);
 }

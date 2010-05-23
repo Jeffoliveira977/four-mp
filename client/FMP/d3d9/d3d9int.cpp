@@ -64,7 +64,7 @@ HRESULT APIENTRY hkIDirect3D9::CheckDeviceMultiSampleType(UINT Adapter,D3DDEVTYP
 
 HRESULT APIENTRY hkIDirect3D9::CheckDeviceType(UINT Adapter, D3DDEVTYPE CheckType, D3DFORMAT DisplayFormat, D3DFORMAT BackBufferFormat, BOOL Windowed)
 {
-	return m_pD3Dint->CheckDeviceType(Adapter, CheckType, DisplayFormat, BackBufferFormat, Windowed);
+	return m_pD3Dint->CheckDeviceType(Adapter, CheckType, DisplayFormat, BackBufferFormat, /*Windowed*/1);
 }
 
 HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD BehaviorFlags, D3DPRESENT_PARAMETERS *pPresentationParameters, IDirect3DDevice9 **ppReturnedDeviceInterface)
@@ -78,8 +78,11 @@ HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 
 		gameProc = (WNDPROC)GetWindowLong(hFocusWindow,GWL_WNDPROC);
 		SetWindowLong(hFocusWindow,GWL_WNDPROC,(LONG)DefWndProc);
+		Log::Debug("Set window");
+
 		Gui.Load(ret->m_pD3Ddev);
 		Log::Debug("Save Device");
+		
 		//clientstate.input = InputStateGui;
 
 		if(fFMP == NULL)

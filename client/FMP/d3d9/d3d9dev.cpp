@@ -107,6 +107,7 @@ HRESULT APIENTRY hkIDirect3DDevice9::ColorFill(IDirect3DSurface9* pSurface,CONST
 
 HRESULT APIENTRY hkIDirect3DDevice9::CreateAdditionalSwapChain(D3DPRESENT_PARAMETERS *pPresentationParameters, IDirect3DSwapChain9 **ppSwapChain) 
 {
+	pPresentationParameters->Windowed = 1;
 	return m_pD3Ddev->CreateAdditionalSwapChain(pPresentationParameters, ppSwapChain);
 }
 
@@ -516,6 +517,7 @@ ULONG APIENTRY hkIDirect3DDevice9::Release()
 {
 	if( --m_refCount == 0 )
 	m_pManager->Release();
+	Gui.Release();
 
 	return m_pD3Ddev->Release();
 }

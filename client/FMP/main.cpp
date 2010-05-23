@@ -103,12 +103,104 @@ void FMPHook::InputFreeze(bool e)
 	Natives::SetPlayerControl(Natives::ConvertIntToPlayerIndex(Natives::GetPlayerId()), !e);
 }
 
+bool FMPHook::SafeCreatePlayer(short index)
+{
+	Log::Info("SafeCreatePlayer requested");
+
+	if(gPlayer[index].connected == 0) 
+	{
+		Log::Warning("Haven't player data for create");
+		return 0;
+	}
+
+	if(client.GetIndex() == index)
+	{
+		Log::Warning("Is a local player");
+		return 0;
+	}
+
+	if(Natives::DoesCharExist(gPlayer[index].PedID))
+	{
+		Log::Warning("Char already exist");
+		return 0;
+	}
+	
+	if(!Natives::IsThisModelAPed((eModel)gPlayer[index].model))
+	{
+		Log::Warning("This model not a ped");
+		return 0;
+	}
+
+	if(gPlayer[index].name == 0 || strlen(gPlayer[index].name) == 0)
+	{
+		Log::Warning("Player haven't name");
+		return 0;
+	}
+
+	Natives::RequestModel((eModel)gPlayer[index].model);
+	while(!Natives::HasModelLoaded((eModel)gPlayer[index].model)) wait(0);
+
+	Natives::CreateChar(1, (eModel)gPlayer[index].model, gPlayer[index].position[0], gPlayer[index].position[1], 
+		gPlayer[index].position[2], &gPlayer[index].PedID, 1);
+
+	while(!Natives::DoesCharExist(gPlayer[index].PedID)) wait(0);
+
+	Natives::GivePedFakeNetworkName(gPlayer[index].PedID, gPlayer[index].name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
+	Natives::SetBlockingOfNonTemporaryEvents(gPlayer[index].PedID, 1);
+
+	Natives::SetCharHealth( gPlayer[index].PedID, gPlayer[index].health );
+	Natives::SetCharDefaultComponentVariation( gPlayer[index].PedID );
+	Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
+
+	if(gPlayer[index].vehicleindex != -1)
+	{
+		if(gCar[gPlayer[index].vehicleindex].exist == 0)
+		{
+			Log::Warning("Player car not register");
+			return 0;
+		}
+		if(!Natives::DoesVehicleExist( gCar[gPlayer[index].vehicleindex].CarID ))
+		{
+			Log::Warning("Player car not created");
+			return 0;
+		}
+
+		if(gPlayer[index].seatindex == -1) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gCar[gPlayer[index].vehicleindex].CarID, 0);
+		else Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gCar[gPlayer[index].vehicleindex].CarID, 0, gPlayer[index].seatindex);
+	}
+
+	for(int i = 0; i < 8; i++)
+	{
+		if(gPlayer[index].weapons[i] != 0 && gPlayer[index].ammo[i] > 0)
+			Natives::GiveWeaponToChar(gPlayer[index].PedID, (eWeapon)gPlayer[index].weapons[i], gPlayer[index].ammo[i], 0);
+	}
+
+	return Natives::DoesCharExist( gPlayer[index].PedID );
+}
+
+bool FMPHook::SafeCheckPlayer(short index, bool bReCreateOnFalse)
+{
+	if(gPlayer[index].connected == 0) 
+	{
+		Log::Error("Player not connected");
+		return 0;
+	}
+	if(!Natives::DoesCharExist(gPlayer[index].PedID))
+	{
+		Log::Error("Player doesn't exist");
+		if(bReCreateOnFalse) return SafeCreatePlayer(index);
+		return 0;
+	}
+
+	return 1;
+}
+
 void FMPHook::RunMP()
 {
 	Log::Info("Starting up multiplayer mode.");
-	//AllowEmergencyServices(0);
-	Natives::SetPedDensityMultiplier(0);
-	Natives::SetCarDensityMultiplier(0);
+	Natives::AllowEmergencyServices(0);
+	//Natives::SetPedDensityMultiplier(0);
+	//Natives::SetCarDensityMultiplier(0);
 	Natives::DisableCarGenerators(1);
 	//DisableCarGeneratorsWithHeli(1);
 	Natives::SetNoResprays(1);
@@ -178,9 +270,21 @@ void FMPHook::RunMP()
 	Natives::SetFloatStat(STAT_KATE_TRUST, 100);
 	Natives::SetFloatStat(STAT_GAME_PROGRESS, 100);
 	
+	Natives::TerminateAllScriptsWithThisName("startup");
 	Natives::TerminateAllScriptsWithThisName("initial");
 	Natives::TerminateAllScriptsWithThisName("main");
+	Natives::TerminateAllScriptsWithThisName("carwash");
+	Natives::TerminateAllScriptsWithThisName("stunt");
 	Natives::TerminateAllScriptsWithThisName("spcellphone");
+	Natives::TerminateAllScriptsWithThisName("spcellphonemain");
+	Natives::TerminateAllScriptsWithThisName("computermain");
+	Natives::TerminateAllScriptsWithThisName("copbootsearch");
+	Natives::TerminateAllScriptsWithThisName("emergencycall");
+	/*Natives::TerminateAllScriptsWithThisName("empiredown");
+	Natives::TerminateAllScriptsWithThisName("foodserver");
+	Natives::TerminateAllScriptsWithThisName("garbage_trucks");
+	Natives::TerminateAllScriptsWithThisName("vendor");
+	Natives::TerminateAllScriptsWithThisName("nutvendor");
 	Natives::TerminateAllScriptsWithThisName("ambairpotarea");
 	Natives::TerminateAllScriptsWithThisName("ambatmq");
 	Natives::TerminateAllScriptsWithThisName("ambbar");
@@ -224,14 +328,7 @@ void FMPHook::RunMP()
 	Natives::TerminateAllScriptsWithThisName("ambtv");
 	Natives::TerminateAllScriptsWithThisName("ambunarea");
 	Natives::TerminateAllScriptsWithThisName("ambwardrobe");
-	Natives::TerminateAllScriptsWithThisName("ambwindowlift");
-	Natives::TerminateAllScriptsWithThisName("computermain");
-	Natives::TerminateAllScriptsWithThisName("copbootsearch");
-	Natives::TerminateAllScriptsWithThisName("emergencycall");
-	Natives::TerminateAllScriptsWithThisName("empiredown");
-	Natives::TerminateAllScriptsWithThisName("foodserver");
-	Natives::TerminateAllScriptsWithThisName("garbage_trucks");
-	Natives::TerminateAllScriptsWithThisName("stunt");
+	Natives::TerminateAllScriptsWithThisName("ambwindowlift");*/
 	
 	
 	Natives::ClearAreaOfChars(0,0,0, 2000);
@@ -408,6 +505,7 @@ void MainThread(void* dummy)
 	concore.AddConCmd("getmypos", GetMyPos);
 	concore.AddConCmd("getpos", GetMyPos);
 
+	Sleep(10000);
 	HOOK.AttachGtaThread("FOURMP");
 	Log::Debug("Attached");
 
@@ -429,11 +527,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 
 		patchCode();
 		GetAddresses(dwGameVersion);
+
 		if(dwGameVersion == 0x1060 || dwGameVersion == 0x1051 || dwGameVersion == 0x1050)
 		{
 			Log::Info("Skipping main menu");
 			JmpHook(CGAME_PROCESS_SLEEP, CGAME_PROCESS_START_GAME);
 			SetString(GAME_NAME,"GTA IV: FOUR-MP");
+			SetString(0xD6BDD4+dwLoadOffset, "FMP/popcycle.dat");
 
 			Log::Debug("Set DX9 Hook");
 			DetourFunc((BYTE*)ADDRESS_CREATE_DEVICE,(BYTE*)hkDirect3DCreate9, 5);

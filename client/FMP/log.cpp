@@ -1,10 +1,23 @@
 #include <stdarg.h>
 #include <vector>
+#include <windows.h>
 
 #include "log.h"
 
+class critical_section
+{
+	CRITICAL_SECTION _cs;
+public:
+	critical_section() { InitializeCriticalSection(&_cs); }
+	~critical_section() { DeleteCriticalSection(&_cs); }
+
+	void Enter() { EnterCriticalSection(&_cs); }
+	void Leave() { LeaveCriticalSection(&_cs); }
+};
+
 namespace Log
 {
+	critical_section critSect;
 	std::vector<Logger*> logging;
 	bool b_Debug = 1;
 	bool b_Info = 1;
@@ -60,60 +73,72 @@ namespace Log
 	{
 		if(logging.size() == 0 || !b_Logging || !b_Debug) return;
 
+		critSect.Enter();
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
 			logging[i]->Log("Debug", string, arglist);		
 		va_end(arglist); 
+		critSect.Leave();
 	}
 	void Info(const char *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging || !b_Info) return;
 
+		critSect.Enter();
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
 			logging[i]->Log("Info", string, arglist);		
 		va_end(arglist); 
+		critSect.Leave();
 	}
 	void Error(const char *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging || !b_Error) return;
 
+		critSect.Enter();
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
 			logging[i]->Log("Error", string, arglist);		
 		va_end(arglist); 
+		critSect.Leave();
 	}
 	void Warning(const char *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging || !b_Warning) return;
 
+		critSect.Enter();
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
 			logging[i]->Log("Warning", string, arglist);		
-		va_end(arglist); 
+		va_end(arglist);
+		critSect.Leave();
 	}
 	void Other(const char *type, const char *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging) return;
 
+		critSect.Enter();
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
 			logging[i]->Log(type, string, arglist);		
 		va_end(arglist); 
+		critSect.Leave();
 	}
 	void Void(const char *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging) return;
 
+		critSect.Enter();
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
 			logging[i]->Log("", string, arglist);		
-		va_end(arglist); 
+		va_end(arglist);
+		critSect.Leave();
 	}
 };

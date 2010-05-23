@@ -181,6 +181,7 @@ void NetworkManager::Tick(void)
 				RakNet::BitStream pong( pack->data+1, sizeof(RakNetTime), false);
 				pong.Read(time);
 				dataLength = pack->length - sizeof(unsigned char) - sizeof(RakNetTime);
+				Log::Debug("Create tmp info");
 				MasterServerInfo *tmp_msi = new MasterServerInfo;
 				tmp_msi->ping = (unsigned int)(RakNet::GetTime()-time);
 

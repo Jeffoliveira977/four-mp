@@ -942,8 +942,6 @@ bool TiXmlDocument::SaveFile() const
 	return SaveFile( Value() );
 }
 
-void LOG(const char *s, int i = 0);
-
 bool TiXmlDocument::LoadFile( const char* _filename, TiXmlEncoding encoding )
 {
 	// There was a really terrifying little bug here. The code:
@@ -954,28 +952,20 @@ bool TiXmlDocument::LoadFile( const char* _filename, TiXmlEncoding encoding )
 	// like a bug in the Microsoft STL implementation.
 	// Add an extra string to avoid the crash.
 
-	LOG("LF 0");
 	TIXML_STRING filename( _filename );
 	value = filename;
-	LOG("LF 1");
 
 	// reading in binary mode so that tinyxml can normalize the EOL
 	FILE* file = TiXmlFOpen( value.c_str (), "rb" );
 
-	LOG("LF 2");
-
 	if ( file )
 	{
-		LOG("LF 3");
 		bool result = LoadFile( file, encoding );
-		LOG("LF 4");
 		fclose( file );
-		LOG("LF 5");
 		return result;
 	}
 	else
 	{
-		LOG("LF 3 ERROR");
 		SetError( TIXML_ERROR_OPENING_FILE, 0, 0, TIXML_ENCODING_UNKNOWN );
 		return false;
 	}

@@ -157,6 +157,7 @@ public:
 	int GetCarDrive(Vehicle car);
 	void GetCamTargetedCoords(float *x, float *y, float *z);
 	void GetMyPos();
+	bool SafeCheckPlayer(short index, bool bReCreateOnFalse = 1);
 
 	// -- Start mp
 	void RunMP();
@@ -166,20 +167,21 @@ public:
 
 	// -- Other players sync
 	void PlayerConnect(char *name, short index, unsigned int model, float position[3]);
-	void PlayerDisconnect(int id);
-	void ReCreatePlayer(int);
+	bool SafeCreatePlayer(short index);
+
+	void PlayerDisconnect(short index);
 	void PlayerMove(short index, float position[3], float speed);
-	void Jump(int);
-	void Duck(int, bool);
-	void PlayerFireAim(int, int, int, float, float, float, bool);
-	void PlayerSwapGun(int, int);
+	void Jump(short index);
+	void Duck(short index, bool);
+	void PlayerFireAim(short index, int, int, float, float, float, bool);
+	void PlayerSwapGun(short index, int);
 
-	void CancelEnterInVehicle(int);
-	void ExitFromVehicle(int);
-	void EnterInVehicle(int, int, int);
+	void CancelEnterInVehicle(short index);
+	void ExitFromVehicle(short index);
+	void EnterInVehicle(short index, int, int);
 
-	void PlayerSyncSkin(int, int);
-	void PlayerSyncSkinVariation(int, int*, int*);
+	void PlayerSyncSkin(short index, int);
+	void PlayerSyncSkinVariation(short index, int*, int*);
 
 	void xPlayerSpawn(NetworkPlayerSpawnData data);
 
