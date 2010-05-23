@@ -5,6 +5,7 @@
 /// \author FaTony
 
 #include <string.h>
+#include <stdio.h>
 
 #include "con_sharedcommands.h"
 #include "../Shared/ClientCore.h"

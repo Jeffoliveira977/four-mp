@@ -2,11 +2,13 @@
 
 #include <windows.h>
 #include "NetworkIDObject.h"
-#include "NetworkIDManager.h"
-#include "../../Shared/RPC3/RPC3.h"
-#include "RakPeerInterface.h"
 
 #include "../../Shared/Network/NetworkProtocol.h"
+
+namespace RakNet
+{
+	class RPC3;
+}
 
 class NetworkManager : public NetworkIDObject
 {
