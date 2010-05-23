@@ -2,8 +2,6 @@
 #include "hook.h"
 #include "../log.h"
 
-DWORD dwLoadOffset = ((DWORD)GetModuleHandle (NULL)-0x400000);
-
 // Получить массив потоков...
 sysArray<GtaThread>* GetThreadsArray()
 {

@@ -80,7 +80,7 @@ namespace Natives
 	static void CreateCar(unsigned int nameHash, float x, float y, float z, Vehicle *pVehicle, bool unknownTrue) { NativeInvoke::Invoke<NATIVE_CREATE_CAR, ScriptVoid>(nameHash, x, y, z, pVehicle, unknownTrue); }
 	static void SetCarHeading(Vehicle vehicle, float dir) { NativeInvoke::Invoke<NATIVE_SET_CAR_HEADING, ScriptVoid>(vehicle, dir); }
 	static void GetCarCharIsUsing(Ped ped, Vehicle *pVehicle) { NativeInvoke::Invoke<NATIVE_GET_CAR_CHAR_IS_USING, ScriptVoid>(ped, pVehicle); }
-	//static void AllowEmergencyServices(bool allow) { NativeInvoke::Invoke<NATIVE_ALLOW_EMERGENCY_SERVICES, ScriptVoid>(allow); }
+	static void AllowEmergencyServices(bool allow) { NativeInvoke::Invoke<NATIVE_ALLOW_EMERGENCY_SERVICES, ScriptVoid>(allow); }
 	static void SwitchAmbientPlanes(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_AMBIENT_PLANES, ScriptVoid>(on); }  
 	static void SwitchArrowAboveBlippedPickups(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_ARROW_ABOVE_BLIPPED_PICKUPS, ScriptVoid>(on); }
 	static void SwitchRandomBoats(bool on) { NativeInvoke::Invoke<NATIVE_SWITCH_RANDOM_BOATS, ScriptVoid>(on); }

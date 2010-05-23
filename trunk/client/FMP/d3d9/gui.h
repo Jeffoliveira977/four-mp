@@ -18,6 +18,8 @@ public:
 	FMPGUI();
 	~FMPGUI();
 
+	void Release();
+
 	void Load(IDirect3DDevice9 * g_pDevice);
 	void HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
 	void MoveMouse(int x, int y);

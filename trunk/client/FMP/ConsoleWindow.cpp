@@ -18,13 +18,13 @@ ConsoleWindow::ConsoleWindow(void)
 
 ConsoleWindow::~ConsoleWindow(void)
 {
-	if (IsLoaded)
+	/*if (IsLoaded)
 	{
 		delete outputbox;
 		delete inputbox;
 		delete submitbutton;
 		delete mainwindow;
-	}
+	}*/
 }
 
 void ConsoleWindow::Load(void)

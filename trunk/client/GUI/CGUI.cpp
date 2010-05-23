@@ -114,7 +114,7 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
 	if( !Document.LoadFile( pszFilePath ) )
 	{
 		MessageBoxA( 0, Document.ErrorDesc(), "XML Error", 0 );
-			return;
+		return;
 	}
 	
 	TiXmlHandle hDoc( &Document );
@@ -127,7 +127,7 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
 		{
 			const char * pszDefaultTheme = pColorThemes->Attribute( "default" );
 			if( pszDefaultTheme )
-					m_sCurTheme = pszDefaultTheme;
+				m_sCurTheme = pszDefaultTheme;
 
 			for( TiXmlElement * pThemeElement = pColorThemes->FirstChildElement(); pThemeElement; pThemeElement = pThemeElement->NextSiblingElement() )
 				for( TiXmlElement * pElementElement = pThemeElement->FirstChildElement(); pElementElement; pElementElement = pElementElement->NextSiblingElement() )
@@ -183,32 +183,15 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
 	}
 }
 
-void LOG(const char *s, int i = 0) 
-{ 
-	FILE *fi = fopen("gui.log", "a");
-	fprintf(fi, "%s %d\n", s, i);
-	fclose(fi);
-}
-
 void CGUI::UpdateFromFile( const char * pszFilePath )
 {
-	LOG("-1");
 	TiXmlDocument Document;
 
-	LOG("0");
-
-	bool bbb = Document.LoadFile( pszFilePath );
-
-	LOG("0.5");
-
-	if( !bbb )
+	if( !Document.LoadFile( pszFilePath ) )
 	{
-		LOG("NOT LOAD");
 		MessageBoxA(NULL, Document.ErrorDesc(), "UpdateGUI", MB_OK);
 		return;
 	}
-
-	LOG("1");
 
 	TiXmlHandle hDoc( &Document );
 
@@ -219,48 +202,31 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 		return;
 	}
 
-	LOG("2");
-
 	for( TiXmlElement * pThemeElement = pGUI->FirstChildElement(); pThemeElement; pThemeElement = pThemeElement->NextSiblingElement() )
 	{
 		int Index = 0;
 		CWindow *wParent = NULL;
 
-		LOG("FOR-1");
-
 		if(strcmp(pThemeElement->Value(), "Over") == 0) Index = 1;
 		if(strcmp(pThemeElement->Attribute("parent"), "none") != 0)
 			wParent = GetWindowByString(pThemeElement->Attribute("parent"), 1);
-
-		LOG("FOR-2");
 
 		for( TiXmlElement * pElementElement = pThemeElement->FirstChildElement(); pElementElement; pElementElement = pElementElement->NextSiblingElement() )
 		{
 			const char *Element = pElementElement->Value();
 
-			LOG("for-1");
-			if(!Element) LOG("for-1 !Element");
-			LOG(Element);
-
 			if(strcmp(Element, "Element") == 0)
 			{
-				LOG("for-2 Element");
 				CElement *pElement;
 				if(wParent == NULL)
 					pElement = GetWindowByString(pElementElement->Attribute("name"), 1);
 				else
 					pElement = wParent->GetElementByString(pElementElement->Attribute("name"), 1);
-
-				if(!pElement) LOG("for !pElement");
-				
+		
 				for(TiXmlElement * pElem = pElementElement->FirstChildElement( "Base" ); pElem; pElem = pElem->NextSiblingElement( "Base" ))
 				{
 					const char *name = pElem->Attribute("string");
 					const char *value = pElem->Attribute("value");
-
-					LOG("sfor-1");
-					LOG(name);
-					LOG(value);
 
 					if(strcmp(name, "height") == 0) pElement->SetHeight(atoi(value));
 					else if(strcmp(name, "width") == 0) pElement->SetWidth(atoi(value));
@@ -272,11 +238,7 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 						pElement->SetThemeElement( GetThemeElement( value ), atoi(pElem->Attribute("number")));
 						pElement->SetElementState("Norm", atoi(pElem->Attribute("number")));
 					}
-
-					LOG("sfor-2");
 				}
-
-				LOG("for-3");
 
 				TiXmlElement * pElem = pElementElement->FirstChildElement( "Font" );
 				if(pElem)
@@ -284,27 +246,18 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 					pElement->SetFont(atoi(pElem->Attribute("size")), (char*)pElem->Attribute("name"), 
 						pElem->Attribute("bold")[0]=='1', pElem->Attribute("italic")[0]=='1');
 				}
-
-				LOG("for-4");
 			}
 			else if(strcmp(Element, "Line") == 0)
 			{
-				LOG("for-2 Line");
-
 				CLine *tLine = new CLine(this, atoi(pElementElement->Attribute("sx")), atoi(pElementElement->Attribute("sy")),
 					atoi(pElementElement->Attribute("ex")),	atoi(pElementElement->Attribute("ey")),
 					atoi(pElementElement->Attribute("size")), new CColor(pElementElement), wParent);
 
-				LOG("for-3");
-
 				if(!wParent) m_eLine[Index].push_back(tLine);
 				else wParent->m_eLine[Index].push_back(tLine);
-
-				LOG("for-4");
 			}
 			else if(strcmp(Element, "Box") == 0)
 			{
-				LOG("for-2 Box");
 				CColor *Inner, *Border;
 
 				TiXmlElement * pColorElement = pElementElement->FirstChildElement( "Color" ); 
@@ -315,53 +268,35 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 				if(strcmp(pColorElement->Attribute("string"), "Inner") == 0) Inner = new CColor(pColorElement);
 				else if(strcmp(pColorElement->Attribute("string"), "Border") == 0) Border = new CColor(pColorElement);
 
-				LOG("for-3");
-
 				CBox *tBox = new CBox(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
 					atoi(pElementElement->Attribute("width")), atoi(pElementElement->Attribute("height")),
 					Inner, Border, wParent);
 
-				LOG("for-4");
-
 				if(!wParent) m_eBox[Index].push_back(tBox);
 				else wParent->m_eBox[Index].push_back(tBox);
-
-				LOG("for-5");
 			}
 			else if(strcmp(Element, "Text") == 0)
 			{
-				LOG("for-2 Text");
 				CText *tText = new CText(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
 					atoi(pElementElement->Attribute("width")), 20, pElementElement->Attribute("string"), 
 					pElementElement->Attribute("name"), NULL);
 
-				LOG("for-3");
 				if(!wParent) m_eText[Index].push_back(tText);
 				else wParent->AddElement(tText);
-
-				LOG("for-4");
 			}
 			else if(strcmp(Element, "Image") == 0)
 			{
-				LOG("for-2 Image");
 				CTexture *tTexture = new CTexture(GetSprite(), pElementElement->Attribute("src"), new CColor(pElementElement));
 
-				LOG("for-3");
 				CImage *tImg = new CImage(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
 					atoi(pElementElement->Attribute("width")), atoi(pElementElement->Attribute("height")),
 					tTexture, wParent);
 
-				LOG("for-4");
-
 				if(!wParent) m_eImage[Index].push_back(tImg);
 				else wParent->m_eImage[Index].push_back(tImg);
-
-				LOG("for-5");
 			}
 		}
-		LOG("FOR-3");
 	}
-	LOG("END");
 }
 
 void CGUI::FillArea( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3dColor )
