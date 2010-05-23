@@ -77,7 +77,7 @@ namespace Log
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
-			logging[i]->Log("Debug", string, arglist);		
+			if(logging[i]) logging[i]->Log("Debug", string, arglist);		
 		va_end(arglist); 
 		critSect.Leave();
 	}
@@ -89,7 +89,7 @@ namespace Log
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
-			logging[i]->Log("Info", string, arglist);		
+			if(logging[i]) logging[i]->Log("Info", string, arglist);		
 		va_end(arglist); 
 		critSect.Leave();
 	}
@@ -101,7 +101,7 @@ namespace Log
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
-			logging[i]->Log("Error", string, arglist);		
+			if(logging[i]) logging[i]->Log("Error", string, arglist);		
 		va_end(arglist); 
 		critSect.Leave();
 	}
@@ -113,7 +113,7 @@ namespace Log
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
-			logging[i]->Log("Warning", string, arglist);		
+			if(logging[i]) logging[i]->Log("Warning", string, arglist);		
 		va_end(arglist);
 		critSect.Leave();
 	}
@@ -125,7 +125,7 @@ namespace Log
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
-			logging[i]->Log(type, string, arglist);		
+			if(logging[i]) logging[i]->Log(type, string, arglist);		
 		va_end(arglist); 
 		critSect.Leave();
 	}
@@ -137,7 +137,7 @@ namespace Log
 		va_list arglist; 
 		va_start(arglist, string); 
 		for(int i = 0; i < (int)logging.size(); i++)
-			logging[i]->Log("", string, arglist);		
+			if(logging[i]) logging[i]->Log("", string, arglist);		
 		va_end(arglist);
 		critSect.Leave();
 	}
