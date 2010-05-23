@@ -68,10 +68,8 @@ void ConsoleWindow::Log(const char *type, const char *string, va_list arglist)
 		return;
 	}
 	int stringsize = _vscprintf(string, arglist);
-	char *tempstring = (char *)calloc(stringsize + 1 + strlen(type), sizeof(char));
-	strcpy(tempstring, type);
-	tempstring[strlen(type)] = ' ';
-	vsprintf(tempstring+strlen(type)+1, string, arglist);
+	char *tempstring = (char *)calloc(stringsize + 1, sizeof(char));
+	vsprintf(tempstring, string, arglist);
 	outputbox->AddString(tempstring);
 	free(tempstring);
 }
