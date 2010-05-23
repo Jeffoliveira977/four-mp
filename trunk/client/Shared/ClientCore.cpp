@@ -35,10 +35,6 @@ ClientCore::ClientCore(void)
 
 ClientCore::~ClientCore(void)
 {
-	if (namecvar)
-	{
-		delete namecvar;
-	}
 }
 
 bool ClientCore::Load(void)
