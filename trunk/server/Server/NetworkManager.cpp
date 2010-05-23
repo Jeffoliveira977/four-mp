@@ -563,21 +563,6 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			infodata.sessionkey = data->playerconnectionrequest->sessionkey;
 			rpc3->CallCPP("&NetworkManager::RecieveClientInfo", defaultclientid, infodata, rpc3);
 			NetworkPlayerFullUpdateData *playerdata;
-			//TODO: This should be last
-			playerdata = this->GetPlayerFullUpdateData(client);
-			if (playerdata == NULL)
-			{
-				this->SendConnectionError(data->playerconnectionrequest->address, NetworkPlayerConnectionErrorAllocationError);
-				net->CloseConnection(data->playerconnectionrequest->address, true);
-				delete clientbuffer[client];
-				clientbuffer[client] = NULL;
-				delete data->playerconnectionrequest;
-				return;
-			}
-			this->SendDataToAll("&NetworkManager::RecieveClientConnection", playerdata);
-			delete playerdata;
-			//END TODO.
-
 			//TODO: Optimize using currently connected players, not buffer size.
 			for (short i = 0; i < clientbuffersize; i++)
 			{
@@ -601,6 +586,18 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 					delete vehicledata;
 				}
 			}
+			playerdata = this->GetPlayerFullUpdateData(client);
+			if (playerdata == NULL)
+			{
+				this->SendConnectionError(data->playerconnectionrequest->address, NetworkPlayerConnectionErrorAllocationError);
+				net->CloseConnection(data->playerconnectionrequest->address, true);
+				delete clientbuffer[client];
+				clientbuffer[client] = NULL;
+				delete data->playerconnectionrequest;
+				return;
+			}
+			this->SendDataToAll("&NetworkManager::RecieveClientConnection", playerdata);
+			delete playerdata;
 			this->UpdateServerInfo();
 			delete data->playerconnectionrequest;
 			break;
