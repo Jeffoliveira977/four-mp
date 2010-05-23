@@ -164,7 +164,7 @@ void FMPHook::CarDoSync()
 			if(seatid >= 0)
 			{
 				Natives::TaskEnterCarAsPassenger(gPlayer[client.GetIndex()].PedID, gCar[carid].CarID, -1, seatid);
-				nm.SendPlayerEntranceInVehicle(seatid);
+				nm.SendPlayerEntranceInVehicle(seatid+1);
 			}
 		}
 	}

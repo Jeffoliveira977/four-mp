@@ -158,6 +158,7 @@ public:
 	void GetCamTargetedCoords(float *x, float *y, float *z);
 	void GetMyPos();
 	bool SafeCheckPlayer(short index, bool bReCreateOnFalse = 1);
+	void CheckAndCheck();
 
 	// -- Start mp
 	void RunMP();

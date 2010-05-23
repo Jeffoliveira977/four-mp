@@ -206,8 +206,8 @@ void FMPHook::EnterInVehicle(short index, int car, int seat)
 	if(!SafeCheckPlayer(index)) return;
 
 	Log::Info("EnterInVehicle %d, %d, %d", index, car, seat);
-	if(seat == -1) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gCar[car].CarID, -1);
-	else Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gCar[car].CarID, -1, seat);
+	if(seat == 0) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gCar[car].CarID, -1);
+	else if(seat > 0) Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gCar[car].CarID, -1, seat);
 	gPlayer[index].vehicleindex = car;
 	gPlayer[index].seatindex = seat;
 }

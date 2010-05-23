@@ -195,6 +195,17 @@ bool FMPHook::SafeCheckPlayer(short index, bool bReCreateOnFalse)
 	return 1;
 }
 
+void FMPHook::CheckAndCheck()
+{
+	for(short i = 0; i < MAX_PLAYERS; i++)
+		if(gPlayer[i].connected)
+			if(!Natives::DoesCharExist( gPlayer[i].PedID ))
+			{
+				Log::Warning("Check: Char not exist");
+				SafeCreatePlayer(i);
+			}
+}
+
 void FMPHook::RunMP()
 {
 	Log::Info("Starting up multiplayer mode.");
@@ -472,6 +483,9 @@ void FMPHook::GameThread()
 				//	// Disconnect: Not info from server
 				//	Natives::PrintStringWithLiteralStringNow("STRING", "SERVER NOT SEND INFO TO YOU", 5000, 1);
 				//}
+
+				CheckAndCheck();
+
 				MoveSync();
 				CarDoSync();
 				GunSync();
