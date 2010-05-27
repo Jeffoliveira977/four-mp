@@ -24,6 +24,8 @@ public:
 	void HandleMessage(UINT Msg, WPARAM wParam, LPARAM lParam);
 	void MoveMouse(int x, int y);
 	void Draw();
+	void Resize(int width, int height);
+
 	void OnResetDevice();
 	void OnLostDevice();
 

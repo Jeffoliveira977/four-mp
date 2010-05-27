@@ -157,6 +157,8 @@ public:
 	int GetCarDrive(Vehicle car);
 	void GetCamTargetedCoords(float *x, float *y, float *z);
 	void GetMyPos();
+	void SetMyPos(float x, float y, float z);
+	void KillMe();
 	bool SafeCheckPlayer(short index, bool bReCreateOnFalse = 1);
 	void CheckAndCheck();
 

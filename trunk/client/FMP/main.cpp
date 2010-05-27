@@ -353,6 +353,10 @@ void FMPHook::RunMP()
 	Natives::SetTimeOfDay(12,0);
 	Natives::SetMaxWantedLevel(0);
 
+	unsigned int score = 0;
+	Natives::StoreScore( _GetPlayer(), &score );
+	Natives::AddScore( _GetPlayer(), -score );
+
 	Log::Info("Multiplayer mode started.");
 }
 
@@ -360,18 +364,10 @@ void FMPHook::GameThread()
 {
 	Log::Debug("GameThread");
 	client.Load();
-	Natives::AddHospitalRestart(0,0,0,0,1000);
-	Natives::AddHospitalRestart(0,0,100,0,1001);
-	Natives::AddHospitalRestart(0,0,0,90,1002);
-	Natives::AddHospitalRestart(0,0,100,90,1003);
-	Natives::AddHospitalRestart(0,0,0,180,1004);
-	Natives::AddHospitalRestart(0,0,100,180,1005);
-	Natives::AddHospitalRestart(0,0,0,270,1006);
-	Natives::AddHospitalRestart(0,0,100,270,1007);
 	InputFreeze(1);
 
 	RunMP();
-	
+
 	while(IsThreadAlive() && client.IsRunning())
 	{
 		client.Tick();
@@ -508,9 +504,39 @@ void FMPHook::GetMyPos()
 	Log::Info("MY POS (%f; %f; %f)", x, y, z);
 }
 
+void FMPHook::SetMyPos(float x, float y, float z)
+{
+	Natives::SetCharCoordinates(_GetPlayerPed(), x, y, z);
+}
+
+void FMPHook::KillMe()
+{
+	Natives::SetCharHealth(_GetPlayerPed(), 0);
+}
+
 void GetMyPos(ConsoleCore *concore, const unsigned char numargs)
 {
 	HOOK.GetMyPos();
+}
+
+void SetMyPos(ConsoleCore *concore, const unsigned char numargs)
+{
+	if(numargs < 3) return;
+
+	float x, y, z;
+	char *tmp;
+	concore->GetCmdArg(1, tmp);
+	x = atof(tmp);
+	concore->GetCmdArg(2, tmp);
+	y = atof(tmp);
+	concore->GetCmdArg(3, tmp);
+	z = atof(tmp);
+	HOOK.SetMyPos(x, y, z);
+}
+
+void KillMe(ConsoleCore *concore, const unsigned char numargs)
+{
+	HOOK.KillMe();
 }
 
 void MainThread(void* dummy)
@@ -518,6 +544,8 @@ void MainThread(void* dummy)
 	Log::Debug("MainThread (0x%x)", dwLoadOffset);
 	concore.AddConCmd("getmypos", GetMyPos);
 	concore.AddConCmd("getpos", GetMyPos);
+	concore.AddConCmd("teleport", SetMyPos);
+	concore.AddConCmd("kill", KillMe);
 
 	Sleep(10000);
 	HOOK.AttachGtaThread("FOURMP");
@@ -525,6 +553,58 @@ void MainThread(void* dummy)
 
 	CloseHandle(MainThreadHandle);
 	MainThreadHandle = NULL;
+}
+
+/*void ALLOCATE_SCRIPT_TO_OBJECT(char *script, int model, int unk1, float unk2, int unk3)
+{
+	Log::Debug("ALLOCATE_SCRIPT_TO_OBJECT");
+	Log::Debug("('%s', 0x%x, %d, %f, %d)", script, model, unk1, unk2, unk3);
+}
+
+void REGISTER_WORLD_POINT_SCRIPT_BRAIN(char *script, float unk1)
+{
+	Log::Debug("REGISTER_WORLD_POINT_SCRIPT_BRAIN");
+	Log::Debug("('%s', %f)", script, unk1);
+}
+void ALLOCATE_SCRIPT_TO_RANDOM_PED(char *script, int model, int unk1, int unk2)
+{
+	Log::Debug("ALLOCATE_SCRIPT_TO_RANDOM_PED");
+	Log::Debug("('%s', 0x%x, %d, %d)", script, model, unk1, unk2);
+}*/
+
+int sub_A002B0(void * th, char *script, int a3, int a4, int a5, int a6, int a7, int a8)
+{
+	Log::Debug("> sub_A002B0 (%s)", script);
+	return 1;
+}
+
+int sub_A00350(char *script, int a2, int a3)
+{
+	Log::Debug("> sub_A00350 (%s)", script);
+	return 1;
+}
+
+bool IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE()
+{
+	Log::Debug("> IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE");
+	return 0;
+}
+
+bool IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE(int a1)
+{
+	Log::Debug("> IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE");
+	Log::Debug(">>> (%d)", a1);
+	return 0;
+}
+
+struct Vector4 { float X, Y, Z, W; };
+
+Vector4 GetSpawnPos(Vector4 *pos, float angle, Vector4 *result) //8E6840
+{
+	Log::Info("GetSpawnPos");
+	Vector4 x = {0, 0, 0, -0};
+	result = &x;
+	return x;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) 
@@ -546,6 +626,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 		{
 			Log::Info("Skipping main menu");
 			JmpHook(CGAME_PROCESS_SLEEP, CGAME_PROCESS_START_GAME);
+
+			// Now support only 1.0.6.0
+			/*JmpHook(0xB5DC50+dwLoadOffset, (DWORD)ALLOCATE_SCRIPT_TO_OBJECT);
+			JmpHook(0xB5DC00+dwLoadOffset, (DWORD)ALLOCATE_SCRIPT_TO_RANDOM_PED);
+			JmpHook(0xB5DCC0+dwLoadOffset, (DWORD)REGISTER_WORLD_POINT_SCRIPT_BRAIN);*/
+			JmpHook(0xB5DD40+dwLoadOffset, (DWORD)IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE);
+			JmpHook(0xB5DCE0+dwLoadOffset, (DWORD)IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE);
+			JmpHook(0x8E6840+dwLoadOffset, (DWORD)GetSpawnPos);
+			//JmpHook(0xB5DEA0+dwLoadOffset, (DWORD)RegisterFunctions);
 			SetString(GAME_NAME,"GTA IV: FOUR-MP");
 			SetString(0xD6BDD4+dwLoadOffset, "FMP/popcycle.dat");
 

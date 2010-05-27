@@ -35,7 +35,8 @@ void CTextBox::Draw()
 	if( m_vStrings.size() )
 		for( int i = pSlider->GetMaxValue()-pSlider->GetValue(), iHeight = 0; i >= 0 && iHeight < iMaxHeight; i-- )
 		{
-			if(m_vStrings.at(i).c_str()) GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pString, m_vStrings.at(i), GetWidth() - pSlider->GetSliderWidth() );
+			if(m_vStrings.at(i).c_str()) 
+				GetFont()->DrawString( Pos.GetX() + 3, Pos.GetY() + iHeight, 0, pString, m_vStrings.at(i).c_str(), GetWidth() - pSlider->GetSliderWidth() );
 			iHeight += iAddHeight;
 		}
 	pSlider->Draw( Pos );
@@ -74,6 +75,8 @@ void CTextBox::AddString( std::string sString )
 	if( !sString.length() )
 		return;
 
+	if(!pSlider) return;
+
 	EnterCriticalSection(&cs);
 	/*std::vector<std::string> vPending;
 	int iLength = static_cast<int>( sString.length() );
@@ -109,6 +112,8 @@ void CTextBox::AddString( std::string sString )
 	int iHeight = 0;
 	for( int i = pSlider->GetValue(); i <= pSlider->GetMaxValue(); i++ )
 	{
+		if( !m_vStrings[ i ].c_str() ) continue;
+
 		float fWidth = static_cast<float>( GetFont()->GetStringWidth( m_vStrings[ i ].c_str() ) );
 		int iLines = static_cast<int>( ceilf( fWidth / ( GetWidth() -  pSlider->GetSliderWidth() ) ) );
 
@@ -165,5 +170,6 @@ void CTextBox::RemoveStrings(int Row, int Count)
 	EnterCriticalSection(&cs);
 	if((int)m_vStrings.size() > Row)
 		m_vStrings.erase(m_vStrings.begin()+Row, (!Count?m_vStrings.end():m_vStrings.begin()+Row+Count));
+	pSlider->SetMaxValue(Row);
 	LeaveCriticalSection(&cs);
 }

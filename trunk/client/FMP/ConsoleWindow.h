@@ -21,6 +21,7 @@ public:
 	virtual void Log(const char *type, const char *string, char* = 0);
 private:
 	bool IsLoaded;
+	CRITICAL_SECTION cs;
 	CWindow *mainwindow;
 	CTextBox *outputbox;
 	CEditBox *inputbox;

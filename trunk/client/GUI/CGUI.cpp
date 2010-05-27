@@ -330,6 +330,8 @@ void CGUI::DrawOutlinedBox( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3
 
 void CGUI::AddWindow( CWindow * pWindow ) 
 {
+	if(!pWindow) return;
+
 	EnterCriticalSection(&cs);
 	m_vWindows.push_back( pWindow );
 	LeaveCriticalSection(&cs);
@@ -358,28 +360,25 @@ void CGUI::BringToTop( CWindow * pWindow )
 void CGUI::Draw()
 {
 	if( !IsVisible() )
-	{
-			return;
-}
+		return;
 
 	EnterCriticalSection(&cs);
 	PreDraw();
-
 	
 	for(int i = 0; i < (int)m_eLine[0].size(); i++)
-		m_eLine[0][i]->Draw();
+		if(m_eLine[0][i]) m_eLine[0][i]->Draw();
 
 	
 	for(int i = 0; i < (int)m_eBox[0].size(); i++)
-		m_eBox[0][i]->Draw();
+		if(m_eBox[0][i]) m_eBox[0][i]->Draw();
 
 	
 	for(int i = 0; i < (int)m_eText[0].size(); i++)
-		m_eText[0][i]->Draw();
+		if(m_eText[0][i]) m_eText[0][i]->Draw();
 
 	
 	for(int i = 0; i < (int)m_eImage[0].size(); i++)
-		m_eImage[0][i]->Draw();
+		if(m_eImage[0][i]) m_eImage[0][i]->Draw();
 
 	
 	for( int iIndex = 0; iIndex < static_cast<int>( m_vWindows.size() ); iIndex++ )
@@ -389,23 +388,23 @@ void CGUI::Draw()
 			continue;
 
 		m_vWindows[ iIndex ]->Draw();
-}
+	}
 
 	
 	for(int i = 0; i < (int)m_eLine[1].size(); i++)
-		m_eLine[1][i]->Draw();
+		if(m_eLine[1][i]) m_eLine[1][i]->Draw();
 
 	
 	for(int i = 0; i < (int)m_eBox[1].size(); i++)
-		m_eBox[1][i]->Draw();
+		if(m_eBox[1][i]) m_eBox[1][i]->Draw();
 
 	
 	for(int i = 0; i < (int)m_eText[1].size(); i++)
-		m_eText[1][i]->Draw();
+		if(m_eText[1][i]) m_eText[1][i]->Draw();
 
 	
 	for(int i = 0; i < (int)m_eImage[1].size(); i++)
-		m_eImage[1][i]->Draw();
+		if(m_eImage[1][i]) m_eImage[1][i]->Draw();
 
 	
 	GetMouse()->Draw();
