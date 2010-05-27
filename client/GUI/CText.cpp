@@ -19,10 +19,12 @@ CText::~CText()
 
 void CText::Draw()
 {
+	if(!GetFormatted().c_str()) return;
+
 	CPos Pos = *GetRelPos();
 	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 	
-	GetFont()->DrawString( Pos.GetX(), Pos.GetY(), 0, pString, GetFormatted(), GetWidth() );
+	GetFont()->DrawString( Pos.GetX(), Pos.GetY(), 0, pString, GetFormatted().c_str(), GetWidth() );
 }
 
 void CText::PreDraw()

@@ -27,6 +27,11 @@ void CFont::OnResetDevice()
 
 void CFont::DrawString( int iX, int iY, DWORD dwFlags, CColor * pColor, std::string sString, int iWidth )
 {
+	if(!m_pFont) return;
+	if(!pGui) return;
+	if(!sString.c_str()) return;
+	if(!pColor) return;
+
 	if( iWidth )
 		CutString( iWidth, sString );
 		pGui->GetSprite()->Begin( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
@@ -44,20 +49,25 @@ void CFont::DrawString( int iX, int iY, DWORD dwFlags, CColor * pColor, std::str
 
 int CFont::GetStringWidth( const char * pszString )
 {
-	std::string sString( pszString );
+	if(!m_pFont) return 0;
+	if(!pszString) return 0;
+
+	//std::string sString( pszString );
 	RECT rRect = { 0 };
 
-	for( int i = 0; i <= static_cast<int>( sString.size() ); i++ )
+	/*for( int i = 0; i <= static_cast<int>( sString.size() ); i++ )
 		if( sString[i] == ' ' )
-			sString[i] = '.';
+			sString[i] = '.';*/
 
-	m_pFont->DrawTextA( 0, sString.c_str(), -1, &rRect, DT_CALCRECT, 0 );
+	m_pFont->DrawTextA( 0, /*sString.c_str()*/pszString, -1, &rRect, DT_CALCRECT, 0 );
 
 	return rRect.right - rRect.left;
 }
 
 int CFont::GetStringHeight()
 {
+	if(!m_pFont) return 0;
+
 	RECT rRect = { 0 };
 	m_pFont->DrawTextA( 0, "Y", -1, &rRect, DT_CALCRECT, 0 );
 

@@ -2,6 +2,7 @@
 
 #include "../../Shared/Console/ConVar.h"
 #include "../../Shared/Network/Limits.h"
+#define MAX_PATH 260
 
 /// \brief Indicates the global state of the game.
 enum GameState
@@ -42,6 +43,9 @@ public:
 	bool SetName(const char name[MAX_PLAYER_NAME_LENGTH]);
 	bool SetIndex(const short i);
 	unsigned int GetSessionKey(void);
+	char * GetPath();
+	void GetPath(const char *file, char *path);
+	
 #if defined (FMP_CLIENT)
 	InputState GetInputState(void);
 	bool SetInputState(const InputState state);
@@ -52,6 +56,7 @@ private:
 	ConVar *namecvar; ///< Holds the pointer to the console variable that holds the desired client name.
 	short index; ///< Holds the client's index while connected to the server, -1 (should be #define) otherwise.
 	unsigned int sessionkey; ///< Holds the unique session key of the client. Used in rare cases to identify it.
+	char PathToClient[MAX_PATH];
 	friend void ConVarHookName(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);
 #if defined (FMP_CLIENT)
 	InputState inputstate; ///< Holds the current input target.

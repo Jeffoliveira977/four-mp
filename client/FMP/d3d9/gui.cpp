@@ -1,5 +1,6 @@
 #include <vector>
 #include <windows.h>
+#include <math.h>
 
 #include "../../GUI/CGUI.h"
 
@@ -228,6 +229,13 @@ namespace CALLBACKS
 
 		std::string login = upLogin->GetString();
 		std::string pass = upPassword->GetString();
+		if(upRemeberMe->GetChecked())
+		{
+			char path[MAX_PATH];
+			client.GetPath("fmp.ini", path);
+			WritePrivateProfileString("FOURMP", "Login", login.c_str(), path);
+			WritePrivateProfileString("FOURMP", "Password", pass.c_str(), path);
+		}
 
 		if(login.length() < 3 || pass.length() < 6) return;
 
@@ -469,23 +477,26 @@ FMPGUI::FMPGUI()
 FMPGUI::~FMPGUI()
 {
 	Log::Debug("FMPGUI::~FMPGUI called");
-	if(GuiReady) Release();
+	Release();
 	Log::Debug("FMPGUI::~FMPGUI completed");
 }
 
 void FMPGUI::Release()
 {
+	if(!GuiReady) return;
 	Log::Debug("FMPGUI::Release called");
+	GuiReady = 0;
 	EnterCriticalSection(&cs_gui);
-	delete m_Gui;
+	SAFE_DELETE(m_Gui);
 	LeaveCriticalSection(&cs_gui);
 	DeleteCriticalSection(&cs_gui);
-	GuiReady = 0;
 	Log::Debug("FMPGUI::Release completed");
 }
 
 void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 {
+	if(GuiReady) return;
+
 	EnterCriticalSection(&cs_gui);
 	Log::Debug("FMPGUI::Load called");
 	fmpms.Load();
@@ -674,6 +685,17 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	fEnterNick->AddElement(enOK);
 	fEnterNick->SetVisible(0);
 
+	char path[MAX_PATH], tmp[64];
+	client.GetPath("fmp.ini", path);
+	GetPrivateProfileString("FOURMP", "Login", "", tmp, 64, path);
+	if(strlen(tmp) > 2)
+	{
+		upLogin->SetString(tmp);
+		GetPrivateProfileString("FOURMP", "Password", "", tmp, 64, path);
+		upPassword->SetString(tmp);
+		upRemeberMe->SetChecked(1);
+	}
+
 	Log::Debug("FMPGUI::Load >> Load console");
 	conwindow.Load();
 	conwindow.Hide();
@@ -747,13 +769,33 @@ void FMPGUI::Draw()
 	LeaveCriticalSection(&cs_gui);
 }
 
+void FMPGUI::Resize(int width, int height)
+{
+	if(!GuiReady) return;
+	if(width < 800 || height < 600) return;
+	if(s_iWidth == width && s_iHeight == height) return;
+
+	s_iWidth = width;
+	s_iHeight = height;
+
+	fServBrowser->SetAbsPos(CPos( width/2 - fServBrowser->GetWidth()/2, height/2 - fServBrowser->GetHeight()/2 ));
+	fUserRegister->SetAbsPos(CPos( width/2 - fUserRegister->GetWidth()/2, height/2 - fUserRegister->GetHeight()/2 ));
+	fUserLogin->SetAbsPos(CPos( width/2 - fUserLogin->GetWidth()/2, height/2 - fUserLogin->GetHeight()/2 ));
+	fInfo->SetAbsPos(CPos( width/2 + fInfo->GetWidth()/2, height/2 - fInfo->GetHeight()/2 ));
+	fEnterNick->SetAbsPos(CPos( width/2 - fEnterNick->GetWidth()/2, height/2 - fEnterNick->GetHeight()/2 ));
+}
+
 void FMPGUI::OnResetDevice()
 {
+	//if(!GuiReady) return;
 	m_Gui->OnResetDevice (  );
+	GuiReady = 1;
 }
 
 void FMPGUI::OnLostDevice()
 {
+	//if(!GuiReady) return;
+	GuiReady = 0;
 	m_Gui->OnLostDevice (  );
 }
 
@@ -779,6 +821,8 @@ bool FMPGUI::IsLogged()
 
 void FMPGUI::UpdateServer(MasterServerInfo *msi)
 {
+	if(!GuiReady) return;
+
 	EnterCriticalSection(&cs_gui);
 	int index = -1;
 	char tmp[32];
@@ -813,6 +857,8 @@ void FMPGUI::UpdateServer(MasterServerInfo *msi)
 
 void FMPGUI::Message(char *data)
 {
+	if(!GuiReady) return;
+
 	EnterCriticalSection(&cs_gui);
 	fInfo->GetElementByString("INFO_TEXT", 1)->SetString(data);
 	fInfo->SetVisible(1);

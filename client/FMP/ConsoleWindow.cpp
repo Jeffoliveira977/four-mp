@@ -14,6 +14,7 @@ extern ConsoleWindow conwindow;
 ConsoleWindow::ConsoleWindow(void)
 {
 	IsLoaded = false;
+	InitializeCriticalSection(&cs);
 }
 
 ConsoleWindow::~ConsoleWindow(void)
@@ -25,6 +26,8 @@ ConsoleWindow::~ConsoleWindow(void)
 		delete submitbutton;
 		delete mainwindow;
 	}*/
+	DeleteCriticalSection(&cs);
+	IsLoaded = false;
 }
 
 void ConsoleWindow::Load(void)
@@ -59,26 +62,30 @@ void ConsoleWindow::Hide(void)
 
 void ConsoleWindow::Log(const char *type, const char *string, va_list arglist)
 {
-	if (!IsLoaded)
-	{
-		return;
-	}
-	if (string == NULL)
-	{
-		return;
-	}
+	if (!IsLoaded) return;
+	if (string == NULL) return;
+	if(!outputbox) return;
+
+	EnterCriticalSection(&cs);
+
 	int stringsize = _vscprintf(string, arglist);
 	char *tempstring = (char *)calloc(stringsize + 1, sizeof(char));
 	vsprintf(tempstring, string, arglist);
+
 	outputbox->AddString(tempstring);
-	free(tempstring);
+
+	SAFE_DELETE(tempstring); // access violation
+
+	LeaveCriticalSection(&cs);
 }
 
 void ConsoleWindow::SubmitText(void)
 {
+	EnterCriticalSection(&cs);
 	this->Log(">", inputbox->GetString().c_str());
 	concore.InterpretLine(inputbox->GetString().c_str());
 	inputbox->SetString("");
+	LeaveCriticalSection(&cs);
 }
 
 void InputBoxCallback(CElement *pElement, CMSG msg, int Param)

@@ -1,5 +1,6 @@
 #define _CRT_RAND_S
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "ClientCore.h"
 #include "../../Shared/Console/ConsoleCore.h"
@@ -31,10 +32,30 @@ ClientCore::ClientCore(void)
 #if defined (FMP_CLIENT)
 	inputstate = InputStateGame;
 #endif
+	GetModuleFileNameA(NULL, PathToClient, MAX_PATH);
+	for(int i = strlen(PathToClient); i >= 0; i--)
+	{
+		if(PathToClient[i] == '/' || PathToClient[i] == '\\')
+			break;
+		PathToClient[i] = 0;
+	}
+	sprintf_s(PathToClient, MAX_PATH, "%sFMP\\", PathToClient);
+	Log::Info("Path: %s", PathToClient);
 }
 
 ClientCore::~ClientCore(void)
 {
+}
+
+char * ClientCore::GetPath()
+{
+	return PathToClient;
+}
+
+void ClientCore::GetPath(const char *file, char *path)
+{
+	sprintf_s(path, MAX_PATH, "%s%s", PathToClient, file);
+	Log::Info("Returned: %s", path);
 }
 
 bool ClientCore::Load(void)
