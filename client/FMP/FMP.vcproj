@@ -44,11 +44,11 @@
 				AdditionalIncludeDirectories="..\..\Shared\Boost; ..\..\Shared\RakNet"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;FMPHOOK_EXPORTS;FMP_CLIENT"
 				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="1"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
