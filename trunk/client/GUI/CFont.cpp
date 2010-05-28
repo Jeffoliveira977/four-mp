@@ -8,21 +8,27 @@ CFont::CFont( CGUI *Gui, IDirect3DDevice9 * pDevice, int iHeight, char * pszFace
 	if( FAILED( hResult ) )
 		MessageBoxA( 0, /*DXGetErrorDescription9A( hResult )*/"Error", "D3DXCreateFontA failed", 0 );
 	m_pFont->PreloadCharacters( 0, 255 );
+	InitializeCriticalSection(&cs);
 }
 
 CFont::~CFont()
 {
 	SAFE_RELEASE( m_pFont );
+	DeleteCriticalSection(&cs);
 }
 
 void CFont::OnLostDevice()
 {
+	EnterCriticalSection(&cs);
 	m_pFont->OnLostDevice();
+	LeaveCriticalSection(&cs);
 }
 
 void CFont::OnResetDevice()
 {
+	EnterCriticalSection(&cs);
 	m_pFont->OnResetDevice();
+	LeaveCriticalSection(&cs);
 }
 
 void CFont::DrawString( int iX, int iY, DWORD dwFlags, CColor * pColor, std::string sString, int iWidth )
@@ -32,19 +38,21 @@ void CFont::DrawString( int iX, int iY, DWORD dwFlags, CColor * pColor, std::str
 	if(!sString.c_str()) return;
 	if(!pColor) return;
 
-	if( iWidth )
-		CutString( iWidth, sString );
-		pGui->GetSprite()->Begin( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
+	EnterCriticalSection(&cs);
+	if( iWidth )CutString( iWidth, sString );
 
-		D3DXMATRIX mat;
-		D3DXMatrixTranslation( &mat, static_cast<float>( iX ), static_cast<float>( iY ), 0 );
-		pGui->GetSprite()->SetTransform( &mat );
+	pGui->GetSprite()->Begin( D3DXSPRITE_ALPHABLEND | D3DXSPRITE_SORT_TEXTURE );
 
-		RECT drawRect = { 0 };
-		DWORD dwDrawFlags = DT_NOCLIP | ( ( dwFlags & FT_CENTER ) ? DT_CENTER : 0 ) | ( ( dwFlags & FT_VCENTER ) ? DT_VCENTER : 0 );
-		m_pFont->DrawTextA( pGui->GetSprite(), sString.c_str(), -1, &drawRect, dwDrawFlags, pColor->GetD3DCOLOR() );
+	D3DXMATRIX mat;
+	D3DXMatrixTranslation( &mat, static_cast<float>( iX ), static_cast<float>( iY ), 0 );
+	pGui->GetSprite()->SetTransform( &mat );
 
-		pGui->GetSprite()->End();
+	RECT drawRect = { 0 };
+	DWORD dwDrawFlags = DT_NOCLIP | ( ( dwFlags & FT_CENTER ) ? DT_CENTER : 0 ) | ( ( dwFlags & FT_VCENTER ) ? DT_VCENTER : 0 );
+	m_pFont->DrawTextA( pGui->GetSprite(), sString.c_str(), -1, &drawRect, dwDrawFlags, pColor->GetD3DCOLOR() );
+
+	pGui->GetSprite()->End();
+	LeaveCriticalSection(&cs);
 }
 
 int CFont::GetStringWidth( const char * pszString )
@@ -59,7 +67,9 @@ int CFont::GetStringWidth( const char * pszString )
 		if( sString[i] == ' ' )
 			sString[i] = '.';*/
 
+	EnterCriticalSection(&cs);
 	m_pFont->DrawTextA( 0, /*sString.c_str()*/pszString, -1, &rRect, DT_CALCRECT, 0 );
+	LeaveCriticalSection(&cs);
 
 	return rRect.right - rRect.left;
 }
@@ -69,7 +79,9 @@ int CFont::GetStringHeight()
 	if(!m_pFont) return 0;
 
 	RECT rRect = { 0 };
+	EnterCriticalSection(&cs);
 	m_pFont->DrawTextA( 0, "Y", -1, &rRect, DT_CALCRECT, 0 );
+	LeaveCriticalSection(&cs);
 
 	return rRect.bottom - rRect.top;
 }
