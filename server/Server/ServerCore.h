@@ -17,7 +17,18 @@ public:
 	char *GetHostname(void);
 	bool GetComponentSelectStatus(void);
 	void EnableComponentSelect(bool enable);
+	void GetTime(int *h, int *m);
+	void SetTime(int h, int m);
 private:
+	
+	struct GameTime
+	{
+		int hour, minute;
+		int last_get;
+	};
+
+	GameTime gametime;
+
 	bool isrunning;
 	unsigned int lastcheck;
 	unsigned int lastmasterservercheck;

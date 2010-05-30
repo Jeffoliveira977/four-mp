@@ -62,6 +62,80 @@ extern DWORD dwGameVersion;
 /*                                           F U N C T I O N S                                           */
 /* ----------------------------------------------------------------------------------------------------- */
 
+bool FMPHook::IsFreeCam()
+{
+	return Natives::DoesCamExist(freeCam);
+}
+
+void FMPHook::SetFreeCam(bool on)
+{
+	/*[INFO] Camera: {-646.000000f, -711.000000f, 68.000000f, 0.000000f, 0.000000f, -104.999893f};
+	[INFO] Camera: {-182.000000f, 158.000000f, 119.000000f, -17.999989f, -0.000000f, 20.000170f};
+	[INFO] Camera: {747.000000f, 221.000000f, 68.000000f, -9.999971f, -0.000000f, 63.000130f};
+	[INFO] Camera: {1481.000000f, 439.000000f, 102.000000f, -26.999943f, -0.000000f, 1.000075f};
+	[INFO] Camera: {2789.000000f, 483.000000f, 52.000000f, -16.999884f, -1.000004f, 103.000015f};*/
+
+	if(!on) 
+	{
+		Natives::ActivateScriptedCams(0, 0);
+		Natives::DisplayHUD(1);
+
+		if(!Natives::DoesCamExist(freeCam))
+		{
+			Log::Error("Cam does exist");
+			return;
+		}
+		Natives::SetCamActive(freeCam, 0);
+		Natives::SetCamPropagate(freeCam, 0);
+		Natives::DestroyCam(freeCam);
+	}
+	else if(on)
+	{
+		if(!Natives::DoesCamExist(freeCam))
+			Natives::CreateCam(14, &freeCam);
+
+		while(!Natives::DoesCamExist(freeCam)) wait(0);
+
+		unsigned int time = Natives::GetHoursOfDay();
+
+		if(time >= 0 && time < 5)
+		{
+			Log::Info("Time 0-5");
+			Natives::SetCamPos(freeCam, -646, -711, 68);
+			Natives::SetCamRot(freeCam, 0, 0, -105);
+		}
+		else if(time >= 5 && time < 10)
+		{
+			Log::Info("Time 5-10");
+			Natives::SetCamPos(freeCam, -182, 158, 119);
+			Natives::SetCamRot(freeCam, -18, 0, 20);
+		}
+		else if(time >= 10 && time < 15)
+		{
+			Log::Info("Time 10-15");
+			Natives::SetCamPos(freeCam, 747, 221, 68);
+			Natives::SetCamRot(freeCam, -10, 0, 63);
+		}
+		else if(time >= 15 && time < 20)
+		{
+			Log::Info("Time 15-20");
+			Natives::SetCamPos(freeCam, 1481, 439, 102);
+			Natives::SetCamRot(freeCam, -27, 0, 1);
+		}
+		else
+		{
+			Log::Info("Time %d", time);
+			Natives::SetCamPos(freeCam, 2789, 483, 52);
+			Natives::SetCamRot(freeCam, -17, -1, 103);
+		}
+
+		Natives::SetCamPropagate(freeCam, 1);
+		Natives::SetCamActive(freeCam, 1);
+		Natives::ActivateScriptedCams(1, 1);
+		Natives::DisplayHUD(0);
+	}
+}
+
 void FMPHook::CreateCar(short index, unsigned int model, float position[3], float angle, unsigned char color[2])
 {
 	Log::Info("CREATE CAR %d", index);
@@ -350,7 +424,7 @@ void FMPHook::RunMP()
 	Natives::RemoveAllCharWeapons(Player);
 	Natives::AddArmourToChar(Player, -1000);
 	Natives::SetCharMoney(Player, 0);
-	Natives::SetTimeOfDay(12,0);
+	Natives::SetTimeOfDay(0,0);
 	Natives::SetMaxWantedLevel(0);
 
 	unsigned int score = 0;
@@ -367,6 +441,7 @@ void FMPHook::GameThread()
 	InputFreeze(1);
 
 	RunMP();
+	SetFreeCam(1);
 
 	while(IsThreadAlive() && client.IsRunning())
 	{
@@ -376,6 +451,7 @@ void FMPHook::GameThread()
 		{
 		case GameStateOffline:
 			{
+				SetFreeCam(1);
 				break;
 			}
 		case GameStateConnecting:
@@ -386,91 +462,6 @@ void FMPHook::GameThread()
 				}*/
 				break;
 			}
-		case GameStateSkinSelect:
-			{
-				Natives::SetPlayerControl(_GetPlayer(), 0);
-				if(GetAsyncKeyState(VK_SHIFT) != 0)
-				{
-					//gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;	
-					Natives::SetPlayerControl(_GetPlayer(), 1);
-					client.SetGameState(GameStateInGame);
-					nm.SendPlayerSpawnRequest();
-				}
-				else if(GetAsyncKeyState(VK_RIGHT) != 0)
-				{
-					//selectedplayerclass++;
-					//gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;
-					nm.SendPlayerModelChange();
-					
-					Natives::RequestModel((eModel)gPlayer[client.GetIndex()].model);
-					while(!Natives::HasModelLoaded((eModel)gPlayer[client.GetIndex()].model)) wait(1);
-					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[client.GetIndex()].model);
-					Natives::SetCharDefaultComponentVariation(_GetPlayerPed());
-				}
-				else if(GetAsyncKeyState(VK_LEFT) != 0)
-				{
-					//selectedplayerclass--;
-					//gPlayer[client.GetIndex()].model = pClass[selectedplayerclass].model;
-					nm.SendPlayerModelChange();
-					
-					Natives::RequestModel((eModel)gPlayer[client.GetIndex()].model);
-					while(!Natives::HasModelLoaded((eModel)gPlayer[client.GetIndex()].model)) wait(1);
-					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[client.GetIndex()].model);
-					Natives::SetCharDefaultComponentVariation(_GetPlayerPed());
-				}
-				break;
-			}
-		case GameStateComponentSelect:
-			{
-				Natives::SetPlayerControl(_GetPlayer(), 0);
-				if(GetAsyncKeyState(VK_SHIFT) != 0)
-				{
-					Natives::SetPlayerControl(_GetPlayer(), 1);
-					client.SetGameState(GameStateInGame);
-
-					for(int i = 0; i < 11; i++)
-					{
-						gPlayer[client.GetIndex()].compD[i] = Natives::GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)i);
-						gPlayer[client.GetIndex()].compT[i] = Natives::GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)i);
-					}
-					nm.SendPlayerComponentsChange();
-					nm.SendPlayerSpawnRequest();
-				}
-				else if(GetAsyncKeyState(VK_RIGHT) != 0)
-				{
-					//int t = Natives::GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)+1;
-					//int d = Natives::GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)+1;
-
-					//Natives::SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass, t, d);
-				}
-				else if(GetAsyncKeyState(VK_LEFT) != 0)
-				{
-					//int t = Natives::GetCharTextureVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)-1;
-					//if(t == -1) t = 0;
-					//int d = Natives::GetCharDrawableVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass)-1;
-					//if(d == -1) t = 0;
-
-					//Natives::SetCharComponentVariation(_GetPlayerPed(), (ePedComponent)selectedplayerclass, t, d);
-				}
-				else if(GetAsyncKeyState(VK_DOWN) != 0)
-				{
-					//selectedplayerclass++;
-					//if(selectedplayerclass == 11)
-					//	selectedplayerclass = 0;
-				}
-				else if(GetAsyncKeyState(VK_UP) != 0)
-				{
-					//if (selectedplayerclass == 0)
-					//{
-					//	selectedplayerclass = 10;
-					//}
-					//else
-					//{
-					//	selectedplayerclass--;
-					//}
-				}
-				break;
-			}
 		case GameStateInGame:
 			{
 
@@ -479,6 +470,24 @@ void FMPHook::GameThread()
 				//	// Disconnect: Not info from server
 				//	Natives::PrintStringWithLiteralStringNow("STRING", "SERVER NOT SEND INFO TO YOU", 5000, 1);
 				//}
+
+				if(gPlayer[client.GetIndex()].want_spawn)
+				{
+					short index = client.GetIndex();
+
+					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[index].model);
+
+					Ped player = _GetPlayerPed();
+
+					Natives::SetCharCoordinates(player, gPlayer[index].spawn_pos[0], gPlayer[index].spawn_pos[1], gPlayer[index].spawn_pos[2]);
+					Natives::SetCharHeading(player, gPlayer[index].spawn_pos[3]);
+					Natives::SetCharHealth(player, gPlayer[index].health);
+					Natives::AddArmourToChar(player, gPlayer[index].armor);
+					Natives::SetCharDefaultComponentVariation(player);
+
+					gPlayer[index].PedID = player;
+					gPlayer[index].want_spawn = 0;
+				}
 
 				CheckAndCheck();
 
@@ -497,6 +506,11 @@ void FMPHook::GameThread()
 	Log::Debug("Exit GameThread");
 }
 
+void FMPHook::SetTime(int h, int m)
+{
+	Natives::SetTimeOfDay(h, m);
+}
+
 void FMPHook::GetMyPos()
 {
 	float x, y, z;
@@ -512,6 +526,18 @@ void FMPHook::SetMyPos(float x, float y, float z)
 void FMPHook::KillMe()
 {
 	Natives::SetCharHealth(_GetPlayerPed(), 0);
+}
+
+void FMPHook::GetTime()
+{
+	unsigned int h = 0, m = 0;
+	Natives::GetTimeOfDay(&h, &m);
+	Log::Info("TIME: %d:%d = %d", h, m, GetTickCount());
+}
+
+void FMPHook::SetTimeScale(float ts)
+{
+	Natives::SetTimeScale(ts);
 }
 
 void GetMyPos(ConsoleCore *concore, const unsigned char numargs)
@@ -539,6 +565,19 @@ void KillMe(ConsoleCore *concore, const unsigned char numargs)
 	HOOK.KillMe();
 }
 
+void GetTime(ConsoleCore *concore, const unsigned char numargs)
+{
+	HOOK.GetTime();
+}
+
+void SetTS(ConsoleCore *concore, const unsigned char numargs)
+{
+	char *tmp;
+	concore->GetCmdArg(1, tmp);
+
+	HOOK.SetTimeScale(atof(tmp));
+}
+
 void MainThread(void* dummy)
 {
 	Log::Debug("MainThread (0x%x)", dwLoadOffset);
@@ -546,6 +585,8 @@ void MainThread(void* dummy)
 	concore.AddConCmd("getpos", GetMyPos);
 	concore.AddConCmd("teleport", SetMyPos);
 	concore.AddConCmd("kill", KillMe);
+	concore.AddConCmd("time", GetTime);
+	concore.AddConCmd("ts", SetTS);
 
 	Sleep(10000);
 	HOOK.AttachGtaThread("FOURMP");
@@ -602,9 +643,20 @@ struct Vector4 { float X, Y, Z, W; };
 Vector4 GetSpawnPos(Vector4 *pos, float angle, Vector4 *result) //8E6840
 {
 	Log::Info("GetSpawnPos");
-	Vector4 x = {0, 0, 0, -0};
-	result = &x;
-	return x;
+	short index = client.GetIndex();
+	gPlayer[index].want_spawn = 1;
+	nm.SendPlayerSpawnRequest();
+
+	while(gPlayer[index].want_spawn) 
+	{
+		client.Tick();
+		Sleep(25);
+	}
+
+	memcpy(result, gPlayer[client.GetIndex()].spawn_pos, sizeof(Vector4));
+
+	gPlayer[index].want_spawn = 1;
+	return *result;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) 

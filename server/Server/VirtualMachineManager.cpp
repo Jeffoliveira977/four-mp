@@ -405,7 +405,7 @@ void VirtualMachineManager::OnPlayerDisconnect(const short index)
 	}
 }
 
-void VirtualMachineManager::OnPlayerSpawn(const short playerindex, const unsigned char classindex)
+void VirtualMachineManager::OnPlayerSpawn(const short playerindex)
 {
 	for (unsigned char i = 0; i < vmbuffersize; i++)
 	{
@@ -415,7 +415,7 @@ void VirtualMachineManager::OnPlayerSpawn(const short playerindex, const unsigne
 			{
 			case VMLanguageSquirrel:
 				{
-					sc_OnPlayerSpawn(*vmbuffer[i]->ptr.squirrel, playerindex, classindex);
+					sc_OnPlayerSpawn(*vmbuffer[i]->ptr.squirrel, playerindex);
 					break;
 				}
 			}
@@ -564,6 +564,12 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GiveWeapon, "GiveWeapon");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_addPlayerClass, "addPlayerClass");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_enableComponentSelect, "enableComponentSelect");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetPlayerSpawnPos, "SetPlayerSpawnPos");
+			// Time func
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetGameTime, "SetGameTime");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetGameHour, "GetGameHour");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetGameMinutes, "GetGameMinutes");
+
 			// Car functions
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateCar, "CreateCar");
 			sq_pushroottable(*vmbuffer[index]->ptr.squirrel);

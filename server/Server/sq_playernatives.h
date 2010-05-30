@@ -10,3 +10,4 @@ void sq_GetPlayerScore(HSQUIRRELVM v);
 void sq_GetPlayerHealth(HSQUIRRELVM v);
 void sq_GetPlayerArmor(HSQUIRRELVM v);
 void sq_GetPlayerWantedLevel(HSQUIRRELVM v);
+void sq_SetPlayerSpawnPos(HSQUIRRELVM v);

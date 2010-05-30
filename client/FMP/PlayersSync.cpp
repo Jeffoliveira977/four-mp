@@ -48,7 +48,8 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float p
 		Log::Debug("PlayerConnect: %s", "SetCoords");
 		client.SetGameState(GameStateInGame);
 		client.SetInputState(InputStateGame);
-		HOOK.InputFreeze(0);
+		InputFreeze(0);
+		SetFreeCam(0);
 	}
 	else // Other player connect
 	{
@@ -269,22 +270,24 @@ void FMPHook::PlayerSyncSkinVariation(short index, int sm[11], int st[11])
 
 void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 {
+	if(data.client == client.GetIndex()) return;
 	if(!SafeCheckPlayer(data.client)) return;
 	Log::Info("Player Spawn START");
-	unsigned int model;
-	Natives::GetCharModel(gPlayer[data.client].PedID, (eModel*)&model);
-	Log::Info("Get Model");
-	if(data.model != model) PlayerSyncSkin(data.client, data.model);
-	Log::Info("IF SPAWN MODEL");
 
+	Ped old = gPlayer[data.client].PedID;
+	Natives::CreateChar(1, (eModel)data.model, data.position[0], data.position[1], data.position[2], &gPlayer[data.client].PedID, 1);
+
+	while(!Natives::DoesCharExist(gPlayer[data.client].PedID)) wait(0);
+
+	Natives::SetCharDefaultComponentVariation(gPlayer[data.client].PedID);
 	PlayerSyncSkinVariation(data.client, data.compD, data.compT);
 
 	Log::Info("Set UP");
-	Natives::SetCharCoordinates(gPlayer[data.client].PedID, data.position[0], data.position[1], data.position[2]);
 	Natives::SetCharHeading(gPlayer[data.client].PedID, data.angle);
 	Natives::SetCharHealth(gPlayer[data.client].PedID, data.health);
-	Natives::AddArmourToChar(gPlayer[data.client].PedID, -1000);
 	Natives::AddArmourToChar(gPlayer[data.client].PedID, data.armor);
-	Natives::SetRoomForCharByKey(gPlayer[data.client].PedID, (eInteriorRoomKey)data.room);
+	if(data.room != 0) Natives::SetRoomForCharByKey(gPlayer[data.client].PedID, (eInteriorRoomKey)data.room);
 	Log::Info("Player SPAWN END");
+	if(Natives::DoesCharExist(old)) Natives::DeleteChar(&old);
+	gPlayer[data.client].want_spawn = 0;
 }

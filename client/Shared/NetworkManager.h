@@ -56,6 +56,7 @@ public:
 	void RecievePlayerComponentsChange(NetworkPlayerComponentsChangeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 *serverrpc3);
 	void RecieveNewVehicle(NetworkVehicleFullUpdateData data, RakNet::RPC3 *serverrpc3);
+	void RecieveTime(NetworkTimeData data, RakNet::RPC3 *serverrpc3);
 private:
 	NetworkIDManager *manager;
 	NetworkID clientid;
@@ -85,7 +86,8 @@ private:
 		NetworkRPCPlayerModelChange,
 		NetworkRPCPlayerComponentsChange,
 		NetworkRPCPlayerChat,
-		NetworkRPCNewVehicle
+		NetworkRPCNewVehicle,
+		NetworkRPCTime
 	};
 	union NetworkRPCUnion
 	{
@@ -110,6 +112,7 @@ private:
 		NetworkPlayerComponentsChangeData *playercomponentschange;
 		NetworkPlayerChatData *playerchat;
 		NetworkVehicleFullUpdateData *newvehicle;
+		NetworkTimeData *time;
 	};
 	struct NetworkRPCData
 	{

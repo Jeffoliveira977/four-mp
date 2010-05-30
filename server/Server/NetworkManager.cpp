@@ -341,7 +341,9 @@ void NetworkManager::RecievePlayerHealthAndArmorChange(NetworkPlayerHealthAndArm
 
 void NetworkManager::RecievePlayerSpawnRequest(NetworkPlayerSpawnRequestData data, RakNet::RPC3 *clientrpc3)
 {
+	PrintToServer("Spawn");
 	short client = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
+	PrintToServer("%d", client);
 	if (client == INVALID_PLAYER_INDEX)
 	{
 		return;
@@ -403,6 +405,16 @@ bool NetworkManager::SendNewVehicleInfoToAll(const short index)
 	data.color[0] = vm.vehiclebuffer[index]->color[0];
 	data.color[1] = vm.vehiclebuffer[index]->color[2];
 	this->SendDataToAll("&NetworkManager::RecieveNewVehicle", &data);
+	return true;
+}
+
+bool NetworkManager::SendTime(const int h, const int m)
+{
+	NetworkTimeData data;
+	data.hour = h;
+	data.minute = m;
+
+	this->SendDataToAll("&NetworkManager::RecieveTime", &data);
 	return true;
 }
 
@@ -564,6 +576,11 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			infodata.index = client;
 			infodata.sessionkey = data->playerconnectionrequest->sessionkey;
 			rpc3->CallCPP("&NetworkManager::RecieveClientInfo", defaultclientid, infodata, rpc3);
+
+			NetworkTimeData timedata;
+			server.GetTime(&timedata.hour, &timedata.minute);
+			rpc3->CallCPP("&NetworkManager::RecieveTime", defaultclientid, timedata, rpc3);
+
 			NetworkPlayerFullUpdateData *playerdata;
 			//TODO: Optimize using currently connected players, not buffer size.
 			for (short i = 0; i < clientbuffersize; i++)
@@ -813,18 +830,31 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 				return;
 			}
 			NetworkPlayerSpawnData data2;
-			data2.armor = 0;
-			data2.health = 200;
-			data2.model = playm.classbuffer[playm.playerbuffer[data->playerspawnrequest->client]->classindex]->model;
-			data2.angle = playm.classbuffer[playm.playerbuffer[data->playerspawnrequest->client]->classindex]->angle;
-			data2.room = 0;
-			memcpy(data2.position, playm.classbuffer[playm.playerbuffer[data->playerspawnrequest->client]->classindex]->position, sizeof(float) * 3);
+
+			playm.playerbuffer[data->playerspawnrequest->client]->armor = 0;
+			playm.playerbuffer[data->playerspawnrequest->client]->health = 200;
+			playm.playerbuffer[data->playerspawnrequest->client]->room = 0;
+
+			PrintToServer("Spawn RPC %d", data->playerspawnrequest->client);
+			vmm.OnPlayerSpawn(data->playerspawnrequest->client);
+
+			data2.armor = playm.playerbuffer[data->playerspawnrequest->client]->armor;
+			data2.health = playm.playerbuffer[data->playerspawnrequest->client]->health;
+			data2.model = playm.playerbuffer[data->playerspawnrequest->client]->model;
+			data2.angle = playm.playerbuffer[data->playerspawnrequest->client]->spawn_pos[3];
+			data2.room = playm.playerbuffer[data->playerspawnrequest->client]->room;
+			memcpy(data2.position, playm.playerbuffer[data->playerspawnrequest->client]->spawn_pos, sizeof(float) * 3);
 			memcpy(data2.compD, playm.playerbuffer[data->playerspawnrequest->client]->compD, sizeof(int) * 11);
 			memcpy(data2.compT, playm.playerbuffer[data->playerspawnrequest->client]->compT, sizeof(int) * 11);
-			vmm.OnPlayerSpawn(data->playerspawnrequest->client, playm.playerbuffer[data->playerspawnrequest->client]->classindex);
 			data2.client = data->playerspawnrequest->client;
+
 			this->SendDataToAll("&NetworkManager::RecievePlayerSpawn", &data2);
 			delete data->playerspawnrequest;
+
+			NetworkTimeData timedata;
+			server.GetTime(&timedata.hour, &timedata.minute);
+			rpc3->CallCPP("&NetworkManager::RecieveTime", defaultclientid, timedata, rpc3);
+
 			break;
 		}
 	case NetworkRPCPlayerModelChange:

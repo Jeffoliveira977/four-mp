@@ -85,6 +85,7 @@ void NetworkManager::Load(void)
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerModelChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerComponentsChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerChat);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveTime);
 	net = RakNetworkFactory::GetRakPeerInterface();
 	SocketDescriptor socketDescriptor(0,0);
 	net->Startup(1, 1, &socketDescriptor, 1);
@@ -559,6 +560,12 @@ void NetworkManager::RecieveNewVehicle(NetworkVehicleFullUpdateData data, RakNet
 	this->WriteToRPCBuffer(NetworkRPCNewVehicle, &data);
 }
 
+void NetworkManager::RecieveTime(NetworkTimeData data, RakNet::RPC3 *serverrpc3)
+{
+	Log::Info("TimeData");
+	this->WriteToRPCBuffer(NetworkRPCTime, &data);
+}
+
 template <typename DATATYPE>
 void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type, const DATATYPE *data)
 {
@@ -698,6 +705,12 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 		{
 			rpcbuffer[rpcbuffersize].data.newvehicle = (NetworkVehicleFullUpdateData *)new DATATYPE;
 			memcpy(rpcbuffer[rpcbuffersize].data.newvehicle, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCTime:
+		{
+			rpcbuffer[rpcbuffersize].data.time = (NetworkTimeData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.time, data, sizeof(DATATYPE));
 			break;
 		}
 	}
@@ -942,6 +955,17 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		}
 	case NetworkRPCPlayerSpawn:
 		{
+			Log::Info("Setup player spawn info %d", data->playerspawn->client);
+			gPlayer[data->playerspawn->client].want_spawn = 0;
+			memcpy(&gPlayer[data->playerspawn->client].spawn_pos, &data->playerspawn->position, sizeof(float) * 3);
+			gPlayer[data->playerspawn->client].spawn_pos[3] = data->playerspawn->angle;
+			gPlayer[data->playerspawn->client].model = data->playerspawn->model;
+			memcpy(&gPlayer[data->playerspawn->client].compD, &data->playerspawn->compD, 11 * sizeof(int));
+			memcpy(&gPlayer[data->playerspawn->client].compT, &data->playerspawn->compT, 11 * sizeof(int));
+			gPlayer[data->playerspawn->client].armor = data->playerspawn->armor;
+			gPlayer[data->playerspawn->client].health = data->playerspawn->health;
+			gPlayer[data->playerspawn->client].room = data->playerspawn->room;
+
 #if defined (FMP_CLIENT)
 			HOOK.xPlayerSpawn(*(data->playerspawn));
 #endif
@@ -978,6 +1002,15 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			HOOK.CreateCar(data->newvehicle->index, data->newvehicle->model, data->newvehicle->position, data->newvehicle->angle, data->newvehicle->color);
 #endif
 			delete data->newvehicle;
+			break;
+		}
+	case NetworkRPCTime:
+		{
+			Log::Info("Set time %d %d", data->time->hour, data->time->minute);
+#if defined (FMP_CLIENT)
+			HOOK.SetTime(data->time->hour, data->time->minute);
+#endif
+			delete data->time;
 			break;
 		}
 	}
@@ -1096,6 +1129,11 @@ void NetworkManager::FreeRPCBuffer(void)
 		case NetworkRPCNewVehicle:
 			{
 				delete rpcbuffer[i].data.newvehicle;
+				break;
+			}
+		case NetworkRPCTime:
+			{
+				delete rpcbuffer[i].data.time;
 				break;
 			}
 		}

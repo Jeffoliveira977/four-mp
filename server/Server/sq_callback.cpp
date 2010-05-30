@@ -89,7 +89,7 @@ void sc_OnPlayerDisconnect(HSQUIRRELVM v, const short index)
 	sq_settop(v,top); 
 }
 
-void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex, const unsigned char classindex)
+void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex)
 {
 	int result;
 	int top = sq_gettop(v); 
@@ -98,7 +98,6 @@ void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex, const unsigned cha
 	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
 		sq_pushroottable(v); 
 		sq_pushinteger(v,playerindex); 
-		sq_pushinteger(v,classindex); 
 		sq_call(v,3,0,0); 
 	}
 	sq_settop(v,top); 
