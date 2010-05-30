@@ -93,3 +93,16 @@ void sq_GetPlayerWantedLevel(HSQUIRRELVM v)
 	char wantedlevel = playm.GetPlayerWantedLevel(index);
 	sq_pushinteger(v, wantedlevel);
 }
+
+void sq_SetPlayerSpawnPos(HSQUIRRELVM v)
+{
+	int index = 0;
+	float pos[4];
+	sq_getinteger(v, 2, &index);
+	sq_getfloat(v, 3, &pos[0]);
+	sq_getfloat(v, 4, &pos[1]);
+	sq_getfloat(v, 5, &pos[2]);
+	sq_getfloat(v, 6, &pos[3]);
+
+	playm.SetPlayerSpawnPos(index, pos);
+}

@@ -29,6 +29,7 @@ public:
 	unsigned char GetNumberOfPlayerClasses(void);
 	bool AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index);
 	bool GetPlayerClassData(const unsigned char index, unsigned int &model, float (&position)[3], float &angle, char (&weapons)[8], short (&ammo)[8]);
+	void SetPlayerSpawnPos(const short index, const float pos[4]);
 private:
 	struct Player
 	{
@@ -54,6 +55,7 @@ private:
 		bool car_enter;
 		unsigned char color[4]; ///< Holds the color of the player.
 		int compT[11], compD[11];
+		float spawn_pos[4];
 	};
 	short maxplayerbuffersize;
 	short playerbuffersize;

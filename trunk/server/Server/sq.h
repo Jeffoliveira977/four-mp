@@ -45,9 +45,8 @@ void sc_OnPlayerDisconnect(HSQUIRRELVM v, const short index);
 
 /// \brief Called when a player is spawning.
 /// \param[in] playerindex Index of the player.
-/// \param[in] classindex Index of the class.
 /// \return No return.
-void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex, const unsigned char classindex);
+void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex);
 
 /// \brief Called when send message in chat
 /// \param[in] playersindex
@@ -65,3 +64,7 @@ void sq_CreateCar(HSQUIRRELVM v);
 void sq_GiveWeapon(HSQUIRRELVM v);
 void sq_addPlayerClass(HSQUIRRELVM v);
 void sq_enableComponentSelect(HSQUIRRELVM v);
+
+void sq_SetGameTime(HSQUIRRELVM v);
+void sq_GetGameHour(HSQUIRRELVM v);
+void sq_GetGameMinutes(HSQUIRRELVM v);

@@ -108,3 +108,24 @@ void sq_enableComponentSelect(HSQUIRRELVM v)
 	sq_getbool(v, 2, &enable);
 	server.EnableComponentSelect(enable);
 }
+
+void sq_SetGameTime(HSQUIRRELVM v)
+{
+	int h, m;
+	sq_getinteger(v, 2, &h);
+	sq_getinteger(v, 3, &m);
+}
+
+void sq_GetGameHour(HSQUIRRELVM v)
+{
+	int h, m;
+	server.GetTime(&h, &m);
+	sq_pushinteger(v, h);
+}
+
+void sq_GetGameMinutes(HSQUIRRELVM v)
+{
+	int h, m;
+	server.GetTime(&h, &m);
+	sq_pushinteger(v, m);
+}

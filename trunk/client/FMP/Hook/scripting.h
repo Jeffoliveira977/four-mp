@@ -149,7 +149,7 @@ namespace Natives
     static void SetPlayerCanBeHassledByGangs(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_CAN_BE_HASSLED_BY_GANGS, ScriptVoid>(playerIndex, value); }
     static void SetPlayerCanDoDriveBy(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_CAN_DO_DRIVE_BY, ScriptVoid>(playerIndex, value); }
     static void SetPlayerCanUseCover(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_CAN_USE_COVER, ScriptVoid>(playerIndex, value); }
-    static void SetPlayerControl(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_CONTROL, ScriptVoid>(playerIndex, value); }
+	static void SetPlayerControl(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_CONTROL, ScriptVoid>(playerIndex, value); }
     static void SetPlayerControlAdvanced(Player playerIndex, bool unknown1, bool unknown2, bool unknown3) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_CONTROL_ADVANCED, ScriptVoid>(playerIndex, unknown1, unknown2, unknown3); }
     static void SetPlayerFastReload(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_FAST_RELOAD, ScriptVoid>(playerIndex, value); }
     static void SetPlayerGroupToFollowAlways(Player playerIndex, bool value) { NativeInvoke::Invoke<NATIVE_SET_PLAYER_GROUP_TO_FOLLOW_ALWAYS, ScriptVoid>(playerIndex, value); }
@@ -798,23 +798,24 @@ namespace Natives
     //static bool CamIsSphereVisible(Camera camera, float pX, float pY, float pZ, float radius) { return NativeInvoke::Invoke<NATIVE_CAM_IS_SPHERE_VISIBLE, bool>(camera, pX, pY, pZ, radius); }
     static void CreateCam(unsigned int camtype_usually14, Camera *camera) { NativeInvoke::Invoke<NATIVE_CREATE_CAM, ScriptVoid>(camtype_usually14, camera); }
     static void DestroyCam(Camera camera) { NativeInvoke::Invoke<NATIVE_DESTROY_CAM, ScriptVoid>(camera); }
-    //static bool DoesCamExist(Camera camera) { return NativeInvoke::Invoke<NATIVE_DOES_CAM_EXIST, bool>(camera); }
+    static bool DoesCamExist(Camera camera) { return NativeInvoke::Invoke<NATIVE_DOES_CAM_EXIST, bool>(camera); }
     static void SetCamActive(Camera camera, bool value) { NativeInvoke::Invoke<NATIVE_SET_CAM_ACTIVE, ScriptVoid>(camera, value); }
     static void GetCamFov(Camera camera, float *fov) { NativeInvoke::Invoke<NATIVE_GET_CAM_FOV, ScriptVoid>(camera, fov); }
     //static void GetCamPos(Camera camera,  float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_CAM_POS, ScriptVoid>(camera, pX, pY, pZ); }
     //static void GetCamRot(Camera camera, float *angleX, float *angleY, float *angleZ) { NativeInvoke::Invoke<NATIVE_GET_CAM_ROT, ScriptVoid>(camera, angleX, angleY, angleZ); }
     //static void GetGameCam(Camera *camera) { NativeInvoke::Invoke<NATIVE_GET_GAME_CAM, ScriptVoid>(camera); }
     static void GetGameCamChild(Camera *camera) { NativeInvoke::Invoke<NATIVE_GET_GAME_CAM_CHILD, ScriptVoid>(camera); }
-    //static bool IsCamActive(Camera camera) { return NativeInvoke::Invoke<NATIVE_IS_CAM_ACTIVE, bool>(camera); }
-    //static bool IsCamInterpolating() { return NativeInvoke::Invoke<NATIVE_IS_CAM_INTERPOLATING, bool>(); }
-    //static bool IsCamPropagating(Camera camera) { return NativeInvoke::Invoke<NATIVE_IS_CAM_PROPAGATING, bool>(camera); }
-    //static void SetCamBehindPed(Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_BEHIND_PED, ScriptVoid>(ped); }
+    static bool IsCamActive(Camera camera) { return NativeInvoke::Invoke<NATIVE_IS_CAM_ACTIVE, bool>(camera); }
+    static bool IsCamInterpolating() { return NativeInvoke::Invoke<NATIVE_IS_CAM_INTERPOLATING, bool>(); }
+    static bool IsCamPropagating(Camera camera) { return NativeInvoke::Invoke<NATIVE_IS_CAM_PROPAGATING, bool>(camera); }
+    static void SetCamBehindPed(Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_BEHIND_PED, ScriptVoid>(ped); }
     static void SetCamFov(Camera camera, float fov) { NativeInvoke::Invoke<NATIVE_SET_CAM_FOV, ScriptVoid>(camera, fov); }
     //static void SetCamInFrontOfPed(Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_IN_FRONT_OF_PED, ScriptVoid>(ped); }
     static void SetCamPos(Camera camera, float pX, float pY, float pZ) { NativeInvoke::Invoke<NATIVE_SET_CAM_POS, ScriptVoid>(camera, pX, pY, pZ); }
     static void SetCamPropagate(Camera camera, bool value) { NativeInvoke::Invoke<NATIVE_SET_CAM_PROPAGATE, ScriptVoid>(camera, value); }
     static void SetCamRot(Camera camera, float angleX, float angleY, float angleZ) { NativeInvoke::Invoke<NATIVE_SET_CAM_ROT, ScriptVoid>(camera, angleX, angleY, angleZ); }
-    //static void SetCamTargetPed(Camera camera, Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_TARGET_PED, ScriptVoid>(camera, ped); }
+    static void SetCamTargetPed(Camera camera, Ped ped) { NativeInvoke::Invoke<NATIVE_SET_CAM_TARGET_PED, ScriptVoid>(camera, ped); }
+	static void ActivateScriptedCams(bool a1, bool a2) { NativeInvoke::Invoke<NATIVE_ACTIVATE_SCRIPTED_CAMS, ScriptVoid>(a1, a2); }
 
     // Network
     static bool NetworkIsGameRanked() { return NativeInvoke::Invoke<NATIVE_NETWORK_IS_GAME_RANKED, bool>(); }

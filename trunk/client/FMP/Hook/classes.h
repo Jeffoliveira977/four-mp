@@ -134,6 +134,7 @@ private:
 	unsigned int m_nWaitTick;
 
 	static void _stdcall FiberStart(void* parameter);
+	Camera freeCam;
 
 protected:
 	ThreadStates Reset(unsigned int hash,int v2,int i3);
@@ -161,6 +162,13 @@ public:
 	void KillMe();
 	bool SafeCheckPlayer(short index, bool bReCreateOnFalse = 1);
 	void CheckAndCheck();
+	void SetFreeCam(bool);
+	bool IsFreeCam();
+
+	void GetTime();
+	void SetTimeScale(float ts);
+
+	void SetTime(int h, int m);
 
 	// -- Start mp
 	void RunMP();

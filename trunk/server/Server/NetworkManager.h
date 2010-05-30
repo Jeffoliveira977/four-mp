@@ -48,6 +48,7 @@ public:
 	void RecievePlayerComponentsChange(NetworkPlayerComponentsChangeData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 *clientrpc3);
 	bool SendNewVehicleInfoToAll(const short index);
+	bool SendTime(const int h, const int m);
 private:
 	unsigned short serverport;
 	NetworkIDManager *manager;

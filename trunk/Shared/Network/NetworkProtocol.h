@@ -177,3 +177,8 @@ struct NetworkVehicleFullUpdateData
 	float angle;
 	unsigned char color[2];
 };
+
+struct NetworkTimeData
+{
+	int hour, minute;
+};

@@ -153,9 +153,8 @@ public:
 
 	/// \brief Called when a player is spawning.
 	/// \param[in] playerindex Index of the player.
-	/// \param[in] classindex Index of the class.
 	/// \return No return.
-	void OnPlayerSpawn(const short playerindex, const unsigned char classindex);
+	void OnPlayerSpawn(const short playerindex);
 
 	///
 	///

@@ -1,4 +1,5 @@
 #include <time.h>
+#include <math.h>
 #include "ServerCore.h"
 #include "logging.h"
 #include "HandleManager.h"
@@ -35,6 +36,8 @@ ServerCore::ServerCore(void)
 	rconpassword = NULL;
 	componentselect = false;
 	componentselectcvar = NULL;
+
+	SetTime(0, 0);
 }
 
 ServerCore::~ServerCore(void)
@@ -221,4 +224,27 @@ void ServerCore::EnableComponentSelect(bool enable)
 {
 	componentselect = enable;
 	componentselectcvar->SetValue(enable);
+}
+
+void ServerCore::SetTime(int h, int m)
+{
+	gametime.hour = h;
+	gametime.minute = m;
+	time((time_t*)&gametime.last_get);
+}
+
+void ServerCore::GetTime(int *h, int *m)
+{
+	int now = 0;
+	time((time_t*)&now);
+	int d = now - gametime.last_get;
+	int th = floor((float)d/120);
+	int tm = d - th*120;
+
+	gametime.hour += th;
+	gametime.minute += tm;
+	
+	*h = gametime.hour;
+	*m = gametime.minute;
+	gametime.last_get = now;
 }
