@@ -480,3 +480,13 @@ char *MasterServer::GetUserName()
 {
 	return user->name;
 }
+
+char *MasterServer::GetUserSession()
+{
+	return user->seskey;
+}
+
+char *MasterServer::GetError()
+{
+	return error;
+}

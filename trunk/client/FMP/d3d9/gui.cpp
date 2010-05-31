@@ -245,9 +245,12 @@ namespace CALLBACKS
 			fUserLogin->SetVisible(0);
 			fServBrowser->SetVisible(1);
 			Gui.Logged();
-			client.SetName(login.c_str());
+			
+			client.SetFMPID(fmpms.GetUserId());
+			client.SetName(fmpms.GetUserNameA());
+			client.SetSessionKey(fmpms.GetUserSession());
 		}
-		else Gui.Message("Can't login");
+		else Gui.Message(fmpms.GetError());
 
 		Log::Debug("CALLBACKS::Login complete");
 	}

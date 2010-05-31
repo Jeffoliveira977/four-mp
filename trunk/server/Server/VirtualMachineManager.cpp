@@ -556,15 +556,17 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			// Player functions
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerName, "GetPlayerName");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerModel, "GetPlayerModel");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerPosition, "GetPlayerPosition");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerAngle, "GetPlayerAngle");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerScore, "GetPlayerScore");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerScore, "GetPlayerHealth");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerScore, "GetPlayerArmor");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerHealth, "GetPlayerHealth");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerArmor, "GetPlayerArmor");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerWantedLevel, "GetPlayerWantedLevel");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GiveWeapon, "GiveWeapon");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_addPlayerClass, "addPlayerClass");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_enableComponentSelect, "enableComponentSelect");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetPlayerSpawnPos, "SetPlayerSpawnPos");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetPlayerModel, "SetPlayerModel");
 			// Time func
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetGameTime, "SetGameTime");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetGameHour, "GetGameHour");

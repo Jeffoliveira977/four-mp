@@ -11,7 +11,8 @@ struct NetworkPlayerConnectionRequestData
 {
 	short protocol;
 	char name[MAX_PLAYER_NAME_LENGTH];
-	unsigned int sessionkey;
+	int fmpid;
+	char sessionkey[33];
 };
 
 enum NetworkPlayerConnectionError
@@ -32,7 +33,7 @@ struct NetworkPlayerConnectionErrorData
 struct NetworkPlayerInfoData
 {
 	short index;
-	unsigned int sessionkey;
+	char sessionkey[33];
 };
 
 struct NetworkPlayerDisconnectionData
@@ -180,5 +181,5 @@ struct NetworkVehicleFullUpdateData
 
 struct NetworkTimeData
 {
-	int hour, minute;
+	unsigned char hour, minute;
 };

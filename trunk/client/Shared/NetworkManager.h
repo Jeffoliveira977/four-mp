@@ -20,21 +20,7 @@ public:
 	void Unload(void);
 	void Ping(const char *hostname, const unsigned short port = 7777);
 	void ConnectToServer(const char *hostname = "", const unsigned short port = 7777);
-	void SendClientConnectionRequest(void);
-	void SendPlayerMove(const float speed);
-	void SendPlayerJump(void);
-	void SendPlayerDuck(void);
-	void SendPlayerEntranceInVehicle(const char seat);
-	void SendPlayerCancelEntranceInVehicle(void);
-	void SendPlayerExitFromVehicle(void);
-	void SendPlayerFire(const float position[3], const int time, const short target, const unsigned int health, const unsigned int armor);
-	void SendPlayerAim(const float position[3], const int time);
-	void SendPlayerWeaponChange(void);
-	void SendPlayerHealthAndArmorChange(void);
-	void SendPlayerSpawnRequest(void);
-	void SendPlayerModelChange(void);
-	void SendPlayerComponentsChange(void);
-	void SendPlayerChat(void);
+	
 	void RecieveClientConnection(NetworkPlayerFullUpdateData data, RakNet::RPC3 *serverrpc3);
 	void RecieveClientConnectionError(NetworkPlayerConnectionErrorData data, RakNet::RPC3 *serverrpc3);
 	void RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 *serverrpc3);
@@ -56,7 +42,23 @@ public:
 	void RecievePlayerComponentsChange(NetworkPlayerComponentsChangeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 *serverrpc3);
 	void RecieveNewVehicle(NetworkVehicleFullUpdateData data, RakNet::RPC3 *serverrpc3);
-	void RecieveTime(NetworkTimeData data, RakNet::RPC3 *serverrpc3);
+	void RecieveGameTime(NetworkTimeData data, RakNet::RPC3 *serverrpc3);
+
+	void SendClientConnectionRequest(void);
+	void SendPlayerMove(const float speed);
+	void SendPlayerJump(void);
+	void SendPlayerDuck(void);
+	void SendPlayerEntranceInVehicle(const char seat);
+	void SendPlayerCancelEntranceInVehicle(void);
+	void SendPlayerExitFromVehicle(void);
+	void SendPlayerFire(const float position[3], const int time, const short target, const unsigned int health, const unsigned int armor);
+	void SendPlayerAim(const float position[3], const int time);
+	void SendPlayerWeaponChange(void);
+	void SendPlayerHealthAndArmorChange(void);
+	void SendPlayerSpawnRequest(void);
+	void SendPlayerModelChange(void);
+	void SendPlayerComponentsChange(void);
+	void SendPlayerChat(void);
 private:
 	NetworkIDManager *manager;
 	NetworkID clientid;

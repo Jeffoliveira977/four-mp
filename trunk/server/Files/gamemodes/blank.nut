@@ -7,9 +7,11 @@ function OnGameModeInit()
 	SetScriptAuthor("009");
 	printr("Строительный мод от 009 загружен. \n");
 
-	CreateCar(418536135,-44.4, -18.53, 14.83, 0.0, 0, 0);
-	CreateCar(1348744438,-42.4, -18.53, 14.83, 0.0, 0, 0);
-	CreateCar(2948279460,-46.4, -18.53, 14.83, 0.0, 0, 0);
+	CreateCar(0x506434F6, -57.856403, 857.939880, 14.718335, 0.0, 0, 0);
+	CreateCar(0x18F25AC7, -58.236626, 841.208984, 14.706969, 0.0, 0, 0);
+	CreateCar(0x1D06D681, -58.281269, 820.258911, 14.704250, 0.0, 0, 0);
+	CreateCar(0x79FBB0C5, -58.267639, 799.859314, 14.659676, 0.0, 0, 0);
+	CreateCar(0xEE6024BC, -58.164066, 772.126892, 14.707888, 0.0, 0, 0);
 	
 	SetGameTime(12, 0);
 
@@ -35,8 +37,13 @@ function OnPlayerDisconnect(playerid)
 
 function OnPlayerSpawn(playerid)
 {
+	print("hello spawn");
 	//SetPlayerHP(playerid,200);
-	SetPlayerSpawnPos(playerid, -106.500755, 764.368164, 15.337303, 0.0);
+	SetPlayerSpawnPos(playerid, -106.500755, 764.368164, 15.337303, 180.0);
+	if(playerid == 0) SetPlayerModel(playerid, 0x6AF081E8); // Playboy X
+	else if(playerid == 1) SetPlayerModel(playerid, 0x58A1E271); // Liljacob
+	else if(playerid == 2) SetPlayerModel(playerid, 0x89395FC9); // Roman
+	else SetPlayerModel(playerid, 0x98E29920);
 }
 
 function OnPlayerDeath(playerid, killerid, reason)

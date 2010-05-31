@@ -65,6 +65,7 @@ void NetworkManager::Load(void)
 	this->SetNetworkID(clientid);
 	rpc3 = new RakNet::RPC3;
 	rpc3->SetNetworkIDManager(manager);
+
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnection);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnectionError);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientInfo);
@@ -84,8 +85,9 @@ void NetworkManager::Load(void)
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerSpawn);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerModelChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerComponentsChange);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveGameTime);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerChat);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveTime);
+
 	net = RakNetworkFactory::GetRakPeerInterface();
 	SocketDescriptor socketDescriptor(0,0);
 	net->Startup(1, 1, &socketDescriptor, 1);
@@ -315,7 +317,9 @@ void NetworkManager::SendClientConnectionRequest(void)
 	char *name = client.GetName();
 	strcpy(data.name, name);
 	free(name);
-	data.sessionkey = client.GetSessionKey();
+	strcpy(data.sessionkey, client.GetSessionKey());
+	data.sessionkey[32] = 0;
+	data.fmpid = client.GetFMPID();
 	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionRequest", serverid, data, rpc3);
 }
 
@@ -461,12 +465,14 @@ void NetworkManager::RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 
 	//this->WriteToRPCBuffer(NetworkRPCPlayerInfo, &data);
 	//Temp fix. Client should use rpc buffer and then send confirmation to the server.
 	//After that, server should send full update.
-	if (data.sessionkey != client.GetSessionKey())
+	if (strcmp(data.sessionkey, client.GetSessionKey()) != 0)
 	{
 		return;
 	}
 	clientid.localSystemAddress = data.index + 1;
 	this->SetNetworkID(clientid);
+
+	Log::Info("My ID: %d", data.index);
 	client.SetIndex(data.index);
 }
 
@@ -560,9 +566,9 @@ void NetworkManager::RecieveNewVehicle(NetworkVehicleFullUpdateData data, RakNet
 	this->WriteToRPCBuffer(NetworkRPCNewVehicle, &data);
 }
 
-void NetworkManager::RecieveTime(NetworkTimeData data, RakNet::RPC3 *serverrpc3)
+void NetworkManager::RecieveGameTime(NetworkTimeData data, RakNet::RPC3 *serverrpc)
 {
-	Log::Info("TimeData");
+	Log::Info("TimeDataTimeDataTimeDataTimeDataTimeDataTimeData");
 	this->WriteToRPCBuffer(NetworkRPCTime, &data);
 }
 
@@ -742,7 +748,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			memcpy(gPlayer[data->playerconnection->index].weapons, data->playerconnection->weapons, sizeof(char) * 8);
 			memcpy(gPlayer[data->playerconnection->index].ammo, data->playerconnection->ammo, sizeof(short) * 8);
 			memcpy(gPlayer[data->playerconnection->index].color, data->playerconnection->color, sizeof(unsigned char) * 4);
-			HOOK.PlayerConnect(data->playerconnection->name, data->playerconnection->index, gPlayer[data->playerconnection->index].model, gPlayer[data->playerconnection->index].position);
+			HOOK.PlayerConnect(data->playerconnection->name, data->playerconnection->index, gPlayer[data->playerconnection->index].model, gPlayer[data->playerconnection->index].position, 1);
 #endif
 			delete data->playerconnection;
 			break;

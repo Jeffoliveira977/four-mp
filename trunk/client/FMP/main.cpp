@@ -79,6 +79,7 @@ void FMPHook::SetFreeCam(bool on)
 	{
 		Natives::ActivateScriptedCams(0, 0);
 		Natives::DisplayHUD(1);
+		Natives::DisplayRadar(1);
 
 		if(!Natives::DoesCamExist(freeCam))
 		{
@@ -100,31 +101,26 @@ void FMPHook::SetFreeCam(bool on)
 
 		if(time >= 0 && time < 5)
 		{
-			Log::Info("Time 0-5");
 			Natives::SetCamPos(freeCam, -646, -711, 68);
 			Natives::SetCamRot(freeCam, 0, 0, -105);
 		}
 		else if(time >= 5 && time < 10)
 		{
-			Log::Info("Time 5-10");
 			Natives::SetCamPos(freeCam, -182, 158, 119);
 			Natives::SetCamRot(freeCam, -18, 0, 20);
 		}
 		else if(time >= 10 && time < 15)
 		{
-			Log::Info("Time 10-15");
 			Natives::SetCamPos(freeCam, 747, 221, 68);
 			Natives::SetCamRot(freeCam, -10, 0, 63);
 		}
 		else if(time >= 15 && time < 20)
 		{
-			Log::Info("Time 15-20");
 			Natives::SetCamPos(freeCam, 1481, 439, 102);
 			Natives::SetCamRot(freeCam, -27, 0, 1);
 		}
 		else
 		{
-			Log::Info("Time %d", time);
 			Natives::SetCamPos(freeCam, 2789, 483, 52);
 			Natives::SetCamRot(freeCam, -17, -1, 103);
 		}
@@ -133,6 +129,7 @@ void FMPHook::SetFreeCam(bool on)
 		Natives::SetCamActive(freeCam, 1);
 		Natives::ActivateScriptedCams(1, 1);
 		Natives::DisplayHUD(0);
+		Natives::DisplayRadar(0);
 	}
 }
 
@@ -452,6 +449,12 @@ void FMPHook::GameThread()
 		case GameStateOffline:
 			{
 				SetFreeCam(1);
+				if(GetAsyncKeyState(112) != 0)
+				{
+					Log::Debug("Player: 0x%x %d", _GetPlayer(), Natives::PlayerHasChar(_GetPlayer()));
+					Log::Debug("%d %d %d %d %d", Natives::IsScreenFadedIn(), Natives::IsScreenFadedOut(), Natives::IsScreenFading(),
+						Natives::IsScreenFadingIn(), Natives::IsScreenFadingOut());
+				}
 				break;
 			}
 		case GameStateConnecting:
@@ -473,19 +476,24 @@ void FMPHook::GameThread()
 
 				if(gPlayer[client.GetIndex()].want_spawn)
 				{
+					if(gPlayer[client.GetIndex()].sync_state == 1) break;
+					Log::Info("NextSpawn");
+
 					short index = client.GetIndex();
+
+					Natives::RequestModel((eModel)gPlayer[index].model);
+					while(!Natives::HasModelLoaded((eModel)gPlayer[index].model)) wait(0);
 
 					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[index].model);
 
-					Ped player = _GetPlayerPed();
+					Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
 
-					Natives::SetCharCoordinates(player, gPlayer[index].spawn_pos[0], gPlayer[index].spawn_pos[1], gPlayer[index].spawn_pos[2]);
-					Natives::SetCharHeading(player, gPlayer[index].spawn_pos[3]);
-					Natives::SetCharHealth(player, gPlayer[index].health);
-					Natives::AddArmourToChar(player, gPlayer[index].armor);
-					Natives::SetCharDefaultComponentVariation(player);
+					Natives::SetCharCoordinates(gPlayer[index].PedID, gPlayer[index].spawn_pos[0], gPlayer[index].spawn_pos[1], gPlayer[index].spawn_pos[2]);
+					Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].spawn_pos[3]);
+					Natives::SetCharHealth(gPlayer[index].PedID, gPlayer[index].health);
+					Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
+					Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
 
-					gPlayer[index].PedID = player;
 					gPlayer[index].want_spawn = 0;
 				}
 
@@ -588,6 +596,11 @@ void MainThread(void* dummy)
 	concore.AddConCmd("time", GetTime);
 	concore.AddConCmd("ts", SetTS);
 
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		memset(&gPlayer[i], 0, sizeof(FPlayer));
+	}
+
 	Sleep(10000);
 	HOOK.AttachGtaThread("FOURMP");
 	Log::Debug("Attached");
@@ -648,14 +661,14 @@ Vector4 GetSpawnPos(Vector4 *pos, float angle, Vector4 *result) //8E6840
 	nm.SendPlayerSpawnRequest();
 
 	while(gPlayer[index].want_spawn) 
-	{
-		client.Tick();
-		Sleep(25);
-	}
+    {
+        client.Tick();
+        Sleep(25);
+    }
 
 	memcpy(result, gPlayer[client.GetIndex()].spawn_pos, sizeof(Vector4));
-
 	gPlayer[index].want_spawn = 1;
+	Log::Info("GetSpawnPos end");
 	return *result;
 }
 

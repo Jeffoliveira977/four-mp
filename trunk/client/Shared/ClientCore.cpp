@@ -28,7 +28,8 @@ ClientCore::ClientCore(void)
 	strcpy(name, "unnamed");
 	namecvar = NULL;
 	index = -1; // Should be defined in PlayerManager.h
-	sessionkey = 0;
+	sessionkey[0] = 0;
+	fmpid = 0;
 #if defined (FMP_CLIENT)
 	inputstate = InputStateGame;
 #endif
@@ -67,7 +68,6 @@ bool ClientCore::Load(void)
 	namecvar = concore.AddConVar("name", "unnamed", "Current user name.", 0);
 	namecvar->HookChange(ConVarHookName);
 	concore.AddConCmd("quit", ConCmdQuit, "Exit the engine.", 0);
-	rand_s(&sessionkey);
 	nm.Load();
 #if defined (FMP_CLIENT)
 	concore.SetExecPath("FMP/cfg/");
@@ -111,6 +111,16 @@ GameState ClientCore::GetGameState(void)
 	return gamestate;
 }
 
+int ClientCore::GetFMPID()
+{
+	return fmpid;
+}
+
+void ClientCore::SetFMPID(int fid)
+{
+	fmpid = fid;
+}
+
 char *ClientCore::GetName(void)
 {
 	if (name == NULL)
@@ -148,7 +158,12 @@ bool ClientCore::SetIndex(const short i)
 	return true;
 }
 
-unsigned int ClientCore::GetSessionKey(void)
+void ClientCore::SetSessionKey(char *key)
+{
+	strcpy(sessionkey, key);
+}
+
+char *ClientCore::GetSessionKey(void)
 {
 	return sessionkey;
 }

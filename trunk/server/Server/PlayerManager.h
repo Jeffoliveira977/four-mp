@@ -30,6 +30,8 @@ public:
 	bool AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index);
 	bool GetPlayerClassData(const unsigned char index, unsigned int &model, float (&position)[3], float &angle, char (&weapons)[8], short (&ammo)[8]);
 	void SetPlayerSpawnPos(const short index, const float pos[4]);
+	void SetPlayerModel(const short index, const unsigned int model);
+	void SetPlayerPosition(const short index, const float pos[3]);
 private:
 	struct Player
 	{
