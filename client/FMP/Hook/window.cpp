@@ -99,10 +99,17 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 					if(strlen(enterMsg) != 255)
 					{
 						int enterChat = strlen(enterMsg);
-						BYTE ks[256];
-						GetKeyboardState(ks);
-						ToAsciiEx(wParam,0,ks, (LPWORD)&enterMsg[enterChat],0, GetKeyboardLayout(GetCurrentThreadId()));
-						if(enterMsg[enterChat] < 32) enterChat--;
+
+						BYTE bKeys[256] = { 0 };
+						GetKeyboardState( bKeys );
+
+						WORD wKey = 0;
+						ToAscii( wParam, HIWORD( lParam )&0xFF, bKeys, &wKey, 0 );
+
+						if(wKey < 32) break;
+
+						enterMsg[enterChat] = wKey;
+
 						enterChat++;
 						enterMsg[enterChat] = 0;
 					}

@@ -86,6 +86,7 @@ bool ServerCore::Load(void)
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("fs_unload_all", ConCmdFsUnloadAll, "Unloads all filterscripts", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("fs_unpause", ConCmdFsUnpause, "fs_unpause <index> : unpauses a loaded filterscript", 0));
 	hm.AddNewHandle(0, HandleTypeConCmd, concore.AddConCmd("fs_unpause_all", ConCmdFsUnpauseAll, "Unpauses all disabled filterscripts", 0));
+	
 	ConVar *gamemodecvar = concore.AddConVar("host_gamemode", "", "Current gamemode name.", 0);
 	gamemodecvar->HookChange(ConVarHookHostGamemode);
 	hm.AddNewHandle(0, HandleTypeConVar, gamemodecvar);
@@ -226,23 +227,42 @@ void ServerCore::EnableComponentSelect(bool enable)
 	componentselectcvar->SetValue(enable);
 }
 
-void ServerCore::SetTime(int h, int m)
+void ServerCore::SetTime(const unsigned char h, const unsigned char m)
 {
 	gametime.hour = h;
 	gametime.minute = m;
+
+	if(gametime.hour > 23) gametime.hour = 23; else if(gametime.hour < 0) gametime.hour = 0;
+	if(gametime.minute > 59) gametime.minute = 59; else if(gametime.minute < 0) gametime.minute = 0;
 	time((time_t*)&gametime.last_get);
+
+	nm.SendTime(h, m);
 }
 
-void ServerCore::GetTime(int *h, int *m)
+void ServerCore::GetTime(unsigned char *h, unsigned char *m)
 {
 	int now = 0;
 	time((time_t*)&now);
 	int d = now - gametime.last_get;
 	int th = floor((float)d/120);
-	int tm = d - th*120;
+	int tm = floor((float)(d - th*120)/2);
+
+	if(tm == 0 && th == 0)
+	{
+		*h = gametime.hour;
+		*m = gametime.minute;
+		return;
+	}
 
 	gametime.hour += th;
 	gametime.minute += tm;
+
+	while(gametime.minute > 59)
+	{
+		gametime.hour++;
+		gametime.minute -= 60;
+		if(gametime.hour > 23) gametime.hour -= 24;
+	}
 	
 	*h = gametime.hour;
 	*m = gametime.minute;

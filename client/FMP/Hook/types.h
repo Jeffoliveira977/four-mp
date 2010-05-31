@@ -26,6 +26,8 @@ typedef struct _FMPHookHandle
 
 		inline bool operator == (const unsigned int handle) { return Handle == handle; }
 		inline bool operator != (const unsigned int handle) { return Handle != handle; }
+
+		inline void Null() { Handle = 0; }
 } FMPHookHandle;
 
 typedef unsigned int Player;     // Left as u32 for legacy support

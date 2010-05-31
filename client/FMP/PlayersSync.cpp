@@ -1,23 +1,24 @@
 #include <vector>
 
 #include "log.h"
-#include "Hook\types.h"
-#include "Hook\classes.h"
+#include "Hook/types.h"
+#include "Hook/classes.h"
 //#include "Hook\hook.h"
-#include "Hook\scripting.h"
+#include "Hook/scripting.h"
 #include "functions.h"
 #include "structs.h"
 #include "main.h"
 #include "../Shared/ClientCore.h"
-#include "hook\classes.h"
+#include "../Shared/NetworkManager.h"
 
 scrThread* GetActiveThread();
 void SetActiveThread(scrThread* thread);
 
 extern ClientCore client;
 extern FMPHook HOOK;
+extern NetworkManager nm;
 
-void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float position[3])
+void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float position[3], bool start)
 {
 	Log::Debug("PlayerConnect: %s", "Start");
 	if(name == 0)
@@ -35,19 +36,45 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float p
 	if(client.GetIndex() == index) // My connect
 	{
 		Log::Debug("Our PlayerConnect");
-		gPlayer[index].model = model;
-		Log::Info("Local player %d", Natives::IsThisModelAPed((eModel)model));
-		Natives::RequestModel((eModel)model);
-		Log::Debug("PlayerConnect: %s", "RequestModel");
-		while(!Natives::HasModelLoaded((eModel)model)) wait(1);
-		Log::Debug("PlayerConnect: %s", "ModelLoaded");
-		Natives::ChangePlayerModel(_GetPlayer(), (eModel)model);
-		Log::Debug("PlayerConnect: %s", "ChangeModel");
-		Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
-		Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
-		Log::Debug("PlayerConnect: %s", "SetCoords");
+		if(start)
+		{
+			//Natives::SetCharHealth(_GetPlayerPed(), 0);
+			nm.SendPlayerSpawnRequest();
+			gPlayer[index].want_spawn = 1;
+			gPlayer[index].sync_state = 1;
+
+			strcpy(gPlayer[index].name, name);
+			gPlayer[index].last_active = GetTickCount();
+			gPlayer[index].connected = 1;
+
+			client.SetGameState(GameStateInGame);
+			client.SetInputState(InputStateGame);
+			
+			InputFreeze(0);
+			SetFreeCam(0);
+
+			Natives::DoScreenFadeOut(1000);
+
+			Log::Debug("PlayerConnect: %s", "fastEnd");
+			return;
+		}
+		else
+		{
+			Log::Info("Local player %d", Natives::IsThisModelAPed((eModel)model));
+			Natives::RequestModel((eModel)model);
+			Log::Debug("PlayerConnect: %s", "RequestModel");
+			while(!Natives::HasModelLoaded((eModel)model)) wait(1);
+			Log::Debug("PlayerConnect: %s", "ModelLoaded");
+			Natives::ChangePlayerModel(_GetPlayer(), (eModel)model);
+			Log::Debug("PlayerConnect: %s", "ChangeModel");
+			Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
+			Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
+			Log::Debug("PlayerConnect: %s", "SetCoords");
+		}
+
 		client.SetGameState(GameStateInGame);
 		client.SetInputState(InputStateGame);
+		
 		InputFreeze(0);
 		SetFreeCam(0);
 	}
@@ -270,8 +297,20 @@ void FMPHook::PlayerSyncSkinVariation(short index, int sm[11], int st[11])
 
 void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 {
-	if(data.client == client.GetIndex()) return;
-	if(!SafeCheckPlayer(data.client)) return;
+	Log::Info("Spawn %d (%d)", data.client, client.GetIndex());
+	if(data.client == client.GetIndex()) 
+	{
+		Log::Info("Its me");
+		if(gPlayer[client.GetIndex()].sync_state == 1) Natives::DoScreenFadeIn(1000);
+		gPlayer[client.GetIndex()].sync_state = 0;
+		gPlayer[data.client].want_spawn = 1;
+		return;
+	}
+	if(!SafeCheckPlayer(data.client)) 
+	{
+		gPlayer[data.client].want_spawn = 0;
+		return;
+	}
 	Log::Info("Player Spawn START");
 
 	Ped old = gPlayer[data.client].PedID;

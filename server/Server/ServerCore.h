@@ -17,13 +17,13 @@ public:
 	char *GetHostname(void);
 	bool GetComponentSelectStatus(void);
 	void EnableComponentSelect(bool enable);
-	void GetTime(int *h, int *m);
-	void SetTime(int h, int m);
+	void GetTime(unsigned char *h, unsigned char *m);
+	void SetTime(const unsigned char h, const unsigned char m);
 private:
 	
 	struct GameTime
 	{
-		int hour, minute;
+		unsigned char hour, minute;
 		int last_get;
 	};
 

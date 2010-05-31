@@ -238,7 +238,16 @@ unsigned char PlayerManager::GetNumberOfPlayerClasses(void)
 
 void PlayerManager::SetPlayerSpawnPos(const short index, const float pos[4])
 {
-	memcpy(&playerbuffer[index]->spawn_pos, &pos, 4 * sizeof(float));
+	memcpy(playerbuffer[index]->spawn_pos, pos, 4 * sizeof(float));
+}
+
+void PlayerManager::SetPlayerModel(const short index, const unsigned int model)
+{
+	playerbuffer[index]->model = model;
+}
+void PlayerManager::SetPlayerPosition(const short index, const float pos[3])
+{
+	memcpy(playerbuffer[index]->position, pos, sizeof(float)*3);
 }
 
 bool PlayerManager::AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index)

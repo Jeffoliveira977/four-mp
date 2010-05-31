@@ -73,7 +73,7 @@ bool MasterServerManager::QueryUserCheck(const int fmpid, const char *ip, const 
 {
 	if(http->IsBusy()) return 0;
 
-	RakString data = RakString("fmpid=%d&ip=%s&status=%s&t=check", fmpid, 
+	RakString data = RakString("fmpid=%d&ip=%s&seskey=%s&t=check", fmpid, 
 		RakString(ip).URLEncode().C_String(), RakString(status).URLEncode().C_String());
 
 	http->Post(RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
@@ -111,6 +111,8 @@ void MasterServerManager::ReadPacket(const RakString data)
 		} break;
 	case MSS_WAIT_USER_CHECK: 
 		{
+			PrintToServer("%s\n", data.C_String());
+
 			if(data.C_String()[1] == 'O') state = MSS_NONE;
 			else state = MSS_ERROR;
 		} break;

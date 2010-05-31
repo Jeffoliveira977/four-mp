@@ -98,7 +98,7 @@ void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex)
 	if(SQ_SUCCEEDED(sq_get(v,-2))) { 
 		sq_pushroottable(v); 
 		sq_pushinteger(v,playerindex); 
-		sq_call(v,3,0,0); 
+		sq_call(v,2,0,0); 
 	}
 	sq_settop(v,top); 
 }

@@ -10,6 +10,7 @@
 #include "ServerCore.h"
 #include "PlayerManager.h"
 #include "VehicleManager.h"
+#include "logging.h"
 
 extern ServerCore server;
 extern PlayerManager playm;
@@ -114,18 +115,22 @@ void sq_SetGameTime(HSQUIRRELVM v)
 	int h, m;
 	sq_getinteger(v, 2, &h);
 	sq_getinteger(v, 3, &m);
+
+	PrintToServer("Time: %d %d", h, m);
+
+	server.SetTime(h, m);
 }
 
 void sq_GetGameHour(HSQUIRRELVM v)
 {
-	int h, m;
+	unsigned char h, m;
 	server.GetTime(&h, &m);
 	sq_pushinteger(v, h);
 }
 
 void sq_GetGameMinutes(HSQUIRRELVM v)
 {
-	int h, m;
+	unsigned char h, m;
 	server.GetTime(&h, &m);
 	sq_pushinteger(v, m);
 }

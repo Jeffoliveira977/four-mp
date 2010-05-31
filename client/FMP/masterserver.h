@@ -59,6 +59,7 @@ class MasterServer
 
 	std::vector<MasterServerInfo*> slist;
 	MasterUserInfo *user;
+	char error[128];
 
 	MasterServerStates state;
 protected:
@@ -74,6 +75,7 @@ public:
 	void Load();
 
 	void ClearServerList();
+	char * GetError();
 
 	bool QueryServerList(bool ban = 0, bool vip = 0, bool empty = 0, bool full = 0, bool password = 1, const char *clan = 0, const char *name = 0, const char *mode = 0, const char *loc = 0);
 	bool QueryUserLogin(const char *login, const char *password);
@@ -93,4 +95,5 @@ public:
 	MasterUserInfo *GetUserInfo();
 	int GetUserId();
 	char *GetUserName();
+	char *GetUserSession();
 };

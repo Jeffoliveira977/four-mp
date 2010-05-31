@@ -86,7 +86,7 @@ private:
 	{
 		SystemAddress address;
 		char name[MAX_PLAYER_NAME_LENGTH];
-		unsigned int sessionkey;
+		char sessionkey[33];
 	};
 	union NetworkRPCUnion
 	{
@@ -130,6 +130,8 @@ private:
 	NetworkVehicleFullUpdateData *GetVehicleFullUpdateData(const short index);
 	template <typename DATATYPE>
 	void SendDataToAll(const char *RPC, const DATATYPE *data);
+	template <typename DATATYPE>
+	void SendDataToOne(const char *RPC, const short index, const DATATYPE *data);
 	template <typename DATATYPE>
 	void SendDataToAllExceptOne(const char *RPC, const short index, const DATATYPE *data);
 	//void SendClassInfo(const short client);

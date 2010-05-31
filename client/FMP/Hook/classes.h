@@ -177,7 +177,7 @@ public:
 	void CreateCar(short index, unsigned int model, float position[3], float angle, unsigned char color[2]);
 
 	// -- Other players sync
-	void PlayerConnect(char *name, short index, unsigned int model, float position[3]);
+	void PlayerConnect(char *name, short index, unsigned int model, float position[3], bool start = 0);
 	bool SafeCreatePlayer(short index);
 
 	void PlayerDisconnect(short index);

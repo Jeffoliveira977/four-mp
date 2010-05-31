@@ -1023,10 +1023,10 @@ namespace Natives
     static void DisplayRadar(bool display) { NativeInvoke::Invoke<NATIVE_DISPLAY_RADAR, ScriptVoid>(display); }
     static void DisplaySniperScopeThisFrame() { NativeInvoke::Invoke<NATIVE_DISPLAY_SNIPER_SCOPE_THIS_FRAME, ScriptVoid>(); }
     static void DoAutoSave() { NativeInvoke::Invoke<NATIVE_DO_AUTO_SAVE, ScriptVoid>(); }
-    //static void DoScreenFadeIn(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_IN, ScriptVoid>(timeMS); }
-    //static void DoScreenFadeInUnhacked(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_IN_UNHACKED, ScriptVoid>(timeMS); }
-    //static void DoScreenFadeOut(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_OUT, ScriptVoid>(timeMS); }
-    //static void DoScreenFadeOutUnhacked(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_OUT_UNHACKED, ScriptVoid>(timeMS); }
+    static void DoScreenFadeIn(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_IN, ScriptVoid>(timeMS); }
+    static void DoScreenFadeInUnhacked(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_IN_UNHACKED, ScriptVoid>(timeMS); }
+    static void DoScreenFadeOut(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_OUT, ScriptVoid>(timeMS); }
+    static void DoScreenFadeOutUnhacked(unsigned int timeMS) { NativeInvoke::Invoke<NATIVE_DO_SCREEN_FADE_OUT_UNHACKED, ScriptVoid>(timeMS); }
     static void DrawRect(float x1, float y1, float x2, float y2, unsigned char r, unsigned char g, unsigned char b, unsigned char a) { NativeInvoke::Invoke<NATIVE_DRAW_RECT, ScriptVoid>(x1, y1, x2, y2, r, g, b, a); }
     static void EnableMaxAmmoCap(bool enable) { NativeInvoke::Invoke<NATIVE_ENABLE_MAX_AMMO_CAP, ScriptVoid>(enable); }
     static void EnablePoliceScanner() { NativeInvoke::Invoke<NATIVE_ENABLE_POLICE_SCANNER, ScriptVoid>(); }
@@ -1094,11 +1094,11 @@ namespace Natives
     static bool IsPayNSprayActive() { return NativeInvoke::Invoke<NATIVE_IS_PAY_N_SPRAY_ACTIVE, bool>(); }
     static bool IsPlayerBeingArrested() { return NativeInvoke::Invoke<NATIVE_IS_PLAYER_BEING_ARRESTED, bool>(); }
     static bool IsPlayerOnline() { return NativeInvoke::Invoke<NATIVE_IS_PLAYER_ONLINE, bool>(); }
-    //static bool IsScreenFadedIn() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADED_IN, bool>(); }
-    //static bool IsScreenFadedOut() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADED_OUT, bool>(); }
-    //static bool IsScreenFading() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING, bool>(); }
-    //static bool IsScreenFadingIn() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING_IN, bool>(); }
-    //static bool IsScreenFadingOut() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING_OUT, bool>(); }
+    static bool IsScreenFadedIn() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADED_IN, bool>(); }
+    static bool IsScreenFadedOut() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADED_OUT, bool>(); }
+    static bool IsScreenFading() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING, bool>(); }
+    static bool IsScreenFadingIn() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING_IN, bool>(); }
+    static bool IsScreenFadingOut() { return NativeInvoke::Invoke<NATIVE_IS_SCREEN_FADING_OUT, bool>(); }
     static bool IsSniperInverted() { return NativeInvoke::Invoke<NATIVE_IS_SNIPER_INVERTED, bool>(); }
     static bool IsSystemUIShowing() { return NativeInvoke::Invoke<NATIVE_IS_SYSTEM_UI_SHOWING, bool>(); }
     static bool IsThisAMinigameScript() { return NativeInvoke::Invoke<NATIVE_IS_THIS_A_MINIGAME_SCRIPT, bool>(); }
