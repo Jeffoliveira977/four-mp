@@ -87,6 +87,7 @@ void NetworkManager::Load(void)
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerComponentsChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveGameTime);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerChat);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerPosition);
 
 	net = RakNetworkFactory::GetRakPeerInterface();
 	SocketDescriptor socketDescriptor(0,0);
@@ -134,6 +135,7 @@ void NetworkManager::Tick(void)
 			{
 #if defined (FMP_CLIENT)
 				Log::Info("You have been kicked from the server.");
+				HOOK.PlayerDisconnect(client.GetIndex());
 				client.SetGameState(GameStateOffline);
 #elif defined (FMP_CONSOLE_CLIENT)
 				PrintToConsole("You have been kicked from the server.");
@@ -152,6 +154,7 @@ void NetworkManager::Tick(void)
 			{
 #if defined (FMP_CLIENT)
 				Log::Info("You are banned from the server.");
+				client.SetGameState(GameStateOffline);
 				client.SetGameState(GameStateOffline);
 #elif defined (FMP_CONSOLE_CLIENT)
 				PrintToConsole("You are banned from the server.");
@@ -327,7 +330,6 @@ void NetworkManager::SendPlayerMove(const float speed)
 {
 	NetworkPlayerMoveData data;
 #if defined (FMP_CLIENT)
-	Log::Debug("Sending player move");
 	memcpy(data.position, gPlayer[client.GetIndex()].position, sizeof(float) * 3);
 	data.angle = gPlayer[client.GetIndex()].angle;
 	data.speed = speed;
@@ -467,6 +469,7 @@ void NetworkManager::RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 
 	//After that, server should send full update.
 	if (strcmp(data.sessionkey, client.GetSessionKey()) != 0)
 	{
+		Log::Error("Bad session");
 		return;
 	}
 	clientid.localSystemAddress = data.index + 1;
@@ -474,6 +477,18 @@ void NetworkManager::RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 
 
 	Log::Info("My ID: %d", data.index);
 	client.SetIndex(data.index);
+
+	NetworkPlayerConnectionRequestData data2;
+
+	data2.protocol = PROTOCOL_VERSION;
+	char *name = client.GetName();
+	strcpy(data2.name, name);
+	free(name);
+	strcpy(data2.sessionkey, client.GetSessionKey());
+	data2.sessionkey[32] = 0;
+	data2.fmpid = client.GetFMPID();
+
+	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionNextRequest", serverid, data2, rpc3);
 }
 
 void NetworkManager::RecieveClientDisconnection(NetworkPlayerDisconnectionData data, RakNet::RPC3 *serverrpc3)
@@ -570,6 +585,11 @@ void NetworkManager::RecieveGameTime(NetworkTimeData data, RakNet::RPC3 *serverr
 {
 	Log::Info("TimeDataTimeDataTimeDataTimeDataTimeDataTimeData");
 	this->WriteToRPCBuffer(NetworkRPCTime, &data);
+}
+
+void NetworkManager::RecievePlayerPosition(NetworkPlayerPositionData data, RakNet::RPC3 *serverrpc3)
+{
+	this->WriteToRPCBuffer(NetworkRPCPlayerPosition, &data);
 }
 
 template <typename DATATYPE>
@@ -717,6 +737,12 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 		{
 			rpcbuffer[rpcbuffersize].data.time = (NetworkTimeData *)new DATATYPE;
 			memcpy(rpcbuffer[rpcbuffersize].data.time, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerPosition:
+		{
+			rpcbuffer[rpcbuffersize].data.playerpos = (NetworkPlayerPositionData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerpos, data, sizeof(DATATYPE));
 			break;
 		}
 	}
@@ -1019,6 +1045,14 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			delete data->time;
 			break;
 		}
+	case NetworkRPCPlayerPosition:
+		{
+#if defined (FMP_CLIENT)
+			HOOK.SetPosition(data->playerpos->client, data->playerpos->pos, data->playerpos->angle);
+#endif
+			delete data->playerpos;
+			break;
+		}
 	}
 }
 
@@ -1140,6 +1174,11 @@ void NetworkManager::FreeRPCBuffer(void)
 		case NetworkRPCTime:
 			{
 				delete rpcbuffer[i].data.time;
+				break;
+			}
+		case NetworkRPCPlayerPosition:
+			{
+				delete rpcbuffer[i].data.playerpos;
 				break;
 			}
 		}

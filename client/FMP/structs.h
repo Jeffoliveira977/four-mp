@@ -52,7 +52,8 @@ struct FVehicle
 	bool doorexists[6];
 	bool doorlock[6];
 	float doorangle[6];
-	unsigned char color[2];
+	unsigned char color[4];
+	bool sirenon;
 };
 
 class COLOR
