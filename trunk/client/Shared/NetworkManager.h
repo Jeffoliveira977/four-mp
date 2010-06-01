@@ -43,6 +43,7 @@ public:
 	void RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 *serverrpc3);
 	void RecieveNewVehicle(NetworkVehicleFullUpdateData data, RakNet::RPC3 *serverrpc3);
 	void RecieveGameTime(NetworkTimeData data, RakNet::RPC3 *serverrpc3);
+	void RecievePlayerPosition(NetworkPlayerPositionData data, RakNet::RPC3 *serverrpc3);
 
 	void SendClientConnectionRequest(void);
 	void SendPlayerMove(const float speed);
@@ -89,7 +90,8 @@ private:
 		NetworkRPCPlayerComponentsChange,
 		NetworkRPCPlayerChat,
 		NetworkRPCNewVehicle,
-		NetworkRPCTime
+		NetworkRPCTime,
+		NetworkRPCPlayerPosition
 	};
 	union NetworkRPCUnion
 	{
@@ -115,6 +117,7 @@ private:
 		NetworkPlayerChatData *playerchat;
 		NetworkVehicleFullUpdateData *newvehicle;
 		NetworkTimeData *time;
+		NetworkPlayerPositionData *playerpos;
 	};
 	struct NetworkRPCData
 	{

@@ -244,10 +244,14 @@ void PlayerManager::SetPlayerSpawnPos(const short index, const float pos[4])
 void PlayerManager::SetPlayerModel(const short index, const unsigned int model)
 {
 	playerbuffer[index]->model = model;
+	if(!playerbuffer[index]->want_spawn) 
+		nm.SendPlayerModel(index, model);
 }
 void PlayerManager::SetPlayerPosition(const short index, const float pos[3])
 {
 	memcpy(playerbuffer[index]->position, pos, sizeof(float)*3);
+	if(!playerbuffer[index]->want_spawn)
+		nm.SendPlayerPosition(index, pos, playerbuffer[index]->angle);
 }
 
 bool PlayerManager::AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index)

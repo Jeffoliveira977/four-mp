@@ -72,6 +72,7 @@ void NetworkManager::Load(const short maxclients, const unsigned short port)
 	rpc3 = new RakNet::RPC3;
 	rpc3->SetNetworkIDManager(manager);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnectionRequest);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnectionNextRequest);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerMove);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerJump);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerDuck);
@@ -278,6 +279,17 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 	this->WriteToRPCBuffer(NetworkRPCPlayerConnectionRequest, &data2);
 }
 
+void NetworkManager::RecieveClientConnectionNextRequest(NetworkPlayerConnectionRequestData data, RakNet::RPC3 *clientrpc3)
+{
+	NetworkPlayerConnectionRequestDataInternal data2;
+	data2.address = clientrpc3->GetLastSenderAddress();
+	strcpy(data2.name, data.name);
+	strcpy(data2.sessionkey, data.sessionkey);
+	PrintToServer("NEXT: %s %s %s", data2.name, data2.sessionkey, clientrpc3->GetLastSenderAddress().ToString());
+
+	this->WriteToRPCBuffer(NetworkRPCPlayerConnectionNextRequest, &data2);
+}
+
 void NetworkManager::RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *clientrpc3)
 {
 	short client = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
@@ -467,6 +479,27 @@ bool NetworkManager::SendTime(const int h, const int m)
 	return true;
 }
 
+bool NetworkManager::SendPlayerPosition(const short index, const float pos[3], const float angle)
+{
+	NetworkPlayerPositionData data;
+	data.client = index;
+	memcpy(data.pos, pos, 3 * sizeof(float));
+	data.angle = angle;
+
+	SendDataToAll("&NetworkManager::RecievePlayerPosition", &data);
+	return true;
+}
+
+bool NetworkManager::SendPlayerModel(const short index, const unsigned int model)
+{
+	NetworkPlayerModelChangeData data;
+	data.client = index;
+	data.model = model;
+
+	SendDataToAll("&NetworkManager::RecievePlayerModelChange", &data);
+	return true;
+}
+
 template <typename DATATYPE>
 void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type, const DATATYPE *data)
 {
@@ -488,6 +521,12 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 		{
 			rpcbuffer[rpcbuffersize].data.playerconnectionrequest = (NetworkPlayerConnectionRequestDataInternal *)new DATATYPE;
 			memcpy(rpcbuffer[rpcbuffersize].data.playerconnectionrequest, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerConnectionNextRequest:
+		{
+			rpcbuffer[rpcbuffersize].data.playerconnectionnextrequest = (NetworkPlayerConnectionRequestDataInternal *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerconnectionnextrequest, data, sizeof(DATATYPE));
 			break;
 		}
 	case NetworkRPCPlayerMove:
@@ -626,6 +665,16 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			strcpy(infodata.sessionkey, data->playerconnectionrequest->sessionkey);
 			rpc3->CallCPP("&NetworkManager::RecieveClientInfo", defaultclientid, infodata, rpc3);
 
+			delete data->playerconnectionrequest; 
+			break;
+		}
+	case NetworkRPCPlayerConnectionNextRequest:
+		{
+			short client = this->GetClientIndex( data->playerconnectionnextrequest->address );
+			if(client == INVALID_PLAYER_INDEX) break;
+
+			PrintToServer("Next connect %d", client);
+
 			NetworkTimeData timedata;
 			server.GetTime(&timedata.hour, &timedata.minute);
 			this->SendDataToOne("&NetworkManager::RecieveGameTime", client, &timedata);
@@ -658,18 +707,18 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			if (playerdata == NULL)
 			{
 				PrintToServer("Bad");
-				this->SendConnectionError(data->playerconnectionrequest->address, NetworkPlayerConnectionErrorAllocationError);
-				net->CloseConnection(data->playerconnectionrequest->address, true);
+				this->SendConnectionError(data->playerconnectionnextrequest->address, NetworkPlayerConnectionErrorAllocationError);
+				net->CloseConnection(data->playerconnectionnextrequest->address, true);
 				delete clientbuffer[client];
 				clientbuffer[client] = NULL;
-				delete data->playerconnectionrequest;
+				delete data->playerconnectionnextrequest;
 				return;
 			}
 			this->SendDataToAll("&NetworkManager::RecieveClientConnection", playerdata);
 			delete playerdata;
 			this->UpdateServerInfo();
 
-			delete data->playerconnectionrequest;
+			delete data->playerconnectionnextrequest;
 			break;
 		}
 	case NetworkRPCPlayerMove:
@@ -885,10 +934,12 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			playm.playerbuffer[data->playerspawnrequest->client]->armor = 0;
 			playm.playerbuffer[data->playerspawnrequest->client]->health = 200;
 			playm.playerbuffer[data->playerspawnrequest->client]->room = 0;
+			playm.playerbuffer[data->playerspawnrequest->client]->want_spawn = 1;
 
 			PrintToServer("Spawn RPC %d", data->playerspawnrequest->client);
 			vmm.OnPlayerSpawn(data->playerspawnrequest->client);
 
+			playm.playerbuffer[data->playerspawnrequest->client]->want_spawn = 0;
 			data2.armor = playm.playerbuffer[data->playerspawnrequest->client]->armor;
 			data2.health = playm.playerbuffer[data->playerspawnrequest->client]->health;
 			data2.model = playm.playerbuffer[data->playerspawnrequest->client]->model;
@@ -975,6 +1026,11 @@ void NetworkManager::FreeRPCBuffer(void)
 		case NetworkRPCPlayerConnectionRequest:
 			{
 				delete rpcbuffer[i].data.playerconnectionrequest;
+				break;
+			}
+		case NetworkRPCPlayerConnectionNextRequest:
+			{
+				delete rpcbuffer[i].data.playerconnectionnextrequest;
 				break;
 			}
 		case NetworkRPCPlayerMove:

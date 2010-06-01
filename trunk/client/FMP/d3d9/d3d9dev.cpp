@@ -525,6 +525,8 @@ ULONG APIENTRY hkIDirect3DDevice9::Release()
 HRESULT APIENTRY hkIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresentationParameters) 
 {
 	Gui.OnLostDevice();
+	if(fFMP) fFMP->OnLostDevice();
+	if(fChat) fChat->OnLostDevice();
 
 	HRESULT hRet = m_pD3Ddev->Reset(pPresentationParameters);
 	Log::Info("Reset: %d %d", pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight );
@@ -534,6 +536,8 @@ HRESULT APIENTRY hkIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresentationP
 	{
 		m_PresentParam = *pPresentationParameters;
 		Gui.OnResetDevice();
+		if(fFMP) fFMP->OnResetDevice();
+		if(fChat) fChat->OnResetDevice();
 		g_bDeviceLost = 0;
 	}
 
@@ -716,10 +720,10 @@ HRESULT APIENTRY hkIDirect3DDevice9::SetVertexShaderConstantI(UINT StartRegister
 
 HRESULT APIENTRY hkIDirect3DDevice9::SetViewport(CONST D3DVIEWPORT9 *pViewport) 
 {
-	if(pViewport->X == 0 && pViewport->Y == 0)
+	/*if(pViewport->X == 0 && pViewport->Y == 0)
 	{
 		Gui.Resize( pViewport->Width - pViewport->X, pViewport->Height - pViewport->Y );
-	}
+	}*/
 	return m_pD3Ddev->SetViewport(pViewport);
 }
 

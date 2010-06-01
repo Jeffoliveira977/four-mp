@@ -183,3 +183,10 @@ struct NetworkTimeData
 {
 	unsigned char hour, minute;
 };
+
+struct NetworkPlayerPositionData
+{
+	short client;
+	float pos[3];
+	float angle;
+};

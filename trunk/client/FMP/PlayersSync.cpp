@@ -51,9 +51,7 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float p
 			client.SetInputState(InputStateGame);
 			
 			InputFreeze(0);
-			SetFreeCam(0);
-
-			Natives::DoScreenFadeOut(1000);
+			//SetFreeCam(0);
 
 			Log::Debug("PlayerConnect: %s", "fastEnd");
 			return;
@@ -145,7 +143,7 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 
 	float lx,ly,lz;
 	Natives::GetCharCoordinates(gPlayer[index].PedID, &lx, &ly, &lz);
-	Log::Info("GETCOORD");
+
 	float d = GetDist(lx, ly, lz, position[0], position[1], position[2]);
 	if(gPlayer[index].vehicleindex == -1) // Если пешком
 	{
@@ -182,13 +180,15 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 				Log::Info("PORTAL or TIMESHIFT");
 			}
 		}
-		Log::Info("MOVE %f=(%f) %d", speed, d, ms);
+
 		Natives::TaskGoStraightToCoord(gPlayer[index].PedID, position[0], position[1], position[2], ms, 45000);
 		wait(1);
 		memcpy(gPlayer[index].position, position, sizeof(float) * 3);
 	}
 	else // Если на машине
 	{
+		if(!SafeCheckVehicle(gPlayer[index].vehicleindex)) return;
+
 		int vect = 1;
 		if(speed < 0) { vect = 2; speed = speed*-1; }
 		if(speed * 3 < d)
@@ -204,6 +204,18 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 
 void FMPHook::PlayerDisconnect(short index)
 {
+	if(index == client.GetIndex())
+	{
+		SafeCleanPlayers();
+		SafeCleanVehicles();
+
+		client.SetIndex(-1);
+
+		client.SetGameState(GameStateOffline);
+		client.SetInputState(InputStateGui);
+		return;
+	}
+
 	if(!SafeCheckPlayer(index)) return;
 
 	Log::Info("DELETE CHAR %d", index);
@@ -263,24 +275,31 @@ void FMPHook::PlayerSwapGun(short index, int gun)
 	Natives::TaskSwapWeapon(gPlayer[index].PedID, (eWeapon)gun);
 }
 
-void FMPHook::PlayerSyncSkin(short index, int skin)
+void FMPHook::SetPosition(short index, float pos[3], float angle)
+{
+	if(!SafeCheckPlayer(index)) return;
+
+	memcpy(gPlayer[index].position, pos, 3 * sizeof(float));
+	gPlayer[index].angle = angle;
+
+	Natives::SetCharCoordinates(gPlayer[index].PedID, pos[0], pos[1], pos[2]);
+	Natives::SetCharHeading(gPlayer[index].PedID, angle);
+}
+
+void FMPHook::PlayerSyncSkin(short index, unsigned int skin)
 {
 	if(!SafeCheckPlayer(index)) return;
 
 	Log::Info("Player Sync Skin START");
-	//Totally bug here.
 	if(index == client.GetIndex())
 	{
-		Natives::RequestModel((eModel)skin);
-		while(!Natives::HasModelLoaded((eModel)skin)) wait(0);
-		Natives::ChangePlayerModel(_GetPlayer(), (eModel)skin);
+		SafeChangeModel(skin);
 	}
 	else
 	{
-		/*Natives::RequestModel((eModel)skin);
-		while(!Natives::HasModelLoaded((eModel)skin)) wait(0);
-		Natives::ChangePlayerModel(_GetPlayer(), (eModel)skin);*/
-		Log::Warning("Other player can't change model");
+		Natives::DeleteChar(&gPlayer[index].PedID);
+		gPlayer[index].model = skin;
+		SafeCreatePlayer(index);
 	}
 	Log::Info("Player Sync Skin END");
 }
@@ -301,7 +320,7 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	if(data.client == client.GetIndex()) 
 	{
 		Log::Info("Its me");
-		if(gPlayer[client.GetIndex()].sync_state == 1) Natives::DoScreenFadeIn(1000);
+		if(gPlayer[client.GetIndex()].sync_state == 1) SetFreeCam(0);
 		gPlayer[client.GetIndex()].sync_state = 0;
 		gPlayer[data.client].want_spawn = 1;
 		return;
@@ -314,6 +333,8 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	Log::Info("Player Spawn START");
 
 	Ped old = gPlayer[data.client].PedID;
+	
+	SafeRequestModel(data.model);
 	Natives::CreateChar(1, (eModel)data.model, data.position[0], data.position[1], data.position[2], &gPlayer[data.client].PedID, 1);
 
 	while(!Natives::DoesCharExist(gPlayer[data.client].PedID)) wait(0);

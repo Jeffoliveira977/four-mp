@@ -37,9 +37,15 @@ void sq_GetPlayerPosition(HSQUIRRELVM v)
 		sq_pushnull(v);
 		return;
 	}
+
+	sq_newarray(v, 0);
 	sq_pushfloat(v, pos[0]);
+	sq_arrayappend(v, -2);
 	sq_pushfloat(v, pos[1]);
+	sq_arrayappend(v, -2);
 	sq_pushfloat(v, pos[2]);
+	sq_arrayappend(v, -2);
+	sq_push(v, -1);
 }
 
 void sq_GetPlayerAngle(HSQUIRRELVM v)

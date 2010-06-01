@@ -104,9 +104,8 @@ void FMPHook::CarDoSync()
 		{
 			short carid;
 			float x, y, z;
-			Log::Info("PED");
 			Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &x, &y, &z);
-			Log::Info("GETCOORD");
+
 			carid = _GetClosestCar(x, y, z, 10);
 			if(carid != -1)
 			{
@@ -126,14 +125,12 @@ void FMPHook::CarDoSync()
 	}
 	else if(GetAsyncKeyState(71) != 0 && !Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && myEnter == 0)
 	{
-		Log::Info("GGGGG");
 		short carid;
 		char seatid = 0; 
 		unsigned int max;
 		float x, y, z;
-		Log::Info("CARPED");
 		Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &x, &y, &z);
-		Log::Info("GETCOORD");
+
 		carid = _GetClosestCar(x, y, z, 10);
 		if(carid != -1)
 		{

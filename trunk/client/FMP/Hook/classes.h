@@ -160,25 +160,36 @@ public:
 	void GetMyPos();
 	void SetMyPos(float x, float y, float z);
 	void KillMe();
-	bool SafeCheckPlayer(short index, bool bReCreateOnFalse = 1);
-	void CheckAndCheck();
 	void SetFreeCam(bool);
 	bool IsFreeCam();
 
 	void GetTime();
 	void SetTimeScale(float ts);
 
-	void SetTime(int h, int m);
+	// -- Safe func
+	void CheckAndCheck();
+	bool SafeCheckPlayer(short index, bool bReCreateOnFalse = 1);
+	bool SafeCreatePlayer(short index);
+	bool SafeCheckVehicle(short index, bool bReCreateOnFalse = 1);
+	bool SafeCreateVehicle(short index);
+	bool SafeChangeModel(unsigned int model);
+	void SafeCleanVehicles();
+	void SafeCleanPlayers();
+	void SafeRequestModel(unsigned int model);
 
 	// -- Start mp
 	void RunMP();
+
+	// -- Script natives player
+	void SetPosition(short index, float pos[3], float angle);
+	// -- Scripting natives game
+	void SetTime(int h, int m);
 
 	// -- Car sync
 	void CreateCar(short index, unsigned int model, float position[3], float angle, unsigned char color[2]);
 
 	// -- Other players sync
 	void PlayerConnect(char *name, short index, unsigned int model, float position[3], bool start = 0);
-	bool SafeCreatePlayer(short index);
 
 	void PlayerDisconnect(short index);
 	void PlayerMove(short index, float position[3], float speed);
@@ -191,7 +202,7 @@ public:
 	void ExitFromVehicle(short index);
 	void EnterInVehicle(short index, int, int);
 
-	void PlayerSyncSkin(short index, int);
+	void PlayerSyncSkin(short index, unsigned int);
 	void PlayerSyncSkinVariation(short index, int*, int*);
 
 	void xPlayerSpawn(NetworkPlayerSpawnData data);

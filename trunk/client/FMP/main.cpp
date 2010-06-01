@@ -266,8 +266,123 @@ bool FMPHook::SafeCheckPlayer(short index, bool bReCreateOnFalse)
 	return 1;
 }
 
+bool FMPHook::SafeCreateVehicle(short index)
+{
+	Log::Info("SafeCreateVehicle requested");
+
+	if(gCar[index].exist == 0) 
+	{
+		Log::Warning("Haven't vehicle data for create");
+		return 0;
+	}
+
+	if(Natives::DoesVehicleExist(gCar[index].CarID))
+	{
+		Log::Warning("Vehicle already exist");
+		return 0;
+	}
+	
+	if(!Natives::IsThisModelAVehicle((eModel)gCar[index].model))
+	{
+		Log::Warning("This model not a vehicle");
+		return 0;
+	}
+
+	Natives::RequestModel((eModel)gCar[index].model);
+	while(!Natives::HasModelLoaded((eModel)gCar[index].model)) wait(0);
+
+	Natives::CreateCar(gCar[index].model, gCar[index].position[0], gCar[index].position[1], gCar[index].position[2], &gCar[index].CarID, 1);
+
+	while(!Natives::DoesVehicleExist(gCar[index].CarID)) wait(0);
+
+	Natives::SetCarHeading(gCar[index].CarID, gCar[index].angle);
+	Natives::SetCarHealth(gCar[index].CarID, gCar[index].health);
+	Natives::SetEngineHealth(gCar[index].CarID, gCar[index].enginehealth);
+	Natives::SetExtraCarColours(gCar[index].CarID, gCar[index].color[2], gCar[index].color[3]);
+	Natives::ChangeCarColour(gCar[index].CarID, gCar[index].color[0], gCar[index].color[1]);
+
+	for(int i = 0; i < 6; i++)
+		if(gCar[index].doorexists[i] == 0)
+			Natives::BreakCarDoor(gCar[index].CarID, (eVehicleDoor)i, 0);
+
+	for(int i = 0; i < 6; i++)
+		Natives::ControlCarDoor(gCar[index].CarID, (eVehicleDoor)i, gCar[index].doorlock[i], gCar[index].doorangle[i]);
+
+	for(int i = 0; i < 5; i++)
+		if(gCar[index].doorlock[i])
+			Natives::LockCarDoors(gCar[index].CarID, (eVehicleDoorLock)i);
+
+	return Natives::DoesVehicleExist( gCar[index].CarID );
+}
+
+bool FMPHook::SafeCheckVehicle(short index, bool bReCreateOnFalse)
+{
+	if(gCar[index].exist == 0) 
+	{
+		Log::Error("Vehicle not created");
+		return 0;
+	}
+	if(!Natives::DoesVehicleExist(gCar[index].CarID))
+	{
+		Log::Error("Vehicle doesn't exist");
+		if(bReCreateOnFalse) return SafeCreateVehicle(index);
+		return 0;
+	}
+
+	return 1;
+}
+
+bool FMPHook::SafeChangeModel(unsigned int model)
+{
+	Natives::RequestModel((eModel)model);
+	while(!Natives::HasModelLoaded((eModel)model)) wait(0);
+	Natives::ChangePlayerModel(_GetPlayer(), (eModel)model);
+
+	return 1;
+}
+
+void FMPHook::SafeCleanPlayers()
+{
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(!gPlayer[i].connected) continue;
+		if(i == client.GetIndex()) continue;
+
+		if(Natives::DoesCharExist(gPlayer[i].PedID))
+			Natives::DeleteChar(&gPlayer[i].PedID);
+	}
+
+	memset(gPlayer, 0, sizeof(FPlayer) * MAX_PLAYERS);
+}
+
+void FMPHook::SafeCleanVehicles()
+{
+	for(int i = 0; i < MAX_CARS; i++)
+	{
+		if(!gCar[i].exist) continue;
+		if(Natives::DoesVehicleExist(gCar[i].CarID))
+			Natives::DeleteCar(&gCar[i].CarID);
+	}
+
+	memset(gCar, 0, sizeof(FVehicle) * MAX_CARS);
+}
+
+void FMPHook::SafeRequestModel(unsigned int model)
+{
+	Natives::RequestModel((eModel)model);
+	while(!Natives::HasModelLoaded((eModel)model)) wait(0);
+}
+
 void FMPHook::CheckAndCheck()
 {
+	for(short i = 0; i < MAX_CARS; i++)
+		if(gCar[i].exist)
+			if(!Natives::DoesVehicleExist( gCar[i].CarID ))
+			{
+				Log::Warning("Check: Car not exist");
+				SafeCreateVehicle(i);
+			}
+
 	for(short i = 0; i < MAX_PLAYERS; i++)
 		if(gPlayer[i].connected)
 			if(!Natives::DoesCharExist( gPlayer[i].PedID ))
@@ -481,10 +596,7 @@ void FMPHook::GameThread()
 
 					short index = client.GetIndex();
 
-					Natives::RequestModel((eModel)gPlayer[index].model);
-					while(!Natives::HasModelLoaded((eModel)gPlayer[index].model)) wait(0);
-
-					Natives::ChangePlayerModel(_GetPlayer(), (eModel)gPlayer[index].model);
+					SafeChangeModel(gPlayer[index].model);
 
 					Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
 
@@ -596,10 +708,7 @@ void MainThread(void* dummy)
 	concore.AddConCmd("time", GetTime);
 	concore.AddConCmd("ts", SetTS);
 
-	for(int i = 0; i < MAX_PLAYERS; i++)
-	{
-		memset(&gPlayer[i], 0, sizeof(FPlayer));
-	}
+	memset(&gPlayer, 0, sizeof(FPlayer) * MAX_PLAYERS);
 
 	Sleep(10000);
 	HOOK.AttachGtaThread("FOURMP");

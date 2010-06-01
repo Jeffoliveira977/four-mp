@@ -58,6 +58,7 @@ private:
 		unsigned char color[4]; ///< Holds the color of the player.
 		int compT[11], compD[11];
 		float spawn_pos[4];
+		bool want_spawn;
 	};
 	short maxplayerbuffersize;
 	short playerbuffersize;
