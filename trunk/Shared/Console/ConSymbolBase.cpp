@@ -16,17 +16,17 @@ ConSymbolBase::~ConSymbolBase(void)
 {
 }
 
-char *ConSymbolBase::GetName(void)
+conchar *ConSymbolBase::GetName(void)
 {
-	char *tempname = (char *)calloc(strlen(name) + 1, sizeof(char));
-	strcpy(tempname, name);
+	conchar *tempname = (conchar *)calloc(con_strlen(name) + 1, sizeof(conchar));
+	con_strcpy(tempname, name);
 	return tempname;
 }
 
-char *ConSymbolBase::GetDescription(void)
+conchar *ConSymbolBase::GetDescription(void)
 {
-	char *tempdescription = (char *)calloc(strlen(description) + 1, sizeof(char));
-	strcpy(tempdescription, description);
+	conchar *tempdescription = (conchar *)calloc(con_strlen(description) + 1, sizeof(conchar));
+	con_strcpy(tempdescription, description);
 	return tempdescription;
 }
 
@@ -40,13 +40,13 @@ void ConSymbolBase::SetFlags(const int f)
 	flags = f;
 }
 
-void ConSymbolBase::Init(ConsoleCore *core, const char *symbolname, const char *desc, const int symbolflags)
+void ConSymbolBase::Init(ConsoleCore *core, const conchar *symbolname, const conchar *desc, const int symbolflags)
 {
 	concore = core;
-	name = (char *)calloc(strlen(symbolname) + 1, sizeof(char));
-	strcpy(name, symbolname);
-	description = (char *)calloc(strlen(desc) + 1, sizeof(char));
-	strcpy(description, desc);
+	name = (conchar *)calloc(con_strlen(symbolname) + 1, sizeof(conchar));
+	con_strcpy(name, symbolname);
+	description = (conchar *)calloc(con_strlen(desc) + 1, sizeof(conchar));
+	con_strcpy(description, desc);
 	flags = symbolflags;
 }
 

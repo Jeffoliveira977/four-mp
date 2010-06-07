@@ -34,7 +34,7 @@ public:
 	/// \brief Loads the game mode.
 	/// \param[in] string Filename of the game mode.
 	/// \return True on success, false otherwise.
-	bool LoadGameMode(const char *string);
+	bool LoadGameMode(const wchar_t *string);
 
 	/// \brief Unloads the game mode.
 	/// \return True on success, false otherwise.
@@ -42,7 +42,7 @@ public:
 
 	/// \brief Returns the game mode name.
 	/// \return Game mode name on success, NULL otherwise.
-	char *GetGameModeName(void);
+	wchar_t *GetGameModeName(void);
 
 	/// \brief Returns the maximum virtual machine buffer size.
 	/// \return Maximum virtual machine buffer size.
@@ -75,12 +75,12 @@ public:
 	/// \brief Checks if the specified filterscript is loaded.
 	/// \param[in] string Filename of the filterscript.
 	/// \return True if the filterscript is loaded, false otherwise.
-	bool IsFilterScriptLoaded(const char *string);
+	bool IsFilterScriptLoaded(const wchar_t *string);
 
 	/// \brief Loads a filterscript.
 	/// \param[in] string Filename of the filterscript.
 	/// \return True on success, false otherwise.
-	bool LoadFilterScript(const char *string);
+	bool LoadFilterScript(const wchar_t *string);
 
 	/// \brief Unloads a filterscript.
 	/// \param[in] index Index of the filterscript.
@@ -105,7 +105,7 @@ public:
 	/// \brief Returns the virtual machine info string.
 	/// \param[in] index Index of the virtual machine.
 	/// \return Info string on success, NULL otherwise.
-	char *GetVirtualMachineInfoString(const unsigned char index);
+	wchar_t *GetVirtualMachineInfoString(const unsigned char index);
 
 	/// \brief Retrieves the virtual machine index by the given pointer.
 	/// \param[in] v Pointer to the virtual machine.
@@ -122,19 +122,19 @@ public:
 	/// \param[in] index Index of the virtual machine.
 	/// \param[in] string Name to set.
 	/// \return No return.
-	void SetVirtualMachineName(const unsigned char index, const char *string);
+	void SetVirtualMachineName(const unsigned char index, const wchar_t *string);
 
 	/// \brief Sets the virtual machine version.
 	/// \param[in] index Index of the virtual machine.
 	/// \param[in] string Version to set.
 	/// \return No return.
-	void SetVirtualMachineVersion(const unsigned char index, const char *string);
+	void SetVirtualMachineVersion(const unsigned char index, const wchar_t *string);
 
 	/// \brief Sets the virtual machine author.
 	/// \param[in] v Pointer to the virtual machine that calls this function.
 	/// \param[in] string Author to set.
 	/// \return No return.
-	void SetVirtualMachineAuthor(const unsigned char index, const char *string);
+	void SetVirtualMachineAuthor(const unsigned char index, const wchar_t *string);
 
 	//------------------------------------------------------------------------------------
 	// Callbacks below this line
@@ -144,7 +144,7 @@ public:
 	/// \param[in] index Index of the player.
 	/// \param[in] name Name of the player.
 	/// \return True if we let the player to connect, false otherwise.
-	bool OnPlayerConnect(const short index, const char *name);
+	bool OnPlayerConnect(const short index, const wchar_t *name);
 
 	/// \brief Called when a player is disconnecting from the server.
 	/// \param[in] index Index of the player.
@@ -160,14 +160,14 @@ public:
 	///
 	///
 	///
-	bool OnPlayerText(const short playerindex, const char *data);
+	bool OnPlayerText(const short playerindex, const wchar_t *data);
 
 	/// \brief Fires a dynamic command callback.
 	/// \param[in] index Index of the virtual machine.
 	/// \param[in] callback Name of the callback to call.
 	/// \param[in] numargs Number of arguments to pass.
 	/// \return No return.
-	void FireCommandCallback(const unsigned char index, const char *callback, const unsigned char numargs);
+	void FireCommandCallback(const unsigned char index, const wchar_t *callback, const unsigned char numargs);
 private:
 	/// \brief Indicates the language of a virtual machine.
 	enum VirtualMachineLanguage
@@ -187,12 +187,12 @@ private:
 	struct VirtualMachine
 	{
 		bool paused; ///< Holds true if the virtual machine is paused, false otherwise.
-		char *name; ///< Holds the name of the virtual machine.
-		char *version; ///< Holds the version of the virtual machine.
-		char *author; ///< Holds the author of the virtual machine.
+		wchar_t *name; ///< Holds the name of the virtual machine.
+		wchar_t *version; ///< Holds the version of the virtual machine.
+		wchar_t *author; ///< Holds the author of the virtual machine.
 		VirtualMachineLanguage lang; ///< Holds the language of the virtual machine.
 		VirtualMachinePtr ptr; ///< Holds the pointer to the language specific virtual machine.
-		char *filename; ///< Holds the filename of the virtual machine.
+		wchar_t *filename; ///< Holds the filename of the virtual machine.
 	};
 	unsigned char maxvmbuffersize; ///< Holds the maximum size of the virtual machine buffer.
 	unsigned char vmbuffersize; ///< Holds the current size of the virtual machine buffer.
@@ -202,13 +202,13 @@ private:
 	/// \param[in] index Index of the virtual machine.
 	/// \param[in] string Filename of the filterscript.
 	/// \return True on success, false otherwise.
-	bool LoadFilterScriptInternal(const unsigned char index, const char *string);
+	bool LoadFilterScriptInternal(const unsigned char index, const wchar_t *string);
 
 	/// \brief Loads a virtual machine into the specified index.
 	/// \param[in] index Index of the virtual machine.
 	/// \param[in] string Filename of the filterscript.
 	/// \return True on success, false otherwise.
-	bool LoadVirtualMachine(const unsigned char index, const char *string);
+	bool LoadVirtualMachine(const unsigned char index, const wchar_t *string);
 
 	/// \brief Unloads a virtual machine.
 	/// \param[in] index Index of the virtual machine.

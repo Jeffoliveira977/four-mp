@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iostream>
-#include <string>
 #include <fstream>
 
+#include "condefs.h"
 #include "common.h"
 #include "coreconcommands.h"
 
@@ -18,20 +18,22 @@ void ConCmdAlias(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore->Output("Current alias commands:");
-		char *aliasstring;
-		char *tempstring;
+		concore->Output(CONSTRING("Current alias commands:"));
+		conchar *aliasstring;
+		conchar *tempstring;
 		for (unsigned short i = 0; i < concore->symbolbuffersize; i++)
 		{
 			if (concore->symbolbuffer[i].type == ConsoleCore::ConsoleSymbolTypeConAlias)
 			{
 				tempstring = concore->symbolbuffer[i].ptr->conalias->GetName();
-				aliasstring = (char *)calloc(_scprintf("%s :", tempstring) + 1, sizeof(char));
-				sprintf(aliasstring, "%s :", tempstring);
+				size_t length = con_scprintf(CONSTRING("%s :"), tempstring) + 1;
+				aliasstring = (conchar *)calloc(length, sizeof(conchar));
+				con_sprintf(aliasstring, length, CONSTRING("%s :")), tempstring);
 				free(tempstring);
 				tempstring = concore->symbolbuffer[i].ptr->conalias->GetDescription();
-				ResizeBuffer<char *>(aliasstring, _scprintf("%s %s", aliasstring, tempstring) + 1);
-				sprintf(aliasstring, "%s %s", aliasstring, tempstring);
+				length = con_scprintf(CONSTRING("%s %s"), aliasstring, tempstring) + 1;
+				ResizeBuffer<conchar *>(aliasstring, length);
+				con_sprintf(aliasstring, length, CONSTRING("%s %s")), aliasstring, tempstring);
 				free(tempstring);
 				concore->Output(aliasstring);
 				free(aliasstring);
@@ -39,12 +41,12 @@ void ConCmdAlias(ConsoleCore *concore, const unsigned char numargs)
 		}
 		return;
 	}
-	char *name;
+	conchar *name;
 	if (!concore->GetCmdArg(1, name))
 	{
 		return;
 	}
-	char *commandstring;
+	conchar *commandstring;
 	if (!concore->GetCmdArg(2, commandstring))
 	{
 		concore->AddConAlias(name);
@@ -55,7 +57,7 @@ void ConCmdAlias(ConsoleCore *concore, const unsigned char numargs)
 void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 {
 	bool search = false;
-	char *searchstring;
+	conchar *searchstring;
 	if (numargs > 0)
 	{
 		if (concore->GetCmdArg(1, searchstring))
@@ -63,11 +65,11 @@ void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 			search = true;
 		}
 	}
-	concore->Output("cvar list\n--------------");
+	concore->Output(CONSTRING("cvar list\n--------------"));
 	unsigned short numfound = 0;
 	unsigned char numcmds;
-	char *symbolstring;
-	char *tempstring;
+	conchar *symbolstring;
+	conchar *tempstring;
 	for (unsigned short i = 0; i < concore->symbolbuffersize; i++)
 	{
 		//TODO: Sort alphabetically
@@ -81,39 +83,46 @@ void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 		}
 		for (unsigned char j = 0; j < numcmds; j++)
 		{
-			symbolstring = (char *)calloc(strlen(concore->symbolbuffer[i].name) + 3, sizeof(char));
-			sprintf(symbolstring, "%s	:", concore->symbolbuffer[i].name);
+			size_t length = con_strlen(concore->symbolbuffer[i].name) + 3;
+			symbolstring = (conchar *)calloc(length, sizeof(conchar));
+			con_sprintf(symbolstring, length, CONSTRING("%s	:")), concore->symbolbuffer[i].name);
 			switch (concore->symbolbuffer[i].type)
 			{
 			case ConsoleCore::ConsoleSymbolTypeConVar:
 				{
 					concore->symbolbuffer[i].ptr->convar->GetValue(tempstring);
-					ResizeBuffer<char *>(symbolstring, _scprintf("%s %s	:", symbolstring, tempstring) + 1);
-					sprintf(symbolstring, "%s %s	:", symbolstring, tempstring);
+					length = con_scprintf(CONSTRING("%s %s	:"), symbolstring, tempstring) + 1;
+					ResizeBuffer<conchar *>(symbolstring, length);
+					con_sprintf(symbolstring, length, CONSTRING("%s %s	:")), symbolstring, tempstring);
 					//TODO: flags
-					ResizeBuffer<char *>(symbolstring, strlen(symbolstring) + 3);
-					sprintf(symbolstring, "%s	:", symbolstring);
+					length = con_strlen(symbolstring) + 3;
+					ResizeBuffer<conchar *>(symbolstring, length);
+					con_sprintf(symbolstring, length, CONSTRING("%s	:")), symbolstring);
 					//TODO: flags
 					free(tempstring);
 					tempstring = concore->symbolbuffer[i].ptr->convar->GetDescription();
-					ResizeBuffer<char *>(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
-					sprintf(symbolstring, "%s %s", symbolstring, tempstring);
+					length = con_scprintf(CONSTRING("%s %s"), symbolstring, tempstring) + 1;
+					ResizeBuffer<conchar *>(symbolstring, length);
+					con_sprintf(symbolstring, length, CONSTRING("%s %s")), symbolstring, tempstring);
 					free(tempstring);
 					concore->Output(symbolstring);
 					break;
 				}
 			case ConsoleCore::ConsoleSymbolTypeConCmd:
 				{
-					ResizeBuffer<char *>(symbolstring, strlen(symbolstring) + 7);
-					sprintf(symbolstring, "%s cmd	:", symbolstring);
+					length = con_strlen(symbolstring) + 7;
+					ResizeBuffer<conchar *>(symbolstring, length);
+					con_sprintf(symbolstring, length, CONSTRING("%s cmd	:")), symbolstring);
 					//TODO: flags
-					ResizeBuffer<char *>(symbolstring, strlen(symbolstring) + 3);
-					sprintf(symbolstring, "%s	:", symbolstring);
+					length = con_strlen(symbolstring) + 3;
+					ResizeBuffer<conchar *>(symbolstring, length);
+					con_sprintf(symbolstring, length, CONSTRING("%s	:")), symbolstring);
 					//TODO: flags
 					//free(tempstring);
 					tempstring = concore->symbolbuffer[i].ptr[j].concmd->GetDescription();
-					ResizeBuffer<char *>(symbolstring, _scprintf("%s %s", symbolstring, tempstring) + 1);
-					sprintf(symbolstring, "%s %s", symbolstring, tempstring);
+					length = con_scprintf(CONSTRING("%s %s"), symbolstring, tempstring) + 1;
+					ResizeBuffer<conchar *>(symbolstring, length);
+					con_sprintf(symbolstring, length, CONSTRING("%s %s")), symbolstring, tempstring);
 					free(tempstring);
 					concore->Output(symbolstring);
 					break;
@@ -127,12 +136,12 @@ void ConCmdCvarlist(ConsoleCore *concore, const unsigned char numargs)
 			free(symbolstring);
 		}
 	}
-	concore->Output("--------------\n%d total convars/concommands", concore->symbolbuffersize);
+	concore->Output(CONSTRING("--------------\n%d total convars/concommands"), concore->symbolbuffersize);
 }
 
 void ConCmdEcho(ConsoleCore *concore, const unsigned char numargs)
 {
-	char *tempstring = concore->GetCmdArgString();
+	conchar *tempstring = concore->GetCmdArgString();
 	if (tempstring == NULL)
 	{
 		return;
@@ -145,55 +154,56 @@ void ConCmdExec(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore->Output("Usage: exec <filename>: execute a script file");
+		concore->Output(CONSTRING("Usage: exec <filename>: execute a script file"));
 		return;
 	}
-	char *tempstring = concore->GetCmdArgString();
+	conchar *tempstring = concore->GetCmdArgString();
 	if (tempstring == NULL)
 	{
-		concore->Output("Usage: exec <filename>: execute a script file");
+		concore->Output(CONSTRING("Usage: exec <filename>: execute a script file"));
 		return;
 	}
-	unsigned int length = strlen(tempstring);
-	unsigned int i = 0;
-	while ((tempstring[i] != '.') && (i < length))
+	size_t length = con_strlen(tempstring);
+	size_t i = 0;
+	while ((tempstring[i] != CONSTRING('.')) && (i < length))
 	{
 		i++;
 	}
-	char *filename;
+	conchar *filename;
 	if (i == length)
 	{
 		length = length + 4;
-		filename = (char *)calloc(length + 1, sizeof(char));
-		sprintf(filename, "%s.cfg", tempstring);
+		filename = (conchar *)calloc(length + 1, sizeof(conchar));
+		con_sprintf(filename, length + 1, CONSTRING("%s.cfg")), tempstring);
 	}
 	else
 	{
-		filename = (char *)calloc(length + 1, sizeof(char));
-		strcpy(filename, tempstring);
+		filename = (conchar *)calloc(length + 1, sizeof(conchar));
+		con_strcpy(filename, tempstring);
 	}
-	char *fullpath;
+	conchar *fullpath;
 	if (concore->execpath != NULL)
 	{
-		fullpath = (char *)calloc(_scprintf("%s%s", concore->execpath, filename) + 1, sizeof(char));
-		sprintf(fullpath, "%s%s", concore->execpath, filename);
+		size_t templength = con_scprintf(CONSTRING("%s%s"), concore->execpath, filename) + 1;
+		fullpath = (conchar *)calloc(templength, sizeof(conchar));
+		con_sprintf(fullpath, templength, CONSTRING("%s%s")), concore->execpath, filename);
 	}
 	else
 	{
-		fullpath = (char *)calloc(length + 1, sizeof(char));
-		strcpy(fullpath, filename);
+		fullpath = (conchar *)calloc(length + 1, sizeof(conchar));
+		con_strcpy(fullpath, filename);
 	}
-	fstream execfile;
+	confstream execfile;
 	execfile.open(fullpath, ios::in);
 	if (!execfile.is_open())
 	{
-		concore->Output("Couldn't exec %s", tempstring);
+		concore->Output(CONSTRING("Couldn't exec %s"), tempstring);
 		free(tempstring);
 		free(fullpath);
 		return;
 	}
-	string execstring;
-	while (getline(execfile, execstring, '\n'))
+	constring execstring;
+	while (getline(execfile, execstring, CONSTRING('\n')))
 	{
 		concore->InterpretLine(execstring.c_str());
 	}
@@ -205,22 +215,22 @@ void ConCmdFind(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs != 1)
 	{
-		concore->Output("Usage: find <string>");
+		concore->Output(CONSTRING("Usage: find <string>"));
 		return;
 	}
-	char *searchstring = concore->GetCmdArgString();
+	conchar *searchstring = concore->GetCmdArgString();
 	if (searchstring == NULL)
 	{
-		concore->Output("Usage: find <string>");
+		concore->Output(CONSTRING("Usage: find <string>"));
 		return;
 	}
 	unsigned short numsymbols = concore->GetNumberOfConsoleSymbols();
-	char *tempstring;
+	conchar *tempstring;
 	for (unsigned short i = 0; i < numsymbols; i++)
 	{
 		//TODO: Sort alphabetically
 		tempstring = concore->GetConsoleSymbolHelpStringByIndex(i);
-		if (strstr(tempstring, searchstring) != NULL)
+		if (con_strstr(tempstring, searchstring) != NULL)
 		{
 			concore->Output(tempstring);
 		}
@@ -232,19 +242,19 @@ void ConCmdHelp(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs != 1)
 	{
-		concore->Output("Usage: help <cvarname>");
+		concore->Output(CONSTRING("Usage: help <cvarname>"));
 		return;
 	}
-	char *cvarname;
+	conchar *cvarname;
 	if (!concore->GetCmdArg(1, cvarname))
 	{
-		concore->Output("Usage: help <cvarname>");
+		concore->Output(CONSTRING("Usage: help <cvarname>"));
 		free(cvarname);
 		return;
 	}
 	if (!concore->IsConsoleSymbolExist(cvarname))
 	{
-		concore->Output("help: no cvar or command named %s", cvarname);
+		concore->Output(CONSTRING("help: no cvar or command named %s"), cvarname);
 		free(cvarname);
 		return;
 	}

@@ -9,10 +9,7 @@
 #include "sq/squirrel.h"
 
 /// \brief Prints a string of text to the server console.
-void sq_PrintToServer(HSQUIRRELVM v, const SQChar *s, ...);
-
-/// \brief TODO:
-void sq_printr(HSQUIRRELVM v);
+void sq_PrintToServer(HSQUIRRELVM v, const SQChar *string, ...);
 
 /// \brief Creates a console variable and returns the handle to it.
 void sq_CreateConVar(HSQUIRRELVM v);

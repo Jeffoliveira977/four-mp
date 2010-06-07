@@ -19,17 +19,17 @@ void ConVarHookHostGamemode(ConVar *convar, const ConVarType oldtype, void *oldv
 {
 	if (newtype == ConVarTypeString)
 	{
-		ResizeBuffer<char *>(server.gamemode, strlen((char *)newvalue) + 1);
-		strcpy(server.gamemode, (char *)newvalue);
+		ResizeBuffer<conchar *>(server.gamemode, con_strlen((conchar *)newvalue) + 1);
+		con_strcpy(server.gamemode, (conchar *)newvalue);
 		return;
 	}
-	char *value;
+	conchar *value;
 	if (!convar->GetValue(value))
 	{
 		return;
 	}
-	ResizeBuffer<char *>(server.gamemode, strlen(value) + 1);
-	strcpy(server.gamemode, value);
+	ResizeBuffer<conchar *>(server.gamemode, con_strlen(value) + 1);
+	con_strcpy(server.gamemode, value);
 	free(value);
 }
 
@@ -37,21 +37,21 @@ void ConVarHookHostname(ConVar *convar, const ConVarType oldtype, void *oldvalue
 {
 	if (newtype == ConVarTypeString)
 	{
-		ResizeBuffer<char *>(server.hostname, strlen((char *)newvalue) + 1);
-		strcpy(server.hostname, (char *)newvalue);
+		ResizeBuffer<conchar *>(server.hostname, con_strlen((conchar *)newvalue) + 1);
+		con_strcpy(server.hostname, (conchar *)newvalue);
 		if (server.isrunning)
 		{
 			nm.UpdateServerInfo();
 		}
 		return;
 	}
-	char *value;
+	conchar *value;
 	if (!convar->GetValue(value))
 	{
 		return;
 	}
-	ResizeBuffer<char *>(server.hostname, strlen(value) + 1);
-	strcpy(server.hostname, value);
+	ResizeBuffer<conchar *>(server.hostname, con_strlen(value) + 1);
+	con_strcpy(server.hostname, value);
 	free(value);
 	if (server.isrunning)
 	{
@@ -63,17 +63,17 @@ void ConVarHookRconPassword(ConVar *convar, const ConVarType oldtype, void *oldv
 {
 	if (newtype == ConVarTypeString)
 	{
-		ResizeBuffer<char *>(server.rconpassword, strlen((char *)newvalue) + 1);
-		strcpy(server.rconpassword, (char *)newvalue);
+		ResizeBuffer<conchar *>(server.rconpassword, con_strlen((conchar *)newvalue) + 1);
+		con_strcpy(server.rconpassword, (conchar *)newvalue);
 		return;
 	}
-	char *value;
+	conchar *value;
 	if (!convar->GetValue(value))
 	{
 		return;
 	}
-	ResizeBuffer<char *>(server.rconpassword, strlen(value) + 1);
-	strcpy(server.rconpassword, value);
+	ResizeBuffer<conchar *>(server.rconpassword, con_strlen(value) + 1);
+	con_strcpy(server.rconpassword, value);
 	free(value);
 }
 
@@ -98,21 +98,21 @@ void ConVarHookSvPassword(ConVar *convar, const ConVarType oldtype, void *oldval
 {
 	if (newtype == ConVarTypeString)
 	{
-		ResizeBuffer<char *>(server.password, strlen((char *)newvalue) + 1);
-		strcpy(server.password, (char *)newvalue);
+		ResizeBuffer<conchar *>(server.password, con_strlen((conchar *)newvalue) + 1);
+		con_strcpy(server.password, (conchar *)newvalue);
 		if (server.isrunning)
 		{
 			nm.UpdateServerInfo();
 		}
 		return;
 	}
-	char *value;
+	conchar *value;
 	if (!convar->GetValue(value))
 	{
 		return;
 	}
-	ResizeBuffer<char *>(server.password, strlen(value) + 1);
-	strcpy(server.password, value);
+	ResizeBuffer<conchar *>(server.password, con_strlen(value) + 1);
+	con_strcpy(server.password, value);
 	free(value);
 	if (server.isrunning)
 	{

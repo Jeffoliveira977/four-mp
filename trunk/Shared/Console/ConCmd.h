@@ -22,7 +22,7 @@ public:
 	/// \param[in] cmdflags Optional bitstring of flags determining how the console command should be handled. See FCVAR_* constants for more details.
 	/// \note Callback should be void func(unsigned char numargs);
 	/// \note Do not explicitly call this function. Use ConsoleCore::AddConCmd() instead.
-	ConCmd(ConsoleCore *core, const char *cmdname, void *callback, const char *desc = "", const int cmdflags = 0);
+	ConCmd(ConsoleCore *core, const conchar *cmdname, void *callback, const conchar *desc = CONSTRING(""), const int cmdflags = 0);
 
 	/// \brief Unloads all resources and removes console command from the console core.
 	~ConCmd(void);

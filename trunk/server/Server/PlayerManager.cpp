@@ -85,7 +85,7 @@ bool PlayerManager::IsPlayerConnected(const short index)
 	return true;
 }
 
-char *PlayerManager::GetPlayerName(const short index)
+wchar_t *PlayerManager::GetPlayerName(const short index)
 {
 	if ((index < 0) || (index >= playerbuffersize))
 	{
@@ -95,8 +95,8 @@ char *PlayerManager::GetPlayerName(const short index)
 	{
 		return NULL;
 	}
-	char *tempstring = (char *)calloc(strlen(playerbuffer[index]->name) + 1, sizeof(char));
-	strcpy(tempstring, playerbuffer[index]->name);
+	wchar_t *tempstring = (wchar_t *)calloc(wcslen(playerbuffer[index]->name) + 1, sizeof(wchar_t));
+	wcscpy(tempstring, playerbuffer[index]->name);
 	return tempstring;
 }
 
@@ -258,7 +258,7 @@ bool PlayerManager::AddPlayerClass(const unsigned int model, const float positio
 {
 	if (!this->GetClassFreeSlot(index))
 	{
-		PrintToServer("Unable to add player class. No free slots.");
+		PrintToServer(L"Unable to add player class. No free slots.");
 		return false;
 	}
 	if (index >= classbuffersize)
@@ -334,7 +334,7 @@ bool PlayerManager::GetPlayerClassData(const unsigned char index, unsigned int &
 	return true;
 }
 
-bool PlayerManager::RegisterNewPlayer(const short index, char (&name)[MAX_PLAYER_NAME_LENGTH])
+bool PlayerManager::RegisterNewPlayer(const short index, wchar_t (&name)[MAX_PLAYER_NAME_LENGTH])
 {
 	if ((index < 0) || (index >= maxplayerbuffersize))
 	{
@@ -362,7 +362,7 @@ bool PlayerManager::RegisterNewPlayer(const short index, char (&name)[MAX_PLAYER
 		return false;
 	}
 	playerbuffer[index] = new Player;
-	strcpy(playerbuffer[index]->name, name);
+	wcscpy(playerbuffer[index]->name, name);
 	playerbuffer[index]->classindex = 0;
 	playerbuffer[index]->model = 0x98E29920;
 	playerbuffer[index]->position[0] = 0;
@@ -418,11 +418,11 @@ short PlayerManager::GetPlayerFreeSlot(void)
 	return index;
 }
 
-bool PlayerManager::AssignPlayerName(char (&name)[MAX_PLAYER_NAME_LENGTH])
+bool PlayerManager::AssignPlayerName(wchar_t (&name)[MAX_PLAYER_NAME_LENGTH])
 {
-	if (strlen(name) == 0)
+	if (wcslen(name) == 0)
 	{
-		strcpy(name, "unnamed");
+		wcscpy(name, L"unnamed");
 		if (!this->AssignPlayerName(name))
 		{
 			return false;
@@ -431,24 +431,24 @@ bool PlayerManager::AssignPlayerName(char (&name)[MAX_PLAYER_NAME_LENGTH])
 	}
 	bool stop;
 	short j = 1;
-	char tempname[MAX_PLAYER_NAME_LENGTH];
-	strncpy(tempname, name, MAX_PLAYER_NAME_LENGTH - 1);
-	tempname[MAX_PLAYER_NAME_LENGTH-1] = '\0';
+	wchar_t tempname[MAX_PLAYER_NAME_LENGTH];
+	wcsncpy(tempname, name, MAX_PLAYER_NAME_LENGTH - 1);
+	tempname[MAX_PLAYER_NAME_LENGTH-1] = L'\0';
 	do
 	{
 		stop = true;
 		for (short i = 0; i < playerbuffersize; i++)
 		{
-			if ((playerbuffer[i] != NULL) && (strcmp(playerbuffer[i]->name, tempname) == 0))
+			if ((playerbuffer[i] != NULL) && (wcscmp(playerbuffer[i]->name, tempname) == 0))
 			{
 				stop = false;
-				_snprintf(tempname, MAX_PLAYER_NAME_LENGTH - 1, "(%d)%s", j, name);
-				tempname[MAX_PLAYER_NAME_LENGTH-1] = '\0';
+				_snwprintf(tempname, MAX_PLAYER_NAME_LENGTH - 1, L"(%d)%s", j, name);
+				tempname[MAX_PLAYER_NAME_LENGTH-1] = L'\0';
 				j++;
 			}
 		}
 	} while (!stop);
-	strcpy(name, tempname);
+	wcscpy(name, tempname);
 	return true;
 }
 

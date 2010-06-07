@@ -63,7 +63,7 @@ bool CoreHandleTypesManager::CloseHandle(const int handle)
 	return true;
 }
 
-int CoreHandleTypesManager::FindConVar(const short owner, const char *name)
+int CoreHandleTypesManager::FindConVar(const short owner, const wchar_t *name)
 {
 	if ((owner < 0) || (owner >= hm.countbuffersize))
 	{
@@ -73,13 +73,13 @@ int CoreHandleTypesManager::FindConVar(const short owner, const char *name)
 	{
 		return INVALID_HANDLE;
 	}
-	char *cvarname;
+	wchar_t *cvarname;
 	for (int i = 0; i < hm.handlebuffersize; i++)
 	{
 		if ((hm.handlebuffer[i] != NULL) && (hm.handlebuffer[i]->type == HandleTypeConVar))
 		{
 			cvarname = ((ConVar *)hm.handlebuffer[i]->ptr)->GetName();
-			if (strcmp(cvarname, name) == 0)
+			if (wcscmp(cvarname, name) == 0)
 			{
 				free(cvarname);
 				if (!hm.AddHandleOwner(i, owner))
@@ -104,7 +104,7 @@ bool CoreHandleTypesManager::ResetConVar(const short owner, const int handle)
 	return true;
 }
 
-char *CoreHandleTypesManager::GetConVarName(const short owner, const int handle)
+wchar_t *CoreHandleTypesManager::GetConVarName(const short owner, const int handle)
 {
 	if (!this->CheckConVar(owner, handle))
 	{
@@ -131,7 +131,7 @@ bool CoreHandleTypesManager::GetConVarValue(const short owner, const int handle,
 	return ((ConVar *)hm.handlebuffer[handle]->ptr)->GetValue(value);
 }
 
-bool CoreHandleTypesManager::GetConVarValue(const short owner, const int handle, char *&value)
+bool CoreHandleTypesManager::GetConVarValue(const short owner, const int handle, wchar_t *&value)
 {
 	if (!this->CheckConVar(owner, handle))
 	{
@@ -186,7 +186,7 @@ bool CoreHandleTypesManager::SetConVarValue(const short owner, const int handle,
 	return ((ConVar *)hm.handlebuffer[handle]->ptr)->SetValue(value);
 }
 
-bool CoreHandleTypesManager::SetConVarValue(const short owner, const int handle, const char *value)
+bool CoreHandleTypesManager::SetConVarValue(const short owner, const int handle, const wchar_t *value)
 {
 	if (!this->CheckConVar(owner, handle))
 	{
@@ -223,7 +223,7 @@ bool CoreHandleTypesManager::SetConVarBound(const short owner, const int handle,
 	return ((ConVar *)hm.handlebuffer[handle]->ptr)->SetBound(type, set, bound);
 }
 
-bool CoreHandleTypesManager::AddDynamicCommand(const short owner, const char *callback, const ConCmd *ptr)
+bool CoreHandleTypesManager::AddDynamicCommand(const short owner, const wchar_t *callback, const ConCmd *ptr)
 {
 	if (ptr == NULL)
 	{
@@ -256,13 +256,13 @@ bool CoreHandleTypesManager::AddDynamicCommand(const short owner, const char *ca
 		return false;
 	}
 	commandbuffer[commandbuffersize].index = handle;
-	commandbuffer[commandbuffersize].callback = (char *)calloc(strlen(callback) + 1, sizeof(char));
-	strcpy(commandbuffer[commandbuffersize].callback, callback);
+	commandbuffer[commandbuffersize].callback = (wchar_t *)calloc(wcslen(callback) + 1, sizeof(wchar_t));
+	wcscpy(commandbuffer[commandbuffersize].callback, callback);
 	commandbuffersize++;
 	return true;
 }
 
-int *CoreHandleTypesManager::GetDynamicCommandHandles(const char *name, unsigned char &numcmds)
+int *CoreHandleTypesManager::GetDynamicCommandHandles(const wchar_t *name, unsigned char &numcmds)
 {
 	if (name == NULL)
 	{
@@ -270,11 +270,11 @@ int *CoreHandleTypesManager::GetDynamicCommandHandles(const char *name, unsigned
 	}
 	numcmds = 0;
 	int *handles = NULL;
-	char *cmdname;
+	wchar_t *cmdname;
 	for (unsigned short i = 0; i < commandbuffersize; i++)
 	{
 		cmdname = ((ConCmd *)hm.handlebuffer[commandbuffer[i].index]->ptr)->GetName();
-		if (strcmp(cmdname, name) == 0)
+		if (wcscmp(cmdname, name) == 0)
 		{
 			if (!ResizeBuffer<int *>(handles, numcmds + 1))
 			{
@@ -315,7 +315,7 @@ bool CoreHandleTypesManager::ExecuteDynamicCommand(const int handle, const unsig
 	{
 		return false;
 	}
-	char *callback = this->GetDynamicCommandCallback(handle);
+	wchar_t *callback = this->GetDynamicCommandCallback(handle);
 	if (callback == NULL)
 	{
 		return false;
@@ -360,7 +360,7 @@ bool CoreHandleTypesManager::CheckConVar(const short owner, const int handle)
 	return true;
 }
 
-char *CoreHandleTypesManager::GetDynamicCommandCallback(const int handle)
+wchar_t *CoreHandleTypesManager::GetDynamicCommandCallback(const int handle)
 {
 	if ((handle < 0) || (handle >= hm.handlebuffersize))
 	{
@@ -370,8 +370,8 @@ char *CoreHandleTypesManager::GetDynamicCommandCallback(const int handle)
 	{
 		if (commandbuffer[i].index == handle)
 		{
-			char *callback = (char *)calloc(strlen(commandbuffer[i].callback) + 1, sizeof(char));
-			strcpy(callback, commandbuffer[i].callback);
+			wchar_t *callback = (wchar_t *)calloc(wcslen(commandbuffer[i].callback) + 1, sizeof(wchar_t));
+			wcscpy(callback, commandbuffer[i].callback);
 			return callback;
 		}
 	}

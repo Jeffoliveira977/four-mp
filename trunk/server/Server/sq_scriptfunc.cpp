@@ -116,7 +116,7 @@ void sq_SetGameTime(HSQUIRRELVM v)
 	sq_getinteger(v, 2, &h);
 	sq_getinteger(v, 3, &m);
 
-	PrintToServer("Time: %d %d", h, m);
+	PrintToServer(L"Time: %d %d", h, m);
 
 	server.SetTime(h, m);
 }

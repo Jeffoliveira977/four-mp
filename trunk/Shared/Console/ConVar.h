@@ -43,7 +43,7 @@ public:
 	/// \param[in] hasMax Optional boolean that determines if the console variable has a maximum value.
 	/// \param[in] max Maximum value that the console variable can have if hasMax is true.
 	/// \note Do not explicitly call this function. Use ConsoleCore::AddConVar() instead.
-	ConVar(ConsoleCore *core, const char *cvarname, const float defvalue, const char *desc = "", const int cvarflags = 0, const bool hasMin = false, const float min = 0.0, const bool hasMax = false, const float max = 0.0);
+	ConVar(ConsoleCore *core, const conchar *cvarname, const float defvalue, const conchar *desc = CONSTRING(""), const int cvarflags = 0, const bool hasMin = false, const float min = 0.0, const bool hasMax = false, const float max = 0.0);
 
 	/// \brief Constructor for the console variable with default integer value.
 	/// \param[in] core Pointer to the console core this variable should be attached to.
@@ -56,7 +56,7 @@ public:
 	/// \param[in] hasMax Optional boolean that determines if the console variable has a maximum value.
 	/// \param[in] max Maximum value that the console variable can have if hasMax is true.
 	/// \note Do not explicitly call this function. Use ConsoleCore::AddConVar() instead.
-	ConVar(ConsoleCore *core, const char *cvarname, const int defvalue, const char *desc = "", const int cvarflags = 0, const bool hasMin = false, const int min = 0, const bool hasMax = false, const int max = 0);
+	ConVar(ConsoleCore *core, const conchar *cvarname, const int defvalue, const conchar *desc = CONSTRING(""), const int cvarflags = 0, const bool hasMin = false, const int min = 0, const bool hasMax = false, const int max = 0);
 
 	/// \brief Constructor for the console variable with default string value.
 	/// \param[in] core Pointer to the console core this variable should be attached to.
@@ -65,7 +65,7 @@ public:
 	/// \param[in] desc Optional description of the console variable.
 	/// \param[in] cvarflags Optional bitstring of flags determining how the console variable should be handled. See FCVAR_* constants for more details.
 	/// \note Do not explicitly call this function. Use ConsoleCore::AddConVar() instead.
-	ConVar(ConsoleCore *core, const char *cvarname, const char *defvalue, const char *desc = "", const int cvarflags = 0);
+	ConVar(ConsoleCore *core, const conchar *cvarname, const conchar *defvalue, const conchar *desc = CONSTRING(""), const int cvarflags = 0);
 
 	/// \brief Unloads all resources and removes console variable from the console core.
 	~ConVar(void);
@@ -95,7 +95,7 @@ public:
 	/// \brief Retrieves a value of the console variable.
 	/// \param[out] val Buffer which write value to.
 	/// \return True on success, false otherwise.
-	bool GetValue(char *&val);
+	bool GetValue(conchar *&val);
 
 	/// \brief Retrieves a default value of the console variable.
 	/// \param[out] val Buffer which write default value to.
@@ -110,7 +110,7 @@ public:
 	/// \brief Retrieves a default value of the console variable.
 	/// \param[out] val Buffer which write default value to.
 	/// \return True on success, false otherwise.
-	bool GetDefaultValue(char *&val);
+	bool GetDefaultValue(conchar *&val);
 
 	/// \brief Sets the value of the console variable.
 	/// \param[in] val Value of the console variable.
@@ -125,7 +125,7 @@ public:
 	/// \brief Sets the value of the console variable.
 	/// \param[in] val Value of the console variable.
 	/// \return True on success, false otherwise.
-	bool SetValue(const char *val);
+	bool SetValue(const conchar *val);
 
 	/// \brief Retrieves a bound of the console variable.
 	/// \param[in] type Type of the bound.
@@ -169,7 +169,7 @@ private:
 	{
 		float f; ///< Floating point value.
 		int i; ///< Integer value.
-		char *s; ///< String value.
+		conchar *s; ///< String value.
 	};
 
 	/// \brief Describes the value of console variable.
@@ -206,5 +206,5 @@ private:
 	/// \brief Fires all change hooks.
 	/// \param[in] val Old value of the console variable.
 	/// \return No return.
-	void FireChangeHook(const char *val);
+	void FireChangeHook(const conchar *val);
 };

@@ -45,7 +45,7 @@ public:
 	/// \param[in] string Format-control string.
 	/// \param[in] ... Optional arguments.
 	/// \return No return.
-	virtual void PrintToServer(const char *string, ...) = 0;
+	virtual void PrintToServer(const wchar_t *string, ...) = 0;
 
 	/// \brief Creates a console variable and returns the handle to it.
 	/// \param[in] plugin Pointer to the plugin that calls this function.
@@ -58,7 +58,7 @@ public:
 	/// \param[in] hasMax Optional boolean that determines if the console variable has a maximum value.
 	/// \param[in] max Maximum value that the console variable can have if hasMax is true.
 	/// \return Handle to the console variable on success, INVALID_HANDLE otherwise.
-	virtual int CreateConVar(const IPluginInterface *plugin, const char *name, const float defaultvalue, const char *description = "", const int flags = 0, const bool hasMin = false, const float min = 0.0, const bool hasMax = false, const float max = 0.0) = 0;
+	virtual int CreateConVar(const IPluginInterface *plugin, const wchar_t *name, const float defaultvalue, const wchar_t *description = L"", const int flags = 0, const bool hasMin = false, const float min = 0.0, const bool hasMax = false, const float max = 0.0) = 0;
 
 	/// \brief Creates a console variable and returns the handle to it.
 	/// \param[in] plugin Pointer to the plugin that calls this function.
@@ -71,7 +71,7 @@ public:
 	/// \param[in] hasMax Optional boolean that determines if the console variable has a maximum value.
 	/// \param[in] max Maximum value that the console variable can have if hasMax is true.
 	/// \return Handle to the console variable on success, INVALID_HANDLE otherwise.
-	virtual int CreateConVar(const IPluginInterface *plugin, const char *name, const int defaultvalue, const char *description = "", const int flags = 0, const bool hasMin = false, const int min = 0, const bool hasMax = false, const int max = 0) = 0;
+	virtual int CreateConVar(const IPluginInterface *plugin, const wchar_t *name, const int defaultvalue, const wchar_t *description = L"", const int flags = 0, const bool hasMin = false, const int min = 0, const bool hasMax = false, const int max = 0) = 0;
 
 	/// \brief Creates a console variable and returns the handle to it.
 	/// \param[in] plugin Pointer to the plugin that calls this function.
@@ -80,13 +80,13 @@ public:
 	/// \param[in] description Optional description of the console variable.
 	/// \param[in] flags Optional bitstring of flags determining how the console variable should be handled. See FCVAR_* constants for more details.
 	/// \return Handle to the console variable on success, INVALID_HANDLE otherwise.
-	virtual int CreateConVar(const IPluginInterface *plugin, const char *name, const char *defaultvalue, const char *description = "", const int flags = 0) = 0;
+	virtual int CreateConVar(const IPluginInterface *plugin, const wchar_t *name, const wchar_t *defaultvalue, const wchar_t *description = L"", const int flags = 0) = 0;
 
 	/// \brief Returns the handle to the console variable and reserves it by the plugin.
 	/// \param[in] plugin Pointer to the plugin that calls this function.
 	/// \param[in] name Name of the console variable to search for.
 	/// \return Handle index on success, INVALID_HANDLE otherwise.
-	virtual int FindConVar(const IPluginInterface *plugin, const char *name) = 0;
+	virtual int FindConVar(const IPluginInterface *plugin, const wchar_t *name) = 0;
 
 	/// \brief Resets the console variable to its default value.
 	/// \param[in] plugin Pointer to the plugin that calls this function.
@@ -98,7 +98,7 @@ public:
 	/// \param[in] plugin Pointer to the plugin that calls this function.
 	/// \param[in] handle Handle to the console variable.
 	/// \return Name on success, NULL otherwise.
-	virtual char *GetConVarName(const IPluginInterface *plugin, const int handle) = 0;
+	virtual wchar_t *GetConVarName(const IPluginInterface *plugin, const int handle) = 0;
 
 	/// \brief Retrieves the value of a console variable.
 	/// \param[in] plugin Pointer to the plugin that calls this function.
@@ -119,7 +119,7 @@ public:
 	/// \param[in] handle Handle to the console variable.
 	/// \param[out] value Buffer to store the value in.
 	/// \return True on success, false otherwise.
-	virtual bool GetConVarValue(const IPluginInterface *plugin, const int handle, char *&value) = 0;
+	virtual bool GetConVarValue(const IPluginInterface *plugin, const int handle, wchar_t *&value) = 0;
 
 	/// \brief Retrieves the bitstring of flags on a console variable.
 	/// \param[in] plugin Pointer to the plugin that calls this function.
@@ -163,7 +163,7 @@ public:
 	/// \param[in] handle Handle to the console variable.
 	/// \param[in] value The value to set.
 	/// \return True on success, false otherwise.
-	virtual bool SetConVarValue(const IPluginInterface *plugin, const int handle, const char *value) = 0;
+	virtual bool SetConVarValue(const IPluginInterface *plugin, const int handle, const wchar_t *value) = 0;
 
 	/// \brief Sets the bitstring of flags on a console variable.
 	/// \param[in] plugin Pointer to the plugin that calls this function.
@@ -198,7 +198,7 @@ public:
 	/// \param[in] flags Optional bitstring of flags determining how the console command should be handled. See FCVAR_* constants for more details.
 	/// \note Callback should be void func(unsigned char numargs);
 	/// \return No return.
-	virtual void RegServerCmd(const IPluginInterface *plugin, const char *name, void *callback, const char *description = "", const int flags = 0) = 0;
+	virtual void RegServerCmd(const IPluginInterface *plugin, const wchar_t *name, void *callback, const wchar_t *description = L"", const int flags = 0) = 0;
 
 	/// \brief Returns the number of arguments from the current console command.
 	/// \return Number of arguments from the current console command.
@@ -206,7 +206,7 @@ public:
 
 	/// \brief Retrieves the entire command argument string in one lump from the current console command.
 	/// \return Arguments string on success, NULL otherwise.
-	virtual char *GetCmdArgString(void) = 0;
+	virtual wchar_t *GetCmdArgString(void) = 0;
 
 	/// \brief Retrieves a command argument type given its index, from the current console command.
 	/// \param[in] argnum Argument number to retrieve.
@@ -218,7 +218,7 @@ public:
 	/// \param[in] argnum Argument number to retrieve.
 	/// \param[out] arg Buffer to use for storing the value.
 	/// \return True on success, false otherwise.
-	virtual bool GetCmdArg(const unsigned char argnum, char *&arg) = 0;
+	virtual bool GetCmdArg(const unsigned char argnum, wchar_t *&arg) = 0;
 
 	/// \brief Retrieves a command argument given its index, from the current console command.
 	/// \param[in] argnum Argument number to retrieve.
@@ -236,5 +236,5 @@ public:
 	/// \param[in] string String to execute.
 	/// \note The input string can contain several commands separated by ;.
 	/// \return No return.
-	virtual void ServerCommand(const char *string) = 0;
+	virtual void ServerCommand(const wchar_t *string) = 0;
 };

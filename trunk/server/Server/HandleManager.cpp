@@ -462,7 +462,7 @@ bool HandleManager::IncreaseHandleCount(const short owner)
 	}
 	if (countbuffer[owner][0] == maxhandlesperowner)
 	{
-		PrintToServer("MEMORY LEAK IN MODULE %d. Unloading.", owner);
+		PrintToServer(L"MEMORY LEAK IN MODULE %d. Unloading.", owner);
 		this->CloseAllHandles(owner);
 		return false;
 	}

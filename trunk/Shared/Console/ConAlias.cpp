@@ -9,7 +9,7 @@
 #include "common.h"
 #include "ConsoleCore.h"
 
-ConAlias::ConAlias(ConsoleCore *core, const char *aliasname, const char *cmdstring)
+ConAlias::ConAlias(ConsoleCore *core, const conchar *aliasname, const conchar *cmdstring)
 {
 	this->Init(core, aliasname, cmdstring);
 }
@@ -19,10 +19,10 @@ ConAlias::~ConAlias(void)
 	this->Uninit();
 }
 
-void ConAlias::SetCommandString(const char *string)
+void ConAlias::SetCommandString(const conchar *string)
 {
-	ResizeBuffer<char *>(description, strlen(string) + 1);
-	strcpy(description, string);
+	ResizeBuffer<conchar *>(description, con_strlen(string) + 1);
+	con_strcpy(description, string);
 }
 
 void ConAlias::Execute(void)

@@ -1,4 +1,4 @@
 #pragma once
 
-void PrintToServer(const char *string, ...);
-void debug(const char *string, ...);
+void PrintToServer(const wchar_t *string, ...);
+void debug(const wchar_t *string, ...);

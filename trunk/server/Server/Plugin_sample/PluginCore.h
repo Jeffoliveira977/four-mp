@@ -36,15 +36,15 @@ public:
 
 	/// \brief Returns the name of the plugin.
 	/// \return Name of the plugin.
-	virtual char *GetName(void);
+	virtual wchar_t *GetName(void);
 
 	/// \brief Returns the version of the plugin.
 	/// \return Version of the plugin.
-	virtual char *GetVersion(void);
+	virtual wchar_t *GetVersion(void);
 
 	/// \brief Return the author of the plugin.
 	/// \return Author of the plugin.
-	virtual char *GetAuthor(void);
+	virtual wchar_t *GetAuthor(void);
 protected:
 	IPluginHandlerInterface *server; ///< Holds the pointer to the host.
 };

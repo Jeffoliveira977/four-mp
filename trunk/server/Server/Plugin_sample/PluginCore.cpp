@@ -53,17 +53,17 @@ void PluginCore::OnPluginUnload(void)
 {
 }
 
-char *PluginCore::GetName(void)
+wchar_t *PluginCore::GetName(void)
 {
 	return PLUGIN_NAME;
 }
 
-char *PluginCore::GetVersion(void)
+wchar_t *PluginCore::GetVersion(void)
 {
 	return PLUGIN_VERSION;
 }
 
-char *PluginCore::GetAuthor(void)
+wchar_t *PluginCore::GetAuthor(void)
 {
 	return PLUGIN_AUTHOR;
 }

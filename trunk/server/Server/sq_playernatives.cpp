@@ -10,7 +10,7 @@ void sq_GetPlayerName(HSQUIRRELVM v)
 {
 	int index;
 	sq_getinteger(v, 2, &index);
-	char *name = playm.GetPlayerName(index);
+	wchar_t *name = playm.GetPlayerName(index);
 	if (name == NULL)
 	{
 		sq_pushnull(v);
@@ -126,7 +126,7 @@ void sq_SetPlayerSpawnPos(HSQUIRRELVM v)
 	sq_getfloat(v, 5, &pos[2]);
 	sq_getfloat(v, 6, &pos[3]);
 
-	PrintToServer("SPAWN POS %d: %f %f %f %f", index, pos[0], pos[1], pos[2], pos[3]);
+	PrintToServer(L"SPAWN POS %d: %f %f %f %f", index, pos[0], pos[1], pos[2], pos[3]);
 
 	playm.SetPlayerSpawnPos(index, pos);
 }
