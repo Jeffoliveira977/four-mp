@@ -48,9 +48,14 @@ unsigned char PluginManager::GetPluginBufferSize(void)
 
 void PluginManager::LoadPlugins(void)
 {
+	if (_waccess(L"plugins", 0) == -1)
+	{
+		_wmkdir(L"plugins");
+		return;
+	}
 	intptr_t ptr;
-	_finddata64i32_t data;
-	ptr = _findfirst("plugins\\*.dll", &data);
+	_wfinddata64i32_t data;
+	ptr = _wfindfirst(L"plugins\\*.dll", &data);
 	if (ptr == -1)
 	{
 		return;
@@ -64,7 +69,7 @@ void PluginManager::LoadPlugins(void)
 		{
 			i++;
 		}
-		continuesearch = _findnext(ptr, &data);
+		continuesearch = _wfindnext(ptr, &data);
 	}
 	_findclose(ptr);
 }
@@ -113,13 +118,14 @@ void PluginManager::UnpausePlugins(void)
 	}
 }
 
-bool PluginManager::IsPluginLoaded(const char *string)
+bool PluginManager::IsPluginLoaded(const wchar_t *string)
 {
-	char *plugin = (char *)calloc(strlen(string) + 8, sizeof(char));
-	sprintf(plugin, "plugins/%s", string);
+	size_t length = wcslen(string) + 8;
+	wchar_t *plugin = (wchar_t *)calloc(length, sizeof(wchar_t));
+	swprintf(plugin, length, L"plugins/%s", string);
 	for (unsigned char i = 0; i < pluginbuffersize; i++)
 	{
-		if ((pluginbuffer[i] != NULL) && (strcmp(pluginbuffer[i]->filename, plugin) == 0))
+		if ((pluginbuffer[i] != NULL) && (wcscmp(pluginbuffer[i]->filename, plugin) == 0))
 		{
 			return true;
 		}
@@ -127,20 +133,17 @@ bool PluginManager::IsPluginLoaded(const char *string)
 	return false;
 }
 
-bool PluginManager::LoadPlugin(const char *string)
+bool PluginManager::LoadPlugin(const wchar_t *string)
 {
 	unsigned char index;
 	if (!this->GetPluginFreeSlot(index))
 	{
 		return false;
 	}
-	char *plugin = (char *)calloc(strlen(string) + 8, sizeof(char));
-	sprintf(plugin, "plugins/%s", string);
-	if (!this->LoadPluginInternal(index, plugin))
-	{
-		return false;
-	}
-	return true;
+	size_t length = wcslen(string) + 9;
+	wchar_t *plugin = (wchar_t *)calloc(length, sizeof(wchar_t));
+	swprintf(plugin, length, L"plugins\\%s", string);
+	return this->LoadPluginInternal(index, plugin);
 }
 
 bool PluginManager::UnloadPlugin(const unsigned char index)
@@ -174,8 +177,8 @@ bool PluginManager::ReloadPlugin(const unsigned char index)
 	{
 		return false;
 	}
-	char *filename = (char *)calloc(strlen(pluginbuffer[index]->filename) + 1, sizeof(char));
-	strcpy(filename, pluginbuffer[index]->filename);
+	wchar_t *filename = (wchar_t *)calloc(wcslen(pluginbuffer[index]->filename) + 1, sizeof(wchar_t));
+	wcscpy(filename, pluginbuffer[index]->filename);
 	if (!this->UnloadPlugin(index))
 	{
 		return false;
@@ -223,7 +226,7 @@ bool PluginManager::UnpausePlugin(const unsigned char index)
 	return true;
 }
 
-char *PluginManager::GetPluginInfoString(const unsigned char index)
+wchar_t *PluginManager::GetPluginInfoString(const unsigned char index)
 {
 	if (index >= pluginbuffersize)
 	{
@@ -233,19 +236,21 @@ char *PluginManager::GetPluginInfoString(const unsigned char index)
 	{
 		return NULL;
 	}
-	char *string;
-	char *name = pluginbuffer[index]->ptr->GetName();
-	char *version = pluginbuffer[index]->ptr->GetVersion();
-	char *author = pluginbuffer[index]->ptr->GetAuthor();
+	wchar_t *string;
+	wchar_t *name = pluginbuffer[index]->ptr->GetName();
+	wchar_t *version = pluginbuffer[index]->ptr->GetVersion();
+	wchar_t *author = pluginbuffer[index]->ptr->GetAuthor();
 	if (!pluginbuffer[index]->paused)
 	{
-		string = (char *)calloc(_scprintf("%d \"%s\" (%s) by %s", index, name, version, author) + 1, sizeof(char));
-		sprintf(string, "%d \"%s\" (%s) by %s", index, name, version, author);
+		int length = _scwprintf(L"%d \"%s\" (%s) by %s", index, name, version, author) + 1;
+		string = (wchar_t *)calloc(length, sizeof(wchar_t));
+		swprintf(string, length, L"%d \"%s\" (%s) by %s", index, name, version, author);
 	}
 	else
 	{
-		string = (char *)calloc(_scprintf("%d (Paused) \"%s\" (%s) by %s", index, name, version, author) + 1, sizeof(char));
-		sprintf(string, "%d (Paused) \"%s\" (%s) by %s", index, name, version, author);
+		int length = _scwprintf(L"%d (Paused) \"%s\" (%s) by %s", index, name, version, author) + 1;
+		string = (wchar_t *)calloc(length, sizeof(wchar_t));
+		swprintf(string, length, L"%d (Paused) \"%s\" (%s) by %s", index, name, version, author);
 	}
 	return string;
 }
@@ -255,7 +260,7 @@ IPluginHandlerInterface *PluginManager::GetPluginHandler(void)
 	return ph;
 }
 
-bool PluginManager::LoadPluginInternal(const unsigned char index, const char *string)
+bool PluginManager::LoadPluginInternal(const unsigned char index, const wchar_t *string)
 {
 	if (index >= maxpluginbuffersize)
 	{
@@ -305,8 +310,8 @@ bool PluginManager::LoadPluginInternal(const unsigned char index, const char *st
 		return false;
 	}
 	pluginbuffer[index]->paused = false;
-	pluginbuffer[index]->filename = (char *)calloc(strlen(string) + 1, sizeof(char));
-	strcpy(pluginbuffer[index]->filename, string);
+	pluginbuffer[index]->filename = (wchar_t *)calloc(wcslen(string) + 1, sizeof(wchar_t));
+	wcscpy(pluginbuffer[index]->filename, string);
 	this->OnPluginLoad(index);
 	return true;
 }
@@ -433,18 +438,18 @@ bool PluginManager::PluginHandler::ReleaseHandleType(const IPluginInterface *plu
 	return true;
 }
 
-void PluginManager::PluginHandler::PrintToServer(const char *string, ...)
+void PluginManager::PluginHandler::PrintToServer(const wchar_t *string, ...)
 {
 	va_list arglist; 
     va_start(arglist, string);
-	char *tempstring = (char *)calloc(_vscprintf(string, arglist) + 1, sizeof(char));
-	vsprintf(tempstring, string, arglist);
+	wchar_t *tempstring = (wchar_t *)calloc(_vscwprintf(string, arglist) + 1, sizeof(wchar_t));
+	vswprintf(tempstring, string, arglist);
 	::PrintToServer(tempstring);
 	free(tempstring);
 	va_end(arglist);
 }
 
-int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const char *name, const float defaultvalue, const char *description, const int flags, const bool hasMin, const float min, const bool hasMax, const float max)
+int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const wchar_t *name, const float defaultvalue, const wchar_t *description, const int flags, const bool hasMin, const float min, const bool hasMax, const float max)
 {
 	unsigned char pluginindex;
 	if (!plugm.FindPlugin(plugin, pluginindex))
@@ -454,7 +459,7 @@ int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, c
 	return hm.AddNewHandle(plugm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max));
 }
 
-int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const char *name, const int defaultvalue, const char *description, const int flags, const bool hasMin, const int min, const bool hasMax, const int max)
+int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const wchar_t *name, const int defaultvalue, const wchar_t *description, const int flags, const bool hasMin, const int min, const bool hasMax, const int max)
 {
 	unsigned char pluginindex;
 	if (!plugm.FindPlugin(plugin, pluginindex))
@@ -464,7 +469,7 @@ int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, c
 	return hm.AddNewHandle(plugm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags, hasMin, min, hasMax, max));
 }
 
-int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const char *name, const char *defaultvalue, const char *description, const int flags)
+int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, const wchar_t *name, const wchar_t *defaultvalue, const wchar_t *description, const int flags)
 {
 	unsigned char pluginindex;
 	if (!plugm.FindPlugin(plugin, pluginindex))
@@ -474,7 +479,7 @@ int PluginManager::PluginHandler::CreateConVar(const IPluginInterface *plugin, c
 	return hm.AddNewHandle(plugm.handleowneroffset + pluginindex, HandleTypeConVar, concore.AddConVar(name, defaultvalue, description, flags));
 }
 
-int PluginManager::PluginHandler::FindConVar(const IPluginInterface *plugin, const char *name)
+int PluginManager::PluginHandler::FindConVar(const IPluginInterface *plugin, const wchar_t *name)
 {
 	unsigned char pluginindex;
 	if (!plugm.FindPlugin(plugin, pluginindex))
@@ -494,12 +499,12 @@ bool PluginManager::PluginHandler::ResetConVar(const IPluginInterface *plugin, c
 	return chtm.ResetConVar(plugm.handleowneroffset + pluginindex, handle);
 }
 
-char *PluginManager::PluginHandler::GetConVarName(const IPluginInterface *plugin, const int handle)
+wchar_t *PluginManager::PluginHandler::GetConVarName(const IPluginInterface *plugin, const int handle)
 {
 	unsigned char pluginindex;
 	if (!plugm.FindPlugin(plugin, pluginindex))
 	{
-		return false;
+		return NULL;
 	}
 	return chtm.GetConVarName(plugm.handleowneroffset + pluginindex, handle);
 }
@@ -524,7 +529,7 @@ bool PluginManager::PluginHandler::GetConVarValue(const IPluginInterface *plugin
 	return chtm.GetConVarValue(plugm.handleowneroffset + pluginindex, handle, value);
 }
 
-bool PluginManager::PluginHandler::GetConVarValue(const IPluginInterface *plugin, const int handle, char *&value)
+bool PluginManager::PluginHandler::GetConVarValue(const IPluginInterface *plugin, const int handle, wchar_t *&value)
 {
 	unsigned char pluginindex;
 	if (!plugm.FindPlugin(plugin, pluginindex))
@@ -584,7 +589,7 @@ bool PluginManager::PluginHandler::SetConVarValue(const IPluginInterface *plugin
 	return chtm.SetConVarValue(plugm.handleowneroffset + pluginindex, handle, value);
 }
 
-bool PluginManager::PluginHandler::SetConVarValue(const IPluginInterface *plugin, const int handle, const char *value)
+bool PluginManager::PluginHandler::SetConVarValue(const IPluginInterface *plugin, const int handle, const wchar_t *value)
 {
 	unsigned char pluginindex;
 	if (!plugm.FindPlugin(plugin, pluginindex))
@@ -624,7 +629,7 @@ bool PluginManager::PluginHandler::SetConVarBound(const IPluginInterface *plugin
 	return chtm.SetConVarBound(plugm.handleowneroffset + pluginindex, handle, type, set, bound);
 }
 
-void PluginManager::PluginHandler::RegServerCmd(const IPluginInterface *plugin, const char *name, void *callback, const char *description, const int flags)
+void PluginManager::PluginHandler::RegServerCmd(const IPluginInterface *plugin, const wchar_t *name, void *callback, const wchar_t *description, const int flags)
 {
 	unsigned char pluginindex;
 	if (!plugm.FindPlugin(plugin, pluginindex))
@@ -639,7 +644,7 @@ unsigned char PluginManager::PluginHandler::GetCmdArgs(void)
 	return concore.GetCmdArgs();
 }
 
-char *PluginManager::PluginHandler::GetCmdArgString(void)
+wchar_t *PluginManager::PluginHandler::GetCmdArgString(void)
 {
 	return concore.GetCmdArgString();
 }
@@ -649,7 +654,7 @@ bool PluginManager::PluginHandler::GetCmdArgType(const unsigned char argnum, Con
 	return concore.GetCmdArgType(argnum, type);
 }
 
-bool PluginManager::PluginHandler::GetCmdArg(const unsigned char argnum, char *&arg)
+bool PluginManager::PluginHandler::GetCmdArg(const unsigned char argnum, wchar_t *&arg)
 {
 	return concore.GetCmdArg(argnum, arg);
 }
@@ -664,7 +669,7 @@ bool PluginManager::PluginHandler::GetCmdArg(const unsigned char argnum, float &
 	return concore.GetCmdArg(argnum, arg);
 }
 
-void PluginManager::PluginHandler::ServerCommand(const char *string)
+void PluginManager::PluginHandler::ServerCommand(const wchar_t *string)
 {
 	concore.InterpretLine(string);
 }

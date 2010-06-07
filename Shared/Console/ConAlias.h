@@ -19,7 +19,7 @@ public:
 	/// \param[in] aliasname Name of the console alias.
 	/// \param[in] cmdstring A command string that will be interpreted when the alias is invoked.
 	/// \note Do not explicitly call this function. Use 'alias' command during runtime instead.
-	ConAlias(ConsoleCore *core, const char *aliasname, const char *cmdstring = "");
+	ConAlias(ConsoleCore *core, const conchar *aliasname, const conchar *cmdstring = CONSTRING(""));
 
 	/// \brief Destructor.
 	~ConAlias(void);
@@ -27,7 +27,7 @@ public:
 	/// \brief Sets the command string of the console alias.
 	/// \param[in] string A command string that will be interpreted when the alias is invoked.
 	/// \return No return.
-	void SetCommandString(const char *string);
+	void SetCommandString(const conchar *string);
 
 	/// \brief Executes the console alias.
 	/// \return No return.

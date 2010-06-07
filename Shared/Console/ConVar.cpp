@@ -11,7 +11,7 @@
 #include "ConVar.h"
 #include "ConsoleCore.h"
 
-ConVar::ConVar(ConsoleCore* core, const char *cvarname, const float defvalue, const char *desc, const int cvarflags, const bool hasMin, const float min, const bool hasMax, const float max)
+ConVar::ConVar(ConsoleCore* core, const conchar *cvarname, const float defvalue, const conchar *desc, const int cvarflags, const bool hasMin, const float min, const bool hasMax, const float max)
 {
 	this->Init(core, cvarname, desc, cvarflags);
 	defaultvalue.type = ConVarTypeFloat;
@@ -41,7 +41,7 @@ ConVar::ConVar(ConsoleCore* core, const char *cvarname, const float defvalue, co
 	hookbuffer = NULL;
 }
 
-ConVar::ConVar(ConsoleCore* core, const char *cvarname, const int defvalue, const char *desc, const int cvarflags, const bool hasMin, const int min, const bool hasMax, const int max)
+ConVar::ConVar(ConsoleCore* core, const conchar *cvarname, const int defvalue, const conchar *desc, const int cvarflags, const bool hasMin, const int min, const bool hasMax, const int max)
 {
 	this->Init(core, cvarname, desc, cvarflags);
 	defaultvalue.type = ConVarTypeInt;
@@ -71,16 +71,16 @@ ConVar::ConVar(ConsoleCore* core, const char *cvarname, const int defvalue, cons
 	hookbuffer = NULL;
 }
 
-ConVar::ConVar(ConsoleCore* core, const char *cvarname, const char *defvalue, const char *desc, const int cvarflags)
+ConVar::ConVar(ConsoleCore* core, const conchar *cvarname, const conchar *defvalue, const conchar *desc, const int cvarflags)
 {
 	this->Init(core, cvarname, desc, cvarflags);
-	unsigned int length = strlen(defvalue);
+	size_t length = con_strlen(defvalue);
 	defaultvalue.type = ConVarTypeString;
-	defaultvalue.value.s = (char *)calloc(length + 1, sizeof(char));
-	strcpy(defaultvalue.value.s, defvalue);
+	defaultvalue.value.s = (conchar *)calloc(length + 1, sizeof(conchar));
+	con_strcpy(defaultvalue.value.s, defvalue);
 	value.type = ConVarTypeString;
-	value.value.s = (char *)calloc(length + 1, sizeof(char));
-	strcpy(value.value.s, defvalue);
+	value.value.s = (conchar *)calloc(length + 1, sizeof(conchar));
+	con_strcpy(value.value.s, defvalue);
 	hookbuffersize = 0;
 	hookbuffer = NULL;
 }
@@ -109,11 +109,11 @@ void ConVar::Reset(void)
 	{
 		if (defaultvalue.type == ConVarTypeString)
 		{
-			if (!ResizeBuffer<char *>(value.value.s, strlen(defaultvalue.value.s) + 1))
+			if (!ResizeBuffer<conchar *>(value.value.s, con_strlen(defaultvalue.value.s) + 1))
 			{
 				return;
 			}
-			strcpy(value.value.s, defaultvalue.value.s);
+			con_strcpy(value.value.s, defaultvalue.value.s);
 		}
 		else
 		{
@@ -141,8 +141,8 @@ void ConVar::Reset(void)
 				return;
 			}
 			value.type = ConVarTypeString;
-			value.value.s = (char *)calloc(strlen(defaultvalue.value.s) + 1, sizeof(char));
-			strcpy(value.value.s, defaultvalue.value.s);
+			value.value.s = (conchar *)calloc(con_strlen(defaultvalue.value.s) + 1, sizeof(conchar));
+			con_strcpy(value.value.s, defaultvalue.value.s);
 			break;
 		}
 	}
@@ -178,7 +178,7 @@ bool ConVar::GetValue(int &val)
 	return true;
 }
 
-bool ConVar::GetValue(char *&val)
+bool ConVar::GetValue(conchar *&val)
 {
 	if (value.type != ConVarTypeString)
 	{
@@ -186,23 +186,25 @@ bool ConVar::GetValue(char *&val)
 		{
 		case ConVarTypeFloat:
 			{
-				val = (char *)calloc(_scprintf("%f", value.value.f) + 1, sizeof(char));
-				sprintf(val, "%f", value.value.f);
+				size_t length = con_scprintf(CONSTRING("%f"), value.value.f) + 1;
+				val = (conchar *)calloc(length, sizeof(conchar));
+				con_sprintf(val, length, CONSTRING("%f")), value.value.f);
 				return true;
 				break;
 			}
 		case ConVarTypeInt:
 			{
-				val = (char *)calloc(_scprintf("%d", value.value.i) + 1, sizeof(char));
-				sprintf(val, "%d", value.value.i);
+				size_t length = con_scprintf(CONSTRING("%d"), value.value.i) + 1;
+				val = (conchar *)calloc(length, sizeof(conchar));
+				con_sprintf(val, length, CONSTRING("%d")), value.value.i);
 				return true;
 				break;
 			}
 		}
 		return false;
 	}
-	val = (char *)calloc(strlen(value.value.s) + 1, sizeof(char));
-	strcpy(val, value.value.s);
+	val = (conchar *)calloc(con_strlen(value.value.s) + 1, sizeof(conchar));
+	con_strcpy(val, value.value.s);
 	return true;
 }
 
@@ -226,7 +228,7 @@ bool ConVar::GetDefaultValue(int &val)
 	return true;
 }
 
-bool ConVar::GetDefaultValue(char *&val)
+bool ConVar::GetDefaultValue(conchar *&val)
 {
 	if (defaultvalue.type != ConVarTypeString)
 	{
@@ -234,23 +236,25 @@ bool ConVar::GetDefaultValue(char *&val)
 		{
 		case ConVarTypeFloat:
 			{
-				val = (char *)calloc(_scprintf("%f", defaultvalue.value.f) + 1, sizeof(char));
-				sprintf(val, "%f", defaultvalue.value.f);
+				size_t length = con_scprintf(CONSTRING("%f"), defaultvalue.value.f) + 1;
+				val = (conchar *)calloc(length, sizeof(conchar));
+				con_sprintf(val, length, CONSTRING("%f")), defaultvalue.value.f);
 				return true;
 				break;
 			}
 		case ConVarTypeInt:
 			{
-				val = (char *)calloc(_scprintf("%d", defaultvalue.value.i) + 1, sizeof(char));
-				sprintf(val, "%d", defaultvalue.value.i);
+				size_t length = con_scprintf(CONSTRING("%d"), defaultvalue.value.i) + 1;
+				val = (conchar *)calloc(length, sizeof(conchar));
+				con_sprintf(val, length, CONSTRING("%d")), defaultvalue.value.i);
 				return true;
 				break;
 			}
 		}
 		return false;
 	}
-	val = (char *)calloc(strlen(defaultvalue.value.s) + 1, sizeof(char));
-	strcpy(val, defaultvalue.value.s);
+	val = (conchar *)calloc(con_strlen(defaultvalue.value.s) + 1, sizeof(conchar));
+	con_strcpy(val, defaultvalue.value.s);
 	return true;
 }
 
@@ -310,7 +314,7 @@ bool ConVar::SetValue(const float val)
 		}
 	case ConVarTypeString:
 		{
-			char *oldvalue = value.value.s;
+			conchar *oldvalue = value.value.s;
 			bool set = false;
 			if ((minimum.exist) && (val < minimum.value.f))
 			{
@@ -390,7 +394,7 @@ bool ConVar::SetValue(const int val)
 		}
 	case ConVarTypeString:
 		{
-			char *oldvalue = value.value.s;
+			conchar *oldvalue = value.value.s;
 			bool set = false;
 			if ((minimum.exist) && (val < minimum.value.i))
 			{
@@ -414,45 +418,45 @@ bool ConVar::SetValue(const int val)
 	return true;
 }
 
-bool ConVar::SetValue(const char *val)
+bool ConVar::SetValue(const conchar *val)
 {
 	if ((minimum.exist == true) || (maximum.exist == true))
 	{
 		return false;
 	}
-	if ((value.type == ConVarTypeString) && (strcmp(value.value.s, val) == 0))
+	if ((value.type == ConVarTypeString) && (con_strcmp(value.value.s, val) == 0))
 	{
 		return true;
 	}
-	unsigned int length = strlen(val);
+	size_t length = con_strlen(val);
 	switch (value.type)
 	{
 	case ConVarTypeFloat:
 		{
 			float oldvalue = value.value.f;
-			value.value.s = (char *)calloc(length + 1, sizeof(char));
-			strcpy(value.value.s, val);
+			value.value.s = (conchar *)calloc(length + 1, sizeof(conchar));
+			con_strcpy(value.value.s, val);
 			this->FireChangeHook(oldvalue);
 			break;
 		}
 	case ConVarTypeInt:
 		{
 			int oldvalue = value.value.i;
-			value.value.s = (char *)calloc(length + 1, sizeof(char));
-			strcpy(value.value.s, val);
+			value.value.s = (conchar *)calloc(length + 1, sizeof(conchar));
+			con_strcpy(value.value.s, val);
 			this->FireChangeHook(oldvalue);
 			break;
 		}
 	case ConVarTypeString:
 		{
-			char *oldvalue = (char *)calloc(strlen(value.value.s) + 1, sizeof(char));
-			strcpy(oldvalue, value.value.s);
-			if (!ResizeBuffer<char *>(value.value.s, length + 1))
+			conchar *oldvalue = (conchar *)calloc(con_strlen(value.value.s) + 1, sizeof(conchar));
+			con_strcpy(oldvalue, value.value.s);
+			if (!ResizeBuffer<conchar *>(value.value.s, length + 1))
 			{
 				free(oldvalue);
 				return false;
 			}
-			strcpy(value.value.s, val);
+			con_strcpy(value.value.s, val);
 			this->FireChangeHook(oldvalue);
 			free(oldvalue);
 			break;
@@ -696,8 +700,8 @@ void ConVar::FireChangeHook(const float val)
 		{
 			float *oldvalue = new float;
 			*oldvalue = val;
-			char *newvalue = (char *)calloc(strlen(value.value.s) + 1, sizeof(char));
-			strcpy(newvalue, value.value.s);
+			conchar *newvalue = (conchar *)calloc(con_strlen(value.value.s) + 1, sizeof(conchar));
+			con_strcpy(newvalue, value.value.s);
 			for (unsigned char i = 0; i < hookbuffersize; i++)
 			{
 				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeFloat, oldvalue, ConVarTypeString, newvalue);
@@ -749,8 +753,8 @@ void ConVar::FireChangeHook(const int val)
 		{
 			int *oldvalue = new int;
 			*oldvalue = val;
-			char *newvalue = (char *)calloc(strlen(value.value.s) + 1, sizeof(char));
-			strcpy(newvalue, value.value.s);
+			conchar *newvalue = (conchar *)calloc(con_strlen(value.value.s) + 1, sizeof(conchar));
+			con_strcpy(newvalue, value.value.s);
 			for (unsigned char i = 0; i < hookbuffersize; i++)
 			{
 				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeInt, oldvalue, ConVarTypeString, newvalue);
@@ -762,7 +766,7 @@ void ConVar::FireChangeHook(const int val)
 	}
 }
 
-void ConVar::FireChangeHook(const char *val)
+void ConVar::FireChangeHook(const conchar *val)
 {
 	if (hookbuffersize == 0)
 	{
@@ -772,8 +776,8 @@ void ConVar::FireChangeHook(const char *val)
 	{
 	case ConVarTypeFloat:
 		{
-			char *oldvalue = (char *)calloc(strlen(val) + 1, sizeof(char));
-			strcpy(oldvalue, val);
+			conchar *oldvalue = (conchar *)calloc(con_strlen(val) + 1, sizeof(conchar));
+			con_strcpy(oldvalue, val);
 			float *newvalue = new float;
 			*newvalue = value.value.f;
 			for (unsigned char i = 0; i < hookbuffersize; i++)
@@ -786,8 +790,8 @@ void ConVar::FireChangeHook(const char *val)
 		}
 	case ConVarTypeInt:
 		{
-			char *oldvalue = (char *)calloc(strlen(val) + 1, sizeof(char));
-			strcpy(oldvalue, val);
+			conchar *oldvalue = (conchar *)calloc(con_strlen(val) + 1, sizeof(conchar));
+			con_strcpy(oldvalue, val);
 			int *newvalue = new int;
 			*newvalue = value.value.i;
 			for (unsigned char i = 0; i < hookbuffersize; i++)
@@ -800,10 +804,10 @@ void ConVar::FireChangeHook(const char *val)
 		}
 	case ConVarTypeString:
 		{
-			char *oldvalue = (char *)calloc(strlen(val) + 1, sizeof(char));
-			strcpy(oldvalue, val);
-			char *newvalue = (char *)calloc(strlen(value.value.s) + 1, sizeof(char));
-			strcpy(newvalue, value.value.s);
+			conchar *oldvalue = (conchar *)calloc(con_strlen(val) + 1, sizeof(conchar));
+			con_strcpy(oldvalue, val);
+			conchar *newvalue = (conchar *)calloc(con_strlen(value.value.s) + 1, sizeof(conchar));
+			con_strcpy(newvalue, value.value.s);
 			for (unsigned char i = 0; i < hookbuffersize; i++)
 			{
 				((void (*) (const ConVar *, const ConVarType, void *, const ConVarType, void *))hookbuffer[i])(this, ConVarTypeString, oldvalue, ConVarTypeString, newvalue);

@@ -14,34 +14,31 @@ public:
 	void Shutdown(void);
 	bool IsLAN(void);
 	bool IsPasswordProtected(void);
-	char *GetHostname(void);
+	wchar_t *GetHostname(void);
 	bool GetComponentSelectStatus(void);
 	void EnableComponentSelect(bool enable);
 	void GetTime(unsigned char *h, unsigned char *m);
 	void SetTime(const unsigned char h, const unsigned char m);
 private:
-	
+	bool isrunning;
+	unsigned int lastcheck;
+	unsigned int lastmasterservercheck;
+	wchar_t *hostname;
+	unsigned short port;
+	bool lan;
+	short maxplayers;
+	wchar_t *gamemode;
+	wchar_t *gamemodename;
+	wchar_t *password;
+	wchar_t *rconpassword;
+	bool componentselect;
+	ConVar *componentselectcvar;
 	struct GameTime
 	{
 		unsigned char hour, minute;
 		int last_get;
 	};
-
 	GameTime gametime;
-
-	bool isrunning;
-	unsigned int lastcheck;
-	unsigned int lastmasterservercheck;
-	char *hostname;
-	unsigned short port;
-	bool lan;
-	short maxplayers;
-	char *gamemode;
-	char *gamemodename;
-	char *password;
-	char *rconpassword;
-	bool componentselect;
-	ConVar *componentselectcvar;
 	friend void ConVarHookHostGamemode(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);
 	friend void ConVarHookHostname(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);
 	friend void ConVarHookRconPassword(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);

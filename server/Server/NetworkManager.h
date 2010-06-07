@@ -91,7 +91,7 @@ private:
 	struct NetworkPlayerConnectionRequestDataInternal
 	{
 		SystemAddress address;
-		char name[MAX_PLAYER_NAME_LENGTH];
+		wchar_t name[MAX_PLAYER_NAME_LENGTH];
 		char sessionkey[33];
 	};
 	union NetworkRPCUnion

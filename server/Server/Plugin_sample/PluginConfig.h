@@ -4,6 +4,6 @@
 
 #pragma once
 
-#define PLUGIN_NAME "Sample plugin" ///< Name of the plugin.
-#define PLUGIN_VERSION "0.0.0.0" ///< Version of the plugin.
-#define PLUGIN_AUTHOR "FOUR-MP team" ///< Author of the plugin.
+#define PLUGIN_NAME L"Sample plugin" ///< Name of the plugin.
+#define PLUGIN_VERSION L"0.0.0.0" ///< Version of the plugin.
+#define PLUGIN_AUTHOR L"FOUR-MP team" ///< Author of the plugin.

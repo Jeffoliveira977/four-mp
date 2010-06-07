@@ -4,6 +4,8 @@
 /// \author FaTony
 #pragma once
 
+#include "condefs.h"
+
 #define FCVAR_NONE				0	///< No flags.
 #define FCVAR_UNREGISTERED		(1<<0)	///< If this is set, don't add to linked list, etc.
 #define FCVAR_DEVELOPMENTONLY	(1<<1)	///< Hidden in released products. Flag is removed automatically if ALLOW_DEVELOPMENT_CVARS is defined.
@@ -44,11 +46,11 @@ public:
 
 	/// \brief Returns symbol name.
 	/// \return Name of the current symbol.
-	char *GetName(void);
+	conchar *GetName(void);
 
 	/// \brief Returns symbol description.
 	/// \return Description of the current symbol or zero-length string.
-	char *GetDescription(void);
+	conchar *GetDescription(void);
 
 	/// \brief Returns symbol flags.
 	/// \return Flags of the current symbol.
@@ -59,8 +61,8 @@ public:
 	void SetFlags(const int f);
 protected:
 	ConsoleCore *concore; ///< Pointer to the console core this symbol belongs to.
-	char *name; ///< Holds name of the current symbol.
-	char *description; ///< Holds description of the current symbol.
+	conchar *name; ///< Holds name of the current symbol.
+	conchar *description; ///< Holds description of the current symbol.
 	int flags; ///< Holds flags of the current symbol.
 
 	/// \brief Initialises all base properties of the current symbol.
@@ -70,7 +72,7 @@ protected:
 	/// \param[in] symbolflags Flags of the symbol.
 	/// \note Used by derived classes' constructor.
 	/// \return No return.
-	void Init(ConsoleCore *core, const char *symbolname, const char *desc = "", const int symbolflags = 0);
+	void Init(ConsoleCore *core, const conchar *symbolname, const conchar *desc = CONSTRING(""), const int symbolflags = 0);
 
 	/// \brief Frees all dynamically allocated memory of current symbol base.
 	/// \note Used by derived classes' destructor.

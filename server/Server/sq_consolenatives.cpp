@@ -23,33 +23,16 @@ extern CoreHandleTypesManager chtm;
 extern ConsoleCore concore;
 extern VirtualMachineManager vmm;
 
-#ifdef SQUNICODE
-#define scvprintf _vscwprintf
-#else
-#define scvprintf _vscprintf
-#endif
-
 // функция печати - PrintToServer(string)
-void sq_PrintToServer(HSQUIRRELVM v, const SQChar *s, ...)
+void sq_PrintToServer(HSQUIRRELVM v, const SQChar *string, ...)
 {
 	va_list arglist;
-    va_start(arglist, s);
-	char *tempstring = (char *)calloc(scvprintf(s, arglist) + 1, sizeof(char));
-	vsprintf(tempstring, s, arglist);
+    va_start(arglist, string);
+	wchar_t *tempstring = (wchar_t *)calloc(_vscwprintf(string, arglist) + 1, sizeof(wchar_t));
+	vswprintf(tempstring, string, arglist);
 	PrintToServer(tempstring);
 	free(tempstring);
     va_end(arglist);
-}
-
-// Функция для печати русских строк - printr(string)
-void sq_printr(HSQUIRRELVM v)
-{
-	char *txt = new char[1024];
-	const char *str = new char[1024];
-	sq_getstring(v, 2, &str);
-	CharToOem(str, txt);
-	PrintToServer(txt);
-	delete txt, str;
 }
 
 void sq_CreateConVar(HSQUIRRELVM v)
@@ -66,8 +49,8 @@ void sq_CreateConVar(HSQUIRRELVM v)
 		sq_pushinteger(v, INVALID_HANDLE);
 		return;
 	}
-	const char *name;
-	const char *description;
+	const wchar_t *name;
+	const wchar_t *description;
 	int flags = 0;
 	sq_getstring(v, 2, &name);
 	if (args >= 3)
@@ -82,7 +65,7 @@ void sq_CreateConVar(HSQUIRRELVM v)
 	{
 	case OT_STRING:
 		{
-			const char *value;
+			const wchar_t *value;
 			sq_getstring(v, 3, &value);
 			sq_pushinteger(v, hm.AddNewHandle(index + 1, HandleTypeConVar, concore.AddConVar(name, value, description, flags)));
 			return;
@@ -137,7 +120,7 @@ void sq_CreateConVar(HSQUIRRELVM v)
 
 void sq_FindConVar(HSQUIRRELVM v)
 {
-	const char *name;
+	const wchar_t *name;
 	sq_getstring(v, 2, &name);
 	unsigned char index;
 	if (!vmm.FindVirtualMachine(&v, index))
@@ -171,7 +154,7 @@ void sq_GetConVarName(HSQUIRRELVM v)
 		sq_pushnull(v);
 		return;
 	}
-	char *name = chtm.GetConVarName(index + 1, handle);
+	wchar_t *name = chtm.GetConVarName(index + 1, handle);
 	if (name == NULL)
 	{
 		sq_pushnull(v);
@@ -222,7 +205,7 @@ void sq_GetConVarInt(HSQUIRRELVM v)
 void sq_GetConVarString(HSQUIRRELVM v)
 {
 	int handle;
-	char *value;
+	wchar_t *value;
 	sq_getinteger(v, 2, &handle);
 	unsigned char index;
 	if (!vmm.FindVirtualMachine(&v, index))
@@ -343,7 +326,7 @@ void sq_SetConVarInt(HSQUIRRELVM v)
 void sq_SetConVarString(HSQUIRRELVM v)
 {
 	int handle;
-	const char *value;
+	const wchar_t *value;
 	sq_getinteger(v, 2, &handle);
 	sq_getstring(v, 3, &value);
 	unsigned char index;
@@ -430,9 +413,9 @@ void sq_SetConVarBoundInt(HSQUIRRELVM v)
 
 void sq_RegServerCmd(HSQUIRRELVM v)
 {
-	const char *name;
-	const char *callback;
-	const char *description;
+	const wchar_t *name;
+	const wchar_t *callback;
+	const wchar_t *description;
 	int flags;
 	sq_getstring(v, 2, &name);
 	sq_getstring(v, 3, &callback);
@@ -453,7 +436,7 @@ void sq_GetCmdArgs(HSQUIRRELVM v)
 
 void sq_GetCmdArgsAsString(HSQUIRRELVM v)
 {
-	char *arg = concore.GetCmdArgString();
+	wchar_t *arg = concore.GetCmdArgString();
 	if (arg == NULL)
 	{
 		sq_pushnull(v);
@@ -495,7 +478,7 @@ void sq_GetCmdArgType(HSQUIRRELVM v)
 void sq_GetCmdArgString(HSQUIRRELVM v)
 {
 	int argnum;
-	char *arg;
+	wchar_t *arg;
 	sq_getinteger(v, 2, &argnum);
 	if (!concore.GetCmdArg(argnum, arg))
 	{
@@ -533,7 +516,7 @@ void sq_GetCmdArgFloat(HSQUIRRELVM v)
 
 void sq_ServerCommand(HSQUIRRELVM v)
 {
-	const char *cmdstring;
+	const wchar_t *cmdstring;
 	sq_getstring(v, 2, &cmdstring);
 	concore.InterpretLine(cmdstring);
 }

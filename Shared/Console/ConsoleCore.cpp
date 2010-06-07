@@ -74,7 +74,7 @@ void ConsoleCore::SetOutputFunction(void *function)
 	outputfunction = function;
 }
 
-void ConsoleCore::SetExecPath(const char *string)
+void ConsoleCore::SetExecPath(const conchar *string)
 {
 	if (string == NULL)
 	{
@@ -85,34 +85,34 @@ void ConsoleCore::SetExecPath(const char *string)
 		}
 		return;
 	}
-	execpath = (char *)calloc(strlen(string) + 1, sizeof(char));
-	strcpy(execpath, string);
+	execpath = (conchar *)calloc(con_strlen(string) + 1, sizeof(conchar));
+	con_strcpy(execpath, string);
 }
 
 void ConsoleCore::RegisterStandardLibrary(void)
 {
-	this->AddConCmd("alias", ConCmdAlias, "Alias a command.", 0);
-	this->AddConCmd("cvarlist", ConCmdCvarlist, "Show the list of convars/concommands.", 0);
-	this->AddConVar("developer", 0, "Show developer messages.", 0, true, 0, true, 2);
-	this->AddConCmd("echo", ConCmdEcho, "Echo text to console.", 0);
-	this->AddConCmd("exec", ConCmdExec, "Execute script file.", 0);
-	this->AddConCmd("find", ConCmdFind, "Find concommands with the specified string in their name/help text.", 0);
-	this->AddConCmd("help", ConCmdHelp, "Find help about a convar/concommand.", 0);
+	this->AddConCmd(CONSTRING("alias"), ConCmdAlias, CONSTRING("Alias a command."), 0);
+	this->AddConCmd(CONSTRING("cvarlist"), ConCmdCvarlist, CONSTRING("Show the list of convars/concommands."), 0);
+	this->AddConVar(CONSTRING("developer"), 0, CONSTRING("Show developer messages."), 0, true, 0, true, 2);
+	this->AddConCmd(CONSTRING("echo"), ConCmdEcho, CONSTRING("Echo text to console."), 0);
+	this->AddConCmd(CONSTRING("exec"), ConCmdExec, CONSTRING("Execute script file."), 0);
+	this->AddConCmd(CONSTRING("find"), ConCmdFind, CONSTRING("Find concommands with the specified string in their name/help text."), 0);
+	this->AddConCmd(CONSTRING("help"), ConCmdHelp, CONSTRING("Find help about a convar/concommand."), 0);
 }
 
-void ConsoleCore::Output(const char *string, ...)
+void ConsoleCore::Output(const conchar *string, ...)
 {
 	if (outputfunction == NULL)
 	{
 		return;
 	}
-	va_list arglist; 
-    va_start(arglist, string);
-	int stringsize = _vscprintf(string, arglist);
-	char *tempstring = (char *)calloc(stringsize + 1, sizeof(char));
-	vsprintf(tempstring, string, arglist);
+	va_list arglist;
+	va_start(arglist, string);
+	int stringsize = con_vscprintf(string, arglist) + 1;
+	conchar *tempstring = (conchar *)calloc(stringsize, sizeof(conchar));
+	con_vsprintf(tempstring, stringsize, string, arglist);
 	va_end(arglist);
-	((void (*) (const char *))outputfunction)(tempstring);
+	((void (*) (const conchar *))outputfunction)(tempstring);
 	free(tempstring);
 }
 
@@ -122,7 +122,7 @@ unsigned short ConsoleCore::GetNumberOfConsoleSymbols(void)
 	return symbolbuffersize;
 }
 
-bool ConsoleCore::IsConsoleSymbolExist(const char *name)
+bool ConsoleCore::IsConsoleSymbolExist(const conchar *name)
 {
 	if (name == NULL)
 	{
@@ -130,7 +130,7 @@ bool ConsoleCore::IsConsoleSymbolExist(const char *name)
 	}
 	for (unsigned short i = 0; i < symbolbuffersize; i++)
 	{
-		if ((strcmp(symbolbuffer[i].name, name)) == 0)
+		if ((con_strcmp(symbolbuffer[i].name, name)) == 0)
 		{
 			return true;
 		}
@@ -138,7 +138,7 @@ bool ConsoleCore::IsConsoleSymbolExist(const char *name)
 	return false;
 }
 
-ConVar *ConsoleCore::AddConVar(const char *name, const float defaultvalue, const char *description, const int flags, const bool hasMin, const float min, const bool hasMax, const float max)
+ConVar *ConsoleCore::AddConVar(const conchar *name, const float defaultvalue, const conchar *description, const int flags, const bool hasMin, const float min, const bool hasMax, const float max)
 {
 	if (name == NULL)
 	{
@@ -168,8 +168,8 @@ ConVar *ConsoleCore::AddConVar(const char *name, const float defaultvalue, const
 	{
 		return NULL;
 	}
-	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
-	strcpy(symbolbuffer[symbolbuffersize].name, name);
+	symbolbuffer[symbolbuffersize].name = (conchar *)calloc(con_strlen(name) + 1, sizeof(conchar));
+	con_strcpy(symbolbuffer[symbolbuffersize].name, name);
 	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConVar;
 	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
 	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(this, name, defaultvalue, description, flags, hasMin, min, hasMax, max);
@@ -178,7 +178,7 @@ ConVar *ConsoleCore::AddConVar(const char *name, const float defaultvalue, const
 	return symbolbuffer[symbolbuffersize-1].ptr->convar;
 }
 
-ConVar *ConsoleCore::AddConVar(const char *name, const int defaultvalue, const char *description, const int flags, const bool hasMin, const int min, const bool hasMax, const int max)
+ConVar *ConsoleCore::AddConVar(const conchar *name, const int defaultvalue, const conchar *description, const int flags, const bool hasMin, const int min, const bool hasMax, const int max)
 {
 	if (name == NULL)
 	{
@@ -208,8 +208,8 @@ ConVar *ConsoleCore::AddConVar(const char *name, const int defaultvalue, const c
 	{
 		return NULL;
 	}
-	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
-	strcpy(symbolbuffer[symbolbuffersize].name, name);
+	symbolbuffer[symbolbuffersize].name = (conchar *)calloc(con_strlen(name) + 1, sizeof(conchar));
+	con_strcpy(symbolbuffer[symbolbuffersize].name, name);
 	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConVar;
 	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
 	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(this, name, defaultvalue, description, flags, hasMin, min, hasMax, max);
@@ -218,7 +218,7 @@ ConVar *ConsoleCore::AddConVar(const char *name, const int defaultvalue, const c
 	return symbolbuffer[symbolbuffersize-1].ptr->convar;
 }
 
-ConVar *ConsoleCore::AddConVar(const char *name, const char *defaultvalue, const char *description, const int flags)
+ConVar *ConsoleCore::AddConVar(const conchar *name, const conchar *defaultvalue, const conchar *description, const int flags)
 {
 	if (name == NULL)
 	{
@@ -244,8 +244,8 @@ ConVar *ConsoleCore::AddConVar(const char *name, const char *defaultvalue, const
 	{
 		return NULL;
 	}
-	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
-	strcpy(symbolbuffer[symbolbuffersize].name, name);
+	symbolbuffer[symbolbuffersize].name = (conchar *)calloc(con_strlen(name) + 1, sizeof(conchar));
+	con_strcpy(symbolbuffer[symbolbuffersize].name, name);
 	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConVar;
 	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
 	symbolbuffer[symbolbuffersize].ptr->convar = new ConVar(this, name, defaultvalue, description, flags);
@@ -254,7 +254,7 @@ ConVar *ConsoleCore::AddConVar(const char *name, const char *defaultvalue, const
 	return symbolbuffer[symbolbuffersize-1].ptr->convar;
 }
 
-ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *description, const int flags)
+ConCmd *ConsoleCore::AddConCmd(const conchar *name, void *callback, const conchar *description, const int flags)
 {
 	if (name == NULL)
 	{
@@ -298,8 +298,8 @@ ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *des
 	{
 		return NULL;
 	}
-	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
-	strcpy(symbolbuffer[symbolbuffersize].name, name);
+	symbolbuffer[symbolbuffersize].name = (conchar *)calloc(con_strlen(name) + 1, sizeof(conchar));
+	con_strcpy(symbolbuffer[symbolbuffersize].name, name);
 	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConCmd;
 	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
 	symbolbuffer[symbolbuffersize].ptr[0].concmd = new ConCmd(this, name, callback, description, flags);
@@ -308,7 +308,7 @@ ConCmd *ConsoleCore::AddConCmd(const char *name, void *callback, const char *des
 	return symbolbuffer[symbolbuffersize-1].ptr[0].concmd;
 }
 
-char *ConsoleCore::GetConsoleSymbolHelpString(const char *name)
+conchar *ConsoleCore::GetConsoleSymbolHelpString(const conchar *name)
 {
 	if (name == NULL)
 	{
@@ -322,7 +322,7 @@ char *ConsoleCore::GetConsoleSymbolHelpString(const char *name)
 	return this->GetHelpString(&symbolbuffer[index]);
 }
 
-char *ConsoleCore::GetConsoleSymbolHelpStringByIndex(unsigned short index)
+conchar *ConsoleCore::GetConsoleSymbolHelpStringByIndex(unsigned short index)
 {
 	if (index >= symbolbuffersize)
 	{
@@ -336,14 +336,14 @@ unsigned char ConsoleCore::GetCmdArgs(void)
 	return numargs;
 }
 
-char *ConsoleCore::GetCmdArgString(void)
+conchar *ConsoleCore::GetCmdArgString(void)
 {
 	if ((argpos == 0) || (commandbuffer == NULL))
 	{
 		return NULL;
 	}
-	char *arg = (char *)calloc(strlen(commandbuffer + argpos) + 1, sizeof(char));
-	strcpy(arg, commandbuffer + argpos);
+	conchar *arg = (conchar *)calloc(con_strlen(commandbuffer + argpos) + 1, sizeof(conchar));
+	con_strcpy(arg, commandbuffer + argpos);
 	return arg;
 }
 
@@ -353,27 +353,27 @@ bool ConsoleCore::GetCmdArgType(const unsigned char argnum, ConVarType &type)
 	{
 		return false;
 	}
-	if (!((commandargs[argnum][0] == '-') || ((commandargs[argnum][0] >= 48) && (commandargs[argnum][0] <= 57))))
+	if (!((commandargs[argnum][0] == CONSTRING('-')) || ((commandargs[argnum][0] >= 48) && (commandargs[argnum][0] <= 57))))
 	{
 		type = ConVarTypeString;
 		return true;
 	}
 	unsigned char firstnum = 0;
-	if (commandargs[argnum][0] == '-')
+	if (commandargs[argnum][0] == CONSTRING('-'))
 	{
 		firstnum = 1;
 	}
-	unsigned int length = strlen(commandargs[argnum]);
-	unsigned int i = 1;
+	size_t length = con_strlen(commandargs[argnum]);
+	size_t i = 1;
 	bool floatflag = false;
 	while (i < length)
 	{
-		if (!((commandargs[argnum][i] == '.') || ((commandargs[argnum][i] >= 48) && (commandargs[argnum][i] <= 57))))
+		if (!((commandargs[argnum][i] == CONSTRING('.')) || ((commandargs[argnum][i] >= 48) && (commandargs[argnum][i] <= 57))))
 		{
 			type = ConVarTypeString;
 			return true;
 		}
-		if (commandargs[argnum][i] == '.')
+		if (commandargs[argnum][i] == CONSTRING('.'))
 		{
 			if (floatflag)
 			{
@@ -398,14 +398,14 @@ bool ConsoleCore::GetCmdArgType(const unsigned char argnum, ConVarType &type)
 	return true;
 }
 
-bool ConsoleCore::GetCmdArg(const unsigned char argnum, char *&arg)
+bool ConsoleCore::GetCmdArg(const unsigned char argnum, conchar *&arg)
 {
 	if (argnum > numargs)
 	{
 		return false;
 	}
-	arg = (char *)calloc(strlen(commandargs[argnum]) + 1, sizeof(char));
-	strcpy(arg, commandargs[argnum]);
+	arg = (conchar *)calloc(con_strlen(commandargs[argnum]) + 1, sizeof(conchar));
+	con_strcpy(arg, commandargs[argnum]);
 	return true;
 }
 
@@ -420,7 +420,7 @@ bool ConsoleCore::GetCmdArg(const unsigned char argnum, int &arg)
 	{
 		return false;
 	}
-	arg = atoi(commandargs[argnum]);
+	arg = con_atoi(commandargs[argnum]);
 	return true;
 }
 
@@ -435,15 +435,15 @@ bool ConsoleCore::GetCmdArg(const unsigned char argnum, float &arg)
 	{
 		return false;
 	}
-	arg = (float)atof(commandargs[argnum]);
+	arg = (float)con_atof(commandargs[argnum]);
 	return true;
 }
 
-void ConsoleCore::InterpretLine(const char *string)
+void ConsoleCore::InterpretLine(const conchar *string)
 {
-	unsigned int length = strlen(string);
-	unsigned int i = 0;
-	while (((string[i] == ' ') || (string[i] == '"')) && (i < length))
+	size_t length = con_strlen(string);
+	size_t i = 0;
+	while (((string[i] == CONSTRING(' ')) || (string[i] == CONSTRING('"'))) && (i < length))
 	{
 		i++;
 	}
@@ -451,7 +451,7 @@ void ConsoleCore::InterpretLine(const char *string)
 	{
 		return;
 	}
-	if ((string[i] == '/') && (string[i+1] == '/'))
+	if ((string[i] == CONSTRING('/')) && (string[i+1] == CONSTRING('/')))
 	{
 		return;
 	}
@@ -459,7 +459,7 @@ void ConsoleCore::InterpretLine(const char *string)
 	while (i < length)
 	{
 		commandbuffer = this->GetCommand(string, i);
-		i = i + strlen(commandbuffer) + 1;
+		i = i + con_strlen(commandbuffer) + 1;
 		comment = (!this->InterpretCommand());
 		free(commandbuffer);
 		commandbuffer = NULL;
@@ -470,7 +470,7 @@ void ConsoleCore::InterpretLine(const char *string)
 	}
 }
 
-void ConsoleCore::AddConAlias(const char *name, const char *cmdstring)
+void ConsoleCore::AddConAlias(const conchar *name, const conchar *cmdstring)
 {
 	if (name == NULL)
 	{
@@ -485,7 +485,7 @@ void ConsoleCore::AddConAlias(const char *name, const char *cmdstring)
 	{
 		if (symbolbuffer[index].type != ConsoleSymbolTypeConAlias)
 		{
-			this->Output("Cannot redefine registered convars/concommands.");
+			this->Output(CONSTRING("Cannot redefine registered convars/concommands."));
 			return;
 		}
 		symbolbuffer[index].ptr->conalias->SetCommandString(cmdstring);
@@ -499,8 +499,8 @@ void ConsoleCore::AddConAlias(const char *name, const char *cmdstring)
 	{
 		return;
 	}
-	symbolbuffer[symbolbuffersize].name = (char *)calloc(strlen(name) + 1, sizeof(char));
-	strcpy(symbolbuffer[symbolbuffersize].name, name);
+	symbolbuffer[symbolbuffersize].name = (conchar *)calloc(con_strlen(name) + 1, sizeof(conchar));
+	con_strcpy(symbolbuffer[symbolbuffersize].name, name);
 	symbolbuffer[symbolbuffersize].type = ConsoleSymbolTypeConAlias;
 	symbolbuffer[symbolbuffersize].ptr = new ConsoleSymbolPtr;
 	symbolbuffer[symbolbuffersize].ptr->conalias = new ConAlias(this, name, cmdstring);
@@ -529,7 +529,7 @@ bool ConsoleCore::DeleteConsoleSymbolByIndex(const unsigned short index)
 	return true;
 }
 
-void ConsoleCore::DeleteConVar(const char *name)
+void ConsoleCore::DeleteConVar(const conchar *name)
 {
 	if (name == NULL)
 	{
@@ -550,7 +550,7 @@ void ConsoleCore::DeleteConVar(const char *name)
 	}
 }
 
-void ConsoleCore::DeleteConCmd(const char *name, ConCmd *ptr)
+void ConsoleCore::DeleteConCmd(const conchar *name, ConCmd *ptr)
 {
 	if (name == NULL)
 	{
@@ -595,11 +595,11 @@ void ConsoleCore::DeleteConCmd(const char *name, ConCmd *ptr)
 	}
 }
 
-bool ConsoleCore::GetConsoleSymbolIndex(const char *name, unsigned short &index)
+bool ConsoleCore::GetConsoleSymbolIndex(const conchar *name, unsigned short &index)
 {
 	for (index = 0; index < symbolbuffersize; index++)
 	{
-		if ((strcmp(symbolbuffer[index].name, name)) == 0)
+		if ((con_strcmp(symbolbuffer[index].name, name)) == 0)
 		{
 			return true;
 		}
@@ -607,10 +607,11 @@ bool ConsoleCore::GetConsoleSymbolIndex(const char *name, unsigned short &index)
 	return false;
 }
 
-char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
+conchar *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 {
-	char *helpstring = (char *)calloc(strlen(symbol->name) + 3, sizeof(char));
-	sprintf(helpstring, "\"%s\"", symbol->name);
+	size_t length = con_strlen(symbol->name) + 3;
+	conchar *helpstring = (conchar *)calloc(length, sizeof(conchar));
+	con_sprintf(helpstring, length, CONSTRING("\"%s\"")), symbol->name);
 	switch (symbol->type)
 	{
 	case ConsoleSymbolTypeConVar:
@@ -621,24 +622,27 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 				{
 					float value;
 					symbol->ptr->convar->GetValue(value);
-					ResizeBuffer<char *>(helpstring, _scprintf("%s = \"%f\"", helpstring, value) + 1);
-					sprintf(helpstring, "%s = \"%f\"", helpstring, value);
+					length = con_scprintf(CONSTRING("%s = \"%f\""), helpstring, value) + 1;
+					ResizeBuffer<conchar *>(helpstring, length);
+					con_sprintf(helpstring, length, CONSTRING("%s = \"%f\"")), helpstring, value);
 					break;
 				}
 			case ConVarTypeInt:
 				{
 					int value;
 					symbol->ptr->convar->GetValue(value);
-					ResizeBuffer<char *>(helpstring, _scprintf("%s = \"%d\"", helpstring, value) + 1);
-					sprintf(helpstring, "%s = \"%d\"", helpstring, value);
+					length = con_scprintf(CONSTRING("%s = \"%d\""), helpstring, value) + 1;
+					ResizeBuffer<conchar *>(helpstring, length);
+					con_sprintf(helpstring, length, CONSTRING("%s = \"%d\"")), helpstring, value);
 					break;
 				}
 			case ConVarTypeString:
 				{
-					char *value;
+					conchar *value;
 					symbol->ptr->convar->GetValue(value);
-					ResizeBuffer<char *>(helpstring, _scprintf("%s = \"%s\"", helpstring, value) + 1);
-					sprintf(helpstring, "%s = \"%s\"", helpstring, value);
+					length = con_scprintf(CONSTRING("%s = \"%s\""), helpstring, value) + 1;
+					ResizeBuffer<conchar *>(helpstring, length);
+					con_sprintf(helpstring, length, CONSTRING("%s = \"%s\"")), helpstring, value);
 					free(value);
 					break;
 				}
@@ -649,17 +653,20 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 				{
 					float value;
 					symbol->ptr->convar->GetDefaultValue(value);
-					ResizeBuffer<char *>(helpstring, _scprintf("%s ( def. \"%f\" )", helpstring, value) + 1);
-					sprintf(helpstring, "%s ( def. \"%f\" )", helpstring, value);
+					length = con_scprintf(CONSTRING("%s ( def. \"%f\" )"), helpstring, value) + 1;
+					ResizeBuffer<conchar *>(helpstring, length);
+					con_sprintf(helpstring, length, CONSTRING("%s ( def. \"%f\" )")), helpstring, value);
 					if (symbol->ptr->convar->GetBound(ConVarBoundLower, value))
 					{
-						ResizeBuffer<char *>(helpstring, _scprintf("%s min. %f", helpstring, value) + 1);
-						sprintf(helpstring, "%s min. %f", helpstring, value);
+						length = con_scprintf(CONSTRING("%s min. %f"), helpstring, value) + 1;
+						ResizeBuffer<conchar *>(helpstring, length);
+						con_sprintf(helpstring, length, CONSTRING("%s min. %f")), helpstring, value);
 					}
 					if (symbol->ptr->convar->GetBound(ConVarBoundUpper, value))
 					{
-						ResizeBuffer<char *>(helpstring, _scprintf("%s max. %f", helpstring, value) + 1);
-						sprintf(helpstring, "%s max. %f", helpstring, value);
+						length = con_scprintf(CONSTRING("%s max. %f"), helpstring, value) + 1;
+						ResizeBuffer<conchar *>(helpstring, length);
+						con_sprintf(helpstring, length, CONSTRING("%s max. %f")), helpstring, value);
 					}
 					break;
 				}
@@ -667,26 +674,30 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 				{
 					int value;
 					symbol->ptr->convar->GetDefaultValue(value);
-					ResizeBuffer<char *>(helpstring, _scprintf("%s ( def. \"%d\" )", helpstring, value) + 1);
-					sprintf(helpstring, "%s ( def. \"%d\" )", helpstring, value);
+					length = con_scprintf(CONSTRING("%s ( def. \"%d\" )"), helpstring, value) + 1;
+					ResizeBuffer<conchar *>(helpstring, length);
+					con_sprintf(helpstring, length, CONSTRING("%s ( def. \"%d\" )")), helpstring, value);
 					if (symbol->ptr->convar->GetBound(ConVarBoundLower, value))
 					{
-						ResizeBuffer<char *>(helpstring, _scprintf("%s min. %d", helpstring, value) + 1);
-						sprintf(helpstring, "%s min. %d", helpstring, value);
+						length = con_scprintf(CONSTRING("%s min. %d"), helpstring, value) + 1;
+						ResizeBuffer<conchar *>(helpstring, length);
+						con_sprintf(helpstring, length, CONSTRING("%s min. %d")), helpstring, value);
 					}
 					if (symbol->ptr->convar->GetBound(ConVarBoundUpper, value))
 					{
-						ResizeBuffer<char *>(helpstring, _scprintf("%s max. %d", helpstring, value) + 1);
-						sprintf(helpstring, "%s max. %d", helpstring, value);
+						length = con_scprintf(CONSTRING("%s max. %d"), helpstring, value) + 1;
+						ResizeBuffer<conchar *>(helpstring, length);
+						con_sprintf(helpstring, length, CONSTRING("%s max. %d")), helpstring, value);
 					}
 					break;
 				}
 			case ConVarTypeString:
 				{
-					char *value;
+					conchar *value;
 					symbol->ptr->convar->GetDefaultValue(value);
-					ResizeBuffer<char *>(helpstring, _scprintf("%s  ( def. \"%s\" )", helpstring, value) + 1);
-					sprintf(helpstring, "%s  ( def. \"%s\" )", helpstring, value);
+					length = con_scprintf(CONSTRING("%s  ( def. \"%s\" )"), helpstring, value) + 1;
+					ResizeBuffer<conchar *>(helpstring, length);
+					con_sprintf(helpstring, length, CONSTRING("%s  ( def. \"%s\" )")), helpstring, value);
 					free(value);
 					break;
 				}
@@ -695,18 +706,19 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 			{
 				//TODO: flags
 			}
-			char *desc = symbol->ptr->convar->GetDescription();
-			if (strlen(desc) != 0)
+			conchar *desc = symbol->ptr->convar->GetDescription();
+			if (con_strlen(desc) != 0)
 			{
-				ResizeBuffer<char *>(helpstring, _scprintf("%s\n - %s", helpstring, desc) + 1);
-				sprintf(helpstring, "%s\n - %s", helpstring, desc);
+				length = con_scprintf(CONSTRING("%s\n - %s"), helpstring, desc) + 1;
+				ResizeBuffer<conchar *>(helpstring, length);
+				con_sprintf(helpstring, length, CONSTRING("%s\n - %s")), helpstring, desc);
 			}
 			free(desc);
 			break;
 		}
 	case ConsoleSymbolTypeConCmd:
 		{
-			char *desc;
+			conchar *desc;
 			for (unsigned char i = 0; i < symbol->numcmds; i++)
 			{
 				if (symbol->ptr->convar->GetFlags() != 0)
@@ -714,10 +726,11 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 					//TODO: flags
 				}
 				desc = symbol->ptr->convar->GetDescription();
-				if (strlen(desc) != 0)
+				if (con_strlen(desc) != 0)
 				{
-					ResizeBuffer<char *>(helpstring, _scprintf("%s\n - %s", helpstring, desc) + 1);
-					sprintf(helpstring, "%s\n - %s", helpstring, desc);
+					length = con_scprintf(CONSTRING("%s\n - %s"), helpstring, desc) + 1;
+					ResizeBuffer<conchar *>(helpstring, length);
+					con_sprintf(helpstring, length, CONSTRING("%s\n - %s")), helpstring, desc);
 				}
 				free(desc);
 			}
@@ -725,59 +738,59 @@ char *ConsoleCore::GetHelpString(const ConsoleSymbol *symbol)
 		}
 	case ConsoleSymbolTypeConAlias:
 		{
-			ResizeBuffer<char *>(helpstring, 1);
-			helpstring[0] = '\0';
+			ResizeBuffer<conchar *>(helpstring, 1);
+			helpstring[0] = CONSTRING('\0');
 			break;
 		}
 	}
 	return helpstring;
 }
 
-char *ConsoleCore::GetCommand(const char *string, const unsigned int startindex)
+conchar *ConsoleCore::GetCommand(const conchar *string, const unsigned int startindex)
 {
-	unsigned int length = strlen(string);
-	unsigned int i = startindex;
+	size_t length = con_strlen(string);
+	size_t i = startindex;
 	bool stringargument = false;
-	while ((!((string[i] == ';') && (stringargument == false))) && (i < length))
+	while ((!((string[i] == CONSTRING(';')) && (stringargument == false))) && (i < length))
 	{
-		if (string[i] == '"')
+		if (string[i] == CONSTRING('"'))
 		{
 			stringargument = !stringargument;
 		}
 		i++;
 	}
 	length = i - startindex;
-	char *cmdstring = (char *)calloc(length + 1, sizeof(char));
-	strncpy(cmdstring, string + startindex, length);
-	cmdstring[length] = '\0';
+	conchar *cmdstring = (conchar *)calloc(length + 1, sizeof(conchar));
+	con_strncpy(cmdstring, string + startindex, length);
+	cmdstring[length] = CONSTRING('\0');
 	return cmdstring;
 }
 
 bool ConsoleCore::InterpretCommand(void)
 {
-	unsigned int length = strlen(commandbuffer);
-	unsigned int i = 0;
-	while (((commandbuffer[i] == ' ') || (commandbuffer[i] == '"')) && (i < length))
+	size_t length = con_strlen(commandbuffer);
+	size_t i = 0;
+	while (((commandbuffer[i] == CONSTRING(' ')) || (commandbuffer[i] == CONSTRING('"'))) && (i < length))
 	{
 		i++;
 	}
-	unsigned int startindex = i;
-	while ((commandbuffer[i] != ' ') && (i < length))
+	size_t startindex = i;
+	while ((commandbuffer[i] != CONSTRING(' ')) && (i < length))
 	{
 		i++;
 	}
-	unsigned int templength = i - startindex;
+	size_t templength = i - startindex;
 	if (templength == 0)
 	{
 		return true;
 	}
-	char *symbolname = (char *)calloc(templength + 1, sizeof(char));
-	strncpy(symbolname, commandbuffer + startindex, templength);
-	symbolname[templength] = '\0';
+	conchar *symbolname = (conchar *)calloc(templength + 1, sizeof(conchar));
+	con_strncpy(symbolname, commandbuffer + startindex, templength);
+	symbolname[templength] = CONSTRING('\0');
 	unsigned short index;
 	if (!this->GetConsoleSymbolIndex(symbolname, index))
 	{
-		this->Output("Unknown command \"%s\"", symbolname);
+		this->Output(CONSTRING("Unknown command \"%s\""), symbolname);
 		free(symbolname);
 		return true;
 	}
@@ -790,20 +803,19 @@ bool ConsoleCore::InterpretCommand(void)
 		}
 		free(commandargs);
 	}
-	commandargs = (char **)calloc(1, sizeof(char *));
-	commandargs[0] = (char *)calloc(templength + 1, sizeof(char));
-	strcpy(commandargs[0], symbolname);
+	commandargs = (conchar **)calloc(1, sizeof(conchar *));
+	commandargs[0] = (conchar *)calloc(templength + 1, sizeof(conchar));
+	con_strcpy(commandargs[0], symbolname);
 	i++;
 	unsigned char j = 1;
-	unsigned int endindex = 0;
 	bool comment = false;
 	while ((i < length) && (!comment))
 	{
-		if (commandbuffer[i] == ' ')
+		if (commandbuffer[i] == CONSTRING(' '))
 		{
 			i++;
 		}
-		else if (commandbuffer[i] == '"')
+		else if (commandbuffer[i] == CONSTRING('"'))
 		{
 			startindex = i + 1;
 			if (j == 1)
@@ -811,16 +823,16 @@ bool ConsoleCore::InterpretCommand(void)
 				argpos = startindex;
 			}
 			i++;
-			while ((commandbuffer[i] != '"') && (i < length))
+			while ((commandbuffer[i] != CONSTRING('"')) && (i < length))
 			{
 				i++;
 			}
 			templength = i - startindex;
 			i++;
-			ResizeBuffer<char **>(commandargs, j + 1);
-			commandargs[j] = (char *)calloc(templength + 1, sizeof(char));
-			strncpy(commandargs[j], commandbuffer + startindex, templength);
-			commandargs[j][templength] = '\0';
+			ResizeBuffer<conchar **>(commandargs, j + 1);
+			commandargs[j] = (conchar *)calloc(templength + 1, sizeof(conchar));
+			con_strncpy(commandargs[j], commandbuffer + startindex, templength);
+			commandargs[j][templength] = CONSTRING('\0');
 			j++;
 		}
 		else
@@ -828,7 +840,7 @@ bool ConsoleCore::InterpretCommand(void)
 			startindex = i;
 			if (j == 1)
 			{
-				if ((commandbuffer[i] == '/') && (commandbuffer[i+1] == '/'))
+				if ((commandbuffer[i] == CONSTRING('/')) && (commandbuffer[i+1] == CONSTRING('/')))
 				{
 					comment = true;
 				}
@@ -840,15 +852,15 @@ bool ConsoleCore::InterpretCommand(void)
 			if (!comment)
 			{
 				i++;
-				while ((commandbuffer[i] != ' ') && (i < length))
+				while ((commandbuffer[i] != CONSTRING(' ')) && (i < length))
 				{
 					i++;
 				}
 				templength = i - startindex;
-				ResizeBuffer<char **>(commandargs, j + 1);
-				commandargs[j] = (char *)calloc(templength + 1, sizeof(char));
-				strncpy(commandargs[j], commandbuffer + startindex, templength);
-				commandargs[j][templength] = '\0';
+				ResizeBuffer<conchar **>(commandargs, j + 1);
+				commandargs[j] = (conchar *)calloc(templength + 1, sizeof(conchar));
+				con_strncpy(commandargs[j], commandbuffer + startindex, templength);
+				commandargs[j][templength] = CONSTRING('\0');
 				j++;
 			}
 		}
@@ -884,7 +896,7 @@ bool ConsoleCore::InterpretCommand(void)
 					}
 				case ConVarTypeString:
 					{
-						char *value;
+						conchar *value;
 						this->GetCmdArg(1, value);
 						symbolbuffer[index].ptr->convar->SetValue(value);
 						free(value);
@@ -894,7 +906,7 @@ bool ConsoleCore::InterpretCommand(void)
 			}
 			else
 			{
-				char *arg = this->GetCmdArgString();
+				conchar *arg = this->GetCmdArgString();
 				symbolbuffer[index].ptr->convar->SetValue(arg);
 			}
 			break;

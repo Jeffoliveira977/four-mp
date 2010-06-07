@@ -9,7 +9,7 @@
 #include "ConCmd.h"
 #include "ConsoleCore.h"
 
-ConCmd::ConCmd(ConsoleCore *core, const char *cmdname, void *callback, const char *desc, const int cmdflags)
+ConCmd::ConCmd(ConsoleCore *core, const conchar *cmdname, void *callback, const conchar *desc, const int cmdflags)
 {
 	this->Init(core, cmdname, desc, cmdflags);
 	handler = callback;

@@ -2,7 +2,7 @@
 
 #include "Limits.h"
 
-#define PROTOCOL_VERSION 6
+#define PROTOCOL_VERSION 7
 
 #define DEFAULT_SERVER_NETWORK_ID 0
 #define DEFAULT_CLIENT_NETWORK_ID 65534
@@ -10,7 +10,7 @@
 struct NetworkPlayerConnectionRequestData
 {
 	short protocol;
-	char name[MAX_PLAYER_NAME_LENGTH];
+	wchar_t name[MAX_PLAYER_NAME_LENGTH];
 	int fmpid;
 	char sessionkey[33];
 };
@@ -49,7 +49,7 @@ struct NetworkPlayerCheckData
 struct NetworkPlayerFullUpdateData
 {
 	short index;
-	char name[MAX_PLAYER_NAME_LENGTH];
+	wchar_t name[MAX_PLAYER_NAME_LENGTH];
 	unsigned int model;
 	float position[3];
 	float angle;
@@ -166,8 +166,7 @@ struct NetworkPlayerComponentsChangeData
 struct NetworkPlayerChatData
 {
 	short client;
-	char msg[MAX_CHAT_MESSAGE_LENGTH];
-	unsigned char color[4];
+	wchar_t msg[MAX_CHAT_MESSAGE_LENGTH];
 };
 
 struct NetworkVehicleFullUpdateData

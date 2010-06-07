@@ -109,12 +109,12 @@ void NetworkManager::Tick(void)
 		{
 		case ID_CONNECTION_REQUEST:
 			{
-				debug("New connection request");
+				debug(L"New connection request");
 				break;
 			}
 		case ID_NEW_INCOMING_CONNECTION:
 			{
-				debug("New connection from %s:%d", pack->systemAddress.ToString(0), pack->systemAddress.port);
+				debug(L"New connection from %s:%d", pack->systemAddress.ToString(0), pack->systemAddress.port);
 				break;
 			}
 		case ID_DISCONNECTION_NOTIFICATION:
@@ -129,29 +129,29 @@ void NetworkManager::Tick(void)
 			}
 		case ID_RPC_REMOTE_ERROR:
 			{
-				PrintToServer("RakNet: RPC remote error");
+				PrintToServer(L"RakNet: RPC remote error");
 				switch (pack->data[1])
 				{
 				case RakNet::RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE:
-					PrintToServer("RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
+					PrintToServer(L"RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
 					break;
 				case RakNet::RPC_ERROR_OBJECT_DOES_NOT_EXIST:
-					PrintToServer("RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
+					PrintToServer(L"RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
 					break;
 				case RakNet::RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
-					PrintToServer("RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
+					PrintToServer(L"RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
 					break;
 				case RakNet::RPC_ERROR_FUNCTION_NOT_REGISTERED:
-					PrintToServer("RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
+					PrintToServer(L"RPC_ERROR_FUNCTION_NOT_REGISTERED\n");
 					break;
 				case RakNet::RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED:
-					PrintToServer("RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
+					PrintToServer(L"RPC_ERROR_FUNCTION_NO_LONGER_REGISTERED\n");
 					break;
 				case RakNet::RPC_ERROR_CALLING_CPP_AS_C:
-					PrintToServer("RPC_ERROR_CALLING_CPP_AS_C\n");
+					PrintToServer(L"RPC_ERROR_CALLING_CPP_AS_C\n");
 					break;
 				case RakNet::RPC_ERROR_CALLING_C_AS_CPP:
-					PrintToServer("RPC_ERROR_CALLING_C_AS_CPP\n");
+					PrintToServer(L"RPC_ERROR_CALLING_C_AS_CPP\n");
 					break;
 				}
 			} break;
@@ -216,8 +216,8 @@ void NetworkManager::CheckClients(void)
 
 void NetworkManager::UpdateServerInfo(void)
 {
-	char *hostname = server.GetHostname();
-	char *gamemode = vmm.GetGameModeName();
+	wchar_t *hostname = server.GetHostname();
+	wchar_t *gamemode = vmm.GetGameModeName();
 	char *info = new char[512];
 	sprintf(info, "%s%c%s%c%s%c%d%c%d%c%d%c%s%c", hostname, 1, gamemode, 1, "World", 1, playm.numplayers, 1, playm.maxplayerbuffersize, 1, server.IsPasswordProtected(), 1, "", 1);
 	net->SetOfflinePingResponse(info, strlen(info) + 1);
@@ -236,14 +236,14 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 	}
 	if (data.protocol != PROTOCOL_VERSION)
 	{
-		PrintToServer("Client has different protocol version.");
+		PrintToServer(L"Client has different protocol version.");
 		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorInvalidProtocol);
 		net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
 		return;
 	}
-	if (strlen(data.name) == 0)
+	if (wcslen(data.name) == 0)
 	{
-		PrintToServer("Client has invalid name.");
+		PrintToServer(L"Client has invalid name.");
 		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorInvalidName);
 		net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
 		return;
@@ -251,7 +251,7 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 	short clientindex = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
 	if (clientindex != INVALID_PLAYER_INDEX)
 	{
-		PrintToServer("Player %s has tried to connect twice.", playm.playerbuffer[clientindex]->name);
+		PrintToServer(L"Player %s has tried to connect twice.", playm.playerbuffer[clientindex]->name);
 		this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorAlreadyConnected);
 		net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
 		return;
@@ -260,7 +260,7 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 	{
 		if(!msm.QueryUserCheck(data.fmpid, clientrpc3->GetLastSenderAddress().ToString(0), data.sessionkey))
 		{
-			PrintToServer("Fake user.");
+			PrintToServer(L"Fake user.");
 			this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorAlreadyConnected);
 			net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
 			return;
@@ -273,9 +273,9 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 
 	NetworkPlayerConnectionRequestDataInternal data2;
 	data2.address = clientrpc3->GetLastSenderAddress();
-	strcpy(data2.name, data.name);
+	wcscpy(data2.name, data.name);
 	strcpy(data2.sessionkey, data.sessionkey);
-	PrintToServer("%s %s %s", data2.name, data2.sessionkey, clientrpc3->GetLastSenderAddress().ToString());
+	PrintToServer(L"%s %s %s", data2.name, data2.sessionkey, clientrpc3->GetLastSenderAddress().ToString());
 	this->WriteToRPCBuffer(NetworkRPCPlayerConnectionRequest, &data2);
 }
 
@@ -283,9 +283,9 @@ void NetworkManager::RecieveClientConnectionNextRequest(NetworkPlayerConnectionR
 {
 	NetworkPlayerConnectionRequestDataInternal data2;
 	data2.address = clientrpc3->GetLastSenderAddress();
-	strcpy(data2.name, data.name);
+	wcscpy(data2.name, data.name);
 	strcpy(data2.sessionkey, data.sessionkey);
-	PrintToServer("NEXT: %s %s %s", data2.name, data2.sessionkey, clientrpc3->GetLastSenderAddress().ToString());
+	PrintToServer(L"NEXT: %s %s %s", data2.name, data2.sessionkey, clientrpc3->GetLastSenderAddress().ToString());
 
 	this->WriteToRPCBuffer(NetworkRPCPlayerConnectionNextRequest, &data2);
 }
@@ -402,9 +402,7 @@ void NetworkManager::RecievePlayerHealthAndArmorChange(NetworkPlayerHealthAndArm
 
 void NetworkManager::RecievePlayerSpawnRequest(NetworkPlayerSpawnRequestData data, RakNet::RPC3 *clientrpc3)
 {
-	PrintToServer("Spawn");
 	short client = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
-	PrintToServer("%d", client);
 	if (client == INVALID_PLAYER_INDEX)
 	{
 		return;
@@ -633,7 +631,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			short client = this->RegisterNewClient(data->playerconnectionrequest->address);
 			if (client == INVALID_PLAYER_INDEX)
 			{
-				PrintToServer("Unable to register new client.");
+				PrintToServer(L"Unable to register new client.");
 				this->SendConnectionError(data->playerconnectionrequest->address, NetworkPlayerConnectionErrorAllocationError);
 				net->CloseConnection(data->playerconnectionrequest->address, true);
 				delete data->playerconnectionrequest;
@@ -641,7 +639,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			}
 			if (!vmm.OnPlayerConnect(client, data->playerconnectionrequest->name))
 			{
-				PrintToServer("Server script has disabled new client.");
+				PrintToServer(L"Server script has disabled new client.");
 				this->SendConnectionError(data->playerconnectionrequest->address, NetworkPlayerConnectionErrorScriptLock);
 				net->CloseConnection(data->playerconnectionrequest->address, true);
 				delete clientbuffer[client];
@@ -651,7 +649,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			}
 			if (!playm.RegisterNewPlayer(client, data->playerconnectionrequest->name))
 			{
-				PrintToServer("Unable to register new client.");
+				PrintToServer(L"Unable to register new client.");
 				this->SendConnectionError(data->playerconnectionrequest->address, NetworkPlayerConnectionErrorAllocationError);
 				net->CloseConnection(data->playerconnectionrequest->address, true);
 				delete clientbuffer[client];
@@ -659,7 +657,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 				delete data->playerconnectionrequest;
 				return;
 			}
-			PrintToServer("Player %s[%d] connected", playm.playerbuffer[client]->name, client);
+			PrintToServer(L"Player %s[%d] connected", playm.playerbuffer[client]->name, client);
 			NetworkPlayerInfoData infodata;
 			infodata.index = client;
 			strcpy(infodata.sessionkey, data->playerconnectionrequest->sessionkey);
@@ -673,7 +671,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			short client = this->GetClientIndex( data->playerconnectionnextrequest->address );
 			if(client == INVALID_PLAYER_INDEX) break;
 
-			PrintToServer("Next connect %d", client);
+			PrintToServer(L"Next connect %d", client);
 
 			NetworkTimeData timedata;
 			server.GetTime(&timedata.hour, &timedata.minute);
@@ -706,7 +704,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			playerdata = this->GetPlayerFullUpdateData(client);
 			if (playerdata == NULL)
 			{
-				PrintToServer("Bad");
+				PrintToServer(L"Bad");
 				this->SendConnectionError(data->playerconnectionnextrequest->address, NetworkPlayerConnectionErrorAllocationError);
 				net->CloseConnection(data->playerconnectionnextrequest->address, true);
 				delete clientbuffer[client];
@@ -936,7 +934,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			playm.playerbuffer[data->playerspawnrequest->client]->room = 0;
 			playm.playerbuffer[data->playerspawnrequest->client]->want_spawn = 1;
 
-			PrintToServer("Spawn RPC %d", data->playerspawnrequest->client);
+			PrintToServer(L"Spawn RPC %d", data->playerspawnrequest->client);
 			vmm.OnPlayerSpawn(data->playerspawnrequest->client);
 
 			playm.playerbuffer[data->playerspawnrequest->client]->want_spawn = 0;
@@ -996,12 +994,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		}
 	case NetworkRPCPlayerChat:
 		{
-			if (!playm.GetPlayerColor(data->playerchat->client, data->playerchat->color))
-			{
-				delete data->playerchat;
-				return;
-			}
-			if(!vmm.OnPlayerText(data->playerchat->client, data->playerchat->msg))
+			if (!vmm.OnPlayerText(data->playerchat->client, data->playerchat->msg))
 			{
 				delete data->playerchat;
 				return;
@@ -1152,7 +1145,7 @@ void NetworkManager::HandleClientDisconnection(const SystemAddress address)
 		return;
 	}
 	vmm.OnPlayerDisconnect(client);
-	PrintToServer("Player %s disconnected", playm.playerbuffer[client]->name);
+	PrintToServer(L"Player %s disconnected", playm.playerbuffer[client]->name);
 	delete playm.playerbuffer[client];
 	playm.playerbuffer[client] = NULL;
 	playm.numplayers--;
@@ -1229,7 +1222,7 @@ NetworkPlayerFullUpdateData *NetworkManager::GetPlayerFullUpdateData(const short
 	}
 	NetworkPlayerFullUpdateData *data = new NetworkPlayerFullUpdateData;
 	data->index = index;
-	strcpy(data->name, playm.playerbuffer[index]->name);
+	wcscpy(data->name, playm.playerbuffer[index]->name);
 	data->model = playm.playerbuffer[index]->model;
 	memcpy(data->position, playm.playerbuffer[index]->position, sizeof(float) * 3);
 	data->angle = playm.playerbuffer[index]->angle;

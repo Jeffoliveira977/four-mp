@@ -41,7 +41,7 @@ public:
 	/// \param[in] owner Owner that requests access to the handle.
 	/// \param[in] name Name of the console variable to search for.
 	/// \return Handle index on success, INVALID_HANDLE otherwise.
-	int FindConVar(const short owner, const char *name);
+	int FindConVar(const short owner, const wchar_t *name);
 
 	/// \brief Resets the console variable to its default value.
 	/// \param[in] owner Owner that requests access to the handle.
@@ -53,7 +53,7 @@ public:
 	/// \param[in] owner Owner that requests access to the handle.
 	/// \param[in] handle Handle to the console variable.
 	/// \return Name on success, NULL otherwise.
-	char *GetConVarName(const short owner, const int handle);
+	wchar_t *GetConVarName(const short owner, const int handle);
 
 	/// \brief Retrieves the value of a console variable.
 	/// \param[in] owner Owner that requests access to the handle.
@@ -74,7 +74,7 @@ public:
 	/// \param[in] handle Handle to the console variable.
 	/// \param[out] value Buffer to store the value in.
 	/// \return True on success, false otherwise.
-	bool GetConVarValue(const short owner, const int handle, char *&value);
+	bool GetConVarValue(const short owner, const int handle, wchar_t *&value);
 
 	/// \brief Retrieves the bitstring of flags on a console variable. 
 	/// \param[in] owner Owner that requests access to the handle.
@@ -118,7 +118,7 @@ public:
 	/// \param[in] handle Handle to the console variable.
 	/// \param[in] value The value to set.
 	/// \return True on success, false otherwise.
-	bool SetConVarValue(const short owner, const int handle, const char *value);
+	bool SetConVarValue(const short owner, const int handle, const wchar_t *value);
 
 	/// \brief Sets the bitstring of flags on a console variable.
 	/// \param[in] owner Owner that requests access to the handle.
@@ -150,13 +150,13 @@ public:
 	/// \param[in] callback Name of the callback that will be called during the execution of the command.
 	/// \param[in] ptr Pointer to the console command that will be associated with this dynamic command.
 	/// \return True on success, false otherwise.
-	bool AddDynamicCommand(const short owner, const char *callback, const ConCmd *ptr);
+	bool AddDynamicCommand(const short owner, const wchar_t *callback, const ConCmd *ptr);
 
 	/// \brief Returns the handle indexes of a dynamic command.
 	/// \param[in] name Name of the command to search for.
 	/// \param[out] numcmds Number of commands found.
 	/// \return An array of handles on success, NULL otherwise.
-	int *GetDynamicCommandHandles(const char *name, unsigned char &numcmds);
+	int *GetDynamicCommandHandles(const wchar_t *name, unsigned char &numcmds);
 
 	/// \brief Deletes the dynamic command by the given handle index.
 	/// \param[in] handle Index of the handle.
@@ -173,7 +173,7 @@ private:
 	struct DynamicCommand
 	{
 		int index; ///< Holds the handle index of the current dynamic command.
-		char *callback; //Holds the callback of the current dynamic command.
+		wchar_t *callback; //Holds the callback of the current dynamic command.
 	};
 	DynamicCommand *commandbuffer; ///< Holds all additional data needed by the dynamic commands.
 	unsigned short maxcommandbuffersize; ///< Holds the maximum size of the dynamic commands buffer.
@@ -188,5 +188,5 @@ private:
 	/// \brief Retrieves the callback of the given handle index.
 	/// \param[in] handle Index of the handle.
 	/// \return Callback string on success, NULL otherwise.
-	char *GetDynamicCommandCallback(const int handle);
+	wchar_t *GetDynamicCommandCallback(const int handle);
 };

@@ -16,7 +16,7 @@ public:
 	short GetNumberOfPlayers(void);
 	bool IsServerFull(void);
 	bool IsPlayerConnected(const short index);
-	char *GetPlayerName(const short index);
+	wchar_t *GetPlayerName(const short index);
 	unsigned int GetPlayerModel(const short index);
 	bool GetPlayerPosition(const short index, float (&postion)[3]);
 	bool GetPlayerAngle(const short index, float &angle);
@@ -35,7 +35,7 @@ public:
 private:
 	struct Player
 	{
-		char name[MAX_PLAYER_NAME_LENGTH]; ///< Holds the name of the player.
+		wchar_t name[MAX_PLAYER_NAME_LENGTH]; ///< Holds the name of the player.
 		unsigned char classindex; ///< Holds the index of the player's class.
 		unsigned int model; ///< Holds the model hash of the player.
 		float position[3]; ///< Holds the position of the player.
@@ -75,9 +75,9 @@ private:
 	unsigned char maxclassbuffersize;
 	unsigned char classbuffersize;
 	PlayerClass **classbuffer;
-	bool RegisterNewPlayer(const short index, char (&name)[MAX_PLAYER_NAME_LENGTH]);
+	bool RegisterNewPlayer(const short index, wchar_t (&name)[MAX_PLAYER_NAME_LENGTH]);
 	short GetPlayerFreeSlot(void);
-	bool AssignPlayerName(char (&name)[MAX_PLAYER_NAME_LENGTH]);
+	bool AssignPlayerName(wchar_t (&name)[MAX_PLAYER_NAME_LENGTH]);
 	bool GetClassFreeSlot(unsigned char &index);
 	friend class NetworkManager;
 };

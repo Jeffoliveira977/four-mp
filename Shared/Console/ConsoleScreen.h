@@ -7,7 +7,7 @@
 
 #include "ConsoleCore.h"
 
-#ifdef WIN32
+#if defined (WIN32)
 #include <windows.h>
 #endif
 
@@ -33,7 +33,7 @@ public:
 	/// \brief Sets caption (1st line).
 	/// \param[in] string String to print as caption.
 	/// \return No return.
-	void SetCaption(const char *string);
+	void SetCaption(const conchar *string);
 
 	/// \brief Handles keyboard input.
 	/// \return No return.
@@ -43,17 +43,17 @@ public:
 	/// \param[in] string Format-control string.
 	/// \param[in] ... Optional arguments.
 	/// \return No return.
-	void Print(const char *string, ...);
+	void Print(const conchar *string, ...);
 private:
 	ConsoleCore *concore; ///< Pointer to the console core this screen is wrapped around.
-	char *caption; ///< Holds caption text.
+	conchar *caption; ///< Holds caption text.
 	unsigned short maxoutputbuffersize; ///< Holds maximum size of the output buffer (in lines).
 	unsigned short outputbuffersize; ///< Holds current size of the output buffer (in lines).
-	char **outputbuffer; ///< Holds everything that was recently outputted to screen.
+	conchar **outputbuffer; ///< Holds everything that was recently outputted to screen.
 	unsigned char maxinputbuffersize; ///< Holds maximum size of the input buffer (in lines).
 	unsigned char inputbuffersize; ///< Holds curent size of the input buffer (in lines).
-	char **inputbuffer; //< Holds input history and current line.
-#ifdef WIN32
+	conchar **inputbuffer; //< Holds input history and current line.
+#if defined (WIN32)
 	HANDLE outputhandle; ///< Holds handle to the Win32 console.
 #endif
 	unsigned char inputbufferposition[2]; ///< Holds current cursor position in the input buffer ([0] - Line index, [1] - Character index).
@@ -117,12 +117,12 @@ private:
 	/// \brief Appends string to the output buffer.
 	/// \param[in] string String to append.
 	/// \return No return.
-	void WriteToOutputBuffer(const char *string);
+	void WriteToOutputBuffer(const conchar *string);
 
 	/// \brief Writes prepared string to the output buffer.
 	/// \param[in] string String to write.
 	/// \return No return.
-	void AppendToOutputBuffer(const char *string);
+	void AppendToOutputBuffer(const conchar *string);
 
 	/// \brief Replaces current input with one from history.
 	/// \return No return.

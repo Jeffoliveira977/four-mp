@@ -31,7 +31,7 @@ public:
 	MasterServerManager(void);
 	~MasterServerManager(void);
 	bool Init(void);
-	bool RegisterServer(const unsigned short port, const char *name, const char *mode, const char *loc, const short maxplayers, const bool password);
+	bool RegisterServer(const unsigned short port, const wchar_t *name, const wchar_t *mode, const wchar_t *loc, const short maxplayers, const bool password);
 	bool QueryUserCheck(const int fmpid, const char *ip, const char *seskey);
 	bool QueryClanCheck(const int fmpid, const char *clan);
 };

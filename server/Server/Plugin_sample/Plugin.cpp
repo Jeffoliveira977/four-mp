@@ -18,7 +18,7 @@ Plugin::~Plugin(void)
 void Plugin::OnPluginLoad(void)
 {
 	//Your code here
-	server->PrintToServer("HELLO WORLD!");
+	server->PrintToServer(L"HELLO WORLD!");
 }
 
 void Plugin::OnPluginUnload(void)
