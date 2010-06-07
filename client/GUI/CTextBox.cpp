@@ -1,18 +1,18 @@
 #include "CGUI.h"
 
-CTextBox::CTextBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CTextBox::CTextBox( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String, const uichar * String2, tAction Callback )
 {
 	m_iLimit = 128;
 	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 
 	pSlider = new CScrollBar( Gui, CPos( GetWidth() + 2, 0 ), GetHeight() );
 
-	SetThemeElement( pGui->GetThemeElement( "TextBox" ) );
+	SetThemeElement( pGui->GetThemeElement( _UI("TextBox") ) );
 
 	if( !GetThemeElement() )
-		MessageBoxA( 0, "Theme element invalid.", "TextBox", 0 );
+		MessageBox( 0, _UI("Theme element invalid."), _UI("TextBox"), 0 );
 	else
-		SetElementState( "Norm" );
+		SetElementState( _UI("Norm") );
 
 }
 
@@ -70,7 +70,7 @@ bool CTextBox::KeyEvent( SKey sKey )
 	return 0;
 }
 
-void CTextBox::AddString( std::string sString )
+void CTextBox::AddString( uistring sString )
 {
 	if( !sString.length() )
 		return;
@@ -78,17 +78,17 @@ void CTextBox::AddString( std::string sString )
 	if(!pSlider) return;
 
 	EnterCriticalSection(&cs);
-	/*std::vector<std::string> vPending;
+	/*std::vector<uistring> vPending;
 	int iLength = static_cast<int>( sString.length() );
 	for( int i = iLength - 1; i > 0; i-- )
 	{
-		if( sString[ i ] == '\n' )
+		if( sString[ i ] == _UI('\n') )
 		{
-			sString[ i ] = '\0';
+			sString[ i ] = _UI('\0');
 			
 			if( i + 1 < iLength )
 			{
-				if( sString[ i + 1 ] == '\r' )
+				if( sString[ i + 1 ] == _UI('\r') )
 				{
 					if( i + 2 < iLength )
 						vPending.push_back( &sString.c_str()[ i + 2 ] );
@@ -127,7 +127,7 @@ void CTextBox::AddString( std::string sString )
 		}
 	}/*
 
-	for( std::vector<std::string>::reverse_iterator iIter = vPending.rbegin(); iIter != vPending.rend(); iIter++ )
+	for( std::vector<uistring>::reverse_iterator iIter = vPending.rbegin(); iIter != vPending.rend(); iIter++ )
 		AddString( *iIter );*/
 
 	LeaveCriticalSection(&cs);
@@ -144,9 +144,9 @@ void CTextBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
 
-	pString = pState->GetColor( "String" );
-	pInner = pState->GetColor( "Inner" );
-	pBorder = pState->GetColor( "Border" );
+	pString = pState->GetColor( _UI("String") );
+	pInner = pState->GetColor( _UI("Inner") );
+	pBorder = pState->GetColor( _UI("Border") );
 }
 
 void CTextBox::ShowSlider(bool bShow)

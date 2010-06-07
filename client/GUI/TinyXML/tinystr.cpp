@@ -2,7 +2,7 @@
 www.sourceforge.net/projects/tinyxml
 Original file by Yves Berquin.
 
-This software is provided 'as-is', without any express or implied
+This software is provided _UI('as-is'), without any express or implied
 warranty. In no event will the authors be held liable for any
 damages arising from the use of this software.
 
@@ -36,7 +36,7 @@ const TiXmlString::size_type TiXmlString::npos = static_cast< TiXmlString::size_
 
 
 // Null rep.
-TiXmlString::Rep TiXmlString::nullrep_ = { 0, 0, { '\0' } };
+TiXmlString::Rep TiXmlString::nullrep_ = { 0, 0, { _TIXML_L('\0') } };
 
 
 void TiXmlString::reserve (size_type cap)
@@ -51,7 +51,7 @@ void TiXmlString::reserve (size_type cap)
 }
 
 
-TiXmlString& TiXmlString::assign(const char* str, size_type len)
+TiXmlString& TiXmlString::assign(const TIXML_CHAR* str, size_type len)
 {
 	size_type cap = capacity();
 	if (len > cap || cap > 3*(len + 8))
@@ -70,7 +70,7 @@ TiXmlString& TiXmlString::assign(const char* str, size_type len)
 }
 
 
-TiXmlString& TiXmlString::append(const char* str, size_type len)
+TiXmlString& TiXmlString::append(const TIXML_CHAR* str, size_type len)
 {
 	size_type newsize = length() + len;
 	if (newsize > capacity())
@@ -92,20 +92,20 @@ TiXmlString operator + (const TiXmlString & a, const TiXmlString & b)
 	return tmp;
 }
 
-TiXmlString operator + (const TiXmlString & a, const char* b)
+TiXmlString operator + (const TiXmlString & a, const TIXML_CHAR* b)
 {
 	TiXmlString tmp;
-	TiXmlString::size_type b_len = static_cast<TiXmlString::size_type>( strlen(b) );
+	TiXmlString::size_type b_len = static_cast<TiXmlString::size_type>( uislen(b) );
 	tmp.reserve(a.length() + b_len);
 	tmp += a;
 	tmp.append(b, b_len);
 	return tmp;
 }
 
-TiXmlString operator + (const char* a, const TiXmlString & b)
+TiXmlString operator + (const TIXML_CHAR* a, const TiXmlString & b)
 {
 	TiXmlString tmp;
-	TiXmlString::size_type a_len = static_cast<TiXmlString::size_type>( strlen(a) );
+	TiXmlString::size_type a_len = static_cast<TiXmlString::size_type>( uislen(a) );
 	tmp.reserve(a_len + b.length());
 	tmp.append(a, a_len);
 	tmp += b;

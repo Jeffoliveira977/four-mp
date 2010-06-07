@@ -1,6 +1,6 @@
 #include "CGUI.h"
 
-CDropDown::CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CDropDown::CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String, const uichar * String2, tAction Callback )
 {
 	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 
@@ -8,12 +8,12 @@ CDropDown::CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const char
 	m_iSelected = m_iMouseOverIndex = 0;
 	iEdge = iButton = 0;
 
-	SetThemeElement( pGui->GetThemeElement( "DropDown" ) );
+	SetThemeElement( pGui->GetThemeElement( _UI("DropDown") ) );
 
 	if( !GetThemeElement() )
-		MessageBoxA( 0, "Theme element invalid.", "DropDown", 0 );
+		MessageBox( 0, _UI("Theme element invalid."), _UI("DropDown"), 0 );
 	else
-		SetElementState( "Norm" );
+		SetElementState( _UI("Norm") );
 }
 
 CDropDown::~CDropDown()
@@ -102,7 +102,7 @@ bool CDropDown::MouseMove( CMouse * pMouse, bool over )
 		inArea &= pMouse->InArea( Pos.GetX(), Pos.GetY()-iHeight, GetWidth(), iHeight + GetHeight() );
 	else
 		inArea &= pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), iHeight + GetHeight() );
-	SetElementState( SetMouseOver( inArea )?"MouseOver":"Norm" );
+	SetElementState( SetMouseOver( inArea )?_UI("MouseOver"):_UI("Norm") );
 
 	if( GetMouseOver() )
 	{
@@ -149,14 +149,14 @@ bool CDropDown::KeyEvent( SKey sKey )
 						GetAction()( this, SELECT, m_iSelected );
 
 					m_bDropped = false;
-					SetElementState( "Norm" );
+					SetElementState( _UI("Norm") );
 				}
 				else
 				{
 					GetParent()->BringToTop( this );
 
 					m_bDropped = true;
-					SetElementState( "Pressed" );
+					SetElementState( _UI("Pressed") );
 				}
 
 				pGui->GetMouse()->SetLeftButton( 0 );
@@ -168,12 +168,12 @@ bool CDropDown::KeyEvent( SKey sKey )
 	return 0;
 }
 
-void CDropDown::AddElement( std::string sElem, std::string sValue )
+void CDropDown::AddElement( uistring sElem, uistring sValue )
 {
 	m_vEntrys.push_back( SEntry( sElem, sValue ) );
 }
 
-std::string CDropDown::GetValue()
+uistring CDropDown::GetValue()
 {
 	return m_vEntrys[ m_iSelected ].m_sValue;
 }
@@ -182,18 +182,18 @@ void CDropDown::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
 
-	pString = pState->GetColor( "String" );
-	pInner = pState->GetColor( "Inner" );
-	pBorder = pState->GetColor( "Border" );
-	pSelectedInner = pState->GetColor( "SelectedInner" );
-	pSelectedString = pState->GetColor( "SelectedString" );
+	pString = pState->GetColor( _UI("String") );
+	pInner = pState->GetColor( _UI("Inner") );
+	pBorder = pState->GetColor( _UI("Border") );
+	pSelectedInner = pState->GetColor( _UI("SelectedInner") );
+	pSelectedString = pState->GetColor( _UI("SelectedString") );
 
-	pButton = pState->GetTexture( "Button" );
-	pLeft = pState->GetTexture( "Left" );
-	pMiddle = pState->GetTexture( "Middle" );
+	pButton = pState->GetTexture( _UI("Button") );
+	pLeft = pState->GetTexture( _UI("Left") );
+	pMiddle = pState->GetTexture( _UI("Middle") );
 
-	SetHeight(pState->GetInt("Height"));
-	iEdge = pState->GetInt("SizeEdge");
-	iButton = pState->GetInt("SizeButton");
-	iPadding = pState->GetInt("Padding");
+	SetHeight(pState->GetInt(_UI("Height")));
+	iEdge = pState->GetInt(_UI("SizeEdge"));
+	iButton = pState->GetInt(_UI("SizeButton"));
+	iPadding = pState->GetInt(_UI("Padding"));
 }

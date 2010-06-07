@@ -12,13 +12,13 @@
 // USAGE:
 //   CD3DFont:
 //     1) Instanciate the class with the parameterized constructor
-//        eg CD3DFont *g_pD3Dfont = new CD3DFont("Arial", 16, FCT_BOLD);
+//        eg CD3DFont *g_pD3Dfont = new CD3DFont(_UI("Arial"), 16, FCT_BOLD);
 //
 //     2) Call Initialize() after other rendering is ready
 //        eg g_pD3DFont->Initialize(pD3Ddevice);
 //
 //     3) To begin rendering use Print function
-//        eg g_pD3DFont->Print(10.0f, 50.0f, 0xFF00FF00, "Hello World", FT_BORDER);
+//        eg g_pD3DFont->Print(10.0f, 50.0f, 0xFF00FF00, _UI("Hello World"), FT_BORDER);
 //
 //     4) call Invalidate() upon Reset of the D3D surface and re-initialize
 //
@@ -98,13 +98,13 @@ HRESULT CD3DBaseRender::Initialize( IDirect3DDevice9 * pD3Ddev )
 {
 	if( m_pD3Ddev == NULL && ( m_pD3Ddev = pD3Ddev ) == NULL )
 	{
-		_DEBUG("m_pD3Ddev is NULL");
+		_DEBUG(_UI("m_pD3Ddev is NULL"));
 		return E_FAIL;
 	}
 	
 	if( !m_statesOK && FAILED( CreateStates() ) )
 	{
-		_DEBUG( "CreateStates() failed" );
+		_DEBUG( _UI("CreateStates() failed") );
 		return E_FAIL;
 	}
 
@@ -121,7 +121,7 @@ HRESULT CD3DBaseRender::BeginRender()
 {
 	if( !m_statesOK )
 	{
-		_DEBUG("::BeginRender() m_statesOK = false");
+		_DEBUG(_UI("::BeginRender() m_statesOK = false"));
 		return E_FAIL;
 	}
 
@@ -139,7 +139,7 @@ HRESULT CD3DBaseRender::EndRender()
 {
 	if( !m_statesOK )
 	{
-		_DEBUG("::EndRender() m_statesOK = false");
+		_DEBUG(_UI("::EndRender() m_statesOK = false"));
 		return E_FAIL;
 	}
 
@@ -366,9 +366,9 @@ HRESULT CD3DRender::D3DAddQuad( int x, int y, int w, int h, DWORD dwColor )
 
 
 
-CD3DFont::CD3DFont( char * pszFontName, int iFontHeight, DWORD dwCreateFlags )
+CD3DFont::CD3DFont( uichar * pszFontName, int iFontHeight, DWORD dwCreateFlags )
 {
-	strcpy_s( m_szFontName, 32, ( pszFontName ? pszFontName : "Arial" ) );
+	uiscpy_s( m_szFontName, 32, ( pszFontName ? pszFontName : _UI("Arial") ) );
 
 	m_fontHeight = iFontHeight;
 	m_dwCreateFlags = dwCreateFlags;
@@ -391,20 +391,20 @@ HRESULT CD3DFont::Initialize( IDirect3DDevice9 * pD3Ddev )
 {
 	if( FAILED( CD3DBaseRender::Initialize( pD3Ddev ) ) )
 	{
-		_DEBUG("::Initialize(pD3Ddev) failed");
+		_DEBUG(_UI("::Initialize(pD3Ddev) failed"));
 		return E_FAIL;
 	}
 
 	m_pRender = new CD3DRender( 256 );
 	if( m_pRender == NULL )
 	{
-		_DEBUG( "m_pRender = NULL" );
+		_DEBUG( _UI("m_pRender = NULL") );
 		return E_FAIL;
 	}
 
 	if( FAILED( m_pRender->Initialize( pD3Ddev ) ) )
 	{
-		_DEBUG( "m_pRender->Initialize failed" );
+		_DEBUG( _UI("m_pRender->Initialize failed") );
 		return E_FAIL;
 	}
 
@@ -412,13 +412,13 @@ HRESULT CD3DFont::Initialize( IDirect3DDevice9 * pD3Ddev )
 
 	if( FAILED( m_pD3Ddev->CreateTexture( m_texWidth, m_texHeight, 1, 0, D3DFMT_A4R4G4B4, D3DPOOL_MANAGED, &m_pD3Dtex, NULL ) ) )
 	{
-		_DEBUG( "CreateTexture failed" );
+		_DEBUG( _UI("CreateTexture failed") );
 		return E_FAIL;
 	}
 	
 	if( FAILED( m_pD3Ddev->CreateVertexBuffer( m_maxTriangles * 3 * sizeof( d3dfont_s ), D3DUSAGE_WRITEONLY | D3DUSAGE_DYNAMIC, 0, D3DPOOL_DEFAULT, &m_pD3Dbuf, NULL ) ) )
 	{
-		_DEBUG( "CreateVertexBuffer failed" );
+		_DEBUG( _UI("CreateVertexBuffer failed") );
 		SAFE_RELEASE( m_pD3Dtex );
 		return E_FAIL;
 	}
@@ -438,13 +438,13 @@ HRESULT CD3DFont::Initialize( IDirect3DDevice9 * pD3Ddev )
 	HBITMAP hbmBitmap = CreateDIBSection( hDC, &bmi, DIB_RGB_COLORS, (void**)&pBitmapBits, NULL, 0 );
 	SetMapMode( hDC, MM_TEXT );
 
-	HFONT hFont = CreateFontW( -MulDiv( m_fontHeight, GetDeviceCaps( hDC, LOGPIXELSY ), 72 ), 0, 0, 0, (m_dwCreateFlags&FCR_BOLD ? FW_BOLD : FW_NORMAL), m_dwCreateFlags&FCR_ITALICS, false, false, 
+	HFONT hFont = CreateFont( -MulDiv( m_fontHeight, GetDeviceCaps( hDC, LOGPIXELSY ), 72 ), 0, 0, 0, (m_dwCreateFlags&FCR_BOLD ? FW_BOLD : FW_NORMAL), m_dwCreateFlags&FCR_ITALICS, false, false, 
 		ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, 
-		VARIABLE_PITCH, L"Tahoma" );
+		VARIABLE_PITCH, _UI("Tahoma") );
 
 	if( hFont == NULL )
 	{
-		_DEBUG( "hFont = NULL" );
+		_DEBUG( _UI("hFont = NULL") );
 		return E_FAIL;
 	}
 
@@ -456,10 +456,10 @@ HRESULT CD3DFont::Initialize( IDirect3DDevice9 * pD3Ddev )
 	SetTextAlign( hDC, TA_TOP );
 
 	int x, y = 0;
-	wchar_t szStr[2] = { L' ', 0 };
+	uichar szStr[2] = { _UI(' '), 0 };
 	SIZE size;
 
-	GetTextExtentPoint32W( hDC, szStr, 1, &size);
+	GetTextExtentPoint32( hDC, szStr, 1, &size);
 	x = m_chrSpacing = static_cast<int>( ceil( size.cx / 4.0f ) );
 	m_fChrHeight = static_cast<float>( size.cy - 1 );
 	
@@ -467,8 +467,8 @@ HRESULT CD3DFont::Initialize( IDirect3DDevice9 * pD3Ddev )
 	{
 		szStr[ 0 ] = btowc( c );
 
-		if( !GetTextExtentPoint32W( hDC, szStr, 1, &size ) )
-			MessageBoxW( 0, szStr, L"GetTextExtentPoint32W", 0 );
+		if( !GetTextExtentPoint32( hDC, szStr, 1, &size ) )
+			MessageBox( 0, szStr, _UI("GetTextExtentPoint32W"), 0 );
 
 		if( x + size.cx + m_chrSpacing > m_texWidth )
 		{
@@ -477,8 +477,8 @@ HRESULT CD3DFont::Initialize( IDirect3DDevice9 * pD3Ddev )
 		}
 
 		RECT rect = { x, y, x + size.cx, y + size.cy };
-		if( !ExtTextOutW( hDC, x, y, ETO_CLIPPED, &rect, szStr, 1, 0 ) )
-			MessageBoxW( 0, szStr, L"ExtTextOutW", 0 );
+		if( !ExtTextOut( hDC, x, y, ETO_CLIPPED, &rect, szStr, 1, 0 ) )
+			MessageBox( 0, szStr, _UI("ExtTextOutW"), 0 );
 
 		//tu src + dst
 		m_fTexCoords[ c - 32 ][ 0 ] = static_cast<float>( ( x + 0		- m_chrSpacing ) ) / static_cast<float>( m_texWidth );
@@ -535,11 +535,11 @@ HRESULT CD3DFont::Invalidate()
 	return S_OK;
 }
 
-HRESULT CD3DFont::Print( float x, float y, DWORD colour, const char * szText, DWORD dwFlags )
+HRESULT CD3DFont::Print( float x, float y, DWORD colour, const uichar * szText, DWORD dwFlags )
 {
 	if( !m_isReady )
 	{
-		_DEBUG( "::Print() m_isReady = false" );
+		_DEBUG( _UI("::Print() m_isReady = false") );
 		return E_FAIL;
 	}
 
@@ -555,7 +555,7 @@ HRESULT CD3DFont::Print( float x, float y, DWORD colour, const char * szText, DW
 
 	if( FAILED( CD3DBaseRender::BeginRender() ) )
 	{
-		_DEBUG( "::Print() BeginRender() failed" );
+		_DEBUG( _UI("::Print() BeginRender() failed") );
 		return E_FAIL;
 	}
 
@@ -565,18 +565,18 @@ HRESULT CD3DFont::Print( float x, float y, DWORD colour, const char * szText, DW
 	m_pD3Ddev->SetTexture( 0, m_pD3Dtex );
 	m_pD3Ddev->SetStreamSource( 0, m_pD3Dbuf, 0, sizeof( d3dfont_s ) );
 
-	if( *szText != '\0' )
+	if( *szText != _UI('\0') )
 	{
 		UINT usedTriangles = 0;
 		d3dfont_s *pVertex;
 
 		if( FAILED( m_pD3Dbuf->Lock( 0, 0, reinterpret_cast<void**>( &pVertex ), D3DLOCK_DISCARD ) ) )
 		{
-			_DEBUG( "::Print() Lock() failed" );
+			_DEBUG( _UI("::Print() Lock() failed") );
 			return E_FAIL;
 		}
 
-		int iLen = static_cast<int>( strlen( szText ) );
+		int iLen = static_cast<int>( uislen( szText ) );
 		for( int i = 0; i < iLen; i++ )
 		{
 			int c = ( szText[i]&0xFF ) - 32;
@@ -602,7 +602,7 @@ HRESULT CD3DFont::Print( float x, float y, DWORD colour, const char * szText, DW
 			usedTriangles += 2;
 			if( usedTriangles >= m_maxTriangles )
 			{
-				_DEBUG( "Please increase the max triangles" );
+				_DEBUG( _UI("Please increase the max triangles") );
 				break;
 			}
 		}
@@ -620,11 +620,11 @@ HRESULT CD3DFont::Print( float x, float y, DWORD colour, const char * szText, DW
 	return S_OK;
 }
 
-int CD3DFont::DrawLength( const char * szText )
+int CD3DFont::DrawLength( const uichar * szText )
 {
 	float fLen = 0.0f;
 
-	for( int i = strlen( szText ) - 1; i >= 0; i-- )
+	for( int i = uislen( szText ) - 1; i >= 0; i-- )
 	{
 		int iChar = ( szText[i]&0xFF ) - 32;
 		if( iChar >= 0 && iChar < 255)

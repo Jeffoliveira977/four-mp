@@ -1,16 +1,16 @@
 #include "CGUI.h"
 
-CCheckBox::CCheckBox( CGUI *Gui, int X, int Y, int Width, int Height, bool Checked, const char * String, const char * String2, tAction Callback )
+CCheckBox::CCheckBox( CGUI *Gui, int X, int Y, int Width, int Height, bool Checked, const uichar * String, const uichar * String2, tAction Callback )
 {
 	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 	SetChecked( Checked );
 
-	SetThemeElement( pGui->GetThemeElement( "CheckBox" ) );
+	SetThemeElement( pGui->GetThemeElement( _UI("CheckBox") ) );
 
 	if( !GetThemeElement() )
-		MessageBoxA( 0, "No color scheme element found.", "CheckBox", 0 );
+		MessageBox( 0, _UI("No color scheme element found."), _UI("CheckBox"), 0 );
 	else
-		SetElementState( "Norm" );
+		SetElementState( _UI("Norm") );
 }
 
 CCheckBox::~CCheckBox()
@@ -52,7 +52,7 @@ bool CCheckBox::MouseMove( CMouse * pMouse, bool over )
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
 	bool inArea = pMouse->InArea( Pos.GetX(), Pos.GetY(), GetFont()->GetStringWidth( GetFormatted().c_str() ) + GetWidth(), GetFont()->GetStringHeight() ) && over;
-	SetElementState( SetMouseOver( inArea )?"MouseOver":"Norm" );
+	SetElementState( SetMouseOver( inArea )?_UI("MouseOver"):_UI("Norm") );
 	return inArea;
 }
 
@@ -75,13 +75,13 @@ void CCheckBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
 
-	pString = pState->GetColor( "String" );
-	tCheck = pState->GetTexture("CheckBox");
-	tChecked = pState->GetTexture("CheckBoxChecked");
+	pString = pState->GetColor( _UI("String") );
+	tCheck = pState->GetTexture(_UI("CheckBox"));
+	tChecked = pState->GetTexture(_UI("CheckBoxChecked"));
 
 	if(GetWidth() == 0)
 	{
-		SetWidth(pState->GetInt("Width"));
-		SetHeight(pState->GetInt("Height"));
+		SetWidth(pState->GetInt(_UI("Width")));
+		SetHeight(pState->GetInt(_UI("Height")));
 	}
 }

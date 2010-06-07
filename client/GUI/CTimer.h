@@ -1,6 +1,6 @@
 #pragma once
 
-#pragma comment (lib,"winmm.lib")
+#pragma comment (lib, "winmm.lib")
 #include <windows.h>
 
 class CTimer

@@ -22,17 +22,17 @@ CScrollBar::CScrollBar( CGUI *Gui, CPos relPos, int inHeight )
 	m_bMouseOver[ 0 ] = m_bMouseOver[ 1 ] = m_bMouseOver[ 2 ] = false;
 	SetDragged( false );
 
-	SetThemeElement( pGui->GetThemeElement( "ScrollBar" ) );
-	SetThemeElement( pGui->GetThemeElement( "ScrollBar" ), 1 );
-	SetThemeElement( pGui->GetThemeElement( "ScrollBar" ), 2 );
+	SetThemeElement( pGui->GetThemeElement( _UI("ScrollBar") ) );
+	SetThemeElement( pGui->GetThemeElement( _UI("ScrollBar") ), 1 );
+	SetThemeElement( pGui->GetThemeElement( _UI("ScrollBar") ), 2 );
 
 	if( !GetThemeElement() )
-		MessageBoxA( 0, "Theme element invalid.", "ScrollBar", 0 );
+		MessageBox( 0, _UI("Theme element invalid."), _UI("ScrollBar"), 0 );
 	else
 	{
-		SetElementState( "Norm" );
-		SetElementState( "Norm", 1 );
-		SetElementState( "Norm", 2 );
+		SetElementState( _UI("Norm") );
+		SetElementState( _UI("Norm"), 1 );
+		SetElementState( _UI("Norm"), 2 );
 	}
 
 	SetRelPos( CPos(relPos.GetX() - ibWidth, relPos.GetY()) );
@@ -78,12 +78,12 @@ void CScrollBar::PreDraw()
 	if( (m_bPressed[ 0 ] && !pGui->GetMouse()->GetLeftButton()) || !m_bMouseOver[ 0 ] )
 	{
 		m_bPressed[ 0 ] = false;
-		SetElementState( m_bMouseOver[ 0 ]?"MouseOver":"Norm" );
+		SetElementState( m_bMouseOver[ 0 ]?_UI("MouseOver"):_UI("Norm") );
 	}
 	if( (m_bPressed[ 2 ] && !pGui->GetMouse()->GetLeftButton()) || m_bMouseOver[ 2 ] )
 	{
 		m_bPressed[ 2 ] = false;
-		SetElementState( m_bMouseOver[ 2 ]?"MouseOver":"Norm", 2 );
+		SetElementState( m_bMouseOver[ 2 ]?_UI("MouseOver"):_UI("Norm"), 2 );
 	}
 }
 
@@ -92,8 +92,8 @@ bool CScrollBar::MouseMove( CPos basePos, CMouse * pMouse )
 	if(!GetShow()) return 0;
 	
 	CPos Pos = basePos + *GetRelPos();
-	SetElementState( ( ( m_bMouseOver[ 0 ]	= pMouse->InArea( Pos.GetX() + 1, Pos.GetY() + 1, ibWidth - 2, ibHeight - 2 ) ) != 0 )?"MouseOver":"Norm" );
-	SetElementState( ( ( m_bMouseOver[ 2 ]	= pMouse->InArea( Pos.GetX() + 1, Pos.GetY() + 1 + GetHeight() - ibHeight, ibWidth - 2, ibHeight - 2 ) ) != 0 )?"MouseOver":"Norm", 2 );
+	SetElementState( ( ( m_bMouseOver[ 0 ]	= pMouse->InArea( Pos.GetX() + 1, Pos.GetY() + 1, ibWidth - 2, ibHeight - 2 ) ) != 0 )?_UI("MouseOver"):_UI("Norm") );
+	SetElementState( ( ( m_bMouseOver[ 2 ]	= pMouse->InArea( Pos.GetX() + 1, Pos.GetY() + 1 + GetHeight() - ibHeight, ibWidth - 2, ibHeight - 2 ) ) != 0 )?_UI("MouseOver"):_UI("Norm"), 2 );
 
 	if( GetMaxValue() < 2 )
 		return 0;
@@ -121,7 +121,7 @@ bool CScrollBar::MouseMove( CPos basePos, CMouse * pMouse )
 			}
 	}
 	else
-		SetElementState( ( ( m_bMouseOver[ 1 ]	= pMouse->InArea( Pos.GetX(),  Pos.GetY() + ibHeight + static_cast<int>( floor( (float)( GetHeight() - 2 * ibHeight - isHeight) / GetMaxValue() * GetValue() ) ), ibWidth, isHeight ) ) != 0 )?"MouseOver":"Norm", 1 );
+		SetElementState( ( ( m_bMouseOver[ 1 ]	= pMouse->InArea( Pos.GetX(),  Pos.GetY() + ibHeight + static_cast<int>( floor( (float)( GetHeight() - 2 * ibHeight - isHeight) / GetMaxValue() * GetValue() ) ), ibWidth, isHeight ) ) != 0 )?_UI("MouseOver"):_UI("Norm"), 1 );
 
 	return 0;
 }
@@ -140,7 +140,7 @@ bool CScrollBar::KeyEvent( CPos basePos, SKey sKey )
 					SetValue( GetValue() - 1 );
 
 				m_bPressed[ 0 ] = true;
-				SetElementState( "Pressed" );
+				SetElementState( _UI("Pressed") );
 			}
 			else if( m_bMouseOver[ 2 ] )
 			{
@@ -148,11 +148,11 @@ bool CScrollBar::KeyEvent( CPos basePos, SKey sKey )
 					SetValue( GetValue() + 1 );
 
 				m_bPressed[ 2 ] = true;
-				SetElementState( "Pressed", 2 );
+				SetElementState( _UI("Pressed"), 2 );
 			}
 			else if( pGui->GetMouse()->InArea( Pos.GetX() + 1, Pos.GetY() + ibHeight, ibWidth, GetHeight() - ibHeight * 2 ) )
 			{	
-				SetElementState( "Pressed", 1 );
+				SetElementState( _UI("Pressed"), 1 );
 				m_bPressed[ 1 ] = true;
 
 				SetDragged( true );
@@ -161,7 +161,7 @@ bool CScrollBar::KeyEvent( CPos basePos, SKey sKey )
 		}
 		else
 		{
-			SetElementState( m_bMouseOver[ 1 ]?"MouseOver":"Norm", 1 );
+			SetElementState( m_bMouseOver[ 1 ]?_UI("MouseOver"):_UI("Norm"), 1 );
 			SetDragged( false );
 		}
 
@@ -233,25 +233,25 @@ void CScrollBar::UpdateTheme( int iIndex )
 
 	if( iIndex == 1 )
 	{
-		ibHeight = pState->GetInt("bHeight");
-		ibWidth = pState->GetInt("bWidth");
-		isHeight = pState->GetInt("sHeight");
-		back = pState->GetColor( "BG" );
-		pSlider = pState->GetTexture( "Scroll" );
+		ibHeight = pState->GetInt(_UI("bHeight"));
+		ibWidth = pState->GetInt(_UI("bWidth"));
+		isHeight = pState->GetInt(_UI("sHeight"));
+		back = pState->GetColor( _UI("BG") );
+		pSlider = pState->GetTexture( _UI("Scroll") );
 	}
 	else if( iIndex == 0 )
 	{
-		pUpArrow = pState->GetTexture( "ArrowUp" );
+		pUpArrow = pState->GetTexture( _UI("ArrowUp") );
 	}
 	else if(iIndex == 2)
 	{
-		pDownArrow = pState->GetTexture( "ArrowDown" );
+		pDownArrow = pState->GetTexture( _UI("ArrowDown") );
 	}
 }
 
-std::string MinValue( const char *, CElement * pElement )
+/*uistring MinValue( const uichar *, CElement * pElement )
 {
-	std::stringstream sStream;
+	unistream sStream;
 
 	if( pElement )
 	{
@@ -263,15 +263,15 @@ std::string MinValue( const char *, CElement * pElement )
 		}
 		catch( ... )
 		{
-			MessageBoxA( 0, "$MinValue failed", pElement->GetString().c_str(), 0 );
+			MessageBox( 0, _UI("$MinValue failed"), pElement->GetString().c_str(), 0 );
 		}
 	}
 	return sStream.str();
 }
 
-std::string MaxValue( const char *, CElement * pElement )
+uistring MaxValue( const uichar *, CElement * pElement )
 {
-	std::stringstream sStream;
+	unistream sStream;
 
 	if( pElement )
 	{
@@ -283,15 +283,15 @@ std::string MaxValue( const char *, CElement * pElement )
 		}
 		catch( ... )
 		{
-			MessageBoxA( 0, "$MaxValue failed", pElement->GetString().c_str(), 0 );
+			MessageBox( 0, _UI("$MaxValue failed"), pElement->GetString().c_str(), 0 );
 		}
 	}
 	return sStream.str();
 }
 
-std::string SliderValue( const char *, CElement * pElement )
+uistring SliderValue( const uichar *, CElement * pElement )
 {
-	std::stringstream sStream;
+	unistream sStream;
 
 	if( pElement )
 	{
@@ -303,11 +303,11 @@ std::string SliderValue( const char *, CElement * pElement )
 		}
 		catch( ... )
 		{
-			MessageBoxA( 0, "$Value failed", pElement->GetString().c_str(), 0 );
+			MessageBox( 0, _UI("$Value failed"), pElement->GetString().c_str(), 0 );
 		}
 	}
 	return sStream.str();
-}
+}*/
 
 void CScrollBar::SetShow(bool bShow)
 {

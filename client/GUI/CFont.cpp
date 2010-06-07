@@ -1,12 +1,12 @@
 #include "CGUI.h"
 
-CFont::CFont( CGUI *Gui, IDirect3DDevice9 * pDevice, int iHeight, char * pszFaceName, bool bold, bool italic )
+CFont::CFont( CGUI *Gui, IDirect3DDevice9 * pDevice, int iHeight, uichar * pszFaceName, bool bold, bool italic )
 {
 	pGui = Gui;
-	HRESULT hResult = D3DXCreateFontA( pDevice, -MulDiv( iHeight, GetDeviceCaps( GetDC( 0 ), LOGPIXELSY ), 72 ), 0, bold?FW_BOLD:FW_NORMAL, 0, italic, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, pszFaceName, &m_pFont );
+	HRESULT hResult = D3DXCreateFont( pDevice, -MulDiv( iHeight, GetDeviceCaps( GetDC( 0 ), LOGPIXELSY ), 72 ), 0, bold?FW_BOLD:FW_NORMAL, 0, italic, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, pszFaceName, &m_pFont );
 
 	if( FAILED( hResult ) )
-		MessageBoxA( 0, /*DXGetErrorDescription9A( hResult )*/"Error", "D3DXCreateFontA failed", 0 );
+		MessageBox( 0, /*DXGetErrorDescription9( hResult )*/_UI("Error"), _UI("D3DXCreateFontA failed"), 0 );
 	m_pFont->PreloadCharacters( 0, 255 );
 	InitializeCriticalSection(&cs);
 }
@@ -31,7 +31,7 @@ void CFont::OnResetDevice()
 	LeaveCriticalSection(&cs);
 }
 
-void CFont::DrawString( int iX, int iY, DWORD dwFlags, CColor * pColor, std::string sString, int iWidth )
+void CFont::DrawString( int iX, int iY, DWORD dwFlags, CColor * pColor, uistring sString, int iWidth )
 {
 	if(!m_pFont) return;
 	if(!pGui) return;
@@ -49,26 +49,26 @@ void CFont::DrawString( int iX, int iY, DWORD dwFlags, CColor * pColor, std::str
 
 	RECT drawRect = { 0 };
 	DWORD dwDrawFlags = DT_NOCLIP | ( ( dwFlags & FT_CENTER ) ? DT_CENTER : 0 ) | ( ( dwFlags & FT_VCENTER ) ? DT_VCENTER : 0 );
-	m_pFont->DrawTextA( pGui->GetSprite(), sString.c_str(), -1, &drawRect, dwDrawFlags, pColor->GetD3DCOLOR() );
+	m_pFont->DrawText( pGui->GetSprite(), sString.c_str(), -1, &drawRect, dwDrawFlags, pColor->GetD3DCOLOR() );
 
 	pGui->GetSprite()->End();
 	LeaveCriticalSection(&cs);
 }
 
-int CFont::GetStringWidth( const char * pszString )
+int CFont::GetStringWidth( const uichar * pszString )
 {
 	if(!m_pFont) return 0;
 	if(!pszString) return 0;
 
-	//std::string sString( pszString );
+	//uistring sString( pszString );
 	RECT rRect = { 0 };
 
 	/*for( int i = 0; i <= static_cast<int>( sString.size() ); i++ )
-		if( sString[i] == ' ' )
-			sString[i] = '.';*/
+		if( sString[i] == _UI(' ') )
+			sString[i] = _UI('.');*/
 
 	EnterCriticalSection(&cs);
-	m_pFont->DrawTextA( 0, /*sString.c_str()*/pszString, -1, &rRect, DT_CALCRECT, 0 );
+	m_pFont->DrawText( 0, /*sString.c_str()*/pszString, -1, &rRect, DT_CALCRECT, 0 );
 	LeaveCriticalSection(&cs);
 
 	return rRect.right - rRect.left;
@@ -80,7 +80,7 @@ int CFont::GetStringHeight()
 
 	RECT rRect = { 0 };
 	EnterCriticalSection(&cs);
-	m_pFont->DrawTextA( 0, "Y", -1, &rRect, DT_CALCRECT, 0 );
+	m_pFont->DrawText( 0, _UI("Y"), -1, &rRect, DT_CALCRECT, 0 );
 	LeaveCriticalSection(&cs);
 
 	return rRect.bottom - rRect.top;
@@ -102,17 +102,17 @@ CColor & CFont::GetColor( int iIndex )
 	return m_cColors[ iIndex ];
 }
 
-void CFont::CutString( int iMaxWidth, std::string & rString )
+void CFont::CutString( int iMaxWidth, uistring & rString )
 {
 	int iIndex = 0, iLength = rString.length();
 
 	for( int iWidth = 0; iIndex < iLength && iWidth + 10 < iMaxWidth; )
 	{
-		char szCurrent[ 2 ] = { rString.c_str()[ iIndex ], 0 };
+		uichar szCurrent[ 2 ] = { rString.c_str()[ iIndex ], 0 };
 		iWidth += /*pGui->GetFont()->*/GetStringWidth( szCurrent );
 		iIndex++;
 	}
 
 	if( iIndex < iLength )
-		rString[ iIndex - 1 ] = '\0';
+		rString[ iIndex - 1 ] = _UI('\0');
 }

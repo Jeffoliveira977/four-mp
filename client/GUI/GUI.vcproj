@@ -351,6 +351,10 @@
 				RelativePath=".\D3D9.h"
 				>
 			</File>
+			<File
+				RelativePath=".\unistr.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="TinyXML"

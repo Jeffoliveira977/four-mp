@@ -39,17 +39,17 @@ struct SElementState
 {
 	SElement * pParent;
 
-	CColor * GetColor( std::string sString );
-	CTexture * GetTexture( std::string sString );
-	int GetInt( std::string sString );
+	CColor * GetColor( uistring sString );
+	CTexture * GetTexture( uistring sString );
+	int GetInt( uistring sString );
 
-	std::map<std::string, CColor*> mColors;
-	std::map<std::string, CTexture*> mTextures;
-	std::map<std::string, int> mInts;
+	std::map<uistring, CColor*> mColors;
+	std::map<uistring, CTexture*> mTextures;
+	std::map<uistring, int> mInts;
 };
 
 struct SElement
 {
-	std::string sDefaultState;
-	std::map<std::string, SElementState*> m_mStates;
+	uistring sDefaultState;
+	std::map<uistring, SElementState*> m_mStates;
 };

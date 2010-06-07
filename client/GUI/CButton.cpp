@@ -1,18 +1,18 @@
 #include "CGUI.h"
 
-CButton::CButton( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CButton::CButton( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String, const uichar * String2, tAction Callback )
 {
 	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 
 	m_bVisibleBack = 1;
 	SizeEdge = 0;
 
-	SetThemeElement( pGui->GetThemeElement( "Button" ) );
+	SetThemeElement( pGui->GetThemeElement( _UI("Button") ) );
 
 	if( !GetThemeElement() )
-		MessageBoxA( 0, "Theme element invalid.", "Button", 0 );
+		MessageBox( 0, _UI("Theme element invalid."), _UI("Button"), 0 );
 	else
-		SetElementState( "Norm" );
+		SetElementState( _UI("Norm") );
 }
 
 CButton::~CButton()
@@ -40,7 +40,7 @@ void CButton::Draw()
 void CButton::PreDraw()
 {
 	if( !m_tPressed.Running() && GetEnabled() )
-		SetElementState( GetMouseOver()?"MouseOver":"Norm" );
+		SetElementState( GetMouseOver()?_UI("MouseOver"):_UI("Norm") );
 }
 
 bool CButton::MouseMove( CMouse * pMouse, bool over )
@@ -50,7 +50,7 @@ bool CButton::MouseMove( CMouse * pMouse, bool over )
 	CPos Pos = *GetParent()->GetAbsPos() + *GetRelPos();
 
 	bool inArea = pMouse->InArea( Pos.GetX(), Pos.GetY(), GetWidth(), GetHeight() ) && over;
-	SetElementState( SetMouseOver( inArea )?"MouseOver":"Norm" );
+	SetElementState( SetMouseOver( inArea )?_UI("MouseOver"):_UI("Norm") );
 
 	return inArea;
 }
@@ -63,7 +63,7 @@ bool CButton::KeyEvent( SKey sKey )
 	{
 		if( GetMouseOver() && pGui->GetMouse()->GetLeftButton( 0 ) )
 		{
-			SetElementState( "Pressed" );
+			SetElementState( _UI("Pressed") );
 
 			if( GetAction() )
 			{
@@ -90,14 +90,14 @@ void CButton::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
 
-	pButton[0] = pState->GetTexture( "ButtonLeft" );
-	pButton[1] = pState->GetTexture( "ButtonMiddle" );
-	pButton[2] = pState->GetTexture( "ButtonRight" );
+	pButton[0] = pState->GetTexture( _UI("ButtonLeft") );
+	pButton[1] = pState->GetTexture( _UI("ButtonMiddle") );
+	pButton[2] = pState->GetTexture( _UI("ButtonRight") );
 
-	pString = pState->GetColor( "String" );
+	pString = pState->GetColor( _UI("String") );
 
-	SetHeight( pState->GetInt( "Height" ) );
-	SizeEdge = pState->GetInt("SizeEdge");
+	SetHeight( pState->GetInt( _UI("Height") ) );
+	SizeEdge = pState->GetInt(_UI("SizeEdge"));
 }
 
 

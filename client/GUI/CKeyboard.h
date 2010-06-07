@@ -4,7 +4,7 @@
 
 struct SKey
 {
-	char m_vKey;
+	uichar m_vKey;
 	bool m_bDown;
 	LPARAM m_lParam;
 
@@ -14,13 +14,13 @@ struct SKey
 		m_bDown = false;
 		m_lParam = 0;
 	}
-	SKey( char vKey, bool bDown )
+	SKey( uichar vKey, bool bDown )
 	{
 		m_vKey = vKey;
 		m_bDown = bDown;
 		m_lParam = 0;
 	}
-	SKey( char vKey, bool bDown, LPARAM lParam )
+	SKey( uichar vKey, bool bDown, LPARAM lParam )
 	{
 		m_vKey = vKey;
 		m_bDown = bDown;

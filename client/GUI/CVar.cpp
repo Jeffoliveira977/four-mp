@@ -4,31 +4,31 @@ CVar::CVar( double dValue )
 {
 	SetDouble( dValue );
 	SetAction( 0 );
-	SetString( "" );
+	SetString( _UI("") );
 }
 
 CVar::CVar( float fValue )
 {
 	SetFloat( fValue );
 	SetAction( 0 );
-	SetString( "" );
+	SetString( _UI("") );
 }
 
 CVar::CVar( int iValue )
 {
 	SetInteger( iValue );
 	SetAction( 0 );
-	SetString( "" );
+	SetString( _UI("") );
 }
 
 CVar::CVar( bool bValue )
 {
 	SetBoolean( bValue );
 	SetAction( 0 );
-	SetString( "" );
+	SetString( _UI("") );
 }
 
-CVar::CVar( std::string sString )
+CVar::CVar( uistring sString )
 {
 	SetString( sString );
 	SetAction( 0 );
@@ -39,7 +39,7 @@ CVar::CVar( tAction pAction )
 {
 	SetAction( pAction );
 	SetDouble( 0.0 );
-	SetString( "" );
+	SetString( _UI("") );
 }
 
 void CVar::SetDouble( double dValue )
@@ -65,7 +65,7 @@ void CVar::SetBoolean( bool bValue )
 		m_dValue = 0.0;
 }
 
-void CVar::SetString( std::string sString )
+void CVar::SetString( uistring sString )
 {
 	m_sString = sString;
 }
@@ -95,14 +95,14 @@ bool CVar::GetBoolean()
 	return ( m_dValue != 0.0 );
 }
 
-std::string CVar::GetString()
+uistring CVar::GetString()
 {
 	return m_sString;
 }
 
-std::string CVar::GetActionString( const char * pszString, CElement * pElement )
+uistring CVar::GetActionString( const uichar * pszString, CElement * pElement )
 {
-	/*std::stringstream sStream;
+	/*unistream sStream;
 
 	if( m_pAction )
 		sStream << m_pAction( pszString, pElement );
@@ -111,12 +111,12 @@ std::string CVar::GetActionString( const char * pszString, CElement * pElement )
 	else if( GetInteger() )
 		sStream << GetInteger();
 	else
-		sStream << "Cvar invalid.";
+		sStream << _UI("Cvar invalid.");
 
 	return sStream.str();*/
 	if( GetAction() )
 		return GetAction()( pszString, pElement );
-	return std::string();
+	return uistring();
 }
 
 CVar::tAction CVar::GetAction()

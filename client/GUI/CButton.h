@@ -14,7 +14,7 @@ class CButton : public CElement
 	int SizeEdge;
 
 public:
-	CButton( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CButton( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String = NULL, const uichar * String2 = NULL, tAction Callback = NULL );
 	~CButton();
 
 	void Draw();

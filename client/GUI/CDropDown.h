@@ -9,9 +9,9 @@ class CDropDown : public CElement
 	
 	struct SEntry
 	{
-		std::string m_sString, m_sValue;
+		uistring m_sString, m_sValue;
 
-		SEntry( std::string sString, std::string sValue )
+		SEntry( uistring sString, uistring sValue )
 		{
 			m_sString = sString;
 			m_sValue = sValue;
@@ -24,15 +24,15 @@ class CDropDown : public CElement
 	int iEdge, iButton, iPadding;
 
 public:
-	CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CDropDown( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String = NULL, const uichar * String2 = NULL, tAction Callback = NULL );
 	~CDropDown();
 
 	void Draw();
 	bool MouseMove( CMouse * pMouse, bool );
 	bool KeyEvent( SKey sKey );
 
-	void AddElement( std::string sElem, std::string sValue );
-	std::string GetValue();
+	void AddElement( uistring sElem, uistring sValue );
+	uistring GetValue();
 
 	void UpdateTheme( int iIndex );
 };

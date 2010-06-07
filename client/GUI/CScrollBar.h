@@ -48,6 +48,6 @@ public:
 	int GetSliderWidth();
 };
 
-std::string MinValue( const char *, CElement * pElement );
-std::string MaxValue( const char *, CElement * pElement );
-std::string SliderValue( const char *, CElement * pElement );
+uistring MinValue( const uichar *, CElement * pElement );
+uistring MaxValue( const uichar *, CElement * pElement );
+uistring SliderValue( const uichar *, CElement * pElement );

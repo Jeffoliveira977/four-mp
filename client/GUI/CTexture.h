@@ -10,11 +10,11 @@ class CTexture
 	ID3DXSprite * m_pSprite;
 	IDirect3DDevice9 * m_pDevice;
 	CColor *m_pColor;
-	char *tPath;
+	uichar *tPath;
 public:
 	~CTexture();
-	CTexture( ID3DXSprite * pSprite, const char * szPath );
-	CTexture( ID3DXSprite * pSprite, const char * szPath, CColor *color );
+	CTexture( ID3DXSprite * pSprite, const uichar * szPath );
+	CTexture( ID3DXSprite * pSprite, const uichar * szPath, CColor *color );
 
 	IDirect3DTexture9 * GetTexture()
 	{

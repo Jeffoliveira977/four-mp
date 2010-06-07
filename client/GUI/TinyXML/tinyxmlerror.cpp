@@ -2,7 +2,7 @@
 www.sourceforge.net/projects/tinyxml
 Original code (2.0 and earlier )copyright (c) 2000-2006 Lee Thomason (www.grinninglizard.com)
 
-This software is provided 'as-is', without any express or implied 
+This software is provided _UI('as-is'), without any express or implied 
 warranty. In no event will the authors be held liable for any 
 damages arising from the use of this software.
 
@@ -31,23 +31,23 @@ distribution.
 // It also cleans up the code a bit.
 //
 
-const char* TiXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
+const TIXML_CHAR* TiXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
 {
-	"No error",
-	"Error",
-	"Failed to open file",
-	"Memory allocation failed.",
-	"Error parsing Element.",
-	"Failed to read Element name",
-	"Error reading Element value.",
-	"Error reading Attributes.",
-	"Error: empty tag.",
-	"Error reading end tag.",
-	"Error parsing Unknown.",
-	"Error parsing Comment.",
-	"Error parsing Declaration.",
-	"Error document empty.",
-	"Error null (0) or unexpected EOF found in input stream.",
-	"Error parsing CDATA.",
-	"Error when TiXmlDocument added to document, because TiXmlDocument can only be at the root.",
+	_TIXML_L("No error"),
+	_TIXML_L("Error"),
+	_TIXML_L("Failed to open file"),
+	_TIXML_L("Memory allocation failed."),
+	_TIXML_L("Error parsing Element."),
+	_TIXML_L("Failed to read Element name"),
+	_TIXML_L("Error reading Element value."),
+	_TIXML_L("Error reading Attributes."),
+	_TIXML_L("Error: empty tag."),
+	_TIXML_L("Error reading end tag."),
+	_TIXML_L("Error parsing Unknown."),
+	_TIXML_L("Error parsing Comment."),
+	_TIXML_L("Error parsing Declaration."),
+	_TIXML_L("Error document empty."),
+	_TIXML_L("Error null (0) or unexpected EOF found in input stream."),
+	_TIXML_L("Error parsing CDATA."),
+	_TIXML_L("Error when TiXmlDocument added to document, because TiXmlDocument can only be at the root."),
 };

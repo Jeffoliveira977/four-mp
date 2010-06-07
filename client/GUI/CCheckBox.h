@@ -10,7 +10,7 @@ class CCheckBox : public CElement
 	CTexture * tCheck, * tChecked;
 
 public:
-	CCheckBox( CGUI *Gui, int X, int Y, int Width, int Height, bool Checked = 0, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CCheckBox( CGUI *Gui, int X, int Y, int Width, int Height, bool Checked = 0, const uichar * String = NULL, const uichar * String2 = NULL, tAction Callback = NULL );
 	~CCheckBox();
 
 	bool GetChecked();

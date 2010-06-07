@@ -7,7 +7,7 @@ CGUI::CGUI( IDirect3DDevice9 * pDevice )
 	InitializeCriticalSection(&cs);
 
 	if( !pDevice )
-		MessageBoxA( 0, "pDevice invalid.", 0, 0 );
+		MessageBox( 0, _UI("pDevice invalid."), 0, 0 );
 
 	m_pDevice = pDevice;
 	m_wFocus = 0;
@@ -19,9 +19,9 @@ CGUI::CGUI( IDirect3DDevice9 * pDevice )
 	m_pKeyboard = new CKeyboard(this);
 	m_pFont = 0;
 
-	Cvars[ "$Value" ] = new CVar( SliderValue );
-	Cvars[ "$MaxValue" ] = new CVar( MaxValue );
-	Cvars[ "$MinValue" ] = new CVar( MinValue );
+	Cvars[ _UI("$Value") ] = new CVar( SliderValue );
+	Cvars[ _UI("$MaxValue") ] = new CVar( MaxValue );
+	Cvars[ _UI("$MinValue") ] = new CVar( MinValue );
 
 	SetVisible( false );
 }
@@ -30,7 +30,7 @@ CGUI::~CGUI()
 {
 	EnterCriticalSection(&cs);
 
-	for( std::map<std::string,CVar*>::iterator iIter = Cvars.begin(); iIter != Cvars.end(); iIter++ )
+	for( std::map<uistring,CVar*>::iterator iIter = Cvars.begin(); iIter != Cvars.end(); iIter++ )
 		SAFE_DELETE( iIter->second );
 
 	SAFE_DELETE( m_pFont );
@@ -82,7 +82,7 @@ CGUI::~CGUI()
 	DeleteCriticalSection(&cs);
 }
 
-void CGUI::LoadFont(int size, char *font)
+void CGUI::LoadFont(int size, uichar *font)
 {
 	m_pFont = new CFont( this, GetDevice(), size, font );
 }
@@ -92,40 +92,40 @@ void CGUI::SetFontColors(int Index, int r, int g, int b, int a)
 	m_pFont->SetColor( Index, CColor( r, g, b, a ) );
 }
 
-void CGUI::SetVarInt(const char *name, int value)
+void CGUI::SetVarInt(const uichar *name, int value)
 {
 	Cvars[ name ] = new CVar( value );
 }
 
-void CGUI::SetVarString(const char *name, std::string value)
+void CGUI::SetVarString(const uichar *name, uistring value)
 {
 	Cvars[ name ] = new CVar( value );
 }
 
-void CGUI::SetVarBool(const char *name, bool value)
+void CGUI::SetVarBool(const uichar *name, bool value)
 {
 	Cvars[ name ] = new CVar( value );
 }
 
-void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
+void CGUI::LoadInterfaceFromFile( const uichar * pszFilePath, const uichar * dir )
 {
 	TiXmlDocument Document;
 
 	if( !Document.LoadFile( pszFilePath ) )
 	{
-		MessageBoxA( 0, Document.ErrorDesc(), "XML Error", 0 );
+		MessageBox( 0, Document.ErrorDesc(), _UI("XML Error"), 0 );
 		return;
 	}
 	
 	TiXmlHandle hDoc( &Document );
 
-	TiXmlElement * pGUI = hDoc.FirstChildElement( "GUI" ).Element();
+	TiXmlElement * pGUI = hDoc.FirstChildElement( _UI("GUI") ).Element();
 	if( pGUI )
 	{
-		TiXmlElement * pColorThemes = pGUI->FirstChildElement( "ColorThemes" );
+		TiXmlElement * pColorThemes = pGUI->FirstChildElement( _UI("ColorThemes") );
 		if( pColorThemes )
 		{
-			const char * pszDefaultTheme = pColorThemes->Attribute( "default" );
+			const uichar * pszDefaultTheme = pColorThemes->Attribute( _UI("default") );
 			if( pszDefaultTheme )
 				m_sCurTheme = pszDefaultTheme;
 
@@ -134,13 +134,13 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
 				{
 					SElement * sCurElement = new SElement();
 
-					const char * pszDefault = pElementElement->Attribute( "default" );
+					const uichar * pszDefault = pElementElement->Attribute( _UI("default") );
 					if( pszDefault )
-						sCurElement->sDefaultState = std::string( pszDefault );
+						sCurElement->sDefaultState = uistring( pszDefault );
 
-					for( TiXmlElement * pStateElement = pElementElement->FirstChildElement( "State" ); pStateElement; pStateElement = pStateElement->NextSiblingElement( "State" ) )
+					for( TiXmlElement * pStateElement = pElementElement->FirstChildElement( _UI("State") ); pStateElement; pStateElement = pStateElement->NextSiblingElement( _UI("State") ) )
 					{
-						const char * pszString = pStateElement->Attribute( "string" );
+						const uichar * pszString = pStateElement->Attribute( _UI("string") );
 
 						if( !pszString )
 							continue;
@@ -149,31 +149,31 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
 
 						pState->pParent = sCurElement;
 
-						for( TiXmlElement * pColorElement = pStateElement->FirstChildElement( "Color" ); pColorElement; pColorElement = pColorElement->NextSiblingElement( "Color" ) )
+						for( TiXmlElement * pColorElement = pStateElement->FirstChildElement( _UI("Color") ); pColorElement; pColorElement = pColorElement->NextSiblingElement( _UI("Color") ) )
 						{
-							pszString = pColorElement->Attribute( "string" );
+							pszString = pColorElement->Attribute( _UI("string") );
 
 							if( !pszString )
 								continue;
 
 							pState->mColors[ pszString ] = new CColor( pColorElement );
 						}
-						for( TiXmlElement * pTextureElement = pStateElement->FirstChildElement( "Texture" ); pTextureElement; pTextureElement = pTextureElement->NextSiblingElement( "Texture" ) )
+						for( TiXmlElement * pTextureElement = pStateElement->FirstChildElement( _UI("Texture") ); pTextureElement; pTextureElement = pTextureElement->NextSiblingElement( _UI("Texture") ) )
 						{
-							std::stringstream sStream;
+							unistream sStream;
 
-							sStream << pThemeElement->Value() << "/" << dir << pTextureElement->Attribute( "path" );
+							sStream << pThemeElement->Value() << _UI("/") << dir << pTextureElement->Attribute( _UI("path") );
 							
-							pState->mTextures[ pTextureElement->Attribute( "string" ) ] = new CTexture( GetSprite(), sStream.str().c_str(), new CColor(pTextureElement) );
+							pState->mTextures[ pTextureElement->Attribute( _UI("string") ) ] = new CTexture( GetSprite(), sStream.str().c_str(), new CColor(pTextureElement) );
 						}
-						for( TiXmlElement * pIntElement = pStateElement->FirstChildElement( "Int" ); pIntElement; pIntElement = pIntElement->NextSiblingElement( "Int" ) )
+						for( TiXmlElement * pIntElement = pStateElement->FirstChildElement( _UI("Int") ); pIntElement; pIntElement = pIntElement->NextSiblingElement( _UI("Int") ) )
 						{
-							pszString = pIntElement->Attribute( "string" );
+							pszString = pIntElement->Attribute( _UI("string") );
 
 							if( !pszString )
 								continue;
 
-							pState->mInts[ pszString ] = atoi(pIntElement->Attribute("value"));
+							pState->mInts[ pszString ] = utoi(pIntElement->Attribute(_UI("value")));
 					}
 
 						m_mThemes[ pThemeElement->Value() ][ pElementElement->Value() ] = sCurElement;
@@ -183,22 +183,22 @@ void CGUI::LoadInterfaceFromFile( const char * pszFilePath, const char * dir )
 	}
 }
 
-void CGUI::UpdateFromFile( const char * pszFilePath )
+void CGUI::UpdateFromFile( const uichar * pszFilePath )
 {
 	TiXmlDocument Document;
 
 	if( !Document.LoadFile( pszFilePath ) )
 	{
-		MessageBoxA(NULL, Document.ErrorDesc(), "UpdateGUI", MB_OK);
+		MessageBox(NULL, Document.ErrorDesc(), _UI("UpdateGUI"), MB_OK);
 		return;
 	}
 
 	TiXmlHandle hDoc( &Document );
 
-	TiXmlElement * pGUI = hDoc.FirstChildElement( "GUI" ).Element();
+	TiXmlElement * pGUI = hDoc.FirstChildElement( _UI("GUI") ).Element();
 	if( !pGUI ) 
 	{
-		MessageBoxA(NULL, "XML Error", "UpdateGUI", MB_OK);
+		MessageBox(NULL, _UI("XML Error"), _UI("UpdateGUI"), MB_OK);
 		return;
 	}
 
@@ -207,89 +207,89 @@ void CGUI::UpdateFromFile( const char * pszFilePath )
 		int Index = 0;
 		CWindow *wParent = NULL;
 
-		if(strcmp(pThemeElement->Value(), "Over") == 0) Index = 1;
-		if(strcmp(pThemeElement->Attribute("parent"), "none") != 0)
-			wParent = GetWindowByString(pThemeElement->Attribute("parent"), 1);
+		if(uiscmp(pThemeElement->Value(), _UI("Over")) == 0) Index = 1;
+		if(uiscmp(pThemeElement->Attribute(_UI("parent")), _UI("none")) != 0)
+			wParent = GetWindowByString(pThemeElement->Attribute(_UI("parent")), 1);
 
 		for( TiXmlElement * pElementElement = pThemeElement->FirstChildElement(); pElementElement; pElementElement = pElementElement->NextSiblingElement() )
 		{
-			const char *Element = pElementElement->Value();
+			const uichar *Element = pElementElement->Value();
 
-			if(strcmp(Element, "Element") == 0)
+			if(uiscmp(Element, _UI("Element")) == 0)
 			{
 				CElement *pElement;
 				if(wParent == NULL)
-					pElement = GetWindowByString(pElementElement->Attribute("name"), 1);
+					pElement = GetWindowByString(pElementElement->Attribute(_UI("name")), 1);
 				else
-					pElement = wParent->GetElementByString(pElementElement->Attribute("name"), 1);
+					pElement = wParent->GetElementByString(pElementElement->Attribute(_UI("name")), 1);
 		
-				for(TiXmlElement * pElem = pElementElement->FirstChildElement( "Base" ); pElem; pElem = pElem->NextSiblingElement( "Base" ))
+				for(TiXmlElement * pElem = pElementElement->FirstChildElement( _UI("Base") ); pElem; pElem = pElem->NextSiblingElement( _UI("Base") ))
 				{
-					const char *name = pElem->Attribute("string");
-					const char *value = pElem->Attribute("value");
+					const uichar *name = pElem->Attribute(_UI("string"));
+					const uichar *value = pElem->Attribute(_UI("value"));
 
-					if(strcmp(name, "height") == 0) pElement->SetHeight(atoi(value));
-					else if(strcmp(name, "width") == 0) pElement->SetWidth(atoi(value));
-					else if(strcmp(name, "name") == 0) pElement->SetString(value);
-					else if(strcmp(name, "x") == 0) pElement->SetRelPos(atoi(value), -1);
-					else if(strcmp(name, "y") == 0) pElement->SetRelPos(-1, atoi(value));
-					else if(strcmp(name, "style") == 0) 
+					if(uiscmp(name, _UI("height")) == 0) pElement->SetHeight(utoi(value));
+					else if(uiscmp(name, _UI("width")) == 0) pElement->SetWidth(utoi(value));
+					else if(uiscmp(name, _UI("name")) == 0) pElement->SetString(value);
+					else if(uiscmp(name, _UI("x")) == 0) pElement->SetRelPos(utoi(value), -1);
+					else if(uiscmp(name, _UI("y")) == 0) pElement->SetRelPos(-1, utoi(value));
+					else if(uiscmp(name, _UI("style")) == 0) 
 					{
-						pElement->SetThemeElement( GetThemeElement( value ), atoi(pElem->Attribute("number")));
-						pElement->SetElementState("Norm", atoi(pElem->Attribute("number")));
+						pElement->SetThemeElement( GetThemeElement( value ), utoi(pElem->Attribute(_UI("number"))));
+						pElement->SetElementState(_UI("Norm"), utoi(pElem->Attribute(_UI("number"))));
 					}
 				}
 
-				TiXmlElement * pElem = pElementElement->FirstChildElement( "Font" );
+				TiXmlElement * pElem = pElementElement->FirstChildElement( _UI("Font") );
 				if(pElem)
 				{
-					pElement->SetFont(atoi(pElem->Attribute("size")), (char*)pElem->Attribute("name"), 
-						pElem->Attribute("bold")[0]=='1', pElem->Attribute("italic")[0]=='1');
+					pElement->SetFont(utoi(pElem->Attribute(_UI("size"))), (uichar*)pElem->Attribute(_UI("name")), 
+						pElem->Attribute(_UI("bold"))[0]==_UI('1'), pElem->Attribute(_UI("italic"))[0]==_UI('1'));
 				}
 			}
-			else if(strcmp(Element, "Line") == 0)
+			else if(uiscmp(Element, _UI("Line")) == 0)
 			{
-				CLine *tLine = new CLine(this, atoi(pElementElement->Attribute("sx")), atoi(pElementElement->Attribute("sy")),
-					atoi(pElementElement->Attribute("ex")),	atoi(pElementElement->Attribute("ey")),
-					atoi(pElementElement->Attribute("size")), new CColor(pElementElement), wParent);
+				CLine *tLine = new CLine(this, utoi(pElementElement->Attribute(_UI("sx"))), utoi(pElementElement->Attribute(_UI("sy"))),
+					utoi(pElementElement->Attribute(_UI("ex"))),	utoi(pElementElement->Attribute(_UI("ey"))),
+					utoi(pElementElement->Attribute(_UI("size"))), new CColor(pElementElement), wParent);
 
 				if(!wParent) m_eLine[Index].push_back(tLine);
 				else wParent->m_eLine[Index].push_back(tLine);
 			}
-			else if(strcmp(Element, "Box") == 0)
+			else if(uiscmp(Element, _UI("Box")) == 0)
 			{
 				CColor *Inner, *Border;
 
-				TiXmlElement * pColorElement = pElementElement->FirstChildElement( "Color" ); 
-				if(strcmp(pColorElement->Attribute("string"), "Inner") == 0) Inner = new CColor(pColorElement);
-				else if(strcmp(pColorElement->Attribute("string"), "Border") == 0) Border = new CColor(pColorElement);
+				TiXmlElement * pColorElement = pElementElement->FirstChildElement( _UI("Color") ); 
+				if(uiscmp(pColorElement->Attribute(_UI("string")), _UI("Inner")) == 0) Inner = new CColor(pColorElement);
+				else if(uiscmp(pColorElement->Attribute(_UI("string")), _UI("Border")) == 0) Border = new CColor(pColorElement);
 
-				pColorElement = pColorElement->NextSiblingElement( "Color" );
-				if(strcmp(pColorElement->Attribute("string"), "Inner") == 0) Inner = new CColor(pColorElement);
-				else if(strcmp(pColorElement->Attribute("string"), "Border") == 0) Border = new CColor(pColorElement);
+				pColorElement = pColorElement->NextSiblingElement( _UI("Color") );
+				if(uiscmp(pColorElement->Attribute(_UI("string")), _UI("Inner")) == 0) Inner = new CColor(pColorElement);
+				else if(uiscmp(pColorElement->Attribute(_UI("string")), _UI("Border")) == 0) Border = new CColor(pColorElement);
 
-				CBox *tBox = new CBox(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
-					atoi(pElementElement->Attribute("width")), atoi(pElementElement->Attribute("height")),
+				CBox *tBox = new CBox(this, utoi(pElementElement->Attribute(_UI("x"))), utoi(pElementElement->Attribute(_UI("y"))),
+					utoi(pElementElement->Attribute(_UI("width"))), utoi(pElementElement->Attribute(_UI("height"))),
 					Inner, Border, wParent);
 
 				if(!wParent) m_eBox[Index].push_back(tBox);
 				else wParent->m_eBox[Index].push_back(tBox);
 			}
-			else if(strcmp(Element, "Text") == 0)
+			else if(uiscmp(Element, _UI("Text")) == 0)
 			{
-				CText *tText = new CText(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
-					atoi(pElementElement->Attribute("width")), 20, pElementElement->Attribute("string"), 
-					pElementElement->Attribute("name"), NULL);
+				CText *tText = new CText(this, utoi(pElementElement->Attribute(_UI("x"))), utoi(pElementElement->Attribute(_UI("y"))),
+					utoi(pElementElement->Attribute(_UI("width"))), 20, pElementElement->Attribute(_UI("string")), 
+					pElementElement->Attribute(_UI("name")), NULL);
 
 				if(!wParent) m_eText[Index].push_back(tText);
 				else wParent->AddElement(tText);
 			}
-			else if(strcmp(Element, "Image") == 0)
+			else if(uiscmp(Element, _UI("Image")) == 0)
 			{
-				CTexture *tTexture = new CTexture(GetSprite(), pElementElement->Attribute("src"), new CColor(pElementElement));
+				CTexture *tTexture = new CTexture(GetSprite(), pElementElement->Attribute(_UI("src")), new CColor(pElementElement));
 
-				CImage *tImg = new CImage(this, atoi(pElementElement->Attribute("x")), atoi(pElementElement->Attribute("y")),
-					atoi(pElementElement->Attribute("width")), atoi(pElementElement->Attribute("height")),
+				CImage *tImg = new CImage(this, utoi(pElementElement->Attribute(_UI("x"))), utoi(pElementElement->Attribute(_UI("y"))),
+					utoi(pElementElement->Attribute(_UI("width"))), utoi(pElementElement->Attribute(_UI("height"))),
 					tTexture, wParent);
 
 				if(!wParent) m_eImage[Index].push_back(tImg);
@@ -568,10 +568,10 @@ void CGUI::OnLostDevice()
 		m_vWindows[i]->OnLostDevice();
 
 	
-	for (std::map<std::string, tTheme>::const_iterator p = m_mThemes.begin(); p != m_mThemes.end(); ++p)
+	for (std::map<uistring, tTheme>::const_iterator p = m_mThemes.begin(); p != m_mThemes.end(); ++p)
 		for (tTheme::const_iterator x = p->second.begin(); x != p->second.end(); ++x)
-			for(std::map<std::string, SElementState*>::const_iterator y = x->second->m_mStates.begin(); y != x->second->m_mStates.end(); ++y)
-				for(std::map<std::string, CTexture*>::const_iterator z = y->second->mTextures.begin(); z != y->second->mTextures.end(); ++z)
+			for(std::map<uistring, SElementState*>::const_iterator y = x->second->m_mStates.begin(); y != x->second->m_mStates.end(); ++y)
+				for(std::map<uistring, CTexture*>::const_iterator z = y->second->mTextures.begin(); z != y->second->mTextures.end(); ++z)
 					z->second->OnLostDevice();			
 
 	LeaveCriticalSection(&cs);
@@ -599,10 +599,10 @@ void CGUI::OnResetDevice()
 	for(int i = 0; i < (int)m_vWindows.size(); i++)
 		m_vWindows[i]->OnResetDevice();
 
-	for (std::map<std::string, tTheme>::const_iterator p = m_mThemes.begin(); p != m_mThemes.end(); ++p)
+	for (std::map<uistring, tTheme>::const_iterator p = m_mThemes.begin(); p != m_mThemes.end(); ++p)
 		for (tTheme::const_iterator x = p->second.begin(); x != p->second.end(); ++x)
-			for(std::map<std::string, SElementState*>::const_iterator y = x->second->m_mStates.begin(); y != x->second->m_mStates.end(); ++y)
-				for(std::map<std::string, CTexture*>::const_iterator z = y->second->mTextures.begin(); z != y->second->mTextures.end(); ++z)
+			for(std::map<uistring, SElementState*>::const_iterator y = x->second->m_mStates.begin(); y != x->second->m_mStates.end(); ++y)
+				for(std::map<uistring, CTexture*>::const_iterator z = y->second->mTextures.begin(); z != y->second->mTextures.end(); ++z)
 					z->second->OnResetDevice();	
 	
 	LeaveCriticalSection(&cs);
@@ -633,7 +633,7 @@ ID3DXSprite * CGUI::GetSprite()
 	return m_pSprite;
 }
 
-CWindow * CGUI::GetWindowByString( std::string sString, int iIndex )
+CWindow * CGUI::GetWindowByString( uistring sString, int iIndex )
 {
 	for( int i = 0; i < static_cast<int>( m_vWindows.size() ); i++ )
 		if( m_vWindows[ i ] )
@@ -642,7 +642,7 @@ CWindow * CGUI::GetWindowByString( std::string sString, int iIndex )
 	return 0;
 }
 
-SElement * CGUI::GetThemeElement( std::string sElement )
+SElement * CGUI::GetThemeElement( uistring sElement )
 {
 	return m_mThemes[ m_sCurTheme ][ sElement ];
 }
