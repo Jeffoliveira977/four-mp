@@ -6,15 +6,15 @@ CTexture::~CTexture()
 	SAFE_DELETE( m_pColor );
 }
 
-CTexture::CTexture( ID3DXSprite * pSprite, const char * szPath )
+CTexture::CTexture( ID3DXSprite * pSprite, const uichar * szPath )
 {
 	pSprite->GetDevice( &m_pDevice );
 
-	D3DXCreateTextureFromFileA( m_pDevice, szPath, &m_pTexture );
+	D3DXCreateTextureFromFile( m_pDevice, szPath, &m_pTexture );
 
 	if( !m_pTexture )
 	{
-		MessageBoxA( 0, "Can't create texture", "CTexture::CTexture( ... )", 0 );
+		MessageBox( 0, _UI("Can't create texture"), _UI("CTexture::CTexture( ... )"), 0 );
 		return;
 	}
 
@@ -22,24 +22,24 @@ CTexture::CTexture( ID3DXSprite * pSprite, const char * szPath )
 	m_pTexture->GetLevelDesc( 0, &m_TexDesc );
 	m_pSprite = pSprite;
 
-	tPath = new char[strlen(szPath)+1];
-	strcpy_s(tPath, strlen(szPath)+1, szPath);
+	tPath = new uichar[uislen(szPath)+1];
+	uiscpy_s(tPath, uislen(szPath)+1, szPath);
 }
 
-CTexture::CTexture( ID3DXSprite * pSprite, const char * szPath, CColor *color )
+CTexture::CTexture( ID3DXSprite * pSprite, const uichar * szPath, CColor *color )
 {
 	pSprite->GetDevice( &m_pDevice );
-	D3DXCreateTextureFromFileA( m_pDevice, szPath, &m_pTexture );
+	D3DXCreateTextureFromFile( m_pDevice, szPath, &m_pTexture );
 	if( !m_pTexture )
 	{
-		MessageBoxA( 0, "Can't create texture", "CTexture::CTexture( ... )", 0 );
+		MessageBox( 0, _UI("Can't create texture"), _UI("CTexture::CTexture( ... )"), 0 );
 		return;
 	}
 	m_pColor = color;
 	m_pTexture->GetLevelDesc( 0, &m_TexDesc );
 	m_pSprite = pSprite;
-	tPath = new char[strlen(szPath)+1];
-	strcpy_s(tPath, strlen(szPath)+1, szPath);
+	tPath = new uichar[uislen(szPath)+1];
+	uiscpy_s(tPath, uislen(szPath)+1, szPath);
 }
 
 void CTexture::OnLostDevice()
@@ -49,11 +49,11 @@ void CTexture::OnLostDevice()
 
 void CTexture::OnResetDevice()
 {
-	D3DXCreateTextureFromFileA( m_pDevice, tPath, &m_pTexture );
+	D3DXCreateTextureFromFile( m_pDevice, tPath, &m_pTexture );
 
 	if( !m_pTexture )
 	{
-		//MessageBoxA( 0, "Can't create texture", "CTexture::CTexture( ... )", 0 );
+		//MessageBox( 0, _UI("Can't create texture"), _UI("CTexture::CTexture( ... )"), 0 );
 		return;
 	}
 	m_pTexture->GetLevelDesc( 0, &m_TexDesc );

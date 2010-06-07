@@ -13,10 +13,10 @@ bool CKeyboard::HandleMessage( unsigned int uMsg, unsigned int wParam, long lPar
 	switch( uMsg )
 	{
 	case WM_KEYDOWN:
-		SetKey( SKey( static_cast<char>( wParam ), true, lParam ) );
+		SetKey( SKey( static_cast<uichar>( wParam ), true, lParam ) );
 		break;
 	case WM_KEYUP:
-		SetKey( SKey( static_cast<char>( wParam ), false, lParam ) );
+		SetKey( SKey( static_cast<uichar>( wParam ), false, lParam ) );
 		break;
 	}
 

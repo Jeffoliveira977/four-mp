@@ -21,10 +21,10 @@ CColor::CColor( TiXmlElement * pElement )
 {
 	int iColors[ 4 ] = { 0 };
 
-	pElement->QueryIntAttribute( "r", &iColors[ 0 ] );
-	pElement->QueryIntAttribute( "g", &iColors[ 1 ] );
-	pElement->QueryIntAttribute( "b", &iColors[ 2 ] );
-	pElement->QueryIntAttribute( "a", &iColors[ 3 ] );
+	pElement->QueryIntAttribute( _UI("r"), &iColors[ 0 ] );
+	pElement->QueryIntAttribute( _UI("g"), &iColors[ 1 ] );
+	pElement->QueryIntAttribute( _UI("b"), &iColors[ 2 ] );
+	pElement->QueryIntAttribute( _UI("a"), &iColors[ 3 ] );
 
 	SetRed( iColors[ 0 ] );
 	SetGreen( iColors[ 1 ] );
@@ -114,7 +114,7 @@ int CColor::GetAlpha()
 	return m_iAlpha;
 }
 
-CColor * SElementState::GetColor( std::string sString )
+CColor * SElementState::GetColor( uistring sString )
 {
 	CColor * pRet = mColors[ sString ];
 
@@ -122,12 +122,12 @@ CColor * SElementState::GetColor( std::string sString )
 		pRet = pParent->m_mStates[ pParent->sDefaultState ]->mColors[ sString ];
 
 	if( !pRet )
-		MessageBoxA( 0, "Color not found.", sString.c_str(), 0 );
+		MessageBox( 0, _UI("Color not found."), sString.c_str(), 0 );
 
 	return pRet;
 }
 
-CTexture * SElementState::GetTexture( std::string sString )
+CTexture * SElementState::GetTexture( uistring sString )
 {
 	CTexture * pRet = mTextures[ sString ];
 
@@ -137,7 +137,7 @@ CTexture * SElementState::GetTexture( std::string sString )
 	return pRet;
 }
 
-int SElementState::GetInt( std::string sString )
+int SElementState::GetInt( uistring sString )
 {
 	int pRet = mInts[ sString ];
 

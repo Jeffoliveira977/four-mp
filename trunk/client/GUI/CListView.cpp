@@ -1,6 +1,6 @@
 #include "CListView.h"
 
-CListView::CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Columns, const char *String, const char *String2, tAction Callback )
+CListView::CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Columns, const uichar *String, const uichar *String2, tAction Callback )
 {
 	Count = Columns;
 	Poss = new int[Count];
@@ -23,19 +23,19 @@ CListView::CListView( CGUI *Gui, int X, int Y, int *Width, int Height, int Colum
 	SetElement( Gui, X, Y, AllWidth, Height, String, String2, Callback );
 	m_iMouseOverIndex = -1;
 	m_iMouseSelect = -1;
-	m_vRows = new std::vector<std::string>[Count];
+	m_vRows = new std::vector<uistring>[Count];
 
 	pSlider = new CScrollBar( Gui, CPos( GetWidth() - 1, 1 ), GetHeight()-2 );
 
-	SetThemeElement( pGui->GetThemeElement( "ListView" ) );
+	SetThemeElement( pGui->GetThemeElement( _UI("ListView") ) );
 
 	ShowSlider(1);
 	Widths[Count-1] -= pSlider->GetWidth();
 
 	if( !GetThemeElement() )
-		MessageBoxA( 0, "Theme element invalid.", "ListView", 0 );
+		MessageBox( 0, _UI("Theme element invalid."), _UI("ListView"), 0 );
 	else
-		SetElementState( "Norm" );
+		SetElementState( _UI("Norm") );
 }
 
 CListView::~CListView()
@@ -107,7 +107,7 @@ void CListView::Draw()
 				}
 
 				if(imgColumn[j].tTrue && imgColumn[j].tFalse)
-					if(m_vRows[j][i][0] == '0')
+					if(m_vRows[j][i][0] == _UI('0'))
 						imgColumn[j].tFalse->Draw(Pos.GetX() + (Poss[j]?Poss[j]:0)+1, Pos.GetY()+iHeight+1, imgColumn[j].Width, imgColumn[j].Height);
 					else
 						imgColumn[j].tTrue->Draw(Pos.GetX() + (Poss[j]?Poss[j]:0)+1, Pos.GetY()+iHeight+1, imgColumn[j].Width, imgColumn[j].Height);
@@ -184,7 +184,7 @@ int CListView::GetSize(int Index)
 	return m_vRows[Index].size();
 }
 
-void CListView::PutStr( std::string sString, int Column, int Row, std::string sHelp )
+void CListView::PutStr( uistring sString, int Column, int Row, uistring sHelp )
 {
 	if(Column < 0 || Column >= Count) return;
 	EnterCriticalSection(&cs);
@@ -204,16 +204,16 @@ void CListView::PutStr( std::string sString, int Column, int Row, std::string sH
 	LeaveCriticalSection(&cs);
 }
 
-std::string CListView::GetStr( int Row, int Column )
+uistring CListView::GetStr( int Row, int Column )
 {
 	if(Column < 0 || Column >= Count) return NULL;
 
 	if( Row >= 0 && Row < static_cast<int>( m_vRows[Column].size() ) )
 		return m_vRows[ Column ][ Row ];
-	return std::string();
+	return uistring();
 }
 
-void CListView::SetTitle( std::string sString, int Column )
+void CListView::SetTitle( uistring sString, int Column )
 {
 	EnterCriticalSection(&cs);
 	if(Column == -1)
@@ -239,18 +239,18 @@ void CListView::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
 
-	pInner = pState->GetColor( "Inner" );
-	pBorder = pState->GetColor( "Border" );
-	pString = pState->GetColor( "String" );
-	pMouseOverString = pState->GetColor( "MouseOverString" );
+	pInner = pState->GetColor( _UI("Inner") );
+	pBorder = pState->GetColor( _UI("Border") );
+	pString = pState->GetColor( _UI("String") );
+	pMouseOverString = pState->GetColor( _UI("MouseOverString") );
 
-	pTitle = pState->GetColor( "Title" );
-	pbTitle = pState->GetColor( "TitleDel" );
-	pbInner = pState->GetColor( "InnerDel" );
-	pTitleString = pState->GetColor( "TitleString" );
+	pTitle = pState->GetColor( _UI("Title") );
+	pbTitle = pState->GetColor( _UI("TitleDel") );
+	pbInner = pState->GetColor( _UI("InnerDel") );
+	pTitleString = pState->GetColor( _UI("TitleString") );
 
-	pSelInner = pState->GetColor( "SelectInner");
-	pSelString = pState->GetColor( "SelectString");
+	pSelInner = pState->GetColor( _UI("SelectInner"));
+	pSelString = pState->GetColor( _UI("SelectString"));
 }
 
 void CListView::ShowSlider( bool bShow )
@@ -268,7 +268,7 @@ void CListView::SetSelect(int Item)
 	m_iMouseSelect = Item;
 }
 
-void CListView::SetColumnImage(int Index, char *True, char *False, char *Title, int W, int H)
+void CListView::SetColumnImage(int Index, uichar *True, uichar *False, uichar *Title, int W, int H)
 {
 	if(Index >= Count) return;
 	imgColumn[Index].tTrue = new CTexture(pGui->GetSprite(), True);
@@ -278,7 +278,7 @@ void CListView::SetColumnImage(int Index, char *True, char *False, char *Title, 
 	imgColumn[Index].Height = H;
 }
 
-std::string CListView::GetHelpString(int row)
+uistring CListView::GetHelpString(int row)
 {
 	return m_vRowsHelp[row];
 }

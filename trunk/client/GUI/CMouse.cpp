@@ -6,7 +6,7 @@ CMouse::CMouse( CGUI *Gui, IDirect3DDevice9 * pDevice, ID3DXSprite * pSprite )
 {
 	pGui = Gui;
 	m_pDevice = pDevice;
-	pCursor = new CTexture(pSprite, "FMPGUI/cursor.png");
+	pCursor = new CTexture(pSprite, _UI("FMPGUI/cursor.png"));
 	SetSize(32);
 
 	SetLeftButton( 0 );

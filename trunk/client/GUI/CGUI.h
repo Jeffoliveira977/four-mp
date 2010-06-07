@@ -26,6 +26,8 @@ class CListBox;
 #include <sstream>
 #include <vector>
 
+#include "unistr.h"
+
 #include "D3D9.h"
 #include "CD3DRender.h"
 #include "TinyXML\tinyxml.h"
@@ -75,14 +77,14 @@ class CGUI
 	std::vector<CWindow*> m_vWindows;
 	CWindow * m_wFocus;
 
-	std::string m_sCurTheme;
+	uistring m_sCurTheme;
 	std::vector<CLine*> m_eLine[2];
 	std::vector<CBox*> m_eBox[2];
 	std::vector<CText*> m_eText[2];
 	std::vector<CImage*> m_eImage[2];
 
-	typedef std::map<std::string, SElement*> tTheme;
-	std::map<std::string, tTheme> m_mThemes;
+	typedef std::map<uistring, SElement*> tTheme;
+	std::map<uistring, tTheme> m_mThemes;
 
 	CRITICAL_SECTION cs;
 public:
@@ -90,10 +92,10 @@ public:
 	CGUI( IDirect3DDevice9 * pDevice );
 	~CGUI();
 
-	void LoadFont(int size = 10, char *font = "Tahoma");
+	void LoadFont(int size = 10, uichar *font = _UI("Tahoma"));
 	void SetFontColors(int Index, int r, int g, int b, int a);
-	void LoadInterfaceFromFile( const char * pszFilePath, const char * dir = "" );
-	void UpdateFromFile( const char * pszFilePath );
+	void LoadInterfaceFromFile( const uichar * pszFilePath, const uichar * dir = _UI("") );
+	void UpdateFromFile( const uichar * pszFilePath );
 
 	void FillArea( int iX, int iY, int iWidth, int iHeight, D3DCOLOR d3dColor );
 	void DrawLine( int iStartX, int iStartY, int iEndX, int iEndY, int iWidth, D3DCOLOR d3dColor );
@@ -117,18 +119,18 @@ public:
 	CFont * GetFont();
 	ID3DXSprite * GetSprite();
 
-	CWindow * GetWindowByString( std::string sString, int iIndex = 0 );
+	CWindow * GetWindowByString( uistring sString, int iIndex = 0 );
 
-	SElement * GetThemeElement( std::string sElement );
+	SElement * GetThemeElement( uistring sElement );
 
 	void SetVisible( bool bVisible );
 	bool IsVisible();
 
-	void SetVarString(const char *name, std::string value);
-	void SetVarInt(const char *name, int value);
-	void SetVarBool(const char *name, bool value);
+	void SetVarString(const uichar *name, uistring value);
+	void SetVarInt(const uichar *name, int value);
+	void SetVarBool(const uichar *name, bool value);
 
 	bool IsFocus(CWindow * w);
 
-	std::map<std::string,CVar*> Cvars;
+	std::map<uistring,CVar*> Cvars;
 };

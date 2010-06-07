@@ -9,11 +9,11 @@ class CTextBox : public CElement
 
 	CScrollBar * pSlider;
 
-	std::vector<std::string> m_vStrings;
+	std::vector<uistring> m_vStrings;
 
 	CColor * pString, * pInner, * pBorder;
 public:
-	CTextBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CTextBox( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String = NULL, const uichar * String2 = NULL, tAction Callback = NULL );
 	~CTextBox();
 
 	void Draw();
@@ -21,7 +21,7 @@ public:
 	bool MouseMove( CMouse * pMouse, bool );
 	bool KeyEvent( SKey sKey );
 
-	void AddString( std::string sString );
+	void AddString( uistring sString );
 	void RemoveStrings(int Row, int Count  = 1);
 	void Clear();
 

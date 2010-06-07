@@ -1,6 +1,6 @@
 #include "CListBox.h"
 
-CListBox::CListBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CListBox::CListBox( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String, const uichar * String2, tAction Callback )
 {
 	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 	m_iMouseOverIndex = -1;
@@ -8,12 +8,12 @@ CListBox::CListBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 
 	pSlider = new CScrollBar( Gui, CPos( GetWidth() + 2, 0 ), GetHeight() );
 
-	SetThemeElement( pGui->GetThemeElement( "ListBox" ) );
+	SetThemeElement( pGui->GetThemeElement( _UI("ListBox") ) );
 
 	if( !GetThemeElement() )
-		MessageBoxA( 0, "Theme element invalid.", "ListBox", 0 );
+		MessageBox( 0, _UI("Theme element invalid."), _UI("ListBox"), 0 );
 	else
-		SetElementState( "Norm" );
+		SetElementState( _UI("Norm") );
 }
 
 CListBox::~CListBox()
@@ -111,7 +111,7 @@ int CListBox::GetSize()
 	return m_vRows.size();
 }
 
-void CListBox::PutStr( std::string sString, int Index )
+void CListBox::PutStr( uistring sString, int Index )
 {
 	if(Index >= static_cast<int>( m_vRows.size() ) || Index == -1)
 	{
@@ -124,11 +124,11 @@ void CListBox::PutStr( std::string sString, int Index )
 	}
 }
 
-std::string CListBox::GetRow( int iIndex )
+uistring CListBox::GetRow( int iIndex )
 {
 	if( iIndex >= 0 && iIndex < static_cast<int>( m_vRows.size() ) )
 		return m_vRows[ iIndex ];
-	return std::string();
+	return uistring();
 }
 
 void CListBox::Clear()
@@ -140,12 +140,12 @@ void CListBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
 
-	pInner = pState->GetColor( "Inner" );
-	pBorder = pState->GetColor( "Border" );
-	pString = pState->GetColor( "String" );
-	pMouseOverString = pState->GetColor( "MouseOverString" );
-	pSelInner = pState->GetColor( "SelectInner");
-	pSelString = pState->GetColor( "SelectString");
+	pInner = pState->GetColor( _UI("Inner") );
+	pBorder = pState->GetColor( _UI("Border") );
+	pString = pState->GetColor( _UI("String") );
+	pMouseOverString = pState->GetColor( _UI("MouseOverString") );
+	pSelInner = pState->GetColor( _UI("SelectInner"));
+	pSelString = pState->GetColor( _UI("SelectString"));
 }
 
 void CListBox::ShowSlider( bool bShow )

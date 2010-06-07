@@ -7,31 +7,31 @@ class CVar;
 class CVar
 {
 	double m_dValue;
-	std::string m_sString;
+	uistring m_sString;
 
-	typedef std::string ( __cdecl * tAction )( const char * pszArgs, CElement * pElement );
+	typedef uistring ( __cdecl * tAction )( const uichar * pszArgs, CElement * pElement );
 	tAction m_pAction;
 public:
 	CVar( double dValue );
 	CVar( float fValue );
 	CVar( int iValue );
 	CVar( bool bValue );
-	CVar( std::string sString );
+	CVar( uistring sString );
 	CVar( tAction pAction );
 
 	void SetDouble( double dValue );
 	void SetFloat( float fValue );
 	void SetInteger( int iValue );
 	void SetBoolean( bool bValue );
-	void SetString( std::string sString );
+	void SetString( uistring sString );
 	void SetAction( tAction pAction );
 
 	double GetDouble();
 	float GetFloat();
 	int GetInteger();
 	bool GetBoolean();
-	std::string GetString();
-	std::string GetActionString( const char * pszString, CElement * pElement = 0 );
+	uistring GetString();
+	uistring GetActionString( const uichar * pszString, CElement * pElement = 0 );
 	tAction GetAction();
 };
 

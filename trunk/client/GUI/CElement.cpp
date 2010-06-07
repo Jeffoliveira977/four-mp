@@ -5,7 +5,7 @@ CElement::~CElement()
 	SAFE_DELETE(pFont);
 }
 
-void CElement::SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback, bool abs)
+void CElement::SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String, const uichar * String2, tAction Callback, bool abs)
 {
 	InitializeCriticalSection(&cs);
 	pGui = Gui;
@@ -113,7 +113,7 @@ bool CElement::HasFocus()
 	return GetParent()->GetFocussedElement() == this;
 }
 
-void CElement::SetString( std::string sString, int iIndex )
+void CElement::SetString( uistring sString, int iIndex )
 {
 	if( static_cast<int>( sString.length() ) > 255 )
 		return;
@@ -121,17 +121,17 @@ void CElement::SetString( std::string sString, int iIndex )
 	m_sRaw[ iIndex ] = sString;
 }
 
-std::string CElement::GetString( bool bReplaceVars, int iIndex )
+uistring CElement::GetString( bool bReplaceVars, int iIndex )
 {
 	m_sFormatted[ iIndex ] = m_sRaw[ iIndex ];
 
-	if( bReplaceVars && m_sRaw[ iIndex ].find( "$" ) != std::string::npos )
+	if( bReplaceVars && m_sRaw[ iIndex ].find( _UI("$") ) != uistring::npos )
 	{
-		for( std::map<std::string,CVar*>::reverse_iterator iIter = pGui->Cvars.rbegin(); iIter != pGui->Cvars.rend(); iIter++ )
+		for( std::map<uistring,CVar*>::reverse_iterator iIter = pGui->Cvars.rbegin(); iIter != pGui->Cvars.rend(); iIter++ )
 		{
 			int iPos = m_sFormatted[ iIndex ].find( iIter->first );
 
-			if( iPos == static_cast<int>( std::string::npos ) )
+			if( iPos == static_cast<int>( uistring::npos ) )
 				continue;
 
 			int iLen = iIter->first.length();
@@ -158,7 +158,7 @@ std::string CElement::GetString( bool bReplaceVars, int iIndex )
 	return m_sRaw[ iIndex ];
 }
 
-std::string CElement::GetFormatted( int iIndex )
+uistring CElement::GetFormatted( int iIndex )
 {
 	return m_sFormatted[ iIndex ];
 }
@@ -187,7 +187,7 @@ SElement * CElement::GetThemeElement( int iIndex )
 	return m_pThemeElement[ iIndex ];
 }
 
-void CElement::SetElementState( std::string sState, int iIndex )
+void CElement::SetElementState( uistring sState, int iIndex )
 {
 	m_pElementState[ iIndex ] = GetThemeElement( iIndex )->m_mStates[ sState ];
 
@@ -242,7 +242,7 @@ bool CElement::KeyEvent( SKey )
 	return 0;
 }
 
-void CElement::SetFont(int size, char *name, bool bold, bool italic)
+void CElement::SetFont(int size, uichar *name, bool bold, bool italic)
 {
 	pFont = new CFont(pGui, pGui->GetDevice(), size, name, bold, italic);
 }
@@ -263,9 +263,9 @@ void CElement::SetEnabled(bool on)
 	SetMouseOver(0);
 
 	if(on)
-		SetElementState( "Norm" );
+		SetElementState( _UI("Norm") );
 	else
-		SetElementState( "Disabled" );
+		SetElementState( _UI("Disabled") );
 }
 
 bool CElement::GetEnabled()

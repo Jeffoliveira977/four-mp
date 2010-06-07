@@ -17,7 +17,7 @@ class CEditBox : public CElement
 	bool Hide;
 
 public:
-	CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String = NULL, const uichar * String2 = NULL, tAction Callback = NULL );
 	~CEditBox();
 
 	void Draw();

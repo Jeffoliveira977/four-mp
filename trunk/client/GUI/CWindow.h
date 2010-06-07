@@ -23,7 +23,7 @@ public:
 	std::vector<CBox*> m_eBox[2];
 	std::vector<CImage*> m_eImage[2];
 
-	CWindow( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL );
+	CWindow( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String = NULL, const uichar * String2 = NULL, tAction Callback = NULL );
 	~CWindow();
 
 	void AddElement( CElement * pElement );
@@ -49,7 +49,7 @@ public:
 	CElement * GetFocussedElement();
 
 	CElement * GetNextElement( CElement * pElement );
-	CElement * GetElementByString( const char * pszString, int iIndex = 0 );
+	CElement * GetElementByString( const uichar * pszString, int iIndex = 0 );
 	
 	void BringToTop( CElement * pElement );
 

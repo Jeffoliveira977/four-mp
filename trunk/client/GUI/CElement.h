@@ -23,7 +23,7 @@ class CElement
 {
 	bool m_bHasFocus, m_bMouseOver, m_bEnabled;
 
-	std::string m_sRaw[2], m_sFormatted[2];
+	uistring m_sRaw[2], m_sFormatted[2];
 	int m_iWidth, m_iHeight;
 
 	CPos m_relPos, m_absPos;
@@ -41,7 +41,7 @@ protected:
 public:
 	~CElement();
 
-	void SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const char * String = NULL, const char * String2 = NULL, tAction Callback = NULL, bool abs = 0 );
+	void SetElement( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String = NULL, const uichar * String2 = NULL, tAction Callback = NULL, bool abs = 0 );
 
 	void SetParent( CWindow * pParent );
 	CWindow * GetParent();
@@ -64,9 +64,9 @@ public:
 
 	bool HasFocus();
 
-	void SetString( std::string sString, int iIndex = 0 );
-	std::string GetString( bool bReplaceVars = false, int iIndex = 0 );
-	std::string GetFormatted( int iIndex = 0 );
+	void SetString( uistring sString, int iIndex = 0 );
+	uistring GetString( bool bReplaceVars = false, int iIndex = 0 );
+	uistring GetFormatted( int iIndex = 0 );
 
 	bool GetMouseOver();
 	bool SetMouseOver( bool bMouseOver );
@@ -74,7 +74,7 @@ public:
 	SElement * SetThemeElement( SElement * pThemeElement, int iIndex = 0 );
 	SElement * GetThemeElement( int iIndex = 0 );
 
-	void SetElementState( std::string sState, int iIndex = 0 );
+	void SetElementState( uistring sState, int iIndex = 0 );
 	SElementState * GetElementState( int iIndex = 0 );
 
 	void LostFocus();
@@ -92,7 +92,7 @@ public:
 	virtual void OnResetDevice();
 
 	CFont * GetFont();
-	void SetFont(int size, char *name, bool bold, bool italic);
+	void SetFont(int size, uichar *name, bool bold, bool italic);
 	void SetFont(CFont *font);
 
 	void SetEnabled(bool on = 1);

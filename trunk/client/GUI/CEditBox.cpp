@@ -1,6 +1,6 @@
 ﻿#include "CGUI.h"
 
-CEditBox::CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char * String, const char * String2, tAction Callback )
+CEditBox::CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const uichar * String, const uichar * String2, tAction Callback )
 {
 	SetElement( Gui, X, Y, Width, Height, String, String2, Callback );
 	SetHeight( 20 );
@@ -17,11 +17,11 @@ CEditBox::CEditBox( CGUI *Gui, int X, int Y, int Width, int Height, const char *
 	{
 		SetAction( Callback );
 	}
-	SetThemeElement( pGui->GetThemeElement( "EditBox" ) );
+	SetThemeElement( pGui->GetThemeElement( _UI("EditBox") ) );
 	if( !GetThemeElement() )
-		MessageBoxA( 0, "Theme element invalid.", "EditBox", 0 );
+		MessageBox( 0, _UI("Theme element invalid."), _UI("EditBox"), 0 );
 	else
-		SetElementState( "Norm" );
+		SetElementState( _UI("Norm") );
 }
 
 CEditBox::~CEditBox()
@@ -39,9 +39,9 @@ void CEditBox::Draw()
 	if(GetParent()) Pos = *GetParent()->GetAbsPos() + Pos;
 
 	SElementState * pState = GetElementState();
-	std::string DataString;
+	uistring DataString;
 	if(!Hide) DataString = GetString();
-	else for(int i = 0; i < (int)GetString().size(); i++) DataString.push_back('*');
+	else for(int i = 0; i < (int)GetString().size(); i++) DataString.push_back(_UI('*'));
 
 	if( pState )
 	{
@@ -90,7 +90,7 @@ void CEditBox::HideContent(bool hide)
 
 void CEditBox::PreDraw()
 {
-	SetElementState( HasFocus()?"Active":"Norm" );
+	SetElementState( HasFocus()?_UI("Active"):_UI("Norm") );
 
 	if( !m_tCursorTimer.Running() )
 	{
@@ -123,7 +123,7 @@ bool CEditBox::KeyEvent( SKey sKey )
 				int iX = pGui->GetMouse()->GetPos().GetX();
 				int iAbsX = ( *GetParent()->GetAbsPos() + *GetRelPos() ).GetX();
 
-				std::string sString( &GetString()[ GetStart() ] );
+				uistring sString( &GetString()[ GetStart() ] );
 				
 				if( iX >= iAbsX + GetFont()->GetStringWidth( sString.c_str() ) )
 					SetIndex( sString.length() );
@@ -151,9 +151,9 @@ bool CEditBox::KeyEvent( SKey sKey )
 		{
 		case VK_END:
 			{
-				std::string sString = GetString();
+				uistring sString = GetString();
 
-				SetIndex( strlen( &sString[ GetStart() ] ) );
+				SetIndex( uislen( &sString[ GetStart() ] ) );
 
 				while( GetFont()->GetStringWidth( &sString.c_str()[ GetStart() ] ) > GetWidth() - 5 || m_iCursorX > GetWidth() - 5 )
 				{
@@ -173,7 +173,7 @@ bool CEditBox::KeyEvent( SKey sKey )
 			{
 				if( GetIndex() )
 				{
-					std::string sString = GetString();
+					uistring sString = GetString();
 
 					sString.erase( GetStart() + GetIndex() - 1,  1 );
 
@@ -190,12 +190,12 @@ bool CEditBox::KeyEvent( SKey sKey )
 			}
 		case VK_DELETE:
 			{
-				std::string sString = GetString();
+				uistring sString = GetString();
 
 				if( GetIndex() <= static_cast<int>( sString.length() ) )
 					sString.erase( GetStart() + m_iIndex, 1 );
 
-				SetString( const_cast<char*>( sString.c_str() ) );
+				SetString( const_cast<uichar*>( sString.c_str() ) );
 
 				break;
 			}
@@ -212,7 +212,7 @@ bool CEditBox::KeyEvent( SKey sKey )
 			{
 				SetIndex( GetIndex() + 1 );
 
-				std::string sString = GetString();
+				uistring sString = GetString();
 				sString[ GetIndex() ] = 0;
 
 				while( GetFont()->GetStringWidth( &sString.c_str()[ GetStart() ] ) > GetWidth() - 5 || m_iCursorX > GetWidth() - 5 )
@@ -233,7 +233,7 @@ bool CEditBox::KeyEvent( SKey sKey )
 			}
 		default:
 			{
-				std::string sString( GetString() );
+				uistring sString( GetString() );
 
 				int iPrevLen = sString.length();
 
@@ -246,7 +246,7 @@ bool CEditBox::KeyEvent( SKey sKey )
 
 				if(wKey < 32) break;
 
-				char szKey[2] = { static_cast<char>( wKey ), 0 };
+				uichar szKey[2] = { static_cast<uichar>( wKey ), 0 };
 				if( GetStart() + m_iIndex >= 0 && GetStart() + m_iIndex <= static_cast<int>( sString.length() ) )
 				{
 					if( wKey != 22 )
@@ -257,7 +257,7 @@ bool CEditBox::KeyEvent( SKey sKey )
 							break;
 
 						HANDLE hData = GetClipboardData( CF_TEXT );
-						char * pszBuffer = static_cast<char*>( GlobalLock( hData ) );
+						uichar * pszBuffer = static_cast<uichar*>( GlobalLock( hData ) );
 						
 						if( pszBuffer )
 							sString.insert( GetStart() + m_iIndex, pszBuffer );
@@ -267,8 +267,8 @@ bool CEditBox::KeyEvent( SKey sKey )
 					}
 				}
 
-				SetString( const_cast<char*>( sString.c_str() ) );
-				if( sKey.m_vKey == ' ' )
+				SetString( const_cast<uichar*>( sString.c_str() ) );
+				if( sKey.m_vKey == _UI(' ') )
 					SetIndex( GetIndex() + 1 );
 				else
 					SetIndex( GetIndex() + sString.length() - iPrevLen );
@@ -293,7 +293,7 @@ int CEditBox::GetIndex()
 
 void CEditBox::SetIndex( int iIndex )
 {
-	std::string sString( &GetString()[ GetStart() ] );
+	uistring sString( &GetString()[ GetStart() ] );
 
 	if( iIndex > static_cast<int>( sString.length() ) || iIndex < 0 )
 		return;
@@ -317,15 +317,15 @@ void CEditBox::UpdateTheme( int iIndex )
 {
 	SElementState * pState = GetElementState( iIndex );
 
-	pString = pState->GetColor( "String" );
-	pCursor = pState->GetColor( "Cursor" );
+	pString = pState->GetColor( _UI("String") );
+	pCursor = pState->GetColor( _UI("Cursor") );
 
-	SizeEdge = pState->GetInt("SizeEdge");
-	SetHeight( pState->GetInt("Height") );
+	SizeEdge = pState->GetInt(_UI("SizeEdge"));
+	SetHeight( pState->GetInt(_UI("Height")) );
 
-	pEdit[0] = pState->GetTexture( "Left" );
-	pEdit[1] = pState->GetTexture( "Middle" );
-	pEdit[2] = pState->GetTexture( "Right" );
+	pEdit[0] = pState->GetTexture( _UI("Left") );
+	pEdit[1] = pState->GetTexture( _UI("Middle") );
+	pEdit[2] = pState->GetTexture( _UI("Right") );
 
-	iPadding = pState->GetInt("Padding");
+	iPadding = pState->GetInt(_UI("Padding"));
 }

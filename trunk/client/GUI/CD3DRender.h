@@ -2,6 +2,7 @@
 #define _D3DRENDER_H
 
 #include <d3d9.h>
+#include "unistr.h"
 
 class CD3DFont;
 class CD3DRender;
@@ -85,22 +86,22 @@ private:
 class CD3DFont : public CD3DBaseRender
 {
 public:
-	CD3DFont( char *szFontName, int fontHeight, DWORD dwCreateFlags = 0 );
+	CD3DFont( uichar *szFontName, int fontHeight, DWORD dwCreateFlags = 0 );
 	~CD3DFont();
 
 	HRESULT Initialize(IDirect3DDevice9 *pD3Ddev);
 	HRESULT Invalidate();
 
-	HRESULT Print( float x, float y, DWORD colour, const char *szText, DWORD dwFlags = 0 );
+	HRESULT Print( float x, float y, DWORD colour, const uichar *szText, DWORD dwFlags = 0 );
 
-	int DrawLength( const char* );
+	int DrawLength( const uichar* );
 	int DrawHeight() const { return static_cast<int>( m_fChrHeight ); };
 
 private:	
 	HRESULT CreateVertexBuffers();
 	HRESULT DeleteVertexBuffers();
 
-	char 	m_szFontName[31+1];
+	uichar 	m_szFontName[31+1];
 	int  	m_fontHeight;
 	DWORD 	m_dwCreateFlags;
 
