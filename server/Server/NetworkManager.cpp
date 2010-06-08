@@ -994,7 +994,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		}
 	case NetworkRPCPlayerChat:
 		{
-			if (!vmm.OnPlayerText(data->playerchat->client, data->playerchat->msg))
+			if (!vmm.OnPlayerText(data->playerchat->client, data->playerchat->message))
 			{
 				delete data->playerchat;
 				return;
