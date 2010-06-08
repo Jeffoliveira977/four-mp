@@ -166,7 +166,7 @@ struct NetworkPlayerComponentsChangeData
 struct NetworkPlayerChatData
 {
 	short client;
-	wchar_t msg[MAX_CHAT_MESSAGE_LENGTH];
+	wchar_t message[MAX_CHAT_MESSAGE_LENGTH];
 };
 
 struct NetworkVehicleFullUpdateData

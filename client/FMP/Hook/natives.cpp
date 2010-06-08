@@ -22,7 +22,7 @@ int GetNativeAddressByHash(unsigned int a1)
 
 	if(!pointer1) 
 	{
-		Log::Debug("# not find pointer");
+		Log::Debug(L"# not find pointer");
 		return 0;
 	}
 	// reset data
@@ -40,7 +40,7 @@ int GetNativeAddressByHash(unsigned int a1)
 	//Log::Debug("# hash_pointer: 0x%x [%d]",hash_pointer,hash_pointer);
 	if(hash_pointer == 0)
 	{
-		Log::Debug("# hash_pointer null");
+		Log::Debug(L"# hash_pointer null");
 		return 0;
 	}
 	int addr = (int)(*(DWORD*)(pointer2 + (8 * v3) + 4));

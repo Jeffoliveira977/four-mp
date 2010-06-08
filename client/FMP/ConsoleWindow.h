@@ -18,7 +18,7 @@ public:
 	bool IsVisible(void);
 	void Show(void);
 	void Hide(void);
-	virtual void Log(const char *type, const char *string, char* = 0);
+	virtual void Log(const wchar_t *type, const wchar_t *string, char* = 0);
 private:
 	bool IsLoaded;
 	CRITICAL_SECTION cs;
@@ -33,4 +33,4 @@ private:
 
 void InputBoxCallback(CElement *pElement, CMSG msg, int Param);
 void SubmitButtonCallback(CElement *pElement, CMSG msg, int Param);
-void PrintToConsole(const char *string, ...);
+void PrintToConsole(const wchar_t *string, ...);

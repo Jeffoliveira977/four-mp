@@ -45,7 +45,7 @@ MasterServer::~MasterServer()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool MasterServer::QueryServerList(bool ban, bool vip, bool empty, bool full, bool password, const char *clan, const char *name, const char *mode, const char *loc)
+bool MasterServer::QueryServerList(bool ban, bool vip, bool empty, bool full, bool password, const wchar_t *clan, const wchar_t *name, const wchar_t *mode, const wchar_t *loc)
 {
 	// t=list
 	// filter[%s] : ban, vip, name, mode, empty, full, clan, password, loc
@@ -53,15 +53,53 @@ bool MasterServer::QueryServerList(bool ban, bool vip, bool empty, bool full, bo
 	if(http->IsBusy()) return 0;
 
 	RakNet::RakString data, tmp;
+	size_t length;
+	char *tmptmp;
 	if(ban) data += "ban=1&";
-	if(vip) data += "vip=1&"; 
-	if(empty) data += "empty=1&"; 
-	if(full) data += "full=1&"; 
-	if(password) data += "password=1&"; 
-	if(clan) { tmp = clan; tmp.URLEncode(); data += RakNet::RakString("clan=%s&", tmp.C_String()); } 
-	if(name) { tmp = name; tmp.URLEncode(); data += RakNet::RakString("name=%s&", tmp.C_String()); } 
-	if(mode) { tmp = mode; tmp.URLEncode(); data += RakNet::RakString("mode=%s&", tmp.C_String()); } 
-	if(loc) { tmp = loc; tmp.URLEncode(); data += RakNet::RakString("loc=%s&", tmp.C_String()); } 
+	if(vip) data += "vip=1&";
+	if(empty) data += "empty=1&";
+	if(full) data += "full=1&";
+	if(password) data += "password=1&";
+	if (clan)
+	{
+		length = (sizeof(wchar_t) / sizeof(char)) * wcslen(clan) + 1;
+		tmptmp = (char *)calloc(length, sizeof(char));
+		wcstombs(tmptmp, clan, length);
+		tmp = tmptmp;
+		free(tmptmp);
+		tmp.URLEncode();
+		data += RakNet::RakString("clan=%s&", tmp.C_String());
+	}
+	if (name)
+	{
+		length = (sizeof(wchar_t) / sizeof(char)) * wcslen(name) + 1;
+		tmptmp = (char *)calloc(length, sizeof(char));
+		wcstombs(tmptmp, name, length);
+		tmp = tmptmp;
+		free(tmptmp);
+		tmp.URLEncode();
+		data += RakNet::RakString("name=%s&", tmp.C_String());
+	}
+	if (mode)
+	{
+		length = (sizeof(wchar_t) / sizeof(char)) * wcslen(mode) + 1;
+		tmptmp = (char *)calloc(length, sizeof(char));
+		wcstombs(tmptmp, mode, length);
+		tmp = tmptmp;
+		free(tmptmp);
+		tmp.URLEncode();
+		data += RakNet::RakString("mode=%s&", tmp.C_String());
+	}
+	if (loc)
+	{
+		length = (sizeof(wchar_t) / sizeof(char)) * wcslen(loc) + 1;
+		tmptmp = (char *)calloc(length, sizeof(char));
+		wcstombs(tmptmp, loc, length);
+		tmp = tmptmp;
+		free(tmptmp);
+		tmp.URLEncode();
+		data += RakNet::RakString("loc=%s&", tmp.C_String());
+	}
 	data += "t=list";
 
 	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "list.php").C_String(), data.C_String());
@@ -83,19 +121,27 @@ bool MasterServer::QueryServerList(bool ban, bool vip, bool empty, bool full, bo
 	return 1;
 }
 
-bool MasterServer::QueryUserLogin(const char *login, const char *password)
+bool MasterServer::QueryUserLogin(const wchar_t *login, const wchar_t *password)
 {
 	// t=login
 	// login= &pass=
 
 	if(http->IsBusy()) return 0;
 
-	RakNet::RakString data = RakNet::RakString("login=%s&pass=%s&t=login", 
-		RakNet::RakString(login).URLEncode().C_String(), RakNet::RakString(password).URLEncode().C_String());
+	int length = _scwprintf(L"login=%s&pass=%s&t=login", login, password) + 1;
+	wchar_t *tempstring = (wchar_t *)calloc(length, sizeof(wchar_t));
+	swprintf(tempstring, length, L"login=%s&pass=%s&t=login", login, password);
+	length = (sizeof(wchar_t) / sizeof(char)) * (length - 1) + 1;
+	char *tempstring2 = (char *)calloc(length, sizeof(char));
+	wcstombs(tempstring2, tempstring, length);
+
+	RakNet::RakString data = RakNet::RakString(RakNet::RakString(tempstring2).URLEncode().C_String());
+	free(tempstring);
+	free(tempstring2);
 
 	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_LOGIN;
-	strcpy(user->login, login);
+	wcscpy(user->login, login);
 
 	RakNetTimeMS endTime=RakNet::GetTimeMS() + 10000;
 	while(RakNet::GetTimeMS() < endTime && !(state == MSS_NONE || state == MSS_ERROR))
@@ -113,17 +159,23 @@ bool MasterServer::QueryUserLogin(const char *login, const char *password)
 	return 1;
 }
 
-bool MasterServer::QueryUserRegister(const char *login, const char *nick, const char *password, const char *email)
+bool MasterServer::QueryUserRegister(const wchar_t *login, const wchar_t *nick, const wchar_t *password, const wchar_t *email)
 {
 	// t=reg
 	// login= &pass= &email= &nick= &hard=
 
 	if(http->IsBusy()) return 0;
 
-	RakNet::RakString data = RakNet::RakString("login=%s&pass=%s&email=%s&nick=%s&hard=%s&t=reg", 
-		RakNet::RakString(login).URLEncode().C_String(), RakNet::RakString(password).URLEncode().C_String(),
-		RakNet::RakString(email).URLEncode().C_String(), RakNet::RakString(nick).URLEncode().C_String(), 
-		RakNet::RakString("fmp02a").URLEncode().C_String());
+	int length = _scwprintf(L"login=%s&pass=%s&email=%s&nick=%s&hard=%s&t=reg", login, password, email, nick, "fmp02a") + 1;
+	wchar_t *tempstring = (wchar_t *)calloc(length, sizeof(wchar_t));
+	swprintf(tempstring, length, L"login=%s&pass=%s&email=%s&nick=%s&hard=%s&t=reg", login, password, email, nick, "fmp02a");
+	length = (sizeof(wchar_t) / sizeof(char)) * (length - 1) + 1;
+	char *tempstring2 = (char *)calloc(length, sizeof(char));
+	wcstombs(tempstring2, tempstring, length);
+
+	RakNet::RakString data = RakNet::RakString(RakNet::RakString(tempstring2).URLEncode().C_String());
+	free(tempstring);
+	free(tempstring2);
 
 	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_REGISTER;
@@ -173,15 +225,23 @@ bool MasterServer::QueryUserLogout()
 	return 1;
 }
 
-bool MasterServer::QueryUserUpdate(const char *status)
+bool MasterServer::QueryUserUpdate(const wchar_t *status)
 {
 	// t=logout
 	// fmpid= &seskey= &status=
 
 	if(http->IsBusy()) return 0;
 
-	RakNet::RakString data = RakNet::RakString("fmpid=%d&seskey=%s&status=%s&t=update", user->fmpid, 
-		RakNet::RakString(user->seskey).URLEncode().C_String(), RakNet::RakString(status).URLEncode().C_String());
+	int length = _scwprintf(L"fmpid=%d&seskey=%s&status=%s&t=update", user->fmpid, user->seskey, status) + 1;
+	wchar_t *tempstring = (wchar_t *)calloc(length, sizeof(wchar_t));
+	swprintf(tempstring, length, L"fmpid=%d&seskey=%s&status=%s&t=update", user->fmpid, user->seskey, status);
+	length = (sizeof(wchar_t) / sizeof(char)) * (length - 1) + 1;
+	char *tempstring2 = (char *)calloc(length, sizeof(char));
+	wcstombs(tempstring2, tempstring, length);
+
+	RakNet::RakString data = RakNet::RakString(RakNet::RakString(tempstring2).URLEncode().C_String());
+	free(tempstring);
+	free(tempstring2);
 
 	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_UPDATE;
@@ -258,19 +318,19 @@ void MasterServer::ReadServerList(RakNet::RakString data)
 		}
 		else if(read_id == 2)
 		{
-			int len = strlen(tmp_info->name);
+			int len = wcslen(tmp_info->name);
 			tmp_info->name[len] = dataCode[i];
 			tmp_info->name[len+1] = 0;
 		}
 		else if(read_id == 3)
 		{
-			int len = strlen(tmp_info->loc);
+			int len = wcslen(tmp_info->loc);
 			tmp_info->loc[len] = dataCode[i];
 			tmp_info->loc[len+1] = 0;
 		}
 		else if(read_id == 4)
 		{
-			int len = strlen(tmp_info->mode);
+			int len = wcslen(tmp_info->mode);
 			tmp_info->mode[len] = dataCode[i];
 			tmp_info->mode[len+1] = 0;
 		}
@@ -288,7 +348,7 @@ void MasterServer::ReadServerList(RakNet::RakString data)
 		}
 		else if(read_id == 8)
 		{
-			int len = strlen(tmp_info->clan);
+			int len = wcslen(tmp_info->clan);
 			tmp_info->clan[len] = dataCode[i];
 			tmp_info->clan[len+1] = 0;
 		}
@@ -337,13 +397,13 @@ void MasterServer::ReadUserInfo(RakNet::RakString data)
 			}
 			else if(read_id == 2)
 			{
-				int len = strlen(user->name);
+				int len = wcslen(user->name);
 				user->name[len] = dataCode[i];
 				user->name[len+1] = 0;
 			}
 			else if(read_id == 3)
 			{
-				int len = strlen(user->status);
+				int len = wcslen(user->status);
 				user->status[len] = dataCode[i];
 				user->status[len+1] = 0;
 			}
@@ -461,10 +521,10 @@ int MasterServer::GetNumServers()
 bool MasterServer::IsUserInfo()
 {
 	if(user->fmpid == 0) return 0;
-	if(strlen(user->login) == 0) return 0;
-	if(strlen(user->name) == 0) return 0;
+	if(wcslen(user->login) == 0) return 0;
+	if(wcslen(user->name) == 0) return 0;
 	if(strlen(user->seskey) == 0) return 0;
-	if(strlen(user->status) == 0) return 0;
+	if(wcslen(user->status) == 0) return 0;
 
 	return 1;
 }
@@ -476,7 +536,7 @@ int MasterServer::GetUserId()
 {
 	return user->fmpid;
 }
-char *MasterServer::GetUserName()
+wchar_t *MasterServer::GetUserName()
 {
 	return user->name;
 }
@@ -486,7 +546,7 @@ char *MasterServer::GetUserSession()
 	return user->seskey;
 }
 
-char *MasterServer::GetError()
+wchar_t *MasterServer::GetError()
 {
 	return error;
 }

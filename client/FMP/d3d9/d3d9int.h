@@ -3,6 +3,8 @@
 
 #include "d3d9.h"
 
+HRESULT CreateD3DXFont( LPDIRECT3DDEVICE9 dDev, LPD3DXFONT* ppd3dxFont, TCHAR* pstrFont, DWORD dwSize, bool bold, bool Italic );
+
 interface hkIDirect3D9 : public IDirect3D9
 {
 public:

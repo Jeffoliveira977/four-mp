@@ -25,59 +25,59 @@ void PrintToConsole(const char *string, ...);
 ClientCore::ClientCore(void)
 {
 	gamestate = GameStateLoading;
-	strcpy(name, "unnamed");
+	wcscpy(name, L"unnamed");
 	namecvar = NULL;
 	index = -1; // Should be defined in PlayerManager.h
 	sessionkey[0] = 0;
-	fmpid = 0;
+	fmpid = -1;
 #if defined (FMP_CLIENT)
 	inputstate = InputStateGame;
 #endif
-	GetModuleFileNameA(NULL, PathToClient, MAX_PATH);
-	for(int i = strlen(PathToClient); i >= 0; i--)
+	GetModuleFileName(NULL, PathToClient, MAX_PATH);
+	for (size_t i = wcslen(PathToClient); i >= 0; i--)
 	{
-		if(PathToClient[i] == '/' || PathToClient[i] == '\\')
+		if(PathToClient[i] == L'/' || PathToClient[i] == L'\\')
 			break;
 		PathToClient[i] = 0;
 	}
-	sprintf_s(PathToClient, MAX_PATH, "%sFMP\\", PathToClient);
-	Log::Info("Path: %s", PathToClient);
+	swprintf(PathToClient, MAX_PATH, L"%sFMP\\", PathToClient);
+	Log::Info(L"Path: %s", PathToClient);
 }
 
 ClientCore::~ClientCore(void)
 {
 }
 
-char * ClientCore::GetPath()
+wchar_t *ClientCore::GetPath()
 {
 	return PathToClient;
 }
 
-void ClientCore::GetPath(const char *file, char *path)
+void ClientCore::GetPath(const wchar_t *file, wchar_t *path)
 {
-	sprintf_s(path, MAX_PATH, "%s%s", PathToClient, file);
-	Log::Info("Returned: %s", path);
+	swprintf(path, MAX_PATH, L"%s%s", PathToClient, file);
+	Log::Info(L"Returned: %s", path);
 }
 
 bool ClientCore::Load(void)
 {
 	concore.SetOutputFunction(PrintToConsole);
 	concore.RegisterStandardLibrary();
-	concore.AddConCmd("connect", ConCmdConnect, "Connect to specified server.", 0);
-	concore.AddConCmd("exit", ConCmdQuit, "Exit the engine.", 0);
-	namecvar = concore.AddConVar("name", "unnamed", "Current user name.", 0);
+	concore.AddConCmd(L"connect", ConCmdConnect, L"Connect to specified server.", 0);
+	concore.AddConCmd(L"exit", ConCmdQuit, L"Exit the engine.", 0);
+	namecvar = concore.AddConVar(L"name", L"unnamed", L"Current user name.", 0);
 	namecvar->HookChange(ConVarHookName);
-	concore.AddConCmd("quit", ConCmdQuit, "Exit the engine.", 0);
+	concore.AddConCmd(L"quit", ConCmdQuit, L"Exit the engine.", 0);
 	nm.Load();
 #if defined (FMP_CLIENT)
-	concore.SetExecPath("FMP/cfg/");
+	concore.SetExecPath(L"FMP/cfg/");
 	inputstate = InputStateGui;
 #elif defined (FMP_CONSOLE_CLIENT)
-	concore.SetExecPath("cfg/");
-	conscreen.SetCaption("FOUR-MP");
+	concore.SetExecPath(L"cfg/");
+	conscreen.SetCaption(L"FOUR-MP");
 #endif
 	gamestate = GameStateOffline;
-	concore.InterpretLine("exec autoexec.cfg");
+	concore.InterpretLine(L"exec autoexec.cfg");
 	return true;
 }
 
@@ -121,14 +121,14 @@ void ClientCore::SetFMPID(int fid)
 	fmpid = fid;
 }
 
-char *ClientCore::GetName(void)
+wchar_t *ClientCore::GetName(void)
 {
 	if (name == NULL)
 	{
 		return NULL;
 	}
-	char *tempstring = (char *)calloc(strlen(name) + 1, sizeof(char));
-	strcpy(tempstring, name);
+	wchar_t *tempstring = (wchar_t *)calloc(wcslen(name) + 1, sizeof(wchar_t));
+	wcscpy(tempstring, name);
 	return tempstring;
 }
 
@@ -143,7 +143,7 @@ bool ClientCore::SetGameState(const GameState state)
 	return true;
 }
 
-bool ClientCore::SetName(const char string[MAX_PLAYER_NAME_LENGTH])
+bool ClientCore::SetName(const wchar_t string[MAX_PLAYER_NAME_LENGTH])
 {
 	if (name == NULL)
 	{

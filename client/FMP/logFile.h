@@ -9,7 +9,7 @@ public:
 	LogFile();
 	~LogFile();
 
-	virtual void Log(const char *type, const char *string, char*);
+	virtual void Log(const wchar_t *type, const wchar_t *string, char*);
 private:
 	CRITICAL_SECTION critSect;
 	FILE * fileHandle;

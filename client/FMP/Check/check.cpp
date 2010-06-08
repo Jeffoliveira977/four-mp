@@ -11,11 +11,11 @@ int CheckSum()
 {
 	bool ok = 1;
 	int argc = 3;
-	_TCHAR* argv[3] = { "\0", "common\\data\\handling.dat\0", "common\\data\\WeaponInfo.xml\0" };
+	_TCHAR* argv[3] = { L"\0", L"common\\data\\handling.dat\0", L"common\\data\\WeaponInfo.xml\0" };
 	int right[2] = { 0x3f19c08a, 0x3a5755dd };
 	for (int i = 1; i < argc; i++)
 	{
-		HANDLE hfile = CreateFile((LPCSTR)argv[i], GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+		HANDLE hfile = CreateFile(argv[i], GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 		if (hfile == INVALID_HANDLE_VALUE) continue;
 		crc32 crc;
 		char data[512];
@@ -30,8 +30,8 @@ int CheckSum()
 BOOL SearchFiles(LPCTSTR lpszFileName, LPSEARCHFUNC lpSearchFunc, BOOL bInnerFolders = TRUE)
 {
     LPTSTR part;
-    char tmp[MAX_PATH]; // временный массив
-    char name[MAX_PATH];
+    wchar_t tmp[MAX_PATH]; // временный массив
+    wchar_t name[MAX_PATH];
 
     HANDLE hSearch = NULL;
     WIN32_FIND_DATA wfd;
@@ -41,8 +41,8 @@ BOOL SearchFiles(LPCTSTR lpszFileName, LPSEARCHFUNC lpSearchFunc, BOOL bInnerFol
     if(bInnerFolders)
     {
         if(GetFullPathName(lpszFileName, MAX_PATH, tmp, &part) == 0) return FALSE;
-        strcpy(name, part);
-        strcpy(part, "*.*");
+        wcscpy(name, part);
+        wcscpy(part, L"*.*");
 
         // если папки существуют, то делаем поиск
         wfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
@@ -53,16 +53,16 @@ BOOL SearchFiles(LPCTSTR lpszFileName, LPSEARCHFUNC lpSearchFunc, BOOL bInnerFol
             // и эти папки мы не трогаем
 
             // пропускаем папки "." и ".."
-            if (!strncmp(wfd.cFileName, ".", 1) || !strncmp(wfd.cFileName, "..", 2))            
+            if (!wcsncmp(wfd.cFileName, L".", 1) || !wcsncmp(wfd.cFileName, L"..", 2))            
             continue;
         
             if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) // если мы нашли папку
             {
-                char next[MAX_PATH];
+                wchar_t next[MAX_PATH];
                 if(GetFullPathName(lpszFileName, MAX_PATH, next, &part) == 0) return FALSE;
-                strcpy(part, wfd.cFileName);
-                strcat(next, "\\");
-                strcat(next, name);
+                wcscpy(part, wfd.cFileName);
+                wcscat(next, L"\\");
+                wcscat(next, name);
 
                 SearchFiles(next, lpSearchFunc, TRUE);
             }
@@ -77,9 +77,9 @@ BOOL SearchFiles(LPCTSTR lpszFileName, LPSEARCHFUNC lpSearchFunc, BOOL bInnerFol
     do
     if (!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) // если мы нашли файл
     {
-        char file[MAX_PATH];
+        wchar_t file[MAX_PATH];
         if(GetFullPathName(lpszFileName, MAX_PATH, file, &part) == 0) return FALSE;
-        strcpy(part, wfd.cFileName);
+        wcscpy(part, wfd.cFileName);
 
         lpSearchFunc(file);
     }
@@ -91,7 +91,7 @@ BOOL SearchFiles(LPCTSTR lpszFileName, LPSEARCHFUNC lpSearchFunc, BOOL bInnerFol
 
 void CheckASI(LPCTSTR fn)
 {
-	LPSTR path = "\0";
+	LPWSTR path = L"\0";
 	GetCurrentDirectory(MAX_PATH, path);
 	cheats = 1;
 }
@@ -99,18 +99,18 @@ void CheckASI(LPCTSTR fn)
 void CheckDLL(LPCTSTR fn)
 {
 	bool nt = 0;
-	LPSTR path = "\0";
+	LPWSTR path = L"\0";
 	GetCurrentDirectory(MAX_PATH, path);
-	char fmp[MAX_PATH];
+	wchar_t fmp[MAX_PATH];
 
-	char dlls[8][64] = { "1911.dll", "binkw32.dll","FirewallInstallHelper.dll",
-		"GameuxInstallHelper.dll","GTAIVGDF.dll","LiveTokenHelper.dll",
-		"Paul.dll","xlive.dll"	};
+	wchar_t dlls[8][64] = { L"1911.dll", L"binkw32.dll", L"FirewallInstallHelper.dll",
+		L"GameuxInstallHelper.dll", L"GTAIVGDF.dll", L"LiveTokenHelper.dll",
+		L"Paul.dll", L"xlive.dll"	};
 
 	for(int i = 0; i < sizeof(dlls); i++)
 	{
-		sprintf(fmp, "%s%s", path, dlls[i]);
-		if(strcmp(fmp, fn) == 0)
+		swprintf(fmp, L"%s%s", path, dlls[i]);
+		if(wcscmp(fmp, fn) == 0)
 		{
 			nt = 1;
 		}

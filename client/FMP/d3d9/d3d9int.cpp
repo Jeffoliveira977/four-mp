@@ -5,12 +5,13 @@
 #include "../Hook/window.h"
 #include "d3d9hook.h"
 #include "gui.h"
+#include "../chat.h"
 
 extern LPD3DXFONT fFMP;
-extern LPD3DXFONT fChat;
 //extern LPDIRECT3DTEXTURE9 g_Texture;
 //extern ID3DXSprite *g_Sprite;
 extern FMPGUI Gui;
+extern ChatManager chat;
 
 HRESULT CreateD3DXFont( LPDIRECT3DDEVICE9 dDev, LPD3DXFONT* ppd3dxFont, TCHAR* pstrFont, DWORD dwSize, bool bold, bool Italic )
 {
@@ -74,21 +75,21 @@ HRESULT APIENTRY hkIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType,
 	if( SUCCEEDED(hRet) )
 	{
 		hkIDirect3DDevice9 *ret = new hkIDirect3DDevice9(ppReturnedDeviceInterface, pPresentationParameters, this);
-		Log::Debug("Hooked Direct3D9 device: 0x%x -> 0x%x", ret->m_pD3Ddev, ret);
+		Log::Debug(L"Hooked Direct3D9 device: 0x%x -> 0x%x", ret->m_pD3Ddev, ret);
 
 		gameProc = (WNDPROC)GetWindowLong(hFocusWindow,GWL_WNDPROC);
 		SetWindowLong(hFocusWindow,GWL_WNDPROC,(LONG)DefWndProc);
-		Log::Debug("Set window");
+		Log::Debug(L"Set window");
 
 		Gui.Load(ret->m_pD3Ddev);
-		Log::Debug("Save Device");
+		Log::Debug(L"Save Device");
 		
 		//clientstate.input = InputStateGui;
 
 		if(fFMP == NULL)
 		{
-			CreateD3DXFont(ret->m_pD3Ddev, &fFMP, "Arial", 14, 1, 0);
-			CreateD3DXFont(ret->m_pD3Ddev, &fChat, "Arial", 10, 0, 0);
+			CreateD3DXFont(ret->m_pD3Ddev, &fFMP, L"Arial", 14, 1, 0);
+			chat.CreateChatFont(ret->m_pD3Ddev);
 			//D3DXCreateTextureFromFile(ret->m_pD3Ddev, "mousecursorhud.png", &g_Texture);
 			//D3DXCreateSprite(ret->m_pD3Ddev, &g_Sprite);
 			/*D3DXCreateTextureFromFileEx( ret->m_pD3Ddev, "mousecursorhud.png", D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2,

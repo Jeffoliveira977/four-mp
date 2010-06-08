@@ -12,15 +12,15 @@ namespace RakNet
 
 struct MasterServerInfo
 {
-	char name[128];			// Server's name
+	wchar_t name[128];			// Server's name
 	char ip[64];			// Server's IP
 	unsigned short port;				// Server's port
-	char loc[64];			// Server's location
-	char mode[64];			// Server's game mode
+	wchar_t loc[64];			// Server's location
+	wchar_t mode[64];			// Server's game mode
 	short players;			// Count players on server
 	short maxplayers;			// Count slots on server
 	bool password;			// Server have a password?
-	char clan[64];			// Clan's server
+	wchar_t clan[64];			// Clan's server
 	bool ban;				// Server in black list?
 	bool vip;				// Server is VIP?
 	unsigned int ping;	// Ping
@@ -30,11 +30,11 @@ struct MasterServerInfo
 struct MasterUserInfo
 {
 	int fmpid;				// FOUR-MP ID
-	char name[32];			// Player nick
-	char login[32];			// Player login
-	char status[128];		// Player status
+	wchar_t name[32];			// Player nick
+	wchar_t login[32];			// Player login
+	wchar_t status[128];		// Player status
 	char seskey[32];		// Session key hash
-	std::string friends;			// Player's friends
+	std::wstring friends;			// Player's friends
 };
 
 // Query states
@@ -59,7 +59,7 @@ class MasterServer
 
 	std::vector<MasterServerInfo*> slist;
 	MasterUserInfo *user;
-	char error[128];
+	wchar_t error[128];
 
 	MasterServerStates state;
 protected:
@@ -75,12 +75,12 @@ public:
 	void Load();
 
 	void ClearServerList();
-	char * GetError();
+	wchar_t * GetError();
 
-	bool QueryServerList(bool ban = 0, bool vip = 0, bool empty = 0, bool full = 0, bool password = 1, const char *clan = 0, const char *name = 0, const char *mode = 0, const char *loc = 0);
-	bool QueryUserLogin(const char *login, const char *password);
-	bool QueryUserUpdate(const char *status);
-	bool QueryUserRegister(const char *login, const char *nick, const char *password, const char *email);
+	bool QueryServerList(bool ban = 0, bool vip = 0, bool empty = 0, bool full = 0, bool password = 1, const wchar_t *clan = 0, const wchar_t *name = 0, const wchar_t *mode = 0, const wchar_t *loc = 0);
+	bool QueryUserLogin(const wchar_t *login, const wchar_t *password);
+	bool QueryUserUpdate(const wchar_t *status);
+	bool QueryUserRegister(const wchar_t *login, const wchar_t *nick, const wchar_t *password, const wchar_t *email);
 	bool QueryUserLogout();
 	bool QueryClan();
 
@@ -94,6 +94,6 @@ public:
 	bool IsUserInfo();
 	MasterUserInfo *GetUserInfo();
 	int GetUserId();
-	char *GetUserName();
+	wchar_t *GetUserName();
 	char *GetUserSession();
 };

@@ -1,11 +1,11 @@
 #include <windows.h>
 #include "../main.h"
 #include "window.h"
-#include "../chat.h"
 #include "../../Shared/ClientCore.h"
 #include "../Hook/classes.h"
 #include "../d3d9/Gui.h"
 #include "../ConsoleWindow.h"
+#include "../chat.h"
 
 extern ClientCore client;
 extern FMPHook HOOK;
@@ -13,6 +13,7 @@ extern FMPGUI Gui;
 extern ConsoleWindow conwindow;
 extern CWindow * fServBrowser;
 extern CWindow * fChat;
+extern ChatManager chat;
 WNDPROC gameProc;
 DWORD g_iMinimized = 1;
 
@@ -65,54 +66,53 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		}
 	case InputStateChat:
 		{
-			if (Msg == WM_KEYUP)
+			switch (Msg)
 			{
-				if(wParam == VK_F6)
+			case WM_KEYDOWN:
 				{
-					client.SetInputState(InputStateGame); 
-					HOOK.InputFreeze(0);
-					break; 
-				}
-				else if(wParam == VK_F5)
-				{
-					client.SetInputState(InputStateGui);
-					HOOK.InputFreeze(0);
-					fChat->SetVisible(1);
+					TranslateMessage((MSG *)wParam);
 					break;
 				}
-
-				if(wParam == 13)
+			case WM_KEYUP:
 				{
-					if(strlen(enterMsg) != 0)
-						SendChatMessage();
-
-					client.SetInputState(InputStateGame); 
-					HOOK.InputFreeze(0);
-				}
-				else if(wParam == 8)
-				{
-					if(strlen(enterMsg) > 0)
-						enterMsg[strlen(enterMsg)-1] = 0;
-				}
-				else
-				{
-					if(strlen(enterMsg) != 255)
+					switch (wParam)
 					{
-						int enterChat = strlen(enterMsg);
-
-						BYTE bKeys[256] = { 0 };
-						GetKeyboardState( bKeys );
-
-						WORD wKey = 0;
-						ToAscii( wParam, HIWORD( lParam )&0xFF, bKeys, &wKey, 0 );
-
-						if(wKey < 32) break;
-
-						enterMsg[enterChat] = wKey;
-
-						enterChat++;
-						enterMsg[enterChat] = 0;
+					case VK_F6:
+						{
+							client.SetInputState(InputStateGame); 
+							HOOK.InputFreeze(0); 
+							break;
+						}
+					case VK_F5:
+						{
+							client.SetInputState(InputStateGui);
+							HOOK.InputFreeze(0);
+							fChat->SetVisible(1);
+							break;
+						}
+					case 13: //Enter
+						{
+							chat.SendChatMessage();
+							client.SetInputState(InputStateGame); 
+							HOOK.InputFreeze(0);
+							break;
+						}
+					case 8: //Backspace
+						{
+							chat.Backspace();
+							break;
+						}
+					default:
+						{
+							//TODO
+						}
 					}
+					break;
+				}
+			case WM_CHAR:
+				{
+					chat.AddCharacter(wParam);
+					break;
 				}
 			}
 			break;

@@ -48,8 +48,8 @@ void FMPHook::MoveSync()
 			if(cs > speed) speed = cs;
 
 			int dr = 1;
-			if(!Natives::DoesVehicleExist(car)) { Log::Debug("DOES"); }
-			if(Natives::IsCarStopped(car)) { Log::Debug("STOP"); dr = 0; }
+			if(!Natives::DoesVehicleExist(car)) { Log::Debug(L"DOES"); }
+			if(Natives::IsCarStopped(car)) { Log::Debug(L"STOP"); dr = 0; }
 			Vector3 v;
 			Natives::GetCarSpeedVector(car, &v, 1);
 			float x = floor(v.X * 1000 + 0.5)/1000;

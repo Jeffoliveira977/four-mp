@@ -7,7 +7,7 @@
 #pragma once
 #include "../../Shared/Network/Limits.h"
 #include "Hook/types.h"
-#include "Hook/scripting.h"
+//#include "Hook/scripting.h"
 
 struct FPlayer
 {
@@ -15,7 +15,7 @@ struct FPlayer
 	bool connected;
 	char ip[16];
 	unsigned short port;
-	char name[MAX_PLAYER_NAME_LENGTH];
+	wchar_t name[MAX_PLAYER_NAME_LENGTH];
 	unsigned int model;
 	float position[3];
 	float angle;
@@ -54,24 +54,4 @@ struct FVehicle
 	float doorangle[6];
 	unsigned char color[4];
 	bool sirenon;
-};
-
-class COLOR
-{
-public:
-	COLOR() {  }
-	COLOR(unsigned char r, unsigned char g, unsigned char b)
-	{
-		this->r = r;
-		this->g = g;
-		this->b = b;
-	}
-
-	unsigned char r, g, b;
-};
-
-struct CHATMSG 
-{
-	char msg[MAX_CHAT_MESSAGE_LENGTH];
-	COLOR color;
 };

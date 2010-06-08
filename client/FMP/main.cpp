@@ -29,6 +29,7 @@
 #include "d3d9/d3d9hook.h"
 #include "d3d9/gui.h"
 #include "ConsoleWindow.h"
+#include "chat.h"
 
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                     Потоки для работы с игрой                                         */
@@ -43,16 +44,13 @@ LogFile fileLogger;
 
 FMPGUI Gui;
 ConsoleWindow conwindow;
+ChatManager chat;
 
 bool myEnter = 0;
 bool cheats = 0;
 
 FPlayer gPlayer[MAX_PLAYERS];
 FVehicle gCar[MAX_CARS];
-CHATMSG mChat[64];
-
-int enterChat = -1;
-char enterMsg[256];
 
 void patchCode();
 extern DWORD dwGameVersion;
@@ -83,7 +81,7 @@ void FMPHook::SetFreeCam(bool on)
 
 		if(!Natives::DoesCamExist(freeCam))
 		{
-			Log::Error("Cam does exist");
+			Log::Error(L"Cam does exist");
 			return;
 		}
 		Natives::SetCamActive(freeCam, 0);
@@ -135,10 +133,10 @@ void FMPHook::SetFreeCam(bool on)
 
 void FMPHook::CreateCar(short index, unsigned int model, float position[3], float angle, unsigned char color[2])
 {
-	Log::Info("CREATE CAR %d", index);
+	Log::Info(L"CREATE CAR %d", index);
 	Natives::RequestModel((eModel)model);
 	while(!Natives::HasModelLoaded((eModel)model)) wait(0);
-	Log::Info("Model LOADED");
+	Log::Info(L"Model LOADED");
 	Natives::CreateCar(model, position[0], position[1], position[2], &gCar[index].CarID, 1);
 	Natives::SetCarHeading(gCar[index].CarID, angle);
 	gCar[index].exist = 1;
@@ -176,35 +174,35 @@ void FMPHook::InputFreeze(bool e)
 
 bool FMPHook::SafeCreatePlayer(short index)
 {
-	Log::Info("SafeCreatePlayer requested");
+	Log::Info(L"SafeCreatePlayer requested");
 
 	if(gPlayer[index].connected == 0) 
 	{
-		Log::Warning("Haven't player data for create");
+		Log::Warning(L"Haven't player data for create");
 		return 0;
 	}
 
 	if(client.GetIndex() == index)
 	{
-		Log::Warning("Is a local player");
+		Log::Warning(L"Is a local player");
 		return 0;
 	}
 
 	if(Natives::DoesCharExist(gPlayer[index].PedID))
 	{
-		Log::Warning("Char already exist");
+		Log::Warning(L"Char already exist");
 		return 0;
 	}
 	
 	if(!Natives::IsThisModelAPed((eModel)gPlayer[index].model))
 	{
-		Log::Warning("This model not a ped");
+		Log::Warning(L"This model not a ped");
 		return 0;
 	}
 
-	if(gPlayer[index].name == 0 || strlen(gPlayer[index].name) == 0)
+	if(gPlayer[index].name == 0 || wcslen(gPlayer[index].name) == 0)
 	{
-		Log::Warning("Player haven't name");
+		Log::Warning(L"Player haven't name");
 		return 0;
 	}
 
@@ -216,7 +214,11 @@ bool FMPHook::SafeCreatePlayer(short index)
 
 	while(!Natives::DoesCharExist(gPlayer[index].PedID)) wait(0);
 
-	Natives::GivePedFakeNetworkName(gPlayer[index].PedID, gPlayer[index].name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
+	size_t length = (sizeof(wchar_t) / sizeof(char)) * wcslen(gPlayer[index].name) + 1;
+	char *tempname = (char *)calloc(length, sizeof(char));
+	wcstombs(tempname, gPlayer[index].name, length);
+	Natives::GivePedFakeNetworkName(gPlayer[index].PedID, tempname, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
+	free(tempname);
 	Natives::SetBlockingOfNonTemporaryEvents(gPlayer[index].PedID, 1);
 
 	Natives::SetCharHealth( gPlayer[index].PedID, gPlayer[index].health );
@@ -227,12 +229,12 @@ bool FMPHook::SafeCreatePlayer(short index)
 	{
 		if(gCar[gPlayer[index].vehicleindex].exist == 0)
 		{
-			Log::Warning("Player car not register");
+			Log::Warning(L"Player car not register");
 			return 0;
 		}
 		if(!Natives::DoesVehicleExist( gCar[gPlayer[index].vehicleindex].CarID ))
 		{
-			Log::Warning("Player car not created");
+			Log::Warning(L"Player car not created");
 			return 0;
 		}
 
@@ -253,12 +255,12 @@ bool FMPHook::SafeCheckPlayer(short index, bool bReCreateOnFalse)
 {
 	if(gPlayer[index].connected == 0) 
 	{
-		Log::Error("Player not connected");
+		Log::Error(L"Player not connected");
 		return 0;
 	}
 	if(!Natives::DoesCharExist(gPlayer[index].PedID))
 	{
-		Log::Error("Player doesn't exist");
+		Log::Error(L"Player doesn't exist");
 		if(bReCreateOnFalse) return SafeCreatePlayer(index);
 		return 0;
 	}
@@ -268,23 +270,23 @@ bool FMPHook::SafeCheckPlayer(short index, bool bReCreateOnFalse)
 
 bool FMPHook::SafeCreateVehicle(short index)
 {
-	Log::Info("SafeCreateVehicle requested");
+	Log::Info(L"SafeCreateVehicle requested");
 
 	if(gCar[index].exist == 0) 
 	{
-		Log::Warning("Haven't vehicle data for create");
+		Log::Warning(L"Haven't vehicle data for create");
 		return 0;
 	}
 
 	if(Natives::DoesVehicleExist(gCar[index].CarID))
 	{
-		Log::Warning("Vehicle already exist");
+		Log::Warning(L"Vehicle already exist");
 		return 0;
 	}
 	
 	if(!Natives::IsThisModelAVehicle((eModel)gCar[index].model))
 	{
-		Log::Warning("This model not a vehicle");
+		Log::Warning(L"This model not a vehicle");
 		return 0;
 	}
 
@@ -319,12 +321,12 @@ bool FMPHook::SafeCheckVehicle(short index, bool bReCreateOnFalse)
 {
 	if(gCar[index].exist == 0) 
 	{
-		Log::Error("Vehicle not created");
+		Log::Error(L"Vehicle not created");
 		return 0;
 	}
 	if(!Natives::DoesVehicleExist(gCar[index].CarID))
 	{
-		Log::Error("Vehicle doesn't exist");
+		Log::Error(L"Vehicle doesn't exist");
 		if(bReCreateOnFalse) return SafeCreateVehicle(index);
 		return 0;
 	}
@@ -379,7 +381,7 @@ void FMPHook::CheckAndCheck()
 		if(gCar[i].exist)
 			if(!Natives::DoesVehicleExist( gCar[i].CarID ))
 			{
-				Log::Warning("Check: Car not exist");
+				Log::Warning(L"Check: Car not exist");
 				SafeCreateVehicle(i);
 			}
 
@@ -387,14 +389,14 @@ void FMPHook::CheckAndCheck()
 		if(gPlayer[i].connected)
 			if(!Natives::DoesCharExist( gPlayer[i].PedID ))
 			{
-				Log::Warning("Check: Char not exist");
+				Log::Warning(L"Check: Char not exist");
 				SafeCreatePlayer(i);
 			}
 }
 
 void FMPHook::RunMP()
 {
-	Log::Info("Starting up multiplayer mode.");
+	Log::Info(L"Starting up multiplayer mode.");
 	Natives::AllowEmergencyServices(0);
 	//Natives::SetPedDensityMultiplier(0);
 	//Natives::SetCarDensityMultiplier(0);
@@ -543,12 +545,12 @@ void FMPHook::RunMP()
 	Natives::StoreScore( _GetPlayer(), &score );
 	Natives::AddScore( _GetPlayer(), -score );
 
-	Log::Info("Multiplayer mode started.");
+	Log::Info(L"Multiplayer mode started.");
 }
 
 void FMPHook::GameThread()
 {
-	Log::Debug("GameThread");
+	Log::Debug(L"GameThread");
 	client.Load();
 	InputFreeze(1);
 
@@ -566,18 +568,14 @@ void FMPHook::GameThread()
 				SetFreeCam(1);
 				if(GetAsyncKeyState(112) != 0)
 				{
-					Log::Debug("Player: 0x%x %d", _GetPlayer(), Natives::PlayerHasChar(_GetPlayer()));
-					Log::Debug("%d %d %d %d %d", Natives::IsScreenFadedIn(), Natives::IsScreenFadedOut(), Natives::IsScreenFading(),
+					Log::Debug(L"Player: 0x%x %d", _GetPlayer(), Natives::PlayerHasChar(_GetPlayer()));
+					Log::Debug(L"%d %d %d %d %d", Natives::IsScreenFadedIn(), Natives::IsScreenFadedOut(), Natives::IsScreenFading(),
 						Natives::IsScreenFadingIn(), Natives::IsScreenFadingOut());
 				}
 				break;
 			}
 		case GameStateConnecting:
 			{
-				/*if(GetTickCount() - LastUpdate > 15*1000)
-				{
-					nm.ConnectToServer();
-				}*/
 				break;
 			}
 		case GameStateInGame:
@@ -592,7 +590,7 @@ void FMPHook::GameThread()
 				if(gPlayer[client.GetIndex()].want_spawn)
 				{
 					if(gPlayer[client.GetIndex()].sync_state == 1) break;
-					Log::Info("NextSpawn");
+					Log::Info(L"NextSpawn");
 
 					short index = client.GetIndex();
 
@@ -623,7 +621,7 @@ void FMPHook::GameThread()
 		wait(100);
 	}
 	client.Unload();
-	Log::Debug("Exit GameThread");
+	Log::Debug(L"Exit GameThread");
 }
 
 void FMPHook::SetTime(int h, int m)
@@ -635,7 +633,7 @@ void FMPHook::GetMyPos()
 {
 	float x, y, z;
 	Natives::GetCharCoordinates(_GetPlayerPed(), &x, &y, &z);
-	Log::Info("MY POS (%f; %f; %f)", x, y, z);
+	Log::Info(L"MY POS (%f; %f; %f)", x, y, z);
 }
 
 void FMPHook::SetMyPos(float x, float y, float z)
@@ -652,7 +650,7 @@ void FMPHook::GetTime()
 {
 	unsigned int h = 0, m = 0;
 	Natives::GetTimeOfDay(&h, &m);
-	Log::Info("TIME: %d:%d = %d", h, m, GetTickCount());
+	Log::Info(L"TIME: %d:%d = %d", h, m, GetTickCount());
 }
 
 void FMPHook::SetTimeScale(float ts)
@@ -670,13 +668,16 @@ void SetMyPos(ConsoleCore *concore, const unsigned char numargs)
 	if(numargs < 3) return;
 
 	float x, y, z;
-	char *tmp;
+	wchar_t *tmp;
 	concore->GetCmdArg(1, tmp);
-	x = atof(tmp);
+	x = _wtof(tmp);
+	free(tmp);
 	concore->GetCmdArg(2, tmp);
-	y = atof(tmp);
+	y = _wtof(tmp);
+	free(tmp);
 	concore->GetCmdArg(3, tmp);
-	z = atof(tmp);
+	z = _wtof(tmp);
+	free(tmp);
 	HOOK.SetMyPos(x, y, z);
 }
 
@@ -692,27 +693,28 @@ void GetTime(ConsoleCore *concore, const unsigned char numargs)
 
 void SetTS(ConsoleCore *concore, const unsigned char numargs)
 {
-	char *tmp;
+	wchar_t *tmp;
 	concore->GetCmdArg(1, tmp);
 
-	HOOK.SetTimeScale(atof(tmp));
+	HOOK.SetTimeScale(_wtof(tmp));
+	free(tmp);
 }
 
 void MainThread(void* dummy)
 {
-	Log::Debug("MainThread (0x%x)", dwLoadOffset);
-	concore.AddConCmd("getmypos", GetMyPos);
-	concore.AddConCmd("getpos", GetMyPos);
-	concore.AddConCmd("teleport", SetMyPos);
-	concore.AddConCmd("kill", KillMe);
-	concore.AddConCmd("time", GetTime);
-	concore.AddConCmd("ts", SetTS);
+	Log::Debug(L"MainThread (0x%x)", dwLoadOffset);
+	concore.AddConCmd(L"getmypos", GetMyPos);
+	concore.AddConCmd(L"getpos", GetMyPos);
+	concore.AddConCmd(L"teleport", SetMyPos);
+	concore.AddConCmd(L"kill", KillMe);
+	concore.AddConCmd(L"time", GetTime);
+	concore.AddConCmd(L"ts", SetTS);
 
 	memset(&gPlayer, 0, sizeof(FPlayer) * MAX_PLAYERS);
 
 	Sleep(10000);
 	HOOK.AttachGtaThread("FOURMP");
-	Log::Debug("Attached");
+	Log::Debug(L"Attached");
 
 	CloseHandle(MainThreadHandle);
 	MainThreadHandle = NULL;
@@ -737,26 +739,26 @@ void ALLOCATE_SCRIPT_TO_RANDOM_PED(char *script, int model, int unk1, int unk2)
 
 int sub_A002B0(void * th, char *script, int a3, int a4, int a5, int a6, int a7, int a8)
 {
-	Log::Debug("> sub_A002B0 (%s)", script);
+	Log::Debug(L"> sub_A002B0 (%s)", script);
 	return 1;
 }
 
 int sub_A00350(char *script, int a2, int a3)
 {
-	Log::Debug("> sub_A00350 (%s)", script);
+	Log::Debug(L"> sub_A00350 (%s)", script);
 	return 1;
 }
 
 bool IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE()
 {
-	Log::Debug("> IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE");
+	Log::Debug(L"> IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE");
 	return 0;
 }
 
 bool IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE(int a1)
 {
-	Log::Debug("> IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE");
-	Log::Debug(">>> (%d)", a1);
+	Log::Debug(L"> IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE");
+	Log::Debug(L">>> (%d)", a1);
 	return 0;
 }
 
@@ -764,7 +766,7 @@ struct Vector4 { float X, Y, Z, W; };
 
 Vector4 GetSpawnPos(Vector4 *pos, float angle, Vector4 *result) //8E6840
 {
-	Log::Info("GetSpawnPos");
+	Log::Info(L"GetSpawnPos");
 	short index = client.GetIndex();
 	gPlayer[index].want_spawn = 1;
 	nm.SendPlayerSpawnRequest();
@@ -777,7 +779,7 @@ Vector4 GetSpawnPos(Vector4 *pos, float angle, Vector4 *result) //8E6840
 
 	memcpy(result, gPlayer[client.GetIndex()].spawn_pos, sizeof(Vector4));
 	gPlayer[index].want_spawn = 1;
-	Log::Info("GetSpawnPos end");
+	Log::Info(L"GetSpawnPos end");
 	return *result;
 }
 
@@ -798,7 +800,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 
 		if(dwGameVersion == 0x1060 || dwGameVersion == 0x1051 || dwGameVersion == 0x1050)
 		{
-			Log::Info("Skipping main menu");
+			Log::Info(L"Skipping main menu");
 			JmpHook(CGAME_PROCESS_SLEEP, CGAME_PROCESS_START_GAME);
 
 			/*JmpHook(0xB5DC50+dwLoadOffset, (DWORD)ALLOCATE_SCRIPT_TO_OBJECT);
@@ -811,15 +813,15 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 			SetString(GAME_NAME,"GTA IV: FOUR-MP");
 			SetString(ADDRESS_STR_POPCYCLE_DAT, "FMP/popcycle.dat");
 
-			Log::Debug("Set DX9 Hook");
+			Log::Debug(L"Set DX9 Hook");
 			DetourFunc((BYTE*)ADDRESS_CREATE_DEVICE,(BYTE*)hkDirect3DCreate9, 5);
 
-			Log::Debug("Set script hook");
+			Log::Debug(L"Set script hook");
 			DWORD threadId = 0; 
 			MainThreadHandle = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&MainThread, 0, 0, (LPDWORD)&threadId);
 		}
 		else
-			Log::Info("This version not supported (%x)", dwGameVersion);
+			Log::Info(L"This version not supported (%x)", dwGameVersion);
 	}
 	else if(ul_reason_for_call == DLL_PROCESS_DETACH)
 	{
@@ -830,7 +832,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 			TerminateThread(MainThreadHandle, 1);
 			CloseHandle(MainThreadHandle);
 		}
-		Log::Debug("EXIT FMP");
+		Log::Debug(L"EXIT FMP");
 	}
 	return TRUE;
 }

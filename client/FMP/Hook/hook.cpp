@@ -43,13 +43,13 @@ FMPHook::FMPHook(): FMPThread()
 
 FMPHook::~FMPHook()
 {
-	Log::Debug("FMPHook::~FMPHook called");
-	Log::Debug("FMPHook::~FMPHook complete");
+	Log::Debug(L"FMPHook::~FMPHook called");
+	Log::Debug(L"FMPHook::~FMPHook complete");
 }
 
 ThreadStates FMPHook::Reset(unsigned int hash,int v2,int i3)
 {
-	Log::Debug("FMPHook::reset called");
+	Log::Debug(L"FMPHook::reset called");
 	if (m_pScriptFiber)
 		DeleteFiber(m_pScriptFiber);
 
@@ -60,18 +60,18 @@ ThreadStates FMPHook::Reset(unsigned int hash,int v2,int i3)
 		Kill();
 		return m_context.eThreadState;
 	}
-	Log::Debug("FMPHook::reset complete");
+	Log::Debug(L"FMPHook::reset complete");
 	return FMPThread::Reset(hash,v2,i3);
 }
 
 void FMPHook::FiberStart(void* parameter)
 {
-	Log::Debug("FMPHook::FiberStart called");
+	Log::Debug(L"FMPHook::FiberStart called");
 	FMPHook* Thread = ptr_cast<FMPHook>(parameter);
 	Thread->GameThread();
 	Thread->m_bKillRequested = true;
 	SwitchToFiber(Thread->m_pPrimaryFiber);
-	Log::Debug("FMPHook::FiberStart complete");
+	Log::Debug(L"FMPHook::FiberStart complete");
 }
 
 ThreadStates FMPHook::Run(int i1)
@@ -117,10 +117,10 @@ void FMPHook::wait(unsigned int timeMS)
 
 void FMPHook::Kill()
 {
-	Log::Debug("FMPHook::Kill called");
+	Log::Debug(L"FMPHook::Kill called");
 	if (GetCurrentFiber() != m_pPrimaryFiber) 
 	{
-		Log::Debug("FMPHook::Kill exited");
+		Log::Debug(L"FMPHook::Kill exited");
 		return;
 	}
 
@@ -131,7 +131,7 @@ void FMPHook::Kill()
 	m_bKillRequested = false;
 
 	FMPThread::Kill();
-	Log::Debug("FMPHook::Kill complete");
+	Log::Debug(L"FMPHook::Kill complete");
 }
 
 bool FMPHook::IsThreadAlive()
@@ -141,13 +141,13 @@ bool FMPHook::IsThreadAlive()
 
 void FMPHook::TerminateThisScript()
 {
-	Log::Debug("FMPHook::TerminateThisScript called");
+	Log::Debug(L"FMPHook::TerminateThisScript called");
 	if (GetCurrentFiber() != m_pScriptFiber)
 		return;
 
 	m_bKillRequested = true;	
 	SwitchToFiber(m_pPrimaryFiber);
-	Log::Debug("FMPHook::TerminateThisScript complete");
+	Log::Debug(L"FMPHook::TerminateThisScript complete");
 }
 
 //-----------------------------------------------------------

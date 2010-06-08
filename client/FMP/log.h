@@ -10,7 +10,7 @@
 class Logger
 {
 public:
-	virtual void Log(const char *type, const char *string, char*) = 0;
+	virtual void Log(const wchar_t *type, const wchar_t *string, char*) = 0;
 };
 
 namespace Log
@@ -18,10 +18,10 @@ namespace Log
 	void AddLogger(Logger* iLog);
 	void SetState(unsigned int state);
 
-	void Debug(const char *string, ...);
-	void Info(const char *string, ...);
-	void Error(const char *string, ...);
-	void Warning(const char *string, ...);
-	void Other(const char *type, const char *string, ...);
-	void Void(const char *string, ...);
+	void Debug(const wchar_t *string, ...);
+	void Info(const wchar_t *string, ...);
+	void Error(const wchar_t *string, ...);
+	void Warning(const wchar_t *string, ...);
+	void Other(const wchar_t *type, const wchar_t *string, ...);
+	void Void(const wchar_t *string, ...);
 }

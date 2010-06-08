@@ -11,10 +11,6 @@
 
 extern FPlayer gPlayer[MAX_PLAYERS];
 extern FVehicle gCar[MAX_CARS];
-extern CHATMSG mChat[64];
-
-extern int enterChat;
-extern char enterMsg[256];
 
 extern bool myEnter;
 

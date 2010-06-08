@@ -33,7 +33,7 @@ public:
 	void Logged();
 
 	void UpdateServer(MasterServerInfo *msi);
-	void Message(char *data);
+	void Message(wchar_t *data);
 
 	DWORD GetWidth();
 	DWORD GetHeight();
