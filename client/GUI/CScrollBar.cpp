@@ -249,7 +249,7 @@ void CScrollBar::UpdateTheme( int iIndex )
 	}
 }
 
-/*uistring MinValue( const uichar *, CElement * pElement )
+uistring MinValue( const uichar *, CElement * pElement )
 {
 	unistream sStream;
 
@@ -307,7 +307,7 @@ uistring SliderValue( const uichar *, CElement * pElement )
 		}
 	}
 	return sStream.str();
-}*/
+}
 
 void CScrollBar::SetShow(bool bShow)
 {
