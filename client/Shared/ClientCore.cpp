@@ -9,6 +9,7 @@
 #include "NetworkManager.h"
 #if defined (FMP_CLIENT)
 #include "../FMP/log.h"
+#include "../FMP/ConsoleWindow.h"
 #elif defined (FMP_CONSOLE_CLIENT)
 #include "../ConsoleClient/logging.h"
 #include "../../Shared/Console/ConsoleScreen.h"
@@ -19,8 +20,6 @@ extern NetworkManager nm;
 #if defined (FMP_CONSOLE_CLIENT)
 extern ConsoleScreen conscreen;
 #endif
-
-void PrintToConsole(const char *string, ...);
 
 ClientCore::ClientCore(void)
 {
