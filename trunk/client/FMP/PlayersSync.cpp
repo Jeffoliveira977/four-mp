@@ -18,24 +18,24 @@ extern ClientCore client;
 extern FMPHook HOOK;
 extern NetworkManager nm;
 
-void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float position[3], bool start)
+void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, float position[3], bool start)
 {
-	Log::Debug("PlayerConnect: %s", "Start");
+	Log::Debug(L"PlayerConnect: Start");
 	if(name == 0)
 	{
-		Log::Error("Can't connecting player (Name is bad)");
+		Log::Error(L"Can't connecting player (Name is bad)");
 		return;
 	}
 	if(index < 0 || index > MAX_PLAYERS)
 	{
-		Log::Error("Can't connecting player (bad index)");
+		Log::Error(L"Can't connecting player (bad index)");
 		return;
 	}
 
-	Log::Info("ConnectInfo: %s %d 0x%x %f %f %f", name, index, model, position[0], position[1], position[2]);
+	Log::Info(L"ConnectInfo: %s %d 0x%x %f %f %f", name, index, model, position[0], position[1], position[2]);
 	if(client.GetIndex() == index) // My connect
 	{
-		Log::Debug("Our PlayerConnect");
+		Log::Debug(L"Our PlayerConnect");
 		if(start)
 		{
 			//Natives::SetCharHealth(_GetPlayerPed(), 0);
@@ -43,7 +43,7 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float p
 			gPlayer[index].want_spawn = 1;
 			gPlayer[index].sync_state = 1;
 
-			strcpy(gPlayer[index].name, name);
+			wcscpy(gPlayer[index].name, name);
 			gPlayer[index].last_active = GetTickCount();
 			gPlayer[index].connected = 1;
 
@@ -53,21 +53,21 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float p
 			InputFreeze(0);
 			//SetFreeCam(0);
 
-			Log::Debug("PlayerConnect: %s", "fastEnd");
+			Log::Debug(L"PlayerConnect: fastEnd");
 			return;
 		}
 		else
 		{
-			Log::Info("Local player %d", Natives::IsThisModelAPed((eModel)model));
+			Log::Info(L"Local player %d", Natives::IsThisModelAPed((eModel)model));
 			Natives::RequestModel((eModel)model);
-			Log::Debug("PlayerConnect: %s", "RequestModel");
+			Log::Debug(L"PlayerConnect: RequestModel");
 			while(!Natives::HasModelLoaded((eModel)model)) wait(1);
-			Log::Debug("PlayerConnect: %s", "ModelLoaded");
+			Log::Debug(L"PlayerConnect: ModelLoaded");
 			Natives::ChangePlayerModel(_GetPlayer(), (eModel)model);
-			Log::Debug("PlayerConnect: %s", "ChangeModel");
+			Log::Debug(L"PlayerConnect: ChangeModel");
 			Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
 			Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
-			Log::Debug("PlayerConnect: %s", "SetCoords");
+			Log::Debug(L"PlayerConnect: SetCoords");
 		}
 
 		client.SetGameState(GameStateInGame);
@@ -78,17 +78,21 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float p
 	}
 	else // Other player connect
 	{
-		Log::Debug("Other player connect");
+		Log::Debug(L"Other player connect");
 		Natives::RequestModel((eModel)model);
-		Log::Debug("PlayerConnect: %s", "RequestModel");
+		Log::Debug(L"PlayerConnect: RequestModel");
 		while(!Natives::HasModelLoaded((eModel)model)) wait(1);
-		Log::Debug("PlayerConnect: %s", "ModelLoaded");
+		Log::Debug(L"PlayerConnect: ModelLoaded");
 		Natives::CreateChar(1, (eModel)model, position[0], position[1], position[2], &gPlayer[index].PedID, 1);
-		Log::Debug("PlayerConnect: %s", "CreateChar");
+		Log::Debug(L"PlayerConnect: CreateChar");
 		while(!Natives::DoesCharExist(gPlayer[index].PedID)) wait(1);
-		Log::Info("MovePlayer %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID),gPlayer[index].PedID);
-		Natives::GivePedFakeNetworkName(gPlayer[index].PedID, name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
-		Log::Info("Player NAME: %s 0x%x%x%x alpha:%x",name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
+		Log::Info(L"MovePlayer %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID),gPlayer[index].PedID);
+		size_t length = (sizeof(wchar_t) / sizeof(char)) * wcslen(name) + 1;
+		char *tempname = (char *)calloc(length, sizeof(char));
+		wcstombs(tempname, name, length);
+		Natives::GivePedFakeNetworkName(gPlayer[index].PedID, tempname, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
+		free(tempname);
+		Log::Info(L"Player NAME: %s 0x%x%x%x alpha:%x",name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
 		Natives::SetBlockingOfNonTemporaryEvents(gPlayer[index].PedID, 1);
 	}
 
@@ -109,17 +113,17 @@ void FMPHook::PlayerConnect(char *name, short index, unsigned int model, float p
 			Natives::GiveWeaponToChar(gPlayer[index].PedID, (eWeapon)gPlayer[index].weapons[i], gPlayer[index].ammo[i], 0);
 	}
 
-	strcpy(gPlayer[index].name, name);
+	wcscpy(gPlayer[index].name, name);
 	gPlayer[index].last_active = GetTickCount();
 	gPlayer[index].connected = 1;
-	Log::Debug("PlayerConnect: %s", "End");
+	Log::Debug(L"PlayerConnect: End");
 }
 
 void FMPHook::Jump(short index)
 {
 	if(!SafeCheckPlayer(index)) return;
 
-	Log::Info("Jump %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID), gPlayer[index].PedID);
+	Log::Info(L"Jump %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID), gPlayer[index].PedID);
 	Natives::TaskJump(gPlayer[index].PedID, 1);
 	gPlayer[index].last_active = GetTickCount();
 }
@@ -128,7 +132,7 @@ void FMPHook::Duck(short index, bool duck)
 {
 	if(!SafeCheckPlayer(index)) return;
 
-	Log::Info("Duck %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID) ,gPlayer[index].PedID);
+	Log::Info(L"Duck %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID) ,gPlayer[index].PedID);
 	Natives::TaskToggleDuck(gPlayer[index].PedID, duck);
 	gPlayer[index].last_active = GetTickCount();
 	gPlayer[index].isducking = duck;
@@ -136,8 +140,8 @@ void FMPHook::Duck(short index, bool duck)
 
 void FMPHook::PlayerMove(short index, float position[3], float speed)
 {
-	Log::Info("PlayerMOVE HOOK");
-	Log::Info("Index: %d, position: %f %f %f, speed: %f", index, position[0], position[1], position[2], speed);
+	Log::Info(L"PlayerMOVE HOOK");
+	Log::Info(L"Index: %d, position: %f %f %f, speed: %f", index, position[0], position[1], position[2], speed);
 	
 	if(!SafeCheckPlayer(index)) return;
 
@@ -147,9 +151,9 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 	float d = GetDist(lx, ly, lz, position[0], position[1], position[2]);
 	if(gPlayer[index].vehicleindex == -1) // Если пешком
 	{
-		Log::Info("MovePlayer (HOOK) %s", "Start");
+		Log::Info(L"MovePlayer (HOOK) %s", "Start");
 		int ms = 4;
-		Log::Info("Before Move");
+		Log::Info(L"Before Move");
 		if(speed < 3)
 		{
 			ms = 2;
@@ -157,7 +161,7 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 			{
 				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
 				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
-				Log::Info("PORTAL or TIMESHIFT");
+				Log::Info(L"PORTAL or TIMESHIFT");
 			}
 		}
 		else if(speed < 5)
@@ -167,7 +171,7 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 			{
 				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
 				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
-				Log::Info("PORTAL or TIMESHIFT");
+				Log::Info(L"PORTAL or TIMESHIFT");
 			}
 		}
 		else
@@ -177,7 +181,7 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 			{
 				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
 				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
-				Log::Info("PORTAL or TIMESHIFT");
+				Log::Info(L"PORTAL or TIMESHIFT");
 			}
 		}
 
@@ -218,7 +222,7 @@ void FMPHook::PlayerDisconnect(short index)
 
 	if(!SafeCheckPlayer(index)) return;
 
-	Log::Info("DELETE CHAR %d", index);
+	Log::Info(L"DELETE CHAR %d", index);
 	Natives::DeleteChar(&gPlayer[index].PedID);
 	gPlayer[index].connected = 0;
 }
@@ -227,7 +231,7 @@ void FMPHook::CancelEnterInVehicle(short index)
 {
 	if(!SafeCheckPlayer(index)) return;
 
-	Log::Info("CancelEnterInVehicle %d", index);
+	Log::Info(L"CancelEnterInVehicle %d", index);
 	Natives::ClearCharTasks(gPlayer[index].PedID);
 	gPlayer[index].vehicleindex = -1;
 }
@@ -236,7 +240,7 @@ void FMPHook::ExitFromVehicle(short index)
 {
 	if(!SafeCheckPlayer(index)) return;
 
-	Log::Info("ExitFromVehicle %d", index);
+	Log::Info(L"ExitFromVehicle %d", index);
 	Natives::TaskLeaveAnyCar(gPlayer[index].PedID);
 	gPlayer[index].vehicleindex = -1;
 }
@@ -245,7 +249,7 @@ void FMPHook::EnterInVehicle(short index, int car, int seat)
 {
 	if(!SafeCheckPlayer(index)) return;
 
-	Log::Info("EnterInVehicle %d, %d, %d", index, car, seat);
+	Log::Info(L"EnterInVehicle %d, %d, %d", index, car, seat);
 	if(seat == 0) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gCar[car].CarID, -1);
 	else if(seat > 0) Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gCar[car].CarID, -1, seat-1);
 	gPlayer[index].vehicleindex = car;
@@ -290,7 +294,7 @@ void FMPHook::PlayerSyncSkin(short index, unsigned int skin)
 {
 	if(!SafeCheckPlayer(index)) return;
 
-	Log::Info("Player Sync Skin START");
+	Log::Info(L"Player Sync Skin START");
 	if(index == client.GetIndex())
 	{
 		SafeChangeModel(skin);
@@ -301,25 +305,25 @@ void FMPHook::PlayerSyncSkin(short index, unsigned int skin)
 		gPlayer[index].model = skin;
 		SafeCreatePlayer(index);
 	}
-	Log::Info("Player Sync Skin END");
+	Log::Info(L"Player Sync Skin END");
 }
 
 void FMPHook::PlayerSyncSkinVariation(short index, int sm[11], int st[11])
 {
 	if(!SafeCheckPlayer(index)) return;
 
-	Log::Info("Player Sync Skin Variation START");
+	Log::Info(L"Player Sync Skin Variation START");
 	for(int i = 0; i < 11; i++)
 		Natives::SetCharComponentVariation(gPlayer[index].PedID, (ePedComponent)i, sm[i], st[i]); 
-	Log::Info("Player Sync Skin Variantion END");
+	Log::Info(L"Player Sync Skin Variantion END");
 }
 
 void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 {
-	Log::Info("Spawn %d (%d)", data.client, client.GetIndex());
+	Log::Info(L"Spawn %d (%d)", data.client, client.GetIndex());
 	if(data.client == client.GetIndex()) 
 	{
-		Log::Info("Its me");
+		Log::Info(L"Its me");
 		if(gPlayer[client.GetIndex()].sync_state == 1) SetFreeCam(0);
 		gPlayer[client.GetIndex()].sync_state = 0;
 		gPlayer[data.client].want_spawn = 1;
@@ -330,7 +334,7 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 		gPlayer[data.client].want_spawn = 0;
 		return;
 	}
-	Log::Info("Player Spawn START");
+	Log::Info(L"Player Spawn START");
 
 	Ped old = gPlayer[data.client].PedID;
 	
@@ -342,12 +346,12 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	Natives::SetCharDefaultComponentVariation(gPlayer[data.client].PedID);
 	PlayerSyncSkinVariation(data.client, data.compD, data.compT);
 
-	Log::Info("Set UP");
+	Log::Info(L"Set UP");
 	Natives::SetCharHeading(gPlayer[data.client].PedID, data.angle);
 	Natives::SetCharHealth(gPlayer[data.client].PedID, data.health);
 	Natives::AddArmourToChar(gPlayer[data.client].PedID, data.armor);
 	if(data.room != 0) Natives::SetRoomForCharByKey(gPlayer[data.client].PedID, (eInteriorRoomKey)data.room);
-	Log::Info("Player SPAWN END");
+	Log::Info(L"Player SPAWN END");
 	if(Natives::DoesCharExist(old)) Natives::DeleteChar(&old);
 	gPlayer[data.client].want_spawn = 0;
 }

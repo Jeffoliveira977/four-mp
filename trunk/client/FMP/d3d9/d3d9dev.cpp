@@ -5,6 +5,7 @@
 #include "../main.h"
 #include "d3d9hook.h"
 #include "gui.h"
+#include "../chat.h"
 
 #define D3DHOOK_TEXTURES //comment this to disable texture hooking
 
@@ -14,9 +15,9 @@ extern DWORD MOUSE_POS_X;
 extern DWORD MOUSE_POS_Y;
 extern FMPGUI Gui;
 extern DWORD g_iMinimized;
+extern ChatManager chat;
 
 LPD3DXFONT fFMP = NULL;
-LPD3DXFONT fChat = NULL;
 
 int MouseX, MouseY;
 bool g_bDeviceLost;
@@ -228,31 +229,14 @@ HRESULT APIENTRY hkIDirect3DDevice9::EndScene() // 1111
 	MouseX = *(int*)MOUSE_POS_X;
 	MouseY = *(int*)MOUSE_POS_Y; 
 
-	RECT rc = {2, 2, 800, 600};
 	InputState inputstate = client.GetInputState();
 	if (client.IsRunning() && (inputstate != InputStateGui) && (client.GetGameState() > GameStateConnecting))
 	{
-		for(int i = 7; i >= 0; i--)
-		{
-			fChat->DrawText(0, mChat[i].msg, -1, &rc, DT_TOP|DT_LEFT, 
-			D3DCOLOR_XRGB(mChat[i].color.r, mChat[i].color.g, mChat[i].color.b));
-			rc.top += 11;
-		}
+		chat.Render();
 	}
 
 	switch (inputstate)
 	{
-		case InputStateChat:
-		{
-			//if(enterChat != -1)
-			//{
-			rc.top += 2;
-			fChat->DrawText(0, ">", -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 0));
-			rc.left += 10;
-			fChat->DrawText(0, enterMsg, -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 0));
-			//}
-			break;
-		}
 		case InputStateGui:
 		{
 			Gui.MoveMouse(MouseX, MouseY);
@@ -526,10 +510,10 @@ HRESULT APIENTRY hkIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresentationP
 {
 	Gui.OnLostDevice();
 	if(fFMP) fFMP->OnLostDevice();
-	if(fChat) fChat->OnLostDevice();
+	chat.OnLostDevice();
 
 	HRESULT hRet = m_pD3Ddev->Reset(pPresentationParameters);
-	Log::Info("Reset: %d %d", pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight );
+	Log::Info(L"Reset: %d %d", pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight );
 	Gui.Resize( pPresentationParameters->BackBufferWidth, pPresentationParameters->BackBufferHeight );
 
 	if( SUCCEEDED(hRet) )
@@ -537,7 +521,7 @@ HRESULT APIENTRY hkIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresentationP
 		m_PresentParam = *pPresentationParameters;
 		Gui.OnResetDevice();
 		if(fFMP) fFMP->OnResetDevice();
-		if(fChat) fChat->OnResetDevice();
+		chat.OnResetDevice();
 		g_bDeviceLost = 0;
 	}
 

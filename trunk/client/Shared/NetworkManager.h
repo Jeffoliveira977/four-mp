@@ -59,7 +59,7 @@ public:
 	void SendPlayerSpawnRequest(void);
 	void SendPlayerModelChange(void);
 	void SendPlayerComponentsChange(void);
-	void SendPlayerChat(void);
+	void SendPlayerChat(const wchar_t *message);
 private:
 	NetworkIDManager *manager;
 	NetworkID clientid;

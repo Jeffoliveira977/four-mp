@@ -8,8 +8,8 @@
 #include <stdio.h>
 
 #include "con_sharedcommands.h"
-#include "../Shared/ClientCore.h"
-#include "../Shared/NetworkManager.h"
+#include "ClientCore.h"
+#include "NetworkManager.h"
 
 extern ClientCore client;
 extern NetworkManager nm;
@@ -18,26 +18,31 @@ void ConCmdConnect(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (numargs == 0)
 	{
-		concore->Output("Usage: connect <server>");
+		concore->Output(L"Usage: connect <server>");
 		return;
 	}
-	char *address = concore->GetCmdArgString();
-	if (address == NULL)
+	wchar_t *tempaddress = concore->GetCmdArgString();
+	if (tempaddress == NULL)
 	{
-		concore->Output("Usage: connect <server>");
+		concore->Output(L"Usage: connect <server>");
 		return;
 	}
+	size_t length = (sizeof(wchar_t) / sizeof(char)) * wcslen(tempaddress) + 1;
+	char *address = (char *)calloc(length, sizeof(char));
+	wcstombs(address, tempaddress, length);
 	char *portstart = strrchr(address, ':');
 	if (portstart == NULL)
 	{
 		nm.ConnectToServer(address);
 		free(address);
+		free(tempaddress);
 		return;
 	}
 	unsigned short port = 7777;
 	sscanf(portstart, "%d", port);
 	nm.ConnectToServer(address, port);
 	free(address);
+	free(tempaddress);
 	return;
 }
 

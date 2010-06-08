@@ -33,11 +33,11 @@ ConsoleWindow::~ConsoleWindow(void)
 void ConsoleWindow::Load(void)
 {
 	EnterCriticalSection(&cs_gui);
-	mainwindow = new CWindow(Gui.m_Gui, 412, 25, 587, 568, "Console");
+	mainwindow = new CWindow(Gui.m_Gui, 412, 25, 587, 568, L"Console");
 	outputbox = new CTextBox(Gui.m_Gui, 8, 8, 571, 492);
 	outputbox->ShowSlider(true);
 	inputbox = new CEditBox(Gui.m_Gui, 8, 508, 492, 24, NULL, NULL, InputBoxCallback);
-	submitbutton = new CButton(Gui.m_Gui, 508, 508, 64, 24, "Submit", NULL, SubmitButtonCallback);
+	submitbutton = new CButton(Gui.m_Gui, 508, 508, 64, 24, L"Submit", NULL, SubmitButtonCallback);
 	mainwindow->AddElement(outputbox);
 	mainwindow->AddElement(inputbox);
 	mainwindow->AddElement(submitbutton);
@@ -60,7 +60,7 @@ void ConsoleWindow::Hide(void)
 	mainwindow->SetVisible(false);
 }
 
-void ConsoleWindow::Log(const char *type, const char *string, va_list arglist)
+void ConsoleWindow::Log(const wchar_t *type, const wchar_t *string, va_list arglist)
 {
 	if (!IsLoaded) return;
 	if (string == NULL) return;
@@ -68,9 +68,9 @@ void ConsoleWindow::Log(const char *type, const char *string, va_list arglist)
 
 	EnterCriticalSection(&cs);
 
-	int stringsize = _vscprintf(string, arglist);
-	char *tempstring = (char *)calloc(stringsize + 1, sizeof(char));
-	vsprintf(tempstring, string, arglist);
+	int stringsize = _vscwprintf(string, arglist);
+	wchar_t *tempstring = (wchar_t *)calloc(stringsize + 1, sizeof(wchar_t));
+	vswprintf(tempstring, string, arglist);
 
 	outputbox->AddString(tempstring);
 
@@ -82,9 +82,9 @@ void ConsoleWindow::Log(const char *type, const char *string, va_list arglist)
 void ConsoleWindow::SubmitText(void)
 {
 	EnterCriticalSection(&cs);
-	this->Log(">", inputbox->GetString().c_str());
+	this->Log(L">", inputbox->GetString().c_str());
 	concore.InterpretLine(inputbox->GetString().c_str());
-	inputbox->SetString("");
+	inputbox->SetString(L"");
 	LeaveCriticalSection(&cs);
 }
 
@@ -109,10 +109,10 @@ void SubmitButtonCallback(CElement *pElement, CMSG msg, int Param)
 	conwindow.SubmitText();
 }
 
-void PrintToConsole(const char *string, ...)
+void PrintToConsole(const wchar_t *string, ...)
 {
 	va_list arglist; 
 	va_start(arglist, string);
-	conwindow.Log("", string, arglist);
+	conwindow.Log(L"", string, arglist);
 	va_end(arglist); 
 }

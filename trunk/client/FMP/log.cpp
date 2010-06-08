@@ -69,75 +69,75 @@ namespace Log
 		logging.push_back(iLog);
 	}
 
-	void Log::Debug(const char *string, ...)
+	void Log::Debug(const wchar_t *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging || !b_Debug) return;
 
 		critSect.Enter();
-		va_list arglist; 
-		va_start(arglist, string); 
+		va_list arglist;
+		va_start(arglist, string);
 		for(int i = 0; i < (int)logging.size(); i++)
-			if(logging[i]) logging[i]->Log("Debug", string, arglist);		
-		va_end(arglist); 
+			if(logging[i]) logging[i]->Log(L"Debug", string, arglist);
+		va_end(arglist);
 		critSect.Leave();
 	}
-	void Info(const char *string, ...)
+	void Info(const wchar_t *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging || !b_Info) return;
 
 		critSect.Enter();
-		va_list arglist; 
-		va_start(arglist, string); 
+		va_list arglist;
+		va_start(arglist, string);
 		for(int i = 0; i < (int)logging.size(); i++)
-			if(logging[i]) logging[i]->Log("Info", string, arglist);		
-		va_end(arglist); 
+			if(logging[i]) logging[i]->Log(L"Info", string, arglist);
+		va_end(arglist);
 		critSect.Leave();
 	}
-	void Error(const char *string, ...)
+	void Error(const wchar_t *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging || !b_Error) return;
 
 		critSect.Enter();
-		va_list arglist; 
-		va_start(arglist, string); 
+		va_list arglist;
+		va_start(arglist, string);
 		for(int i = 0; i < (int)logging.size(); i++)
-			if(logging[i]) logging[i]->Log("Error", string, arglist);		
-		va_end(arglist); 
+			if(logging[i]) logging[i]->Log(L"Error", string, arglist);
+		va_end(arglist);
 		critSect.Leave();
 	}
-	void Warning(const char *string, ...)
+	void Warning(const wchar_t *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging || !b_Warning) return;
 
 		critSect.Enter();
-		va_list arglist; 
-		va_start(arglist, string); 
+		va_list arglist;
+		va_start(arglist, string);
 		for(int i = 0; i < (int)logging.size(); i++)
-			if(logging[i]) logging[i]->Log("Warning", string, arglist);		
+			if(logging[i]) logging[i]->Log(L"Warning", string, arglist);
 		va_end(arglist);
 		critSect.Leave();
 	}
-	void Other(const char *type, const char *string, ...)
+	void Other(const wchar_t *type, const wchar_t *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging) return;
 
 		critSect.Enter();
-		va_list arglist; 
-		va_start(arglist, string); 
+		va_list arglist;
+		va_start(arglist, string);
 		for(int i = 0; i < (int)logging.size(); i++)
-			if(logging[i]) logging[i]->Log(type, string, arglist);		
-		va_end(arglist); 
+			if(logging[i]) logging[i]->Log(type, string, arglist);
+		va_end(arglist);
 		critSect.Leave();
 	}
-	void Void(const char *string, ...)
+	void Void(const wchar_t *string, ...)
 	{
 		if(logging.size() == 0 || !b_Logging) return;
 
 		critSect.Enter();
-		va_list arglist; 
-		va_start(arglist, string); 
+		va_list arglist;
+		va_start(arglist, string);
 		for(int i = 0; i < (int)logging.size(); i++)
-			if(logging[i]) logging[i]->Log("", string, arglist);		
+			if(logging[i]) logging[i]->Log(L"", string, arglist);
 		va_end(arglist);
 		critSect.Leave();
 	}

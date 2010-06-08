@@ -7,7 +7,8 @@
 #include <stdlib.h>
 
 #include "con_sharedcvarhooks.h"
-#include "../Shared/ClientCore.h"
+#include "ClientCore.h"
+#include "../../Shared/Network/Limits.h"
 
 extern ClientCore client;
 
@@ -15,30 +16,30 @@ void ConVarHookName(ConVar *convar, const ConVarType oldtype, void *oldvalue, co
 {
 	if (newtype == ConVarTypeString)
 	{
-		unsigned int length = strlen((char *)newvalue);
-		if (length > 31)
+		size_t length = wcslen((wchar_t *)newvalue);
+		if (length > MAX_PLAYER_NAME_LENGTH - 1)
 		{
-			strncpy(client.name, (char *)newvalue, 31);
-			client.name[31] = '\0';
+			wcsncpy(client.name, (wchar_t *)newvalue, MAX_PLAYER_NAME_LENGTH - 1);
+			client.name[MAX_PLAYER_NAME_LENGTH-1] = L'\0';
 			return;
 		}
-		strncpy(client.name, (char *)newvalue, length);
-		client.name[length] = '\0';
+		wcsncpy(client.name, (wchar_t *)newvalue, length);
+		client.name[length] = L'\0';
 		return;
 	}
-	char *value;
+	wchar_t *value;
 	if (!convar->GetValue(value))
 	{
 		return;
 	}
-	unsigned int length = strlen(value);
-	if (length > 31)
+	size_t length = wcslen(value);
+	if (length > MAX_PLAYER_NAME_LENGTH - 1)
 	{
-		strncpy(client.name, value, 31);
-		client.name[31] = '\0';
+		wcsncpy(client.name, value, MAX_PLAYER_NAME_LENGTH - 1);
+		client.name[MAX_PLAYER_NAME_LENGTH - 1] = L'\0';
 		return;
 	}
-	strncpy(client.name, value, length);
+	wcsncpy(client.name, value, length);
 	client.name[length] = '\0';
 	free(value);
 }

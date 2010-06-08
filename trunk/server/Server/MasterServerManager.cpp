@@ -54,6 +54,8 @@ bool MasterServerManager::RegisterServer(const unsigned short port, const wchar_
 	char *tempdata2 = (char *)calloc(length, sizeof(char));
 	wcstombs(tempdata2, tempdata, length);
 	RakString data = RakString(tempdata2).URLEncode();
+	free(tempdata);
+	free(tempdata2);
 
 	http->Post(RakString("%s%s", MASTER_PATH, "list.php").C_String(), data);
 	state = MSS_WAIT_SERVER_ADD;
