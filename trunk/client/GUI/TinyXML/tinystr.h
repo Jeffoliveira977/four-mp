@@ -2,7 +2,7 @@
 www.sourceforge.net/projects/tinyxml
 Original file by Yves Berquin.
 
-This software is provided _UI('as-is'), without any express or implied
+This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any
 damages arising from the use of this software.
 
@@ -30,7 +30,7 @@ distribution.
  * - fixed reserve() to work as per specification.
  * - fixed buggy compares operator==(), operator<(), and operator>()
  * - fixed operator+=() to take a const ref argument, following spec.
- * - added _UI("copy") constructor with length, and most compare operators.
+ * - added "copy" constructor with length, and most compare operators.
  * - added swap(), clear(), size(), capacity(), operator+().
  */
 
@@ -57,15 +57,19 @@ distribution.
 #endif
 
 #if defined (_UNICODE)
+
+#include <wchar.h>
+
 #define TIXML_CHAR wchar_t
 #define U_TIXML_CHAR wchar_t
 #define _TIXML_L(x) L ## x
 #define uislen(a) wcslen(a)
-#define uiscmp(a,b) wcscmp(a,b) 
-#define uiscpy(a,b) wcscpy(a,b) 
-#define uiscpy_s(a,b,c) wcscpy_s(a,b,c) 
-#define utoi(a) _wtoi(a) 
-#define utof(a) _wtof(a) 
+#define uiscmp(a,b) wcscmp(a,b)
+#define uiscpy(a,b) wcscpy(a,b)
+#define uiscpy_s(a,b,c) wcscpy_s(a,b,c)
+#define uimemcpy(a,b,c) wmemcpy(a,b,c)
+#define utoi(a) _wtoi(a)
+#define utof(a) _wtof(a)
 #define uischr(a,b) wcschr(a, b)
 #define uisncmp(a,b,c) wcsncmp(a,b,c)
 #else
@@ -73,11 +77,12 @@ distribution.
 #define U_TIXML_CHAR unsigned char
 #define _TIXML_L(x) x
 #define uislen(a) strlen(a)
-#define uiscmp(a,b) strcmp(a,b) 
-#define uiscpy(a,b) strcpy(a,b) 
-#define uiscpy_s(a,b,c) strcpy_s(a,b,c) 
-#define utoi(a) atoi(a) 
-#define utof(a) atof(a) 
+#define uiscmp(a,b) strcmp(a,b)
+#define uiscpy(a,b) strcpy(a,b)
+#define uiscpy_s(a,b,c) strcpy_s(a,b,c)
+#define uimemcpy(a,b,c) memcpy(a,b,c)
+#define utoi(a) atoi(a)
+#define utof(a) atof(a)
 #define uischr(a,b) strchr(a, b)
 #define uisncmp(a,b,c) strncmp(a,b,c)
 #endif
@@ -115,14 +120,14 @@ class TiXmlString
 	TIXML_EXPLICIT TiXmlString ( const TIXML_CHAR * copy) : rep_(0)
 	{
 		init( static_cast<size_type>( uislen(copy) ));
-		memcpy(start(), copy, length());
+		uimemcpy(start(), copy, length());
 	}
 
 	// TiXmlString constructor, based on a string
 	TIXML_EXPLICIT TiXmlString ( const TIXML_CHAR * str, size_type len) : rep_(0)
 	{
 		init(len);
-		memcpy(start(), str, len);
+		uimemcpy(start(), str, len);
 	}
 
 	// TiXmlString destructor
