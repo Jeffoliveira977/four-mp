@@ -2,7 +2,7 @@
 #include <d3d9.h>
 #include <d3dx9.h>
 
-struct MasterServerInfo;
+struct ServerInfo;
 class CGUI;
 
 class FMPGUI
@@ -32,7 +32,7 @@ public:
 	bool IsLogged();
 	void Logged();
 
-	void UpdateServer(MasterServerInfo *msi);
+	void UpdateServer(ServerInfo *msi);
 	void Message(wchar_t *data);
 
 	DWORD GetWidth();

@@ -10,7 +10,7 @@ namespace RakNet
 #define MASTER_HOST "master.four-mp.com"
 #define MASTER_PATH "/"
 
-struct MasterServerInfo
+struct ServerInfo
 {
 	wchar_t name[128];			// Server's name
 	char ip[64];			// Server's IP
@@ -57,7 +57,7 @@ class MasterServer
 	TCPInterface *tcp;
 	HTTPConnection *http;
 
-	std::vector<MasterServerInfo*> slist;
+	std::vector<ServerInfo*> slist;
 	MasterUserInfo *user;
 	wchar_t error[128];
 
@@ -84,9 +84,9 @@ public:
 	bool QueryUserLogout();
 	bool QueryClan();
 
-	std::vector<MasterServerInfo*> *GetServerList();
-	MasterServerInfo *GetServerInfo(int Index);
-	MasterServerInfo *GetServerInfo(char *ip, unsigned short port, int *index);
+	std::vector<ServerInfo*> *GetServerList();
+	ServerInfo *GetServerInfo(int Index);
+	ServerInfo *GetServerInfo(char *ip, unsigned short port, int *index);
 	int GetNumServers();
 	bool IsServerVIP(char *ip, unsigned short port);
 	bool IsServerBanned(char *ip, unsigned short port);

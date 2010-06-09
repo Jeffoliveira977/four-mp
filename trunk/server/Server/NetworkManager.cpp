@@ -218,12 +218,16 @@ void NetworkManager::UpdateServerInfo(void)
 {
 	wchar_t *hostname = server.GetHostname();
 	wchar_t *gamemode = vmm.GetGameModeName();
-	char *info = new char[512];
-	sprintf(info, "%s%c%s%c%s%c%d%c%d%c%d%c%s%c", hostname, 1, gamemode, 1, "World", 1, playm.numplayers, 1, playm.maxplayerbuffersize, 1, server.IsPasswordProtected(), 1, "", 1);
-	net->SetOfflinePingResponse(info, strlen(info) + 1);
+	int length = _scwprintf(L"%s%c%s%c%s%c%d%c%d%c%d%c%s%c", hostname, 1, gamemode, 1, L"World", 1, playm.numplayers, 1, playm.maxplayerbuffersize, 1, server.IsPasswordProtected(), 1, L"", 1);
+	wchar_t *tempstring = (wchar_t *)calloc(length + 1, sizeof(wchar_t));
+	swprintf(tempstring, length + 1, L"%s%c%s%c%s%c%d%c%d%c%d%c%s%c", hostname, 1, gamemode, 1, L"World", 1, playm.numplayers, 1, playm.maxplayerbuffersize, 1, server.IsPasswordProtected(), 1, L"", 1);
+	length = (sizeof(wchar_t) / sizeof(char)) * length + 1;
+	char *info = (char *)calloc(length, sizeof(char));
+	wcstombs(info, tempstring, length);
+	net->SetOfflinePingResponse(info, length);
 	free(hostname);
 	free(gamemode);
-	delete info;
+	free(info);
 }
 
 void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionRequestData data, RakNet::RPC3 *clientrpc3)
