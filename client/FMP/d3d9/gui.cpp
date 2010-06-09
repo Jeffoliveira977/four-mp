@@ -515,7 +515,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	m_Gui->LoadInterfaceFromFile( L"FMP\\GUITheme.xml" );
 
 	Log::Debug(L"FMPGUI::Load >> Load Font");
-	m_Gui->LoadFont();
+	m_Gui->LoadFont(10, L"Arial");
 	m_Gui->SetFontColors(0, 0, 0, 0, 255); // <!--black-->
 	m_Gui->SetFontColors(1, 255, 255, 255, 255); // <!--white-->
 	m_Gui->SetFontColors(2, 0, 0, 255, 255); // <!--blue-->
