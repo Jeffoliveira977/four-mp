@@ -183,7 +183,7 @@ public:
 	// -- Script natives player
 	void SetPosition(short index, float pos[3], float angle);
 	// -- Scripting natives game
-	void SetTime(int h, int m);
+	void SetTime(const unsigned char time[2]);
 
 	// -- Car sync
 	void CreateCar(short index, unsigned int model, float position[3], float angle, unsigned char color[2]);

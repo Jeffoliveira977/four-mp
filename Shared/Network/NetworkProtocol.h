@@ -2,7 +2,7 @@
 
 #include "Limits.h"
 
-#define PROTOCOL_VERSION 8
+#define PROTOCOL_VERSION 9
 
 #define DEFAULT_SERVER_NETWORK_ID 0
 #define DEFAULT_CLIENT_NETWORK_ID 65534
@@ -36,6 +36,11 @@ struct NetworkPlayerInfoData
 	char sessionkey[33];
 };
 
+struct NetworkPlayerConnectionConfirmationData
+{
+	short client;
+};
+
 struct NetworkPlayerDisconnectionData
 {
 	short client;
@@ -44,6 +49,11 @@ struct NetworkPlayerDisconnectionData
 struct NetworkPlayerCheckData
 {
 	short client;
+};
+
+struct NetworkTimeData
+{
+	unsigned char time[2];
 };
 
 struct NetworkPlayerFullUpdateData
@@ -176,11 +186,6 @@ struct NetworkVehicleFullUpdateData
 	float position[3];
 	float angle;
 	unsigned char color[2];
-};
-
-struct NetworkTimeData
-{
-	unsigned char hour, minute;
 };
 
 struct NetworkPlayerPositionData

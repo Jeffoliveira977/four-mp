@@ -624,9 +624,9 @@ void FMPHook::GameThread()
 	Log::Debug(L"Exit GameThread");
 }
 
-void FMPHook::SetTime(int h, int m)
+void FMPHook::SetTime(const unsigned char time[2])
 {
-	Natives::SetTimeOfDay(h, m);
+	Natives::SetTimeOfDay(time[0], time[1]);
 }
 
 void FMPHook::GetMyPos()

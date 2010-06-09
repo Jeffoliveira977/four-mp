@@ -34,7 +34,7 @@ public:
 	void UpdateServerInfo(void);
 
 	void RecieveClientConnectionRequest(NetworkPlayerConnectionRequestData data, RakNet::RPC3 *clientrpc3);
-	void RecieveClientConnectionNextRequest(NetworkPlayerConnectionRequestData data, RakNet::RPC3 *clientrpc3);
+	void RecieveClientConnectionConfirmation(NetworkPlayerConnectionConfirmationData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerJump(NetworkPlayerJumpData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerDuck(NetworkPlayerDuckData data, RakNet::RPC3 *clientrpc3);
@@ -51,7 +51,7 @@ public:
 	void RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 *clientrpc3);
 
 	bool SendNewVehicleInfoToAll(const short index);
-	bool SendTime(const int h, const int m);
+	bool SendTime(const unsigned char time[2]);
 	bool SendPlayerPosition(const short index, const float pos[3], const float angle);
 	bool SendPlayerModel(const short index, const unsigned int model);
 private:
@@ -72,7 +72,7 @@ private:
 	enum NetworkRPCType
 	{
 		NetworkRPCPlayerConnectionRequest,
-		NetworkRPCPlayerConnectionNextRequest,
+		NetworkRPCPlayerConnectionConfirmation,
 		NetworkRPCPlayerMove,
 		NetworkRPCPlayerJump,
 		NetworkRPCPlayerDuck,
@@ -97,7 +97,7 @@ private:
 	union NetworkRPCUnion
 	{
 		NetworkPlayerConnectionRequestDataInternal *playerconnectionrequest;
-		NetworkPlayerConnectionRequestDataInternal *playerconnectionnextrequest;
+		NetworkPlayerConnectionConfirmationData *playerconnectionconfirmation;
 		NetworkPlayerMoveData *playermove;
 		NetworkPlayerJumpData *playerjump;
 		NetworkPlayerDuckData *playerduck;
