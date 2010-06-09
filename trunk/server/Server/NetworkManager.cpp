@@ -1269,13 +1269,15 @@ void NetworkManager::SendDataToAll(const char *RPC, const DATATYPE *data)
 template <typename DATATYPE>
 void NetworkManager::SendDataToOne(const char *RPC, const short index, const DATATYPE *data)
 {
-	if(index < clientbuffersize)
+	if((index < 0) && (index >= clientbuffersize))
 	{
-		if (clientbuffer[index] != NULL)
-		{
-			rpc3->CallCPP(RPC, clientbuffer[index]->id, *data, rpc3);
-		}
+		return;
 	}
+	if (clientbuffer[index] == NULL)
+	{
+		return;
+	}
+	rpc3->CallCPP(RPC, clientbuffer[index]->id, *data, rpc3);
 }
 
 template <typename DATATYPE>
