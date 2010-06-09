@@ -240,8 +240,13 @@ bool CEditBox::KeyEvent( SKey sKey )
 				BYTE bKeys[256] = { 0 };
 				GetKeyboardState( bKeys );
 
-				WORD wKey = 0;
-				ToAscii( sKey.m_vKey, HIWORD( sKey.m_lParam )&0xFF, bKeys, &wKey, 0 );
+				#ifndef _UNICODE
+					WORD wKey = 0;
+					ToAscii( sKey.m_vKey, HIWORD( sKey.m_lParam )&0xFF, bKeys, &wKey, 0 );
+				#else
+					wchar_t wKey = 0;
+					ToUnicode( sKey.m_vKey, HIWORD( sKey.m_lParam )&0xFF, bKeys, &wKey, 1, 0 );
+				#endif
 				SendMsg(CHANGE, wKey);
 
 				if(wKey < 32) break;
