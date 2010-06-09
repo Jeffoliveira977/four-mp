@@ -455,6 +455,22 @@ void MasterServer::Process()
 	http->Update();
 }
 
+char *MasterServer::URLEncode(const wchar_t *string)
+{
+	if (string == NULL)
+	{
+		return NULL;
+	}
+	size_t length = (sizeof(wchar_t) / sizeof(char)) * wcslen(string) + 1;
+	char *tempstring = (char *)calloc(length, sizeof(char));
+	wcstombs(tempstring, string, length);
+	RakNet::RakString tempstring2 = RakNet::RakString(tempstring).URLEncode();
+	char *tempstring3 = (char *)calloc(strlen(tempstring2.C_String()) + 1, sizeof(char));
+	strcpy(tempstring3, tempstring2.C_String());
+	free(tempstring);
+	return tempstring3;
+}
+
 void MasterServer::ClearServerList()
 {
 	slist.clear();
@@ -541,20 +557,4 @@ char *MasterServer::GetUserSession()
 wchar_t *MasterServer::GetError()
 {
 	return error;
-}
-
-char *MasterServer::URLEncode(const wchar_t *string)
-{
-	if (string == NULL)
-	{
-		return NULL;
-	}
-	size_t length = (sizeof(wchar_t) / sizeof(char)) * wcslen(string) + 1;
-	char *tempstring = (char *)calloc(length, sizeof(char));
-	wcstombs(tempstring, string, length);
-	RakNet::RakString tempstring2 = RakNet::RakString(tempstring).URLEncode();
-	char *tempstring3 = (char *)calloc(strlen(tempstring2.C_String()) + 1, sizeof(char));
-	strcpy(tempstring3, tempstring2.C_String());
-	free(tempstring);
-	return tempstring3;
 }

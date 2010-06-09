@@ -47,15 +47,13 @@ bool MasterServerManager::RegisterServer(const unsigned short port, const wchar_
 {
 	if(http->IsBusy()) return 0;
 
-	size_t length = _scwprintf(L"port=%d&name=%s&mode=%s&loc=%s&maxpl=%d&password=%d&t=add", port, name, mode, loc, maxpl, password);
-	wchar_t *tempdata = (wchar_t *)calloc(length + 1, sizeof(wchar_t));
-	swprintf(tempdata, length + 1, L"port=%d&name=%s&mode=%s&loc=%s&maxpl=%d&password=%d&t=add", port, name, mode, loc, maxpl, password);
-	length = (sizeof(wchar_t) / sizeof(char)) * length + 1;
-	char *tempdata2 = (char *)calloc(length, sizeof(char));
-	wcstombs(tempdata2, tempdata, length);
-	RakString data = RakString(tempdata2).URLEncode();
-	free(tempdata);
-	free(tempdata2);
+	char *urlname = this->URLEncode(name);
+	char *urlmode = this->URLEncode(mode);
+	char *urlloc = this->URLEncode(loc);
+	RakString data("port=%d&name=%s&mode=%s&loc=%s&maxpl=%d&password=%d&t=add", port, urlname, urlmode, urlloc, maxpl, password);
+	free(urlname);
+	free(urlmode);
+	free(urlloc);
 
 	http->Post(RakString("%s%s", MASTER_PATH, "list.php").C_String(), data);
 	state = MSS_WAIT_SERVER_ADD;
@@ -100,7 +98,7 @@ bool MasterServerManager::QueryUserCheck(const int fmpid, const char *ip, const 
 	return 1;
 }
 
-bool MasterServerManager::QueryClanCheck(const int fmpid, const char *clan)
+bool MasterServerManager::QueryClanCheck(const int fmpid, const wchar_t *clan)
 {
 	return true;
 }
@@ -152,4 +150,20 @@ void MasterServerManager::Process(void)
 	}
 
 	http->Update();
+}
+
+char *MasterServerManager::URLEncode(const wchar_t *string)
+{
+	if (string == NULL)
+	{
+		return NULL;
+	}
+	size_t length = (sizeof(wchar_t) / sizeof(char)) * wcslen(string) + 1;
+	char *tempstring = (char *)calloc(length, sizeof(char));
+	wcstombs(tempstring, string, length);
+	RakNet::RakString tempstring2 = RakNet::RakString(tempstring).URLEncode();
+	char *tempstring3 = (char *)calloc(strlen(tempstring2.C_String()) + 1, sizeof(char));
+	strcpy(tempstring3, tempstring2.C_String());
+	free(tempstring);
+	return tempstring3;
 }

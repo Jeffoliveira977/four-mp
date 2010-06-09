@@ -41,7 +41,7 @@ void ConVarHookHostname(ConVar *convar, const ConVarType oldtype, void *oldvalue
 		con_strcpy(server.hostname, (conchar *)newvalue);
 		if (server.isrunning)
 		{
-			nm.UpdateServerInfo();
+			server.UpdateServerInfo();
 		}
 		return;
 	}
@@ -55,7 +55,7 @@ void ConVarHookHostname(ConVar *convar, const ConVarType oldtype, void *oldvalue
 	free(value);
 	if (server.isrunning)
 	{
-		nm.UpdateServerInfo();
+		server.UpdateServerInfo();
 	}
 }
 
@@ -102,7 +102,7 @@ void ConVarHookSvPassword(ConVar *convar, const ConVarType oldtype, void *oldval
 		con_strcpy(server.password, (conchar *)newvalue);
 		if (server.isrunning)
 		{
-			nm.UpdateServerInfo();
+			server.UpdateServerInfo();
 		}
 		return;
 	}
@@ -116,7 +116,7 @@ void ConVarHookSvPassword(ConVar *convar, const ConVarType oldtype, void *oldval
 	free(value);
 	if (server.isrunning)
 	{
-		nm.UpdateServerInfo();
+		server.UpdateServerInfo();
 	}
 }
 
