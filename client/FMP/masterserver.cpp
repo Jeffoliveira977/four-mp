@@ -6,7 +6,6 @@
 #include "GetTime.h"
 
 #include "masterserver.h"
-#include "log.h"
 
 MasterServer::MasterServer()
 {
@@ -277,8 +276,8 @@ void MasterServer::ReadServerList(RakNet::RakString data)
 	const char *dataCode = data.C_String();
 	// `ip`, `port`, `name`, `location`, `mode`, `password`, `players`, `maxplayers`, `clan`, `ban`, `vip`
 
-	MasterServerInfo *tmp_info = new MasterServerInfo;
-	memset(tmp_info, 0, sizeof(MasterServerInfo));
+	ServerInfo *tmp_info = new ServerInfo;
+	memset(tmp_info, 0, sizeof(ServerInfo));
 
 	unsigned char read_id = 0;
 
@@ -294,8 +293,8 @@ void MasterServer::ReadServerList(RakNet::RakString data)
 			read_id = 0;
 			tmp_info->ping = 9999;
 			slist.push_back(tmp_info);
-			tmp_info = new MasterServerInfo;
-			memset(tmp_info, 0, sizeof(MasterServerInfo));
+			tmp_info = new ServerInfo;
+			memset(tmp_info, 0, sizeof(ServerInfo));
 			continue;
 		}
 		
@@ -461,18 +460,18 @@ void MasterServer::ClearServerList()
 	slist.clear();
 }
 
-std::vector<MasterServerInfo*> *MasterServer::GetServerList()
+std::vector<ServerInfo*> *MasterServer::GetServerList()
 {
 	return &slist;
 }
 
-MasterServerInfo *MasterServer::GetServerInfo(int Index)
+ServerInfo *MasterServer::GetServerInfo(int Index)
 {
 	if(Index >= (int)slist.size()) return 0;
 	return slist[Index];
 }
 
-MasterServerInfo *MasterServer::GetServerInfo(char *ip, unsigned short port, int *index)
+ServerInfo *MasterServer::GetServerInfo(char *ip, unsigned short port, int *index)
 {
 	for(int i = 0; i < (int)slist.size(); i++)
 	{

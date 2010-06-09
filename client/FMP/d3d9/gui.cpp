@@ -53,8 +53,8 @@ CCheckBox *upRemeberMe;
 CEditBox * enNick; 
 CButton * enOK;
 
-std::vector<MasterServerInfo*> server_list;
-std::vector<MasterServerInfo*> server_list_fav;
+std::vector<ServerInfo*> server_list;
+std::vector<ServerInfo*> server_list_fav;
 
 int tab = 3;
 
@@ -83,7 +83,7 @@ namespace CALLBACKS
 			else
 			{
 				char *tmp = new char[128];
-				MasterServerInfo *msi;
+				ServerInfo *msi;
 				for(int i = 0; i < fmpms.GetNumServers(); i++)
 				{
 					msi = fmpms.GetServerInfo(i);
@@ -144,7 +144,7 @@ namespace CALLBACKS
 		if(fmpms.GetNumServers() > 0)
 		{
 			char tmp[64];
-			MasterServerInfo *msi;
+			ServerInfo *msi;
 			sbServList->Clear();
 			server_list.clear();
 
@@ -176,7 +176,7 @@ namespace CALLBACKS
 		if(fmpms.GetNumServers() > 0)
 		{
 			char tmp[64];
-			MasterServerInfo *msi;
+			ServerInfo *msi;
 			sbServList->Clear();
 			server_list.clear();
 
@@ -368,7 +368,7 @@ namespace CALLBACKS
 				fEnterNick->SetVisible(1);
 				return;
 			}
-			MasterServerInfo *tmp_msi = server_list.at(sel);
+			ServerInfo *tmp_msi = server_list.at(sel);
 			Log::Debug(L"FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
 			nm.ConnectToServer(tmp_msi->ip, tmp_msi->port);
 		}
@@ -394,7 +394,7 @@ namespace CALLBACKS
 		int sel = sbServList->GetSelected();
 		if(sel >= 0)
 		{
-			MasterServerInfo *tmp_msi = server_list.at(sel);
+			ServerInfo *tmp_msi = server_list.at(sel);
 			Log::Debug(L"FROM LIST - Server: [%s:%d]", tmp_msi->ip, tmp_msi->port);
 			nm.ConnectToServer(tmp_msi->ip, tmp_msi->port);
 		}
@@ -445,8 +445,8 @@ namespace CALLBACKS
 		if(sbEnterIP->GetString().length() > 0 && sbEnterPort->GetString().length() > 0)
 		{
 			// Add entered server
-			MasterServerInfo * tmp_msi = new MasterServerInfo;
-			memset(tmp_msi, 0, sizeof(MasterServerInfo));
+			ServerInfo * tmp_msi = new ServerInfo;
+			memset(tmp_msi, 0, sizeof(ServerInfo));
 			wcstombs(tmp_msi->ip, sbEnterIP->GetString().c_str(), 64);
 			tmp_msi->port = _wtoi(sbEnterPort->GetString().c_str());
 			swprintf_s(tmp_msi->name, 128, L"%s:%d", tmp_msi->ip, tmp_msi->port);
@@ -823,7 +823,7 @@ bool FMPGUI::IsLogged()
 	return logged;
 }
 
-void FMPGUI::UpdateServer(MasterServerInfo *msi)
+void FMPGUI::UpdateServer(ServerInfo *msi)
 {
 	if(!GuiReady) return;
 

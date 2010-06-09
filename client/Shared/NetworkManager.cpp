@@ -189,7 +189,7 @@ void NetworkManager::Tick(void)
 				pong.Read(time);
 				dataLength = pack->length - sizeof(unsigned char) - sizeof(RakNetTime);
 				Log::Debug(L"Create tmp info");
-				MasterServerInfo *tmp_msi = new MasterServerInfo;
+				ServerInfo *tmp_msi = new ServerInfo;
 				tmp_msi->ping = (unsigned int)(RakNet::GetTime()-time);
 
 				Log::Debug(L"ID_PONG from SystemAddress:%u:%u.", pack->systemAddress.binaryAddress, pack->systemAddress.port);
@@ -199,9 +199,17 @@ void NetworkManager::Tick(void)
 
 				if (dataLength > 0)
 				{
+					char tempname[256];
+					char tempmode[128];
+					char temploc[128];
+					char tempclan[128];
 					unsigned char *data = pack->data+sizeof(unsigned char)+sizeof(RakNetTime);
-					sscanf((char*)data, "%[^\1]\1%[^\1]\1%[^\1]\1%d\1%d\1%d\1%[^\1]\1\0", &tmp_msi->name, &tmp_msi->mode, &tmp_msi->loc, 
-					&tmp_msi->players, &tmp_msi->maxplayers, &tmp_msi->password, &tmp_msi->clan);
+					sscanf((char*)data, "%[^\1]\1%[^\1]\1%[^\1]\1%d\1%d\1%d\1%[^\1]\1\0", &tempname, &tempmode, &temploc, 
+					&tmp_msi->players, &tmp_msi->maxplayers, &tmp_msi->password, &tempclan);
+					mbstowcs(tmp_msi->name, tempname, 128);
+					mbstowcs(tmp_msi->mode, tempmode, 64);
+					mbstowcs(tmp_msi->loc, temploc, 64);
+					mbstowcs(tmp_msi->clan, tempclan, 64);
 				}
 				strcpy_s(tmp_msi->ip, 64, pack->systemAddress.ToString(0));
 				tmp_msi->port = pack->systemAddress.port;
