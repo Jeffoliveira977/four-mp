@@ -1,5 +1,4 @@
 #include <time.h>
-#include <math.h>
 #include "ServerCore.h"
 #include "logging.h"
 #include "HandleManager.h"
@@ -15,6 +14,8 @@
 #include "VirtualMachineManager.h"
 #include "PlayerManager.h"
 
+#define SERVER_TICKRATE 10
+
 extern HandleManager hm;
 extern ConsoleCore concore;
 extern ConsoleScreen conscreen;
@@ -27,6 +28,7 @@ extern PlayerManager playm;
 ServerCore::ServerCore(void)
 {
 	isrunning = false;
+	sleepcount = 100;
 	lastcheck = 0;
 	hostname = NULL;
 	port = 7777;
@@ -36,8 +38,10 @@ ServerCore::ServerCore(void)
 	rconpassword = NULL;
 	componentselect = false;
 	componentselectcvar = NULL;
-
-	SetTime(0, 0);
+	gametime.ticksperminute = 20;
+	gametime.tickcount = 0;
+	gametime.time[0] = 0;
+	gametime.time[1] = 0;
 }
 
 ServerCore::~ServerCore(void)
@@ -121,6 +125,8 @@ bool ServerCore::Load(void)
 	hm.AddNewHandle(0, HandleTypeConVar, portcvar);
 	PrintToServer(L"FOUR-MP. Copyright 2009-2010 Four-mp team.");
 	concore.InterpretLine(L"exec server.cfg");
+	sleepcount = 1000 / SERVER_TICKRATE;
+	gametime.ticksperminute = SERVER_TICKRATE * 2;
 	nm.Load(playm.GetMaxPlayers(), port);
 	maxplayers = playm.GetMaxPlayers();
 	plugm.LoadPlugins();
@@ -154,6 +160,12 @@ void ServerCore::Tick(void)
 {
 	conscreen.CheckUserInput();
 	nm.Tick();
+	gametime.tickcount++;
+	if (gametime.tickcount == gametime.ticksperminute)
+	{
+		gametime.tickcount = 0;
+		this->IncrementGameTime();
+	}
 	if(GetTickCount() - lastcheck >= 30000)
 	{
 		lastcheck = GetTickCount();
@@ -170,7 +182,7 @@ void ServerCore::Tick(void)
 			}
 		}
 	}
-	Sleep(100);
+	Sleep(sleepcount);
 }
 
 void ServerCore::Unload(void)
@@ -226,44 +238,31 @@ void ServerCore::EnableComponentSelect(bool enable)
 	componentselectcvar->SetValue(enable);
 }
 
-void ServerCore::SetTime(const unsigned char h, const unsigned char m)
+void ServerCore::GetTime(unsigned char (&time)[2])
 {
-	gametime.hour = h;
-	gametime.minute = m;
-
-	if(gametime.hour > 23) gametime.hour = 23; else if(gametime.hour < 0) gametime.hour = 0;
-	if(gametime.minute > 59) gametime.minute = 59; else if(gametime.minute < 0) gametime.minute = 0;
-	time((time_t*)&gametime.last_get);
-
-	nm.SendTime(h, m);
+	memcpy(time, &gametime.time, sizeof(unsigned char) * 2);
 }
 
-void ServerCore::GetTime(unsigned char *h, unsigned char *m)
+void ServerCore::SetTime(const unsigned char time[2])
 {
-	int now = 0;
-	time((time_t*)&now);
-	int d = now - gametime.last_get;
-	int th = floor((float)d/120);
-	int tm = floor((float)(d - th*120)/2);
-
-	if(tm == 0 && th == 0)
+	if ((time[0] >= 24) || (time[1] >= 60))
 	{
-		*h = gametime.hour;
-		*m = gametime.minute;
 		return;
 	}
+	memcpy(gametime.time, &time, sizeof(unsigned char) * 2);
+	nm.SendTime(gametime.time);
+}
 
-	gametime.hour += th;
-	gametime.minute += tm;
-
-	while(gametime.minute > 59)
+void ServerCore::IncrementGameTime(void)
+{
+	gametime.time[1]++;
+	if (gametime.time[1] == 60)
 	{
-		gametime.hour++;
-		gametime.minute -= 60;
-		if(gametime.hour > 23) gametime.hour -= 24;
+		gametime.time[1] = 0;
+		gametime.time[0]++;
+		if (gametime.time[0] == 24)
+		{
+			gametime.time[0] = 0;
+		}
 	}
-	
-	*h = gametime.hour;
-	*m = gametime.minute;
-	gametime.last_get = now;
 }

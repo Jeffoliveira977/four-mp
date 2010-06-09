@@ -17,10 +17,11 @@ public:
 	wchar_t *GetHostname(void);
 	bool GetComponentSelectStatus(void);
 	void EnableComponentSelect(bool enable);
-	void GetTime(unsigned char *h, unsigned char *m);
-	void SetTime(const unsigned char h, const unsigned char m);
+	void GetTime(unsigned char (&timebuffer)[2]);
+	void SetTime(const unsigned char time[2]);
 private:
 	bool isrunning;
+	short sleepcount;
 	unsigned int lastcheck;
 	unsigned int lastmasterservercheck;
 	wchar_t *hostname;
@@ -35,10 +36,12 @@ private:
 	ConVar *componentselectcvar;
 	struct GameTime
 	{
-		unsigned char hour, minute;
-		int last_get;
+		short ticksperminute;
+		short tickcount;
+		unsigned char time[2];
 	};
 	GameTime gametime;
+	void IncrementGameTime(void);
 	friend void ConVarHookHostGamemode(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);
 	friend void ConVarHookHostname(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);
 	friend void ConVarHookRconPassword(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);

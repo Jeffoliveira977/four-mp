@@ -475,30 +475,7 @@ void NetworkManager::RecieveClientConnectionError(NetworkPlayerConnectionErrorDa
 
 void NetworkManager::RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 *serverrpc3)
 {
-	//this->WriteToRPCBuffer(NetworkRPCPlayerInfo, &data);
-	//Temp fix. Client should use rpc buffer and then send confirmation to the server.
-	//After that, server should send full update.
-	if (strcmp(data.sessionkey, client.GetSessionKey()) != 0)
-	{
-		return;
-	}
-	clientid.localSystemAddress = data.index + 1;
-	this->SetNetworkID(clientid);
-
-	Log::Info(L"My ID: %d", data.index);
-	client.SetIndex(data.index);
-
-	NetworkPlayerConnectionRequestData data2;
-
-	data2.protocol = PROTOCOL_VERSION;
-	wchar_t *name = client.GetName();
-	wcscpy(data2.name, name);
-	free(name);
-	strcpy(data2.sessionkey, client.GetSessionKey());
-	data2.sessionkey[32] = 0;
-	data2.fmpid = client.GetFMPID();
-
-	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionNextRequest", serverid, data2, rpc3);
+	this->WriteToRPCBuffer(NetworkRPCPlayerInfo, &data);
 }
 
 void NetworkManager::RecieveClientDisconnection(NetworkPlayerDisconnectionData data, RakNet::RPC3 *serverrpc3)
@@ -852,14 +829,17 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		}
 	case NetworkRPCPlayerInfo:
 		{
-			if (data->playerinfo->sessionkey != client.GetSessionKey())
+			if (strcmp(data->playerinfo->sessionkey, client.GetSessionKey()) != 0)
 			{
+				delete data->playerinfo;
 				return;
 			}
 			clientid.localSystemAddress = data->playerinfo->index + 1;
 			this->SetNetworkID(clientid);
 			client.SetIndex(data->playerinfo->index);
 			delete data->playerinfo;
+			NetworkPlayerConnectionConfirmationData data2;
+			rpc3->CallCPP("&NetworkManager::RecieveClientConnectionConfirmation", serverid, data2, rpc3);
 			break;
 		}
 	case NetworkRPCPlayerDisconnection:
@@ -1047,9 +1027,8 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		}
 	case NetworkRPCTime:
 		{
-			Log::Info(L"Set time %d %d", data->time->hour, data->time->minute);
 #if defined (FMP_CLIENT)
-			HOOK.SetTime(data->time->hour, data->time->minute);
+			HOOK.SetTime(data->time->time);
 #endif
 			delete data->time;
 			break;

@@ -116,21 +116,20 @@ void sq_SetGameTime(HSQUIRRELVM v)
 	sq_getinteger(v, 2, &h);
 	sq_getinteger(v, 3, &m);
 
-	PrintToServer(L"Time: %d %d", h, m);
-
-	server.SetTime(h, m);
+	unsigned char time[2] = { h, m };
+	server.SetTime(time);
 }
 
 void sq_GetGameHour(HSQUIRRELVM v)
 {
-	unsigned char h, m;
-	server.GetTime(&h, &m);
-	sq_pushinteger(v, h);
+	unsigned char time[2];
+	server.GetTime(time);
+	sq_pushinteger(v, time[0]);
 }
 
 void sq_GetGameMinutes(HSQUIRRELVM v)
 {
-	unsigned char h, m;
-	server.GetTime(&h, &m);
-	sq_pushinteger(v, m);
+	unsigned char time[2];
+	server.GetTime(time);
+	sq_pushinteger(v, time[1]);
 }
