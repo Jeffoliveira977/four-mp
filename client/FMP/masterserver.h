@@ -96,4 +96,6 @@ public:
 	int GetUserId();
 	wchar_t *GetUserName();
 	char *GetUserSession();
+
+	char *URLEncode(const wchar_t *string);
 };

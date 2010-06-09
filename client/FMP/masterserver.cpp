@@ -6,6 +6,7 @@
 #include "GetTime.h"
 
 #include "masterserver.h"
+#include "log.h"
 
 MasterServer::MasterServer()
 {
@@ -128,16 +129,12 @@ bool MasterServer::QueryUserLogin(const wchar_t *login, const wchar_t *password)
 
 	if(http->IsBusy()) return 0;
 
-	int length = _scwprintf(L"login=%s&pass=%s&t=login", login, password) + 1;
-	wchar_t *tempstring = (wchar_t *)calloc(length, sizeof(wchar_t));
-	swprintf(tempstring, length, L"login=%s&pass=%s&t=login", login, password);
-	length = (sizeof(wchar_t) / sizeof(char)) * (length - 1) + 1;
-	char *tempstring2 = (char *)calloc(length, sizeof(char));
-	wcstombs(tempstring2, tempstring, length);
+	char *urllogin = this->URLEncode(login);
+	char *urlpassword = this->URLEncode(password);
 
-	RakNet::RakString data = RakNet::RakString(RakNet::RakString(tempstring2).URLEncode().C_String());
-	free(tempstring);
-	free(tempstring2);
+	RakNet::RakString data("login=%s&pass=%s&t=login", urllogin, urlpassword);
+	free(urllogin);
+	free(urlpassword);
 
 	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_LOGIN;
@@ -166,16 +163,18 @@ bool MasterServer::QueryUserRegister(const wchar_t *login, const wchar_t *nick, 
 
 	if(http->IsBusy()) return 0;
 
-	int length = _scwprintf(L"login=%s&pass=%s&email=%s&nick=%s&hard=%s&t=reg", login, password, email, nick, "fmp02a") + 1;
-	wchar_t *tempstring = (wchar_t *)calloc(length, sizeof(wchar_t));
-	swprintf(tempstring, length, L"login=%s&pass=%s&email=%s&nick=%s&hard=%s&t=reg", login, password, email, nick, "fmp02a");
-	length = (sizeof(wchar_t) / sizeof(char)) * (length - 1) + 1;
-	char *tempstring2 = (char *)calloc(length, sizeof(char));
-	wcstombs(tempstring2, tempstring, length);
-
-	RakNet::RakString data = RakNet::RakString(RakNet::RakString(tempstring2).URLEncode().C_String());
-	free(tempstring);
-	free(tempstring2);
+	char *urllogin = this->URLEncode(login);
+	char *urlpassword = this->URLEncode(password);
+	char *urlemail = this->URLEncode(email);
+	char *urlnick = this->URLEncode(nick);
+	char *urlhard = this->URLEncode(L"fmp02a");
+	
+	RakNet::RakString data("login=%s&pass=%s&email=%s&nick=%s&hard=%s&t=reg", urllogin, urlpassword, urlemail, urlnick, urlhard);
+	free(urllogin);
+	free(urlpassword);
+	free(urlemail);
+	free(urlnick);
+	free(urlhard);
 
 	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_REGISTER;
@@ -232,16 +231,10 @@ bool MasterServer::QueryUserUpdate(const wchar_t *status)
 
 	if(http->IsBusy()) return 0;
 
-	int length = _scwprintf(L"fmpid=%d&seskey=%s&status=%s&t=update", user->fmpid, user->seskey, status) + 1;
-	wchar_t *tempstring = (wchar_t *)calloc(length, sizeof(wchar_t));
-	swprintf(tempstring, length, L"fmpid=%d&seskey=%s&status=%s&t=update", user->fmpid, user->seskey, status);
-	length = (sizeof(wchar_t) / sizeof(char)) * (length - 1) + 1;
-	char *tempstring2 = (char *)calloc(length, sizeof(char));
-	wcstombs(tempstring2, tempstring, length);
-
-	RakNet::RakString data = RakNet::RakString(RakNet::RakString(tempstring2).URLEncode().C_String());
-	free(tempstring);
-	free(tempstring2);
+	char *urlstatus = this->URLEncode(status);
+	
+	RakNet::RakString data("fmpid=%d&seskey=%s&status=%s&t=update", user->fmpid, user->seskey, urlstatus);
+	free(urlstatus);
 
 	http->Post(RakNet::RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_UPDATE;
@@ -549,4 +542,20 @@ char *MasterServer::GetUserSession()
 wchar_t *MasterServer::GetError()
 {
 	return error;
+}
+
+char *MasterServer::URLEncode(const wchar_t *string)
+{
+	if (string == NULL)
+	{
+		return NULL;
+	}
+	size_t length = (sizeof(wchar_t) / sizeof(char)) * wcslen(string) + 1;
+	char *tempstring = (char *)calloc(length, sizeof(char));
+	wcstombs(tempstring, string, length);
+	RakNet::RakString tempstring2 = RakNet::RakString(tempstring).URLEncode();
+	char *tempstring3 = (char *)calloc(strlen(tempstring2.C_String()) + 1, sizeof(char));
+	strcpy(tempstring3, tempstring2.C_String());
+	free(tempstring);
+	return tempstring3;
 }
