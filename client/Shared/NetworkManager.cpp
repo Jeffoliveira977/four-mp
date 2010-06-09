@@ -108,7 +108,7 @@ void NetworkManager::Tick(void)
 #if defined (FMP_CLIENT)
 				Log::Info(L"Connection accepted. Sending client info...");
 #elif defined (FMP_CONSOLE_CLIENT)
-				PrintToConsole("Connection accepted. Sending client info...");
+				PrintToConsole(L"Connection accepted. Sending client info...");
 #endif
 				this->SendClientConnectionRequest();
 			} break;
@@ -118,7 +118,7 @@ void NetworkManager::Tick(void)
 				Log::Info(L"Already connected");
 				//clientstate.game = GameStateInGame;
 #elif defined (FMP_CONSOLE_CLIENT)
-				PrintToConsole("Already connected");
+				PrintToConsole(L"Already connected");
 #endif
 			} break;
 		case ID_NO_FREE_INCOMING_CONNECTIONS:
@@ -127,7 +127,7 @@ void NetworkManager::Tick(void)
 				Log::Info(L"No free connections");
 				client.SetGameState(GameStateOffline);
 #elif defined (FMP_CONSOLE_CLIENT)
-				PrintToConsole("No free connections");
+				PrintToConsole(L"No free connections");
 #endif
 			} break;
 		case ID_DISCONNECTION_NOTIFICATION:
@@ -137,7 +137,7 @@ void NetworkManager::Tick(void)
 				HOOK.PlayerDisconnect(client.GetIndex());
 				client.SetGameState(GameStateOffline);
 #elif defined (FMP_CONSOLE_CLIENT)
-				PrintToConsole("You have been kicked from the server.");
+				PrintToConsole(L"You have been kicked from the server.");
 #endif
 			} break;
 		case ID_CONNECTION_LOST:
@@ -146,7 +146,7 @@ void NetworkManager::Tick(void)
 				Log::Info(L"Lost connection to the server.");
 				client.SetGameState(GameStateOffline);
 #elif defined (FMP_CONSOLE_CLIENT)
-				PrintToConsole("Lost connection to the server.");
+				PrintToConsole(L"Lost connection to the server.");
 #endif
 			} break;
 		case ID_CONNECTION_BANNED:
@@ -156,7 +156,7 @@ void NetworkManager::Tick(void)
 				client.SetGameState(GameStateOffline);
 				client.SetGameState(GameStateOffline);
 #elif defined (FMP_CONSOLE_CLIENT)
-				PrintToConsole("You are banned from the server.");
+				PrintToConsole(L"You are banned from the server.");
 #endif
 			} break;
 		case ID_INVALID_PASSWORD:
@@ -165,7 +165,7 @@ void NetworkManager::Tick(void)
 				Log::Info(L"Invalid password");
 				client.SetGameState(GameStateOffline);
 #elif defined (FMP_CONSOLE_CLIENT)
-				PrintToConsole("Invalid password");
+				PrintToConsole(L"Invalid password");
 #endif
 			} break;
 		case ID_CONNECTION_ATTEMPT_FAILED:
@@ -177,7 +177,7 @@ void NetworkManager::Tick(void)
 				swprintf(str, L"Can't connect to %S", pack->systemAddress.ToString());
 				Gui.Message(str);
 #elif defined (FMP_CONSOLE_CLIENT)
-				PrintToConsole("Connection failed");
+				PrintToConsole(L"Connection failed");
 #endif
 			} break;
 		case ID_PONG:
@@ -251,7 +251,7 @@ void NetworkManager::Tick(void)
 #if defined (FMP_CLIENT)
 				Log::Info(L"RakNet: Unknown message (0x%x)", pack->data[0]);
 #elif defined (FMP_CONSOLE_CLIENT)
-				PrintToConsole("RakNet: Unknown message (0x%x)", pack->data[0]);
+				PrintToConsole(L"RakNet: Unknown message (0x%x)", pack->data[0]);
 #endif
 			} break;
 		}
@@ -313,7 +313,7 @@ void NetworkManager::ConnectToServer(const char *hostname, const unsigned short 
 	}
 	client.SetGameState(GameStateConnecting);
 #elif defined (FMP_CONSOLE_CLIENT)
-	PrintToConsole("Connecting to server...");
+	PrintToConsole(L"Connecting to server...");
 	net->Connect(hostname, port, 0, 0, 0);
 	serveraddress.SetBinaryAddress(hostname);
 	serveraddress.port = port;
@@ -774,7 +774,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 #if defined (FMP_CLIENT)
 					Log::Info(L"Connection error: Server is full.");
 #elif defined (FMP_CONSOLE_CLIENT)
-					PrintToConsole("Connection error: Server is full.");
+					PrintToConsole(L"Connection error: Server is full.");
 #endif
 					break;
 				}
@@ -783,7 +783,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 #if defined (FMP_CLIENT)
 					Log::Info(L"Connection error: Server is using different protocol.");
 #elif defined (FMP_CONSOLE_CLIENT)
-					PrintToConsole("Connection error: Server is using different protocol.");
+					PrintToConsole(L"Connection error: Server is using different protocol.");
 #endif
 					break;
 				}
@@ -792,7 +792,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 #if defined (FMP_CLIENT)
 					Log::Info(L"Connection error: Invalid user name.");
 #elif defined (FMP_CONSOLE_CLIENT)
-					PrintToConsole("Connection error: Invalid user name.");
+					PrintToConsole(L"Connection error: Invalid user name.");
 #endif
 					break;
 				}
@@ -801,7 +801,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 #if defined (FMP_CLIENT)
 					Log::Info(L"Connection error: You are already connected.");
 #elif defined (FMP_CONSOLE_CLIENT)
-					PrintToConsole("Connection error: You are already connected.");
+					PrintToConsole(L"Connection error: You are already connected.");
 #endif
 					break;
 				}
@@ -810,7 +810,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 #if defined (FMP_CLIENT)
 					Log::Info(L"Connection error: Server was unable to allocate player resources.");
 #elif defined (FMP_CONSOLE_CLIENT)
-					PrintToConsole("Connection error: Server was unable to allocate player resources.");
+					PrintToConsole(L"Connection error: Server was unable to allocate player resources.");
 #endif
 					break;
 				}
@@ -819,7 +819,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 #if defined (FMP_CLIENT)
 					Log::Info(L"Connection error: Connection has been refused by a server script.");
 #elif defined (FMP_CONSOLE_CLIENT)
-					PrintToConsole("Connection error: Connection has been refused by a server script.");
+					PrintToConsole(L"Connection error: Connection has been refused by a server script.");
 #endif
 					break;
 				}
@@ -870,8 +870,8 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			Log::Info(L"Player full update. Name is %s", data->playerfullupdate->name);
 			HOOK.PlayerConnect(data->playerfullupdate->name, data->playerfullupdate->index, gPlayer[data->playerfullupdate->index].model, gPlayer[data->playerfullupdate->index].position);
 #elif defined (FMP_CONSOLE_CLIENT)
-			PrintToConsole("Player full update. Name is %s", data->playerfullupdate->name);
-			PrintToConsole("Position is %f %f %f", data->playerfullupdate->position[0], data->playerfullupdate->position[1], data->playerfullupdate->position[2]);
+			PrintToConsole(L"Player full update. Name is %s", data->playerfullupdate->name);
+			PrintToConsole(L"Position is %f %f %f", data->playerfullupdate->position[0], data->playerfullupdate->position[1], data->playerfullupdate->position[2]);
 #endif
 			delete data->playerfullupdate;
 			break;
@@ -976,6 +976,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		}
 	case NetworkRPCPlayerSpawn:
 		{
+#if defined (FMP_CLIENT)
 			Log::Info(L"Setup player spawn info %d", data->playerspawn->client);
 			gPlayer[data->playerspawn->client].want_spawn = 0;
 			memcpy(&gPlayer[data->playerspawn->client].spawn_pos, &data->playerspawn->position, sizeof(float) * 3);
@@ -986,8 +987,6 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			gPlayer[data->playerspawn->client].armor = data->playerspawn->armor;
 			gPlayer[data->playerspawn->client].health = data->playerspawn->health;
 			gPlayer[data->playerspawn->client].room = data->playerspawn->room;
-
-#if defined (FMP_CLIENT)
 			HOOK.xPlayerSpawn(*(data->playerspawn));
 #endif
 			delete data->playerspawn;

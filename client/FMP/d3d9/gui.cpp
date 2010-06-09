@@ -618,7 +618,7 @@ void FMPGUI::Load(IDirect3DDevice9 * g_pDevice)
 	// Create login window
 	Log::Debug(L"FMPGUI::Load >> Create login");
 	fUserLogin = new CWindow(m_Gui, s_iWidth/2-150, s_iHeight/2-100, 300, 200, L"USER LOGIN", L"WND_USER_LOGIN", CALLBACKS::UserLogin);
-	upLoginInfo = new CText(m_Gui, 20, 15, 280, 40, L"Please login or Regsiter", L"UP_INFO");
+	upLoginInfo = new CText(m_Gui, 20, 15, 280, 40, L"Please login or register", L"UP_INFO");
 	upLogin = new CEditBox(m_Gui, 100, 45, 180, 0, L"", L"UP_LOGIN", CALLBACKS::Login);
 	upPassword = new CEditBox(m_Gui, 100, 75, 180, 0, L"", L"UP_PASSWORD", CALLBACKS::Login);
 	upPassword->HideContent(1);
