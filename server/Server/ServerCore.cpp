@@ -142,6 +142,7 @@ bool ServerCore::Load(void)
 		msm.Init();
 	}
 	this->UpdateServerInfo();
+	this->UpdateCaption();
 	isrunning = true;
 	debug(L"Started");
 	return true;
@@ -160,6 +161,7 @@ void ServerCore::Tick(void)
 	{
 		gametime.tickcount = 0;
 		this->IncrementGameTime();
+		this->UpdateCaption();
 	}
 	if(GetTickCount() - lastcheck >= 30000)
 	{
@@ -273,4 +275,11 @@ void ServerCore::IncrementGameTime(void)
 			gametime.time[0] = 0;
 		}
 	}
+}
+
+void ServerCore::UpdateCaption(void)
+{
+	wchar_t caption[81];
+	swprintf(caption, 81, L"FOUR-MP %02d / %02d %-58.58s %02d:%02d", playm.GetNumberOfPlayers(), playm.GetMaxPlayers(), gamemodename, gametime.time[0], gametime.time[1]);
+	conscreen.SetCaption(caption);
 }
