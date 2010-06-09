@@ -1,3 +1,3 @@
 #pragma once
 
-void PrintToConsole(const char *string, ...);
+void PrintToConsole(const wchar_t *string, ...);

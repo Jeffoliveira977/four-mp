@@ -7,12 +7,13 @@
 
 extern ConsoleScreen conscreen;
 
-void PrintToConsole(const char *string, ...)
+void PrintToConsole(const wchar_t *string, ...)
 {
-	va_list arglist; 
+	va_list arglist;
     va_start(arglist, string);
-	char *tempstring = (char *)calloc(_vscprintf(string, arglist) + 1, sizeof(char));
-	vsprintf(tempstring, string, arglist); 
+	int length = _vscwprintf(string, arglist) + 1;
+	wchar_t *tempstring = (wchar_t *)calloc(length, sizeof(wchar_t));
+	vswprintf(tempstring, length, string, arglist); 
 	conscreen.Print(tempstring);
 	free(tempstring);
 	va_end(arglist); 

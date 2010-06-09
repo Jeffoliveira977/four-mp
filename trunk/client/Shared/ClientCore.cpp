@@ -40,7 +40,6 @@ ClientCore::ClientCore(void)
 		PathToClient[i] = 0;
 	}
 	swprintf(PathToClient, MAX_PATH, L"%sFMP\\", PathToClient);
-	Log::Info(L"Path: %s", PathToClient);
 }
 
 ClientCore::~ClientCore(void)
@@ -55,7 +54,6 @@ wchar_t *ClientCore::GetPath()
 void ClientCore::GetPath(const wchar_t *file, wchar_t *path)
 {
 	swprintf(path, MAX_PATH, L"%s%s", PathToClient, file);
-	Log::Info(L"Returned: %s", path);
 }
 
 bool ClientCore::Load(void)
