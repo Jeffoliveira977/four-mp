@@ -518,7 +518,7 @@ TiXmlElement::TiXmlElement (const TIXML_CHAR * _value)
 
 
 #ifdef TIXML_USE_STL
-TiXmlElement::TiXmlElement( const uistring& _value ) 
+TiXmlElement::TiXmlElement( const TIXML_STRING& _value ) 
 	: TiXmlNode( TiXmlNode::ELEMENT )
 {
 	firstChild = lastChild = 0;
@@ -570,7 +570,7 @@ const TIXML_CHAR* TiXmlElement::Attribute( const TIXML_CHAR* name ) const
 
 
 #ifdef TIXML_USE_STL
-const uistring* TiXmlElement::Attribute( const uistring& name ) const
+const TIXML_STRING* TiXmlElement::Attribute( const TIXML_STRING& name ) const
 {
 	const TiXmlAttribute* node = attributeSet.Find( name );
 	if ( node )
@@ -597,9 +597,9 @@ const TIXML_CHAR* TiXmlElement::Attribute( const TIXML_CHAR* name, int* i ) cons
 
 
 #ifdef TIXML_USE_STL
-const uistring* TiXmlElement::Attribute( const uistring& name, int* i ) const
+const TIXML_STRING* TiXmlElement::Attribute( const TIXML_STRING& name, int* i ) const
 {
-	const uistring* s = Attribute( name );
+	const TIXML_STRING* s = Attribute( name );
 	if ( i )
 	{
 		if ( s ) {
@@ -631,9 +631,9 @@ const TIXML_CHAR* TiXmlElement::Attribute( const TIXML_CHAR* name, double* d ) c
 
 
 #ifdef TIXML_USE_STL
-const uistring* TiXmlElement::Attribute( const uistring& name, double* d ) const
+const TIXML_STRING* TiXmlElement::Attribute( const TIXML_STRING& name, double* d ) const
 {
-	const uistring* s = Attribute( name );
+	const TIXML_STRING* s = Attribute( name );
 	if ( d )
 	{
 		if ( s ) {
@@ -658,7 +658,7 @@ int TiXmlElement::QueryIntAttribute( const TIXML_CHAR* name, int* ival ) const
 
 
 #ifdef TIXML_USE_STL
-int TiXmlElement::QueryIntAttribute( const uistring& name, int* ival ) const
+int TiXmlElement::QueryIntAttribute( const TIXML_STRING& name, int* ival ) const
 {
 	const TiXmlAttribute* node = attributeSet.Find( name );
 	if ( !node )
@@ -678,7 +678,7 @@ int TiXmlElement::QueryDoubleAttribute( const TIXML_CHAR* name, double* dval ) c
 
 
 #ifdef TIXML_USE_STL
-int TiXmlElement::QueryDoubleAttribute( const uistring& name, double* dval ) const
+int TiXmlElement::QueryDoubleAttribute( const TIXML_STRING& name, double* dval ) const
 {
 	const TiXmlAttribute* node = attributeSet.Find( name );
 	if ( !node )
@@ -701,11 +701,18 @@ void TiXmlElement::SetAttribute( const TIXML_CHAR * name, int val )
 
 
 #ifdef TIXML_USE_STL
-void TiXmlElement::SetAttribute( const uistring& name, int val )
+void TiXmlElement::SetAttribute( const TIXML_STRING& name, int val )
 {	
-   std::ostringstream oss;
-   oss << val;
-   SetAttribute( name, oss.str() );
+	/*std::ostringstream oss;
+	oss << val;*/
+	TIXML_CHAR oss[16];
+#ifdef _UNICODE
+	_itow(val, oss, 10);
+#else
+	itoa(val, oss, 10);
+#endif
+
+	SetAttribute( name, oss );
 }
 #endif
 
@@ -753,7 +760,7 @@ void TiXmlElement::SetAttribute( const TIXML_CHAR * cname, const TIXML_CHAR * cv
 
 
 #ifdef TIXML_USE_STL
-void TiXmlElement::SetAttribute( const uistring& name, const uistring& _value )
+void TiXmlElement::SetAttribute( const TIXML_STRING& name, const TIXML_STRING& _value )
 {
 	TiXmlAttribute* node = attributeSet.Find( name );
 	if ( node )
@@ -906,7 +913,7 @@ TiXmlDocument::TiXmlDocument( const TIXML_CHAR * documentName ) : TiXmlNode( TiX
 
 
 #ifdef TIXML_USE_STL
-TiXmlDocument::TiXmlDocument( const uistring& documentName ) : TiXmlNode( TiXmlNode::DOCUMENT )
+TiXmlDocument::TiXmlDocument( const TIXML_STRING& documentName ) : TiXmlNode( TiXmlNode::DOCUMENT )
 {
 	tabsize = 4;
 	useMicrosoftBOM = false;
@@ -954,8 +961,8 @@ bool TiXmlDocument::LoadFile( const TIXML_CHAR* _filename, TiXmlEncoding encodin
 {
 	// There was a really terrifying little bug here. The code:
 	//		value = filename
-	// in the STL case, cause the assignment method of the uistring to
-	// be called. What is strange, is that the uistring had the same
+	// in the STL case, cause the assignment method of the TIXML_STRING to
+	// be called. What is strange, is that the TIXML_STRING had the same
 	// address as it's c_str() method, and so bad things happen. Looks
 	// like a bug in the Microsoft STL implementation.
 	// Add an extra string to avoid the crash.
@@ -1030,14 +1037,25 @@ bool TiXmlDocument::LoadFile( FILE* file, TiXmlEncoding encoding )
 	}
 	*/
 
-	TIXML_CHAR* buf = new TIXML_CHAR[ length+1 ];
+#ifdef _UNICODE
+	char* bufa = new char[ length+1 ];
+	bufa[0] = 0;
+#else
+	char* buf = new TIXML_CHAR[ length+1 ];
 	buf[0] = 0;
+#endif
 
-	if ( fread( buf, length, 1, file ) != 1 ) {
-		delete [] buf;
+	if ( fread( bufa, length, 1, file ) != 1 ) {
+		delete [] bufa;
 		SetError( TIXML_ERROR_OPENING_FILE, 0, 0, TIXML_ENCODING_UNKNOWN );
 		return false;
 	}
+
+#ifdef _UNICODE
+	TIXML_CHAR *buf = new TIXML_CHAR[ length+1 ];
+	mbstowcs(buf, bufa, length);
+	delete [] bufa;
+#endif
 
 	const TIXML_CHAR* lastPos = buf;
 	const TIXML_CHAR* p = buf;
@@ -1400,9 +1418,9 @@ TiXmlDeclaration::TiXmlDeclaration( const TIXML_CHAR * _version,
 
 
 #ifdef TIXML_USE_STL
-TiXmlDeclaration::TiXmlDeclaration(	const uistring& _version,
-									const uistring& _encoding,
-									const uistring& _standalone )
+TiXmlDeclaration::TiXmlDeclaration(	const TIXML_STRING& _version,
+									const TIXML_STRING& _encoding,
+									const TIXML_STRING& _standalone )
 	: TiXmlNode( TiXmlNode::DECLARATION )
 {
 	version = _version;
@@ -1557,7 +1575,7 @@ void TiXmlAttributeSet::Remove( TiXmlAttribute* removeMe )
 
 
 #ifdef TIXML_USE_STL
-const TiXmlAttribute* TiXmlAttributeSet::Find( const uistring& name ) const
+const TiXmlAttribute* TiXmlAttributeSet::Find( const TIXML_STRING& name ) const
 {
 	for( const TiXmlAttribute* node = sentinel.next; node != &sentinel; node = node->next )
 	{
@@ -1568,7 +1586,7 @@ const TiXmlAttribute* TiXmlAttributeSet::Find( const uistring& name ) const
 }
 
 /*
-TiXmlAttribute*	TiXmlAttributeSet::Find( const uistring& name )
+TiXmlAttribute*	TiXmlAttributeSet::Find( const TIXML_STRING& name )
 {
 	for( TiXmlAttribute* node = sentinel.next; node != &sentinel; node = node->next )
 	{
@@ -1616,7 +1634,8 @@ std::istream& operator>> (std::istream & in, TiXmlNode & base)
 #endif
 
 
-#ifdef TIXML_USE_STL	
+#ifdef TIXML_USE_STL
+#ifndef _UNICODE
 std::ostream& operator<< (std::ostream & out, const TiXmlNode & base)
 {
 	TiXmlPrinter printer;
@@ -1626,9 +1645,20 @@ std::ostream& operator<< (std::ostream & out, const TiXmlNode & base)
 
 	return out;
 }
+#else
+std::wostream& operator<< (std::wostream & out, const TiXmlNode & base)
+{
+	TiXmlPrinter printer;
+	printer.SetStreamPrinting();
+	base.Accept( &printer );
+	out << printer.Str();
+
+	return out;
+}
+#endif
 
 
-uistring& operator<< (uistring& out, const TiXmlNode& base )
+TIXML_STRING& operator<< (TIXML_STRING& out, const TiXmlNode& base )
 {
 	TiXmlPrinter printer;
 	printer.SetStreamPrinting();

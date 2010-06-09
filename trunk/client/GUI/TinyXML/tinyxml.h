@@ -26,6 +26,8 @@ distribution.
 #ifndef TINYXML_INCLUDED
 #define TINYXML_INCLUDED
 
+#define TIXML_USE_STL
+
 #ifdef _MSC_VER
 #pragma warning( push )
 #pragma warning( disable : 4530 )
@@ -41,6 +43,37 @@ distribution.
 // Help out windows:
 #if defined( _DEBUG ) && !defined( DEBUG )
 #define DEBUG
+#endif
+
+#if defined (_UNICODE)
+
+#include <wchar.h>
+
+#define TIXML_CHAR wchar_t
+#define U_TIXML_CHAR wchar_t
+#define _TIXML_L(x) L ## x
+#define uislen(a) wcslen(a)
+#define uiscmp(a,b) wcscmp(a,b)
+#define uiscpy(a,b) wcscpy(a,b)
+#define uiscpy_s(a,b,c) wcscpy_s(a,b,c)
+#define uimemcpy(a,b,c) wmemcpy(a,b,c)
+#define utoi(a) _wtoi(a)
+#define utof(a) _wtof(a)
+#define uischr(a,b) wcschr(a, b)
+#define uisncmp(a,b,c) wcsncmp(a,b,c)
+#else
+#define TIXML_CHAR char
+#define U_TIXML_CHAR unsigned char
+#define _TIXML_L(x) x
+#define uislen(a) strlen(a)
+#define uiscmp(a,b) strcmp(a,b)
+#define uiscpy(a,b) strcpy(a,b)
+#define uiscpy_s(a,b,c) strcpy_s(a,b,c)
+#define uimemcpy(a,b,c) memcpy(a,b,c)
+#define utoi(a) atoi(a)
+#define utof(a) atof(a)
+#define uischr(a,b) strchr(a, b)
+#define uisncmp(a,b,c) strncmp(a,b,c)
 #endif
 
 #ifdef TIXML_USE_STL
@@ -232,7 +265,7 @@ public:
 	virtual ~TiXmlBase()			{}
 
 	/**	All TinyXml classes can print themselves to a filestream
-		or the string class (TiXmlString in non-STL mode, uistring
+		or the string class (TiXmlString in non-STL mode, TIXML_STRING
 		in STL mode.) Either or both cfile and str can be null.
 		
 		This is a formatted print, and will insert 
@@ -481,8 +514,8 @@ public:
 	    */	
 	    friend std::ostream& operator<< (std::ostream& out, const TiXmlNode& base);
 
-		/// Appends the XML node or attribute to a uistring.
-		friend uistring& operator<< (uistring& out, const TiXmlNode& base );
+		/// Appends the XML node or attribute to a TIXML_STRING.
+		friend TIXML_STRING& operator<< (TIXML_STRING& out, const TiXmlNode& base );
 
 	#endif
 
@@ -517,11 +550,11 @@ public:
 	const TIXML_CHAR *Value() const { return value.c_str (); }
 
     #ifdef TIXML_USE_STL
-	/** Return Value() as a uistring. If you only use STL,
+	/** Return Value() as a TIXML_STRING. If you only use STL,
 	    this is more efficient than calling Value().
 		Only available in STL mode.
 	*/
-	const uistring& ValueStr() const { return value; }
+	const TIXML_STRING& ValueStr() const { return value; }
 	#endif
 
 	const TIXML_STRING& ValueTStr() const { return value; }
@@ -538,8 +571,8 @@ public:
 	void SetValue(const TIXML_CHAR * _value) { value = _value;}
 
     #ifdef TIXML_USE_STL
-	/// STL uistring form.
-	void SetValue( const uistring& _value )	{ value = _value; }
+	/// STL TIXML_STRING form.
+	void SetValue( const TIXML_STRING& _value )	{ value = _value; }
 	#endif
 
 	/// Delete all the children of this node. Does not affect _UI('this').
@@ -567,10 +600,10 @@ public:
 	}
 
     #ifdef TIXML_USE_STL
-	const TiXmlNode* FirstChild( const uistring& _value ) const	{	return FirstChild (_value.c_str ());	}	///< STL uistring form.
-	TiXmlNode* FirstChild( const uistring& _value )				{	return FirstChild (_value.c_str ());	}	///< STL uistring form.
-	const TiXmlNode* LastChild( const uistring& _value ) const	{	return LastChild (_value.c_str ());	}	///< STL uistring form.
-	TiXmlNode* LastChild( const uistring& _value )				{	return LastChild (_value.c_str ());	}	///< STL uistring form.
+	const TiXmlNode* FirstChild( const TIXML_STRING& _value ) const	{	return FirstChild (_value.c_str ());	}	///< STL TIXML_STRING form.
+	TiXmlNode* FirstChild( const TIXML_STRING& _value )				{	return FirstChild (_value.c_str ());	}	///< STL TIXML_STRING form.
+	const TiXmlNode* LastChild( const TIXML_STRING& _value ) const	{	return LastChild (_value.c_str ());	}	///< STL TIXML_STRING form.
+	TiXmlNode* LastChild( const TIXML_STRING& _value )				{	return LastChild (_value.c_str ());	}	///< STL TIXML_STRING form.
 	#endif
 
 	/** An alternate way to walk the children of a node.
@@ -601,8 +634,8 @@ public:
 	}
 
     #ifdef TIXML_USE_STL
-	const TiXmlNode* IterateChildren( const uistring& _value, const TiXmlNode* previous ) const	{	return IterateChildren (_value.c_str (), previous);	}	///< STL uistring form.
-	TiXmlNode* IterateChildren( const uistring& _value, const TiXmlNode* previous ) {	return IterateChildren (_value.c_str (), previous);	}	///< STL uistring form.
+	const TiXmlNode* IterateChildren( const TIXML_STRING& _value, const TiXmlNode* previous ) const	{	return IterateChildren (_value.c_str (), previous);	}	///< STL TIXML_STRING form.
+	TiXmlNode* IterateChildren( const TIXML_STRING& _value, const TiXmlNode* previous ) {	return IterateChildren (_value.c_str (), previous);	}	///< STL TIXML_STRING form.
 	#endif
 
 	/** Add a new node related to this. Adds a child past the LastChild.
@@ -651,10 +684,10 @@ public:
 	}
 
     #ifdef TIXML_USE_STL
-	const TiXmlNode* PreviousSibling( const uistring& _value ) const	{	return PreviousSibling (_value.c_str ());	}	///< STL uistring form.
-	TiXmlNode* PreviousSibling( const uistring& _value ) 			{	return PreviousSibling (_value.c_str ());	}	///< STL uistring form.
-	const TiXmlNode* NextSibling( const uistring& _value) const		{	return NextSibling (_value.c_str ());	}	///< STL uistring form.
-	TiXmlNode* NextSibling( const uistring& _value) 					{	return NextSibling (_value.c_str ());	}	///< STL uistring form.
+	const TiXmlNode* PreviousSibling( const TIXML_STRING& _value ) const	{	return PreviousSibling (_value.c_str ());	}	///< STL TIXML_STRING form.
+	TiXmlNode* PreviousSibling( const TIXML_STRING& _value ) 			{	return PreviousSibling (_value.c_str ());	}	///< STL TIXML_STRING form.
+	const TiXmlNode* NextSibling( const TIXML_STRING& _value) const		{	return NextSibling (_value.c_str ());	}	///< STL TIXML_STRING form.
+	TiXmlNode* NextSibling( const TIXML_STRING& _value) 					{	return NextSibling (_value.c_str ());	}	///< STL TIXML_STRING form.
 	#endif
 
 	/// Navigate to a sibling node.
@@ -686,8 +719,8 @@ public:
 	}
 
     #ifdef TIXML_USE_STL
-	const TiXmlElement* NextSiblingElement( const uistring& _value) const	{	return NextSiblingElement (_value.c_str ());	}	///< STL uistring form.
-	TiXmlElement* NextSiblingElement( const uistring& _value)				{	return NextSiblingElement (_value.c_str ());	}	///< STL uistring form.
+	const TiXmlElement* NextSiblingElement( const TIXML_STRING& _value) const	{	return NextSiblingElement (_value.c_str ());	}	///< STL TIXML_STRING form.
+	TiXmlElement* NextSiblingElement( const TIXML_STRING& _value)				{	return NextSiblingElement (_value.c_str ());	}	///< STL TIXML_STRING form.
 	#endif
 
 	/// Convenience function to get through elements.
@@ -703,8 +736,8 @@ public:
 	}
 
     #ifdef TIXML_USE_STL
-	const TiXmlElement* FirstChildElement( const uistring& _value ) const	{	return FirstChildElement (_value.c_str ());	}	///< STL uistring form.
-	TiXmlElement* FirstChildElement( const uistring& _value )				{	return FirstChildElement (_value.c_str ());	}	///< STL uistring form.
+	const TiXmlElement* FirstChildElement( const TIXML_STRING& _value ) const	{	return FirstChildElement (_value.c_str ());	}	///< STL TIXML_STRING form.
+	TiXmlElement* FirstChildElement( const TIXML_STRING& _value )				{	return FirstChildElement (_value.c_str ());	}	///< STL TIXML_STRING form.
 	#endif
 
 	/** Query the type (as an enumerated value, above) of this node.
@@ -819,8 +852,8 @@ public:
 	}
 
 	#ifdef TIXML_USE_STL
-	/// uistring constructor.
-	TiXmlAttribute( const uistring& _name, const uistring& _value )
+	/// TIXML_STRING constructor.
+	TiXmlAttribute( const TIXML_STRING& _name, const TIXML_STRING& _value )
 	{
 		name = _name;
 		value = _value;
@@ -841,7 +874,7 @@ public:
 	const TIXML_CHAR*		Name()  const		{ return name.c_str(); }		///< Return the name of this attribute.
 	const TIXML_CHAR*		Value() const		{ return value.c_str(); }		///< Return the value of this attribute.
 	#ifdef TIXML_USE_STL
-	const uistring& ValueStr() const	{ return value; }				///< Return the value of this attribute.
+	const TIXML_STRING& ValueStr() const	{ return value; }				///< Return the value of this attribute.
 	#endif
 	int				IntValue() const;									///< Return the value of this attribute, converted to an integer.
 	double			DoubleValue() const;								///< Return the value of this attribute, converted to a double.
@@ -869,10 +902,10 @@ public:
 	void SetDoubleValue( double _value );								///< Set the value from a double.
 
     #ifdef TIXML_USE_STL
-	/// STL uistring form.
-	void SetName( const uistring& _name )	{ name = _name; }	
-	/// STL uistring form.	
-	void SetValue( const uistring& _value )	{ value = _value; }
+	/// STL TIXML_STRING form.
+	void SetName( const TIXML_STRING& _name )	{ name = _name; }	
+	/// STL TIXML_STRING form.	
+	void SetValue( const TIXML_STRING& _value )	{ value = _value; }
 	#endif
 
 	/// Get the next sibling attribute in the DOM. Returns null at end.
@@ -949,8 +982,8 @@ public:
 		return const_cast< TiXmlAttribute* >( (const_cast< const TiXmlAttributeSet* >(this))->Find( _name ) );
 	}
 	#ifdef TIXML_USE_STL
-	const TiXmlAttribute*	Find( const uistring& _name ) const;
-	TiXmlAttribute*	Find( const uistring& _name ) {
+	const TiXmlAttribute*	Find( const TIXML_STRING& _name ) const;
+	TiXmlAttribute*	Find( const TIXML_STRING& _name ) {
 		return const_cast< TiXmlAttribute* >( (const_cast< const TiXmlAttributeSet* >(this))->Find( _name ) );
 	}
 
@@ -977,8 +1010,8 @@ public:
 	TiXmlElement (const TIXML_CHAR * in_value);
 
 	#ifdef TIXML_USE_STL
-	/// uistring constructor.
-	TiXmlElement( const uistring& _value );
+	/// TIXML_STRING constructor.
+	TiXmlElement( const TIXML_STRING& _value );
 	#endif
 
 	TiXmlElement( const TiXmlElement& );
@@ -1037,7 +1070,7 @@ public:
 
 		@return TIXML_SUCCESS, TIXML_WRONG_TYPE, or TIXML_NO_ATTRIBUTE
 	*/
-	template< typename T > int QueryValueAttribute( const uistring& name, T* outValue ) const
+	template< typename T > int QueryValueAttribute( const TIXML_STRING& name, T* outValue ) const
 	{
 		const TiXmlAttribute* node = attributeSet.Find( name );
 		if ( !node )
@@ -1050,12 +1083,12 @@ public:
 		return TIXML_WRONG_TYPE;
 	}
 	/*
-	 This is - in theory - a bug fix for _UI("QueryValueAtribute returns truncated uistring")
+	 This is - in theory - a bug fix for _UI("QueryValueAtribute returns truncated TIXML_STRING")
 	 but template specialization is hard to get working cross-compiler. Leaving the bug for now.
 	 
-	// The above will fail for uistring because the space character is used as a seperator.
-	// Specialize for strings. Bug [ 1695429 ] QueryValueAtribute returns truncated uistring
-	template<> int QueryValueAttribute( const uistring& name, uistring* outValue ) const
+	// The above will fail for TIXML_STRING because the space character is used as a seperator.
+	// Specialize for strings. Bug [ 1695429 ] QueryValueAtribute returns truncated TIXML_STRING
+	template<> int QueryValueAttribute( const TIXML_STRING& name, TIXML_STRING* outValue ) const
 	{
 		const TiXmlAttribute* node = attributeSet.Find( name );
 		if ( !node )
@@ -1072,16 +1105,16 @@ public:
 	void SetAttribute( const TIXML_CHAR* name, const TIXML_CHAR * _value );
 
     #ifdef TIXML_USE_STL
-	const uistring* Attribute( const uistring& name ) const;
-	const uistring* Attribute( const uistring& name, int* i ) const;
-	const uistring* Attribute( const uistring& name, double* d ) const;
-	int QueryIntAttribute( const uistring& name, int* _value ) const;
-	int QueryDoubleAttribute( const uistring& name, double* _value ) const;
+	const TIXML_STRING* Attribute( const TIXML_STRING& name ) const;
+	const TIXML_STRING* Attribute( const TIXML_STRING& name, int* i ) const;
+	const TIXML_STRING* Attribute( const TIXML_STRING& name, double* d ) const;
+	int QueryIntAttribute( const TIXML_STRING& name, int* _value ) const;
+	int QueryDoubleAttribute( const TIXML_STRING& name, double* _value ) const;
 
-	/// STL uistring form.
-	void SetAttribute( const uistring& name, const uistring& _value );
-	///< STL uistring form.
-	void SetAttribute( const uistring& name, int _value );
+	/// STL TIXML_STRING form.
+	void SetAttribute( const TIXML_STRING& name, const TIXML_STRING& _value );
+	///< STL TIXML_STRING form.
+	void SetAttribute( const TIXML_STRING& name, int _value );
 	#endif
 
 	/** Sets an attribute of name to a given value. The attribute
@@ -1098,7 +1131,7 @@ public:
 	*/
 	void RemoveAttribute( const TIXML_CHAR * name );
     #ifdef TIXML_USE_STL
-	void RemoveAttribute( const uistring& name )	{	RemoveAttribute (name.c_str ());	}	///< STL uistring form.
+	void RemoveAttribute( const TIXML_STRING& name )	{	RemoveAttribute (name.c_str ());	}	///< STL TIXML_STRING form.
 	#endif
 
 	const TiXmlAttribute* FirstAttribute() const	{ return attributeSet.First(); }		///< Access the first attribute in this element.
@@ -1247,7 +1280,7 @@ public:
 
 	#ifdef TIXML_USE_STL
 	/// Constructor.
-	TiXmlText( const uistring& initValue ) : TiXmlNode (TiXmlNode::TEXT)
+	TiXmlText( const TIXML_STRING& initValue ) : TiXmlNode (TiXmlNode::TEXT)
 	{
 		SetValue( initValue );
 		cdata = false;
@@ -1311,9 +1344,9 @@ public:
 
 #ifdef TIXML_USE_STL
 	/// Constructor.
-	TiXmlDeclaration(	const uistring& _version,
-						const uistring& _encoding,
-						const uistring& _standalone );
+	TiXmlDeclaration(	const TIXML_STRING& _version,
+						const TIXML_STRING& _encoding,
+						const TIXML_STRING& _standalone );
 #endif
 
 	/// Construct.
@@ -1421,7 +1454,7 @@ public:
 
 	#ifdef TIXML_USE_STL
 	/// Constructor.
-	TiXmlDocument( const uistring& documentName );
+	TiXmlDocument( const TIXML_STRING& documentName );
 	#endif
 
 	TiXmlDocument( const TiXmlDocument& copy );
@@ -1450,13 +1483,13 @@ public:
 	bool SaveFile( FILE* ) const;
 
 	#ifdef TIXML_USE_STL
-	bool LoadFile( const uistring& filename, TiXmlEncoding encoding = TIXML_DEFAULT_ENCODING )			///< STL uistring version.
+	bool LoadFile( const TIXML_STRING& filename, TiXmlEncoding encoding = TIXML_DEFAULT_ENCODING )			///< STL TIXML_STRING version.
 	{
 //		StringToBuffer f( filename );
 //		return ( f.buffer && LoadFile( f.buffer, encoding ));
 		return LoadFile( filename.c_str(), encoding );
 	}
-	bool SaveFile( const uistring& filename ) const		///< STL uistring version.
+	bool SaveFile( const TIXML_STRING& filename ) const		///< STL TIXML_STRING version.
 	{
 //		StringToBuffer f( filename );
 //		return ( f.buffer && SaveFile( f.buffer ));
@@ -1698,11 +1731,11 @@ public:
 	TiXmlHandle ChildElement( int index ) const;
 
 	#ifdef TIXML_USE_STL
-	TiXmlHandle FirstChild( const uistring& _value ) const				{ return FirstChild( _value.c_str() ); }
-	TiXmlHandle FirstChildElement( const uistring& _value ) const		{ return FirstChildElement( _value.c_str() ); }
+	TiXmlHandle FirstChild( const TIXML_STRING& _value ) const				{ return FirstChild( _value.c_str() ); }
+	TiXmlHandle FirstChildElement( const TIXML_STRING& _value ) const		{ return FirstChildElement( _value.c_str() ); }
 
-	TiXmlHandle Child( const uistring& _value, int index ) const			{ return Child( _value.c_str(), index ); }
-	TiXmlHandle ChildElement( const uistring& _value, int index ) const	{ return ChildElement( _value.c_str(), index ); }
+	TiXmlHandle Child( const TIXML_STRING& _value, int index ) const			{ return Child( _value.c_str(), index ); }
+	TiXmlHandle ChildElement( const TIXML_STRING& _value, int index ) const	{ return ChildElement( _value.c_str(), index ); }
 	#endif
 
 	/** Return the handle as a TiXmlNode. This may return null.
@@ -1803,7 +1836,7 @@ public:
 
 	#ifdef TIXML_USE_STL
 	/// Return the result.
-	const uistring& Str()						{ return buffer; }
+	const TIXML_STRING& Str()						{ return buffer; }
 	#endif
 
 private:
