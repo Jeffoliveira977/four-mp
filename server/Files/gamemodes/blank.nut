@@ -5,7 +5,6 @@ function OnGameModeInit()
 	SetScriptName("Building mode");
 	SetScriptVersion("0.0.0.1");
 	SetScriptAuthor("009");
-	print("Строительный мод от 009 загружен. \n");
 
 	CreateCar(0x506434F6, -57.856403, 857.939880, 14.718335, 0.0, 0, 0);
 	CreateCar(0x18F25AC7, -58.236626, 841.208984, 14.706969, 0.0, 0, 0);
@@ -25,7 +24,6 @@ function OnGameModeExit()
 
 function OnPlayerConnect(playerid, name)
 {
-	print("Новый плеер приконектился "+name+"\n");
 	SendClientMessageToAll(name + " connected");
 	//GiveWeapon(playerid, 15, 150); // Not working
 }

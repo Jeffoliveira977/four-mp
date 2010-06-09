@@ -353,5 +353,6 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	if(data.room != 0) Natives::SetRoomForCharByKey(gPlayer[data.client].PedID, (eInteriorRoomKey)data.room);
 	Log::Info(L"Player SPAWN END");
 	if(Natives::DoesCharExist(old)) Natives::DeleteChar(&old);
+	Log::Info(L"Player Old Delete END");
 	gPlayer[data.client].want_spawn = 0;
 }
