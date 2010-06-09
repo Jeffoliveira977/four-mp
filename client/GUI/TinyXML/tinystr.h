@@ -41,6 +41,7 @@ distribution.
 
 #include <assert.h>
 #include <string.h>
+#include <stdio.h>
 
 /*	The support for explicit isn_UI('t that universal, and it isn')t really
 	required - it is used to check that the TiXmlString class isn't incorrectly
@@ -56,6 +57,7 @@ distribution.
 	#define TIXML_EXPLICIT
 #endif
 
+#ifndef TIXML_CHAR
 #if defined (_UNICODE)
 
 #include <wchar.h>
@@ -86,6 +88,7 @@ distribution.
 #define uischr(a,b) strchr(a, b)
 #define uisncmp(a,b,c) strncmp(a,b,c)
 #endif
+#endif
 
 /*
    TiXmlString is an emulation of a subset of the uistring template.
@@ -113,21 +116,21 @@ class TiXmlString
 	TiXmlString ( const TiXmlString & copy) : rep_(0)
 	{
 		init(copy.length());
-		memcpy(start(), copy.data(), length());
+		memcpy(start(), copy.data(), length()*sizeof(TIXML_CHAR));
 	}
 
 	// TiXmlString constructor, based on a string
 	TIXML_EXPLICIT TiXmlString ( const TIXML_CHAR * copy) : rep_(0)
 	{
 		init( static_cast<size_type>( uislen(copy) ));
-		uimemcpy(start(), copy, length());
+		memcpy(start(), copy, length()*sizeof(TIXML_CHAR));
 	}
 
 	// TiXmlString constructor, based on a string
 	TIXML_EXPLICIT TiXmlString ( const TIXML_CHAR * str, size_type len) : rep_(0)
 	{
 		init(len);
-		uimemcpy(start(), str, len);
+		memcpy(start(), str, len*sizeof(TIXML_CHAR));
 	}
 
 	// TiXmlString destructor
@@ -271,8 +274,8 @@ class TiXmlString
 			const size_type intsNeeded = ( bytesNeeded + sizeof(int) - 1 ) / sizeof( int ); 
 			rep_ = reinterpret_cast<Rep*>( new int[ intsNeeded ] );
 
-			rep_->str[ rep_->size = sz ] = _TIXML_L('\0');
-			rep_->capacity = cap;
+			rep_->str[ rep_->size = sz/* * sizeof(TIXML_CHAR)*/ ] = _TIXML_L('\0');
+			rep_->capacity = cap/* * sizeof(TIXML_CHAR)*/;
 		}
 		else
 		{

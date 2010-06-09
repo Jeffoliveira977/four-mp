@@ -704,6 +704,7 @@ void TiXmlDocument::StreamIn( std::istream * in, TIXML_STRING * tag )
 const TIXML_CHAR* TiXmlDocument::Parse( const TIXML_CHAR* p, TiXmlParsingData* prevData, TiXmlEncoding encoding )
 {
 	ClearError();
+	FILE *f = fopen("gui.txt", "a"); fwprintf(f, L"----------------\n%s\n--------------\n", p); fclose(f);
 
 	// Parse away, at the document level. Since a document
 	// contains nothing but other tags, most of what happens

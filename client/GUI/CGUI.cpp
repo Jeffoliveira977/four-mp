@@ -114,6 +114,7 @@ void CGUI::LoadInterfaceFromFile( const uichar * pszFilePath, const uichar * dir
 	if( !Document.LoadFile( pszFilePath ) )
 	{
 		MessageBox( 0, Document.ErrorDesc(), _UI("XML Error"), 0 );
+		exit(1);
 		return;
 	}
 	

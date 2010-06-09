@@ -2,6 +2,7 @@
 #include <windows.h>
 #include <math.h>
 
+#define LIB_INCLUDE
 #include "../../GUI/CGUI.h"
 
 #include "gui.h"
