@@ -12,6 +12,7 @@ public:
 	void Tick(void);
 	void Unload(void);
 	void Shutdown(void);
+	void UpdateServerInfo(void);
 	bool IsLAN(void);
 	bool IsPasswordProtected(void);
 	wchar_t *GetHostname(void);

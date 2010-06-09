@@ -140,13 +140,8 @@ bool ServerCore::Load(void)
 	if (!lan)
 	{
 		msm.Init();
-		if (!msm.RegisterServer(port, hostname, gamemodename, L"World", maxplayers, password))
-		{
-			PrintToServer(L"Unable to register server.");
-		}
-		lastmasterservercheck = time(0);
 	}
-	nm.UpdateServerInfo();
+	this->UpdateServerInfo();
 	isrunning = true;
 	debug(L"Started");
 	return true;
@@ -200,6 +195,19 @@ void ServerCore::Unload(void)
 void ServerCore::Shutdown(void)
 {
 	isrunning = false;
+}
+
+void ServerCore::UpdateServerInfo(void)
+{
+	if (!lan)
+	{
+		if (!msm.RegisterServer(port, hostname, gamemodename, L"World", maxplayers, password))
+		{
+			PrintToServer(L"Unable to register server.");
+		}
+		lastmasterservercheck = time(0);
+	}
+	nm.UpdateServerInfo();
 }
 
 bool ServerCore::IsLAN(void)

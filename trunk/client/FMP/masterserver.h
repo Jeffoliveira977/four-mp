@@ -69,6 +69,8 @@ protected:
 	void ReadServerList(RakNet::RakString data);
 	void ReadUserInfo(RakNet::RakString data);
 	void ReadClanInfo(RakNet::RakString data);
+
+	char *URLEncode(const wchar_t *string);
 public:
 	MasterServer();
 	~MasterServer();
@@ -96,6 +98,4 @@ public:
 	int GetUserId();
 	wchar_t *GetUserName();
 	char *GetUserSession();
-
-	char *URLEncode(const wchar_t *string);
 };

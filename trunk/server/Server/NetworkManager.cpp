@@ -710,7 +710,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			}
 			this->SendDataToAll("&NetworkManager::RecieveClientConnection", playerdata);
 			delete playerdata;
-			this->UpdateServerInfo();
+			server.UpdateServerInfo();
 
 			delete data->playerconnectionconfirmation;
 			break;
@@ -1158,7 +1158,7 @@ void NetworkManager::HandleClientDisconnection(const SystemAddress address)
 	NetworkPlayerDisconnectionData data;
 	data.client = client;
 	this->SendDataToAll("&NetworkManager::RecieveClientDisconnection", &data);
-	this->UpdateServerInfo();
+	server.UpdateServerInfo();
 }
 
 short NetworkManager::GetClientIndex(const SystemAddress address)

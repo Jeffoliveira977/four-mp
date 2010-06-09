@@ -595,15 +595,16 @@ void FMPHook::GameThread()
 					short index = client.GetIndex();
 
 					SafeChangeModel(gPlayer[index].model);
-
+					Log::Info(L"Changed player model");
 					Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
 
 					Natives::SetCharCoordinates(gPlayer[index].PedID, gPlayer[index].spawn_pos[0], gPlayer[index].spawn_pos[1], gPlayer[index].spawn_pos[2]);
+					Log::Info(L"Teleported player");
 					Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].spawn_pos[3]);
 					Natives::SetCharHealth(gPlayer[index].PedID, gPlayer[index].health);
 					Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
 					Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
-
+					Log::Info(L"Set up player");
 					gPlayer[index].want_spawn = 0;
 				}
 
