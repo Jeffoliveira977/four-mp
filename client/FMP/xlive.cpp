@@ -1240,7 +1240,7 @@ void patch107r ()
 	*(BYTE  *)(0xD34FB0+dwLoadOffset) = 0xC3;	    // RETN - enable debugger in error menu (don't load WER.dll)
 	*(DWORD *)(0x403F30+dwLoadOffset) = 0x900008C2;	// RETN 8 - certificates check
 	*(DWORD *)(0x40264D+dwLoadOffset) = 0x4AE9C033;	// xor eax, eax - address of the RGSC object
-	*(DWORD *)(0x402650+dwLoadOffset) = 0x90000002;	// jmp 40289E (skip RGSC connect and EFC checks)		
+	*(DWORD *)(0x402651+dwLoadOffset) = 0x90000002;	// jmp 40289E (skip RGSC connect and EFC checks)		
 	*(WORD  *)(0x4028A3+dwLoadOffset) = 0xA390;	    // NOP; MOV [g_rgsc], eax
 	memset ((BYTE *)(0x40290D+dwLoadOffset), 0x90, 0x2A);
 	*(DWORD *)(0x40293D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
