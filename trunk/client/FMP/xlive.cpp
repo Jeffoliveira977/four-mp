@@ -1243,8 +1243,8 @@ void patch107r ()
 	*(DWORD *)(0x402650+dwLoadOffset) = 0x90000002;	// jmp 40289E (skip RGSC connect and EFC checks)		
 	*(WORD  *)(0x4028A3+dwLoadOffset) = 0xA390;	    // NOP; MOV [g_rgsc], eax
 	memset ((BYTE *)(0x40290D+dwLoadOffset), 0x90, 0x2A);
-    *(DWORD *)(0x40293D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
-    *(WORD  *)(0x402941+dwLoadOffset) = 0x9090;	    // NOP*2- last RGSC init check 
+	*(DWORD *)(0x40293D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
+	*(WORD  *)(0x402941+dwLoadOffset) = 0x9090;	    // NOP*2- last RGSC init check 
 
 	// skip missing tests...
 	memset ((BYTE *)(0x402B32+dwLoadOffset), 0x90, 14);
