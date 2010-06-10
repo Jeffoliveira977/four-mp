@@ -278,25 +278,25 @@ void GetAddresses(DWORD version)
 		} break;
 	case 0x1061: // Patch 1.0.6.1 (RUS)
 		{
-			/*ADDRESS_CREATE_DEVICE = 0x+dwLoadOffset;
-			ADDRESS_HASH_GET = 0x+dwLoadOffset;
-			ADDRESS_THREAD_ID = 0x+dwLoadOffset;
-			ADDRESS_SCRIPTS_COUNT = 0x+dwLoadOffset;
-			SCRIPT_POINTER_1 = 0x+dwLoadOffset;
-			SCRIPT_POINTER_2 = 0x+dwLoadOffset;
-			ADDRESS_ACTIVE_THREAD = 0x+dwLoadOffset; 
-			ADDRESS_THREADS_ARRAY = 0x+dwLoadOffset;
-			ADDRESS_THREAD_TICK = 0x+dwLoadOffset;
-			CGAME_PROCESS_SLEEP = 0x+dwLoadOffset;
-			CGAME_PROCESS_LOAD_MENU = 0x+dwLoadOffset;
-			CGAME_PROCESS_START_GAME = 0x+dwLoadOffset;
-			GAME_NAME = 0x+dwLoadOffset;
-			MOUSE_POS_X = 0x+dwLoadOffset;
-			MOUSE_POS_Y = 0x+dwLoadOffset;
-			ADDRESS_GET_SPAWN_POS = 0x+dwLoadOffset;
-			ADDRESS_IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE = 0x+dwLoadOffset;
-			ADDRESS_IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE = 0x+dwLoadOffset;
-			ADDRESS_STR_POPCYCLE_DAT = 0x+dwLoadOffset;*/
+			ADDRESS_CREATE_DEVICE = 0xD2FE92+dwLoadOffset;
+			ADDRESS_HASH_GET = 0x5A7F10+dwLoadOffset;
+			ADDRESS_THREAD_ID = 0x1848B00+dwLoadOffset;
+			ADDRESS_SCRIPTS_COUNT = 0x1848B1C+dwLoadOffset;
+			SCRIPT_POINTER_1 = 0x198234C+dwLoadOffset;
+			SCRIPT_POINTER_2 = 0x1982348+dwLoadOffset;
+			ADDRESS_ACTIVE_THREAD = 0x1848B04+dwLoadOffset; 
+			ADDRESS_THREADS_ARRAY = 0x1982330+dwLoadOffset;
+			ADDRESS_THREAD_TICK = 0xBC0330+dwLoadOffset;
+			CGAME_PROCESS_SLEEP = 0x402B5C+dwLoadOffset;
+			CGAME_PROCESS_LOAD_MENU = 0x402BEA+dwLoadOffset;
+			CGAME_PROCESS_START_GAME = 0x402C27+dwLoadOffset;
+			GAME_NAME = 0xE9D18C+dwLoadOffset;
+			MOUSE_POS_X = 0x1889BB4+dwLoadOffset;
+			MOUSE_POS_Y = 0x1889BC0+dwLoadOffset;
+			ADDRESS_GET_SPAWN_POS = 0x8F6410+dwLoadOffset;
+			ADDRESS_IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE = 0xB61420+dwLoadOffset;
+			ADDRESS_IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE = 0xB613C0+dwLoadOffset;
+			ADDRESS_STR_POPCYCLE_DAT = 0xD6BAE4+dwLoadOffset;
 		} break;
 	case 0x1060: // Patch 1.0.6.0 (ENG-US)
 		{
