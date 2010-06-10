@@ -94,6 +94,7 @@ void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, floa
 		free(tempname);
 		Log::Info(L"Player NAME: %s 0x%x%x%x alpha:%x",name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
 		Natives::SetBlockingOfNonTemporaryEvents(gPlayer[index].PedID, 1);
+		Natives::SetCharInvincible(gPlayer[index].PedID, 1);
 	}
 
 	Natives::SetCharDefaultComponentVariation( gPlayer[index].PedID );
@@ -350,6 +351,9 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	Natives::SetCharHeading(gPlayer[data.client].PedID, data.angle);
 	Natives::SetCharHealth(gPlayer[data.client].PedID, data.health);
 	Natives::AddArmourToChar(gPlayer[data.client].PedID, data.armor);
+	Natives::SetCharInvincible(gPlayer[data.client].PedID, 1);
+	Natives::SetBlockingOfNonTemporaryEvents(gPlayer[data.client].PedID, 1);
+
 	if(data.room != 0) Natives::SetRoomForCharByKey(gPlayer[data.client].PedID, (eInteriorRoomKey)data.room);
 	Log::Info(L"Player SPAWN END");
 	if(Natives::DoesCharExist(old)) Natives::DeleteChar(&old);
