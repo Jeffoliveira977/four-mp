@@ -39,13 +39,13 @@ public:
 	GameState GetGameState(void);
 	wchar_t *GetName(void);
 	short GetIndex(void);
+	unsigned int GetSessionKey(void);
 	int GetFMPID();
 	bool SetGameState(const GameState state);
 	bool SetName(const wchar_t name[MAX_PLAYER_NAME_LENGTH]);
 	bool SetIndex(const short i);
+	void SetSessionKey(unsigned int key);
 	void SetFMPID(int);
-	void SetSessionKey(char *key);
-	char *GetSessionKey(void);
 	wchar_t *GetPath();
 	void GetPath(const wchar_t *file, wchar_t *path);
 #if defined (FMP_CLIENT)
@@ -57,7 +57,7 @@ private:
 	wchar_t name[MAX_PLAYER_NAME_LENGTH]; ///< Holds the desired client name (May be overriden by the server).
 	ConVar *namecvar; ///< Holds the pointer to the console variable that holds the desired client name.
 	short index; ///< Holds the client's index while connected to the server, -1 (should be #define) otherwise.
-	char sessionkey[32]; ///< Holds the unique session key of the client. Used in rare cases to identify it.
+	unsigned int sessionkey; ///< Holds the unique session key of the client. Used in rare cases to identify it.
 	int fmpid;
 	wchar_t PathToClient[MAX_PATH];
 	friend void ConVarHookName(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);

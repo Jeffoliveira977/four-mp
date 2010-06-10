@@ -92,7 +92,7 @@ private:
 	{
 		SystemAddress address;
 		wchar_t name[MAX_PLAYER_NAME_LENGTH];
-		char sessionkey[33];
+		unsigned int sessionkey;
 	};
 	union NetworkRPCUnion
 	{

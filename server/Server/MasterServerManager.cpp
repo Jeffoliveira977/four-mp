@@ -73,12 +73,12 @@ bool MasterServerManager::RegisterServer(const unsigned short port, const wchar_
 	return 1;
 }
 
-bool MasterServerManager::QueryUserCheck(const int fmpid, const char *ip, const char *status)
+bool MasterServerManager::QueryUserCheck(const int fmpid, const char *ip, const unsigned int sessionkey)
 {
 	if(http->IsBusy()) return 0;
 
-	RakString data = RakString("fmpid=%d&ip=%s&seskey=%s&t=check", fmpid, 
-		RakString(ip).URLEncode().C_String(), RakString(status).URLEncode().C_String());
+	RakString data = RakString("fmpid=%d&ip=%s&seskey=%d&t=check", fmpid, 
+		RakString(ip).URLEncode().C_String(), sessionkey);
 
 	http->Post(RakString("%s%s", MASTER_PATH, "login.php").C_String(), data);
 	state = MSS_WAIT_USER_CHECK;

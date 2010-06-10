@@ -327,8 +327,7 @@ void NetworkManager::SendClientConnectionRequest(void)
 	wchar_t *name = client.GetName();
 	wcscpy(data.name, name);
 	free(name);
-	strcpy(data.sessionkey, client.GetSessionKey());
-	data.sessionkey[32] = 0;
+	data.sessionkey = client.GetSessionKey();
 	data.fmpid = client.GetFMPID();
 	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionRequest", serverid, data, rpc3);
 }
@@ -829,7 +828,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		}
 	case NetworkRPCPlayerInfo:
 		{
-			if (strcmp(data->playerinfo->sessionkey, client.GetSessionKey()) != 0)
+			if (data->playerinfo->sessionkey != client.GetSessionKey())
 			{
 				delete data->playerinfo;
 				return;

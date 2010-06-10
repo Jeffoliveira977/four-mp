@@ -2,7 +2,7 @@
 
 #include "Limits.h"
 
-#define PROTOCOL_VERSION 9
+#define PROTOCOL_VERSION 10
 
 #define DEFAULT_SERVER_NETWORK_ID 0
 #define DEFAULT_CLIENT_NETWORK_ID 65534
@@ -11,8 +11,8 @@ struct NetworkPlayerConnectionRequestData
 {
 	short protocol;
 	wchar_t name[MAX_PLAYER_NAME_LENGTH];
+	unsigned int sessionkey;
 	int fmpid;
-	char sessionkey[33];
 };
 
 enum NetworkPlayerConnectionError
@@ -33,7 +33,7 @@ struct NetworkPlayerConnectionErrorData
 struct NetworkPlayerInfoData
 {
 	short index;
-	char sessionkey[33];
+	unsigned int sessionkey;
 };
 
 struct NetworkPlayerConnectionConfirmationData

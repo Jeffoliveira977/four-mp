@@ -27,7 +27,7 @@ ClientCore::ClientCore(void)
 	wcscpy(name, L"unnamed");
 	namecvar = NULL;
 	index = -1; // Should be defined in PlayerManager.h
-	sessionkey[0] = 0;
+	rand_s(&sessionkey);
 	fmpid = -1;
 #if defined (FMP_CLIENT)
 	inputstate = InputStateGame;
@@ -108,16 +108,6 @@ GameState ClientCore::GetGameState(void)
 	return gamestate;
 }
 
-int ClientCore::GetFMPID()
-{
-	return fmpid;
-}
-
-void ClientCore::SetFMPID(int fid)
-{
-	fmpid = fid;
-}
-
 wchar_t *ClientCore::GetName(void)
 {
 	if (name == NULL)
@@ -132,6 +122,16 @@ wchar_t *ClientCore::GetName(void)
 short ClientCore::GetIndex(void)
 {
 	return index;
+}
+
+unsigned int ClientCore::GetSessionKey(void)
+{
+	return sessionkey;
+}
+
+int ClientCore::GetFMPID()
+{
+	return fmpid;
 }
 
 bool ClientCore::SetGameState(const GameState state)
@@ -155,14 +155,14 @@ bool ClientCore::SetIndex(const short i)
 	return true;
 }
 
-void ClientCore::SetSessionKey(char *key)
+void ClientCore::SetSessionKey(unsigned int key)
 {
-	strcpy(sessionkey, key);
+	sessionkey = key;
 }
 
-char *ClientCore::GetSessionKey(void)
+void ClientCore::SetFMPID(int fid)
 {
-	return sessionkey;
+	fmpid = fid;
 }
 
 #if defined (FMP_CLIENT)
