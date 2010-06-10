@@ -196,7 +196,7 @@ public:
 	/// \param[in] callback A function to use as a callback for when the command is invoked.
 	/// \param[in] description Optional description of the console command.
 	/// \param[in] flags Optional bitstring of flags determining how the console command should be handled. See FCVAR_* constants for more details.
-	/// \note Callback should be void func(unsigned char numargs);
+	/// \note Callback should be void func(const unsigned char numargs);
 	/// \return No return.
 	virtual void RegServerCmd(const IPluginInterface *plugin, const wchar_t *name, void *callback, const wchar_t *description = L"", const int flags = 0) = 0;
 
