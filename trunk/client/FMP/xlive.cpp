@@ -1267,6 +1267,28 @@ void patch107r ()
 
 void patchCode () 
 {
+	// Unprotect image - make .text and .rdata section writeable
+    BYTE * pImageBase = reinterpret_cast<BYTE *>(dwLoadOffset + 0x400000); 
+    PIMAGE_DOS_HEADER   pDosHeader = reinterpret_cast<PIMAGE_DOS_HEADER> (dwLoadOffset + 0x400000);
+    PIMAGE_NT_HEADERS   pNtHeader  = reinterpret_cast<PIMAGE_NT_HEADERS> (pImageBase+pDosHeader->e_lfanew);
+    PIMAGE_SECTION_HEADER pSection = IMAGE_FIRST_SECTION(pNtHeader);
+    // trace ("[EXE] NtHeader contains %d sections\n", pNtHeaders->FileHeader.NumberOfSections);
+
+    for (int iSection = 0; iSection < pNtHeader->FileHeader.NumberOfSections; ++iSection, ++pSection) {
+        char * pszSectionName = reinterpret_cast<char *>(pSection->Name);
+        if (!strcmp (pszSectionName, ".text") || !strcmp (pszSectionName, ".rdata")) {
+            DWORD dwPhysSize = (pSection->Misc.VirtualSize + 4095) & ~4095;    
+            Log::Debug (L"[EXE] unprotecting section '%s': addr = 0x%08x, size = 0x%08x\n", pSection->Name, pSection->VirtualAddress, dwPhysSize);
+
+            DWORD oldProtect;
+            DWORD newProtect = (pSection->Characteristics & IMAGE_SCN_MEM_EXECUTE) ? PAGE_EXECUTE_READWRITE : PAGE_READWRITE;
+            if (!VirtualProtect (reinterpret_cast <VOID *>(dwLoadOffset+0x400000+pSection->VirtualAddress), dwPhysSize, newProtect, &oldProtect)) {
+                Log::Debug (L"[EXE] Virtual protect error\n");
+                ExitProcess (0);
+            }
+        }
+    }
+
 	// version check
 	DWORD signature = *(DWORD *)(0x608C34+dwLoadOffset);
 
