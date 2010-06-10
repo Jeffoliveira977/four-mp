@@ -549,9 +549,9 @@ wchar_t *MasterServer::GetUserName()
 	return user->name;
 }
 
-char *MasterServer::GetUserSession()
+unsigned int MasterServer::GetUserSession()
 {
-	return user->seskey;
+	return (unsigned int)atoi(user->seskey);
 }
 
 wchar_t *MasterServer::GetError()

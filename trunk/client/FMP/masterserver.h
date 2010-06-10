@@ -97,5 +97,5 @@ public:
 	MasterUserInfo *GetUserInfo();
 	int GetUserId();
 	wchar_t *GetUserName();
-	char *GetUserSession();
+	unsigned int GetUserSession();
 };

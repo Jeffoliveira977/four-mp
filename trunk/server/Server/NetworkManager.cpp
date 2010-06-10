@@ -270,7 +270,7 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 	NetworkPlayerConnectionRequestDataInternal data2;
 	data2.address = clientrpc3->GetLastSenderAddress();
 	wcscpy(data2.name, data.name);
-	strcpy(data2.sessionkey, data.sessionkey);
+	data2.sessionkey = data.sessionkey;
 	this->WriteToRPCBuffer(NetworkRPCPlayerConnectionRequest, &data2);
 }
 
@@ -662,7 +662,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			PrintToServer(L"Player %s[%d] connected", playm.playerbuffer[client]->name, client);
 			NetworkPlayerInfoData infodata;
 			infodata.index = client;
-			strcpy(infodata.sessionkey, data->playerconnectionrequest->sessionkey);
+			infodata.sessionkey = data->playerconnectionrequest->sessionkey;
 			rpc3->CallCPP("&NetworkManager::RecieveClientInfo", defaultclientid, infodata, rpc3);
 			delete data->playerconnectionrequest; 
 			break;
