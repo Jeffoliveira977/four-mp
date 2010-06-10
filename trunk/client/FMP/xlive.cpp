@@ -1237,32 +1237,32 @@ void patch107r ()
 
 	// process patches
 	*(DWORD *)(0x401835+dwLoadOffset) = 1;		    // disable sleep
-	*(BYTE  *)(0xD356D0+dwLoadOffset) = 0xC3;	    // RETN - enable debugger in error menu (don't load WER.dll)
-	*(DWORD *)(0x403F10+dwLoadOffset) = 0x900008C2;	// RETN 8 - certificates check
-	*(DWORD *)(0x40262D+dwLoadOffset) = 0x4AE9C033;	// xor eax, eax - address of the RGSC object
-	*(DWORD *)(0x402631+dwLoadOffset) = 0x90000002;	// jmp 40289E (skip RGSC connect and EFC checks)		
-	*(WORD  *)(0x402883+dwLoadOffset) = 0xA390;	    // NOP; MOV [g_rgsc], eax
-	memset ((BYTE *)(0x4028ED+dwLoadOffset), 0x90, 0x2A);
-    *(DWORD *)(0x40291D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
-    *(WORD  *)(0x402921+dwLoadOffset) = 0x9090;	    // NOP*2- last RGSC init check 
+	*(BYTE  *)(0xD34FB0+dwLoadOffset) = 0xC3;	    // RETN - enable debugger in error menu (don't load WER.dll)
+	*(DWORD *)(0x403F30+dwLoadOffset) = 0x900008C2;	// RETN 8 - certificates check
+	*(DWORD *)(0x40264D+dwLoadOffset) = 0x4AE9C033;	// xor eax, eax - address of the RGSC object
+	*(DWORD *)(0x402650+dwLoadOffset) = 0x90000002;	// jmp 40289E (skip RGSC connect and EFC checks)		
+	*(WORD  *)(0x4028A3+dwLoadOffset) = 0xA390;	    // NOP; MOV [g_rgsc], eax
+	memset ((BYTE *)(0x40290D+dwLoadOffset), 0x90, 0x2A);
+    *(DWORD *)(0x40293D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
+    *(WORD  *)(0x402941+dwLoadOffset) = 0x9090;	    // NOP*2- last RGSC init check 
 
 	// skip missing tests...
-	memset ((BYTE *)(0x402B12+dwLoadOffset), 0x90, 14);
-	memset ((BYTE *)(0x402D17+dwLoadOffset), 0x90, 14);
-	*(DWORD *)(0x403870+dwLoadOffset) = 0x90C3C033;	// xor eax, eax; retn
-	*(DWORD *)(0x404250+dwLoadOffset) = 0x90C3C033;	// xor eax, eax; retn
+	memset ((BYTE *)(0x402B32+dwLoadOffset), 0x90, 14);
+	memset ((BYTE *)(0x402D37+dwLoadOffset), 0x90, 14);
+	*(DWORD *)(0x403890+dwLoadOffset) = 0x90C3C033;	// xor eax, eax; retn
+	*(DWORD *)(0x404270+dwLoadOffset) = 0x90C3C033;	// xor eax, eax; retn
 
 	// savegames
-	*(WORD *)(0x5B06E5+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
-	injectFunction (0x5B0110, (DWORD)getSavefilePath); // replace getSavefilePath
-	pszPath = (char *)(0x10F1DA0+dwLoadOffset);	
+	*(WORD *)(0x5B0425+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
+	injectFunction (0x5AFE50, (DWORD)getSavefilePath); // replace getSavefilePath
+	pszPath = (char *)(0x10F0980+dwLoadOffset);	
 
-	*(DWORD *)(0xBAC160+dwLoadOffset) = 0x90C301B0;	// mov al, 1; retn
-	*(DWORD *)(0xBAC180+dwLoadOffset) = 0x90C301B0;
-	*(DWORD *)(0xBAC190+dwLoadOffset) = 0x90C301B0;
-	*(DWORD *)(0xBAC1C0+dwLoadOffset) = 0x90C301B0;
+	*(DWORD *)(0xBAF690+dwLoadOffset) = 0x90C301B0;	// mov al, 1; retn
+	*(DWORD *)(0xBAF6B0+dwLoadOffset) = 0x90C301B0;
+	*(DWORD *)(0xBAF6C0+dwLoadOffset) = 0x90C301B0;
+	*(DWORD *)(0xBAF6F0+dwLoadOffset) = 0x90C301B0;
 
-	Log::Debug (L"Patching OK (1.0.7.0 - update 7)\n");
+	Log::Debug (L"Patching OK (1.0.6.1 - update 7)\n");
 }
 
 void patchCode () 
@@ -1286,7 +1286,7 @@ void patchCode ()
 		patch106r();
 	else if (signature == 0x1006e857) 
         patch107 ();
-	else if (signature == 0x1006e857) 
+	else if (signature == 0x00000094) 
         patch107r ();
 	else 
 		Log::Debug(L"Unknown game version, skipping patches (signature = 0x%08x)", signature);
