@@ -254,6 +254,50 @@ void GetAddresses(DWORD version)
 {
 	switch(version)
 	{
+	case 0x1070: // Patch 1.0.7.0 (ENG-US)
+		{
+			ADDRESS_CREATE_DEVICE = 0xD305C4+dwLoadOffset;
+			ADDRESS_HASH_GET = 0x5A8290+dwLoadOffset;
+			ADDRESS_THREAD_ID = 0x1849ADC+dwLoadOffset;
+			ADDRESS_SCRIPTS_COUNT = 0x1849AF8+dwLoadOffset;
+			SCRIPT_POINTER_1 = 0x198332C+dwLoadOffset;
+			SCRIPT_POINTER_2 = 0x1983328+dwLoadOffset;
+			ADDRESS_ACTIVE_THREAD = 0x1849AE0+dwLoadOffset; 
+			ADDRESS_THREADS_ARRAY = 0x1983310+dwLoadOffset;
+			ADDRESS_THREAD_TICK = 0xBBCDF0+dwLoadOffset;
+			CGAME_PROCESS_SLEEP = 0x402B3C+dwLoadOffset;
+			CGAME_PROCESS_LOAD_MENU = 0x402BCA+dwLoadOffset;
+			CGAME_PROCESS_START_GAME = 0x402C07+dwLoadOffset;
+			GAME_NAME = 0xE9E17C+dwLoadOffset;
+			MOUSE_POS_X = 0x188AB90+dwLoadOffset;
+			MOUSE_POS_Y = 0x188AB9C+dwLoadOffset;
+			ADDRESS_GET_SPAWN_POS = 0x8E65B0+dwLoadOffset;
+			ADDRESS_IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE = 0xB5DF20+dwLoadOffset;
+			ADDRESS_IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE = 0xB5DEC0+dwLoadOffset;
+			ADDRESS_STR_POPCYCLE_DAT = 0xD6CDBC+dwLoadOffset;
+		} break;
+	case 0x1061: // Patch 1.0.6.1 (RUS)
+		{
+			/*ADDRESS_CREATE_DEVICE = 0x+dwLoadOffset;
+			ADDRESS_HASH_GET = 0x+dwLoadOffset;
+			ADDRESS_THREAD_ID = 0x+dwLoadOffset;
+			ADDRESS_SCRIPTS_COUNT = 0x+dwLoadOffset;
+			SCRIPT_POINTER_1 = 0x+dwLoadOffset;
+			SCRIPT_POINTER_2 = 0x+dwLoadOffset;
+			ADDRESS_ACTIVE_THREAD = 0x+dwLoadOffset; 
+			ADDRESS_THREADS_ARRAY = 0x+dwLoadOffset;
+			ADDRESS_THREAD_TICK = 0x+dwLoadOffset;
+			CGAME_PROCESS_SLEEP = 0x+dwLoadOffset;
+			CGAME_PROCESS_LOAD_MENU = 0x+dwLoadOffset;
+			CGAME_PROCESS_START_GAME = 0x+dwLoadOffset;
+			GAME_NAME = 0x+dwLoadOffset;
+			MOUSE_POS_X = 0x+dwLoadOffset;
+			MOUSE_POS_Y = 0x+dwLoadOffset;
+			ADDRESS_GET_SPAWN_POS = 0x+dwLoadOffset;
+			ADDRESS_IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE = 0x+dwLoadOffset;
+			ADDRESS_IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE = 0x+dwLoadOffset;
+			ADDRESS_STR_POPCYCLE_DAT = 0x+dwLoadOffset;*/
+		} break;
 	case 0x1060: // Patch 1.0.6.0 (ENG-US)
 		{
 			ADDRESS_CREATE_DEVICE = 0xD301E4+dwLoadOffset;

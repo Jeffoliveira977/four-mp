@@ -220,6 +220,7 @@ bool FMPHook::SafeCreatePlayer(short index)
 	Natives::GivePedFakeNetworkName(gPlayer[index].PedID, tempname, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
 	free(tempname);
 	Natives::SetBlockingOfNonTemporaryEvents(gPlayer[index].PedID, 1);
+	Natives::SetCharInvincible(gPlayer[index].PedID, 1);
 
 	Natives::SetCharHealth( gPlayer[index].PedID, gPlayer[index].health );
 	Natives::SetCharDefaultComponentVariation( gPlayer[index].PedID );
@@ -539,6 +540,7 @@ void FMPHook::RunMP()
 	Natives::AddArmourToChar(Player, -1000);
 	Natives::SetCharMoney(Player, 0);
 	Natives::SetTimeOfDay(0,0);
+	Natives::ForceWeatherNow((eWeather)1);
 	Natives::SetMaxWantedLevel(0);
 
 	unsigned int score = 0;
@@ -799,7 +801,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 		patchCode();
 		GetAddresses(dwGameVersion);
 
-		if(dwGameVersion == 0x1060 || dwGameVersion == 0x1051 || dwGameVersion == 0x1050)
+		if(dwGameVersion >= 0x1050 && dwGameVersion <= 0x1070)
 		{
 			Log::Info(L"Skipping main menu");
 			JmpHook(CGAME_PROCESS_SLEEP, CGAME_PROCESS_START_GAME);

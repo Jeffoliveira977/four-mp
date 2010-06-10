@@ -924,24 +924,10 @@ extern "C" DWORD __stdcall xlive_5372 (HANDLE, DWORD, DWORD, DWORD, BYTE *, HAND
 
 // === end of xlive functions ===
 
+static char * pszPath = "";
+
 // change savefile path to "%USERPROFILE%\Documents\Rockstar Games\GTA IV\savegames\"
-void getSavefilePath (int __unused, char * pBuffer, char * pszSaveName) 
-{
-	char * pszPath = (char *)(0xF9FF08+dwLoadOffset);
-
-	if (dwGameVersion == 0x1010)	
-		pszPath = (char *)(0xFA7778+dwLoadOffset);	
-    else if (dwGameVersion == 0x1030)
-		pszPath = (char *)(0xFBF260+dwLoadOffset);
-    else if (dwGameVersion == 0x1040)
-		pszPath = (char *)(0xFC4700+dwLoadOffset);
-    else if (dwGameVersion == 0x1050)
-		pszPath = (char *)(0x12892B0+dwLoadOffset);
-	else if (dwGameVersion == 0x1051)
-		pszPath = (char *)(0x10F0B00+dwLoadOffset);
-	else if (dwGameVersion == 0x1060)
-		pszPath = (char *)(0x10F0B00+dwLoadOffset);
-
+void getSavefilePath (int __unused, char * pBuffer, char * pszSaveName) {
 	strcpy_s (pBuffer, 256, pszPath);
 	strcat_s (pBuffer, 256, "FMP\\savegames");
 
@@ -950,8 +936,8 @@ void getSavefilePath (int __unused, char * pBuffer, char * pszSaveName)
 	if (attrs == INVALID_FILE_ATTRIBUTES) 
 		CreateDirectoryA (pBuffer, NULL);
 	else if (!(attrs & FILE_ATTRIBUTE_DIRECTORY)) {
-		Log::Debug(L"ERROR: unable to create directory '%s', file '%s' already exists", pBuffer);
-		strcpy (pBuffer, pszSaveName);
+		Log::Debug(L"ERROR: unable to create directory '%s', file '%s' already exists\n", pBuffer);
+		strcpy_s (pBuffer, 256, pszSaveName);
 		return;
 	}
 
@@ -959,20 +945,13 @@ void getSavefilePath (int __unused, char * pBuffer, char * pszSaveName)
 		strcat_s (pBuffer, 256, "\\");
 		strcat_s (pBuffer, 256, pszSaveName);
 	}
+    Log::Debug(L"[getSavefilePath]: '%s'\n", pBuffer);
 }
 
 // === miscellaneous patches ===
-void patch101 () {
+void patch101 () 
+{
 	dwGameVersion = 0x1010;	// GTA IV 1.0.1 (patch 1)
-
-	DWORD oldProtect;
-	// enable write access to code and rdata
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x8D8000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Log::Debug(L"ERROR: unable to unprotect code seg");
-		return;
-	}
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x8D9000+0x400000), 0x1A8000, PAGE_READWRITE, &oldProtect)) 
-		Log::Debug(L"ERROR: unable to unprotect .rdata seg");
 
 	// process patches
 	*(WORD *)(0x608C35+dwLoadOffset) = 0x9090; // NOP; NOP	- save file CRC32 check
@@ -989,24 +968,45 @@ void patch101 () {
 
 	// replace getSavefilePath
 	injectFunction (0x608660, (DWORD)getSavefilePath);
+    pszPath = (char *)(0xFA7878+dwLoadOffset);	// char pszPathPersonal[128];
 
 	Log::Debug(L"Patching OK (1.0.1)");
 }
 
-void patch103 () {
+void patch102 () 
+{
+	dwGameVersion = 0x1020;	// GTA IV 1.0.2 (patch 2)
+
+	// process patches
+	*(WORD *)(0x6086B5+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
+	*(BYTE *)(0x79F710+dwLoadOffset) = 0xC3;	// RETN - enable debugger in error menu (don't load WER.dll)
+	*(BYTE *)(0x7A0740+dwLoadOffset) = 0xC3;	// RETN - skip files.txt hash check
+
+	*(BYTE *)(0x46FA7D+dwLoadOffset) = 0xE9;	// JMP
+	*(DWORD *)(0x46FA7E+dwLoadOffset)= 0x16;	// jmp target
+	*(BYTE *)(0x4701C0+dwLoadOffset) = 0xC3;	// RETN - certificates check
+	*(BYTE *)(0x46F120+dwLoadOffset) = 0xC2;	// RETN - remove connect to the RGSC 
+	*(BYTE *)(0x46F121+dwLoadOffset) = 0x04;	// RETN - remove connect to the RGSC 
+	*(BYTE *)(0x46F122+dwLoadOffset) = 0x00;	// RETN - remove connect to the RGSC 
+	memset ((BYTE *)(0x46FB16+dwLoadOffset), 0x90, 0x1B);
+	*(WORD *)(0x46FAAA+dwLoadOffset) = 0x9090;	// NOP; NOP - RGSC initialization check
+    *(WORD *)(0x46FB36+dwLoadOffset) = 0x9090;	// NOP; NOP - last RGSC init check
+    *(DWORD *)(0x46FB38+dwLoadOffset) = 0x90909090;
+	*(WORD *)(0x46FAB1+dwLoadOffset) = 0xC033;	// XOR eax, eax - RGSC initialization check
+	*(WORD *)(0x46FAB8+dwLoadOffset) = 0xA390;	// NOP; MOV [], eax
+
+	*(DWORD *)(0x401825+dwLoadOffset) = 1;		// disable sleep
+
+	// replace getSavefilePath
+	injectFunction (0x6080E0, (DWORD)getSavefilePath);
+    pszPath = (char *)(0xFA0308+dwLoadOffset);	// char pszPathPersonal[128];
+
+	Log::Debug(L"Patching OK (1.0.2)");
+}
+
+void patch103 () 
+{
 	dwGameVersion = 0x1030;	// GTA IV 1.0.3 (patch 3)
-
-
-	DWORD oldProtect;
-	// enable write access to code and rdata
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x8E4000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Log::Debug(L"ERROR: unable to unprotect code seg");
-		return;
-	}
-
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x8e5000+0x400000), 0x1B1000, PAGE_READWRITE, &oldProtect)) 
-		Log::Debug(L"ERROR: unable to unprotect .rdata seg");
-
 
 	// process patches
 	*(WORD *)(0x60C095+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
@@ -1015,7 +1015,7 @@ void patch103 () {
 
 	*(BYTE  *)(0x471CBD+dwLoadOffset) = 0xE9;	// JMP
 	*(DWORD *)(0x471CBE+dwLoadOffset) = 0x16;	// jmp target
-//	*(BYTE  *)(0x472E50+dwLoadOffset) = 0xC3;	// RETN - certificates check
+	//*(BYTE  *)(0x472E50+dwLoadOffset) = 0xC3;	// RETN - certificates check
 	*(BYTE  *)(0x472E50+dwLoadOffset) = 0xC2;	// RETN - certificates check
 	*(BYTE  *)(0x472E51+dwLoadOffset) = 0x08;	// RETN - certificates check
 	*(BYTE  *)(0x472E52+dwLoadOffset) = 0x00;	// RETN - certificates check
@@ -1024,38 +1024,28 @@ void patch103 () {
 	*(BYTE  *)(0x471362+dwLoadOffset) = 0x00;	// RETN - remove connect to the RGSC 
 	memset ((BYTE *)(0x471D60+dwLoadOffset), 0x90, 0x1B);
 	*(WORD  *)(0x471CEA+dwLoadOffset) = 0x9090;	// NOP; NOP - RGSC initialization check
-        *(DWORD *)(0x471D80+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
-        *(WORD  *)(0x471D84+dwLoadOffset) = 0x9090;	// NOP*4- last RGSC init check
+    *(DWORD *)(0x471D80+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
+    *(WORD  *)(0x471D84+dwLoadOffset) = 0x9090;	// NOP*4- last RGSC init check
 	*(WORD *)(0x471CF1+dwLoadOffset) = 0xC033;	// XOR eax, eax - RGSC initialization check
 	*(WORD *)(0x471CF8+dwLoadOffset) = 0xA390;	// NOP; MOV [], eax
 
 	*(DWORD *)(0x401815+dwLoadOffset) = 1;		// disable sleep
 
 	injectFunction (0x60BAC0, (DWORD)getSavefilePath); // replace getSavefilePath
+	pszPath = (char *)(0xFBF860+dwLoadOffset);	// char pszPathPersonal[128];
 
-        memset ((BYTE *)(0x451E19+dwLoadOffset), 0x90, 0x1BF);	// EFC20
+    memset ((BYTE *)(0x451E19+dwLoadOffset), 0x90, 0x1BF);	// EFC20
 	*(DWORD *)(0xA0D1E0+dwLoadOffset) = 0x90C301B0;	// mov al, 1; retn
 	*(DWORD *)(0xA0D200+dwLoadOffset) = 0x90C301B0;
 	*(DWORD *)(0xA0D210+dwLoadOffset) = 0x90C301B0;
 	*(DWORD *)(0xA0D240+dwLoadOffset) = 0x90C301B0;
 
-// B001C3 => 0xC301B090
-
 	Log::Debug(L"Patching OK (1.0.3)");
 }
 
-void patch104 () {
+void patch104 () 
+{
 	dwGameVersion = 0x1040;	// GTA IV 1.0.4 (patch 4)
-
-	DWORD oldProtect;
-	// enable write access to code and rdata
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x8E4000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Log::Debug(L"ERROR: unable to unprotect code seg");
-		return;
-	}
-
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x8e5000+0x400000), 0x1B1000, PAGE_READWRITE, &oldProtect)) 
-		Log::Debug(L"ERROR: unable to unprotect .rdata seg");
 
 	// process patches
 	*(WORD *)(0x60C1A5+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
@@ -1064,7 +1054,7 @@ void patch104 () {
 
 	*(BYTE  *)(0x471E5D+dwLoadOffset) = 0xE9;	// JMP
 	*(DWORD *)(0x471E5E+dwLoadOffset) = 0x16;	// jmp target
-//	*(BYTE  *)(0x472FF0+dwLoadOffset) = 0xC3;	// RETN - certificates check
+	//*(BYTE  *)(0x472FF0+dwLoadOffset) = 0xC3;	// RETN - certificates check
 	*(BYTE  *)(0x472FF0+dwLoadOffset) = 0xC2;	// RETN - certificates check
 	*(BYTE  *)(0x472FF1+dwLoadOffset) = 0x08;	// RETN - certificates check
 	*(BYTE  *)(0x472FF2+dwLoadOffset) = 0x00;	// RETN - certificates check
@@ -1074,16 +1064,17 @@ void patch104 () {
 	*(BYTE  *)(0x471502+dwLoadOffset) = 0x00;	// RETN - remove connect to the RGSC 
 	memset ((BYTE *)(0x471F00+dwLoadOffset), 0x90, 0x1B);
 	*(WORD  *)(0x471E8A+dwLoadOffset) = 0x9090;	// NOP; NOP - RGSC initialization check
-        *(DWORD *)(0x471F20+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
-        *(WORD  *)(0x471F24+dwLoadOffset) = 0x9090;	// NOP*4- last RGSC init check 
+    *(DWORD *)(0x471F20+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
+    *(WORD  *)(0x471F24+dwLoadOffset) = 0x9090;	// NOP*4- last RGSC init check 
 	*(WORD *)(0x471E91+dwLoadOffset) = 0xC033;	// XOR eax, eax - RGSC initialization check
 	*(WORD *)(0x471E98+dwLoadOffset) = 0xA390;	// NOP; MOV [], eax
 
 	*(DWORD *)(0x4017F5+dwLoadOffset) = 1;		// disable sleep
 
 	injectFunction (0x60BBD0, (DWORD)getSavefilePath); // replace getSavefilePath
+	pszPath = (char *)(0xFC4B00+dwLoadOffset);	// char pszPathPersonal[128];
 
-        memset ((BYTE *)(0x452129+dwLoadOffset), 0x90, 0x1BF);	// EFC20
+    memset ((BYTE *)(0x452129+dwLoadOffset), 0x90, 0x1BF);	// EFC20
 
 	*(DWORD *)(0xA0D9C0+dwLoadOffset) = 0x90C301B0;	// mov al, 1; retn
 	*(DWORD *)(0xA0D9E0+dwLoadOffset) = 0x90C301B0;
@@ -1093,18 +1084,9 @@ void patch104 () {
 	Log::Debug(L"Patching OK (1.0.4)");
 }
 
-void patch105 () {
+void patch105 () 
+{
 	dwGameVersion = 0x1050;	// GTA IV 1.0.0.4 (patch 5)
-
-	DWORD oldProtect;
-	// enable write access to code and rdata
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x0915000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Log::Debug(L"ERROR: unable to unprotect code seg");
-		return;
-	}
-
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x0916000+0x400000), 0x01AA000, PAGE_READWRITE, &oldProtect)) 
-		Log::Debug(L"ERROR: unable to unprotect .rdata seg");
 
 	// process patches
 	*(BYTE *)(0x7B82A0+dwLoadOffset) = 0xC3;	// RETN - enable debugger in error menu (don't load WER.dll)
@@ -1115,8 +1097,8 @@ void patch105 () {
 	*(WORD *)(0x526BCB+dwLoadOffset) = 0xA390;	// NOP; MOV [g_rgsc], eax
 
 	memset ((BYTE *)(0x526C30+dwLoadOffset), 0x90, 0x29);
-        *(DWORD *)(0x526C5F+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
-        *(WORD  *)(0x526C63+dwLoadOffset) = 0x9090;	// NOP*2- last RGSC init check 
+    *(DWORD *)(0x526C5F+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
+    *(WORD  *)(0x526C63+dwLoadOffset) = 0x9090;	// NOP*2- last RGSC init check 
 
 	// skip missing tests...
 	*(WORD *)(0x474D0B+dwLoadOffset) = 0xC033;
@@ -1138,7 +1120,7 @@ void patch105 () {
 	// savegames
 	*(WORD *)(0x6C31A5+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
 	injectFunction (0x6C2BD0, (DWORD)getSavefilePath); // replace getSavefilePath
-
+	pszPath = (char *)(0x12898B0+dwLoadOffset);	
 
 	*(DWORD *)(0xB3E190+dwLoadOffset) = 0x90C301B0;	// mov al, 1; retn
 	*(DWORD *)(0xB3E1B0+dwLoadOffset) = 0x90C301B0;
@@ -1151,18 +1133,6 @@ void patch105 () {
 void patch106 () {
 	dwGameVersion = 0x1060;	// GTA IV 1.0.6.0 (patch 6)
 
-	DWORD oldProtect;
-	// enable write access to code and rdata
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x094B000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Log::Debug(L"ERROR: unable to unprotect code seg");
-		return;
-	}
-
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x094C000+0x400000), 0x01BF000, PAGE_READWRITE, &oldProtect)) {
-		Log::Debug(L"ERROR: unable to unprotect .rdata seg");
-		return;
-	}
-
 	// process patches
 	*(DWORD *)(0x401855+dwLoadOffset) = 1;		// disable sleep
 	*(BYTE  *)(0xD35310+dwLoadOffset) = 0xC3;	// RETN - enable debugger in error menu (don't load WER.dll)
@@ -1171,20 +1141,19 @@ void patch106 () {
 	*(DWORD *)(0x402651+dwLoadOffset) = 0x90000002;	// jmp 40289E (skip RGSC connect and EFC checks)		
 	*(WORD *)(0x4028A3+dwLoadOffset) = 0xA390;	// NOP; MOV [g_rgsc], eax
 	memset ((BYTE *)(0x40290D+dwLoadOffset), 0x90, 0x2A);
-        *(DWORD *)(0x40293D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
-        *(WORD  *)(0x402941+dwLoadOffset) = 0x9090;	// NOP*2- last RGSC init check 
-
-
+    *(DWORD *)(0x40293D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
+    *(WORD  *)(0x402941+dwLoadOffset) = 0x9090;	// NOP*2- last RGSC init check 
 
 	// skip missing tests...
 	memset ((BYTE *)(0x402B32+dwLoadOffset), 0x90, 14);
 	memset ((BYTE *)(0x402D37+dwLoadOffset), 0x90, 14);
-	*(DWORD *)(0x403890+dwLoadOffset) = 0x90CC033;	// xor eax, eax; retn
-	*(DWORD *)(0x404270+dwLoadOffset) = 0x90CC033;	// xor eax, eax; retn
+	*(DWORD *)(0x403890+dwLoadOffset) = 0x90C3C033;	// xor eax, eax; retn
+	*(DWORD *)(0x404270+dwLoadOffset) = 0x90C3C033;	// xor eax, eax; retn
 
 	// savegames
 	*(WORD *)(0x5B0505+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
 	injectFunction (0x5AFF30, (DWORD)getSavefilePath); // replace getSavefilePath
+	pszPath = (char *)(0x10F1100+dwLoadOffset);	
 
 	*(DWORD *)(0xBABFB0+dwLoadOffset) = 0x90C301B0;	// mov al, 1; retn
 	*(DWORD *)(0xBABFD0+dwLoadOffset) = 0x90C301B0;
@@ -1194,20 +1163,9 @@ void patch106 () {
 	Log::Debug(L"Patching OK (1.0.6.0 - update 6)");
 }
 
-void patch106r () {
+void patch106r () 
+{
 	dwGameVersion = 0x1051;	// GTA IV 1.0.5.1 (patch 6 rus)
-
-	DWORD oldProtect;
-	// enable write access to code and rdata
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x094B000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Log::Debug(L"ERROR: unable to unprotect code seg");
-		return;
-	}
-
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x094C000+0x400000), 0x01BF000, PAGE_READWRITE, &oldProtect)) {
-		Log::Debug(L"ERROR: unable to unprotect .rdata seg");
-		return;
-	}
 
 	// process patches
 	*(DWORD *)(0x401835+dwLoadOffset) = 1;		// disable sleep
@@ -1217,10 +1175,8 @@ void patch106r () {
 	*(DWORD *)(0x402651+dwLoadOffset) = 0x90000002;	// jmp 40289E (skip RGSC connect and EFC checks)		
 	*(WORD *)(0x4028A3+dwLoadOffset) = 0xA390;	// NOP; MOV [g_rgsc], eax
 	memset ((BYTE *)(0x40290D+dwLoadOffset), 0x90, 0x2A);
-        *(DWORD *)(0x40293D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
-        *(WORD  *)(0x402941+dwLoadOffset) = 0x9090;	// NOP*2- last RGSC init check 
-
-
+    *(DWORD *)(0x40293D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
+    *(WORD  *)(0x402941+dwLoadOffset) = 0x9090;	// NOP*2- last RGSC init check 
 
 	// skip missing tests...
 	memset ((BYTE *)(0x402B32+dwLoadOffset), 0x90, 14);
@@ -1231,6 +1187,7 @@ void patch106r () {
 	// savegames
 	*(WORD *)(0x5B02A5+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
 	injectFunction (0x5AFCD0, (DWORD)getSavefilePath); // replace getSavefilePath
+	pszPath = (char *)(0x10F0B00+dwLoadOffset);
 
 	*(DWORD *)(0xBAF5D0+dwLoadOffset) = 0x90C301B0;	// mov al, 1; retn
 	*(DWORD *)(0xBAF5F0+dwLoadOffset) = 0x90C301B0;
@@ -1240,67 +1197,79 @@ void patch106r () {
 	Log::Debug(L"Patching OK (1.0.5.1 - update 6)");
 }
 
-void patch102 () {
-	dwGameVersion = 0x1020;	// GTA IV 1.0.2 (patch 2)
-
-	DWORD oldProtect;
-	// enable write access to code and rdata
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x8D7000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Log::Debug(L"ERROR: unable to unprotect code seg");
-		return;
-	}
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x8D8000+0x400000), 0x19F000, PAGE_READWRITE, &oldProtect)) 
-		Log::Debug(L"ERROR: unable to unprotect .rdata seg");
+void patch107 () 
+{
+	dwGameVersion = 0x1070;	// GTA IV 1.0.7.0 (patch 7)
 
 	// process patches
-	*(WORD *)(0x6086B5+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
-	*(BYTE *)(0x79F710+dwLoadOffset) = 0xC3;	// RETN - enable debugger in error menu (don't load WER.dll)
-	*(BYTE *)(0x7A0740+dwLoadOffset) = 0xC3;	// RETN - skip files.txt hash check
+	*(DWORD *)(0x401835+dwLoadOffset) = 1;		    // disable sleep
+	*(BYTE  *)(0xD356D0+dwLoadOffset) = 0xC3;	    // RETN - enable debugger in error menu (don't load WER.dll)
+	*(DWORD *)(0x403F10+dwLoadOffset) = 0x900008C2;	// RETN 8 - certificates check
+	*(DWORD *)(0x40262D+dwLoadOffset) = 0x4AE9C033;	// xor eax, eax - address of the RGSC object
+	*(DWORD *)(0x402631+dwLoadOffset) = 0x90000002;	// jmp 40289E (skip RGSC connect and EFC checks)		
+	*(WORD  *)(0x402883+dwLoadOffset) = 0xA390;	    // NOP; MOV [g_rgsc], eax
+	memset ((BYTE *)(0x4028ED+dwLoadOffset), 0x90, 0x2A);
+    *(DWORD *)(0x40291D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
+    *(WORD  *)(0x402921+dwLoadOffset) = 0x9090;	    // NOP*2- last RGSC init check 
 
-	*(BYTE *)(0x46FA7D+dwLoadOffset) = 0xE9;	// JMP
-	*(DWORD *)(0x46FA7E+dwLoadOffset)= 0x16;	// jmp target
-	*(BYTE *)(0x4701C0+dwLoadOffset) = 0xC3;	// RETN - certificates check
-	*(BYTE *)(0x46F120+dwLoadOffset) = 0xC2;	// RETN - remove connect to the RGSC 
-	*(BYTE *)(0x46F121+dwLoadOffset) = 0x04;	// RETN - remove connect to the RGSC 
-	*(BYTE *)(0x46F122+dwLoadOffset) = 0x00;	// RETN - remove connect to the RGSC 
-	memset ((BYTE *)(0x46FB16+dwLoadOffset), 0x90, 0x1B);
-	*(WORD *)(0x46FAAA+dwLoadOffset) = 0x9090;	// NOP; NOP - RGSC initialization check
-        *(WORD *)(0x46FB36+dwLoadOffset) = 0x9090;	// NOP; NOP - last RGSC init check
-        *(DWORD *)(0x46FB38+dwLoadOffset) = 0x90909090;
-	*(WORD *)(0x46FAB1+dwLoadOffset) = 0xC033;	// XOR eax, eax - RGSC initialization check
-	*(WORD *)(0x46FAB8+dwLoadOffset) = 0xA390;	// NOP; MOV [], eax
+	// skip missing tests...
+	memset ((BYTE *)(0x402B12+dwLoadOffset), 0x90, 14);
+	memset ((BYTE *)(0x402D17+dwLoadOffset), 0x90, 14);
+	*(DWORD *)(0x403870+dwLoadOffset) = 0x90C3C033;	// xor eax, eax; retn
+	*(DWORD *)(0x404250+dwLoadOffset) = 0x90C3C033;	// xor eax, eax; retn
 
-	*(DWORD *)(0x401825+dwLoadOffset) = 1;		// disable sleep
+	// savegames
+	*(WORD *)(0x5B06E5+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
+	injectFunction (0x5B0110, (DWORD)getSavefilePath); // replace getSavefilePath
+	pszPath = (char *)(0x10F1DA0+dwLoadOffset);	
 
-	// replace getSavefilePath
-	injectFunction (0x6080E0, (DWORD)getSavefilePath);
+	*(DWORD *)(0xBAC160+dwLoadOffset) = 0x90C301B0;	// mov al, 1; retn
+	*(DWORD *)(0xBAC180+dwLoadOffset) = 0x90C301B0;
+	*(DWORD *)(0xBAC190+dwLoadOffset) = 0x90C301B0;
+	*(DWORD *)(0xBAC1C0+dwLoadOffset) = 0x90C301B0;
 
-	Log::Debug(L"Patching OK (1.0.2)");
+	Log::Debug (L"Patching OK (1.0.7.0 - update 7)\n");
 }
 
-void patchRFG () {
-	dwGameVersion = 0;	// RFG. should I make some constant ?
-	DWORD	oldProtect;
-	// enable write access to code and rdata
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x1000+0x400000), 0x06CC000, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-		Log::Debug(L"ERROR: unable to unprotect code seg");
-		return;
-	}
+void patch107r () 
+{
+	dwGameVersion = 0x1061;	// GTA IV 1.0.6.1 (patch 7 rus)
 
-	if (!VirtualProtect ((LPVOID)(dwLoadOffset+0x6CD000+0x400000), 0xD2000, PAGE_READWRITE, &oldProtect)) 
-		Log::Debug(L"ERROR: unable to unprotect .rdata seg");
+	// process patches
+	*(DWORD *)(0x401835+dwLoadOffset) = 1;		    // disable sleep
+	*(BYTE  *)(0xD356D0+dwLoadOffset) = 0xC3;	    // RETN - enable debugger in error menu (don't load WER.dll)
+	*(DWORD *)(0x403F10+dwLoadOffset) = 0x900008C2;	// RETN 8 - certificates check
+	*(DWORD *)(0x40262D+dwLoadOffset) = 0x4AE9C033;	// xor eax, eax - address of the RGSC object
+	*(DWORD *)(0x402631+dwLoadOffset) = 0x90000002;	// jmp 40289E (skip RGSC connect and EFC checks)		
+	*(WORD  *)(0x402883+dwLoadOffset) = 0xA390;	    // NOP; MOV [g_rgsc], eax
+	memset ((BYTE *)(0x4028ED+dwLoadOffset), 0x90, 0x2A);
+    *(DWORD *)(0x40291D+dwLoadOffset) = 0x90909090;	// NOP*4- last RGSC init check
+    *(WORD  *)(0x402921+dwLoadOffset) = 0x9090;	    // NOP*2- last RGSC init check 
 
-	// disable savegame check
-	*(WORD*)(0x522A38+dwLoadOffset) = 0x9090;
-	*(WORD*)(0x522A3E+dwLoadOffset) = 0x9090;
-	*(WORD*)(0x522A44+dwLoadOffset) = 0x9090;
-	Log::Debug(L"Patching OK (RF:G)");
+	// skip missing tests...
+	memset ((BYTE *)(0x402B12+dwLoadOffset), 0x90, 14);
+	memset ((BYTE *)(0x402D17+dwLoadOffset), 0x90, 14);
+	*(DWORD *)(0x403870+dwLoadOffset) = 0x90C3C033;	// xor eax, eax; retn
+	*(DWORD *)(0x404250+dwLoadOffset) = 0x90C3C033;	// xor eax, eax; retn
+
+	// savegames
+	*(WORD *)(0x5B06E5+dwLoadOffset) = 0x9090; 	// NOP; NOP - save file CRC32 check
+	injectFunction (0x5B0110, (DWORD)getSavefilePath); // replace getSavefilePath
+	pszPath = (char *)(0x10F1DA0+dwLoadOffset);	
+
+	*(DWORD *)(0xBAC160+dwLoadOffset) = 0x90C301B0;	// mov al, 1; retn
+	*(DWORD *)(0xBAC180+dwLoadOffset) = 0x90C301B0;
+	*(DWORD *)(0xBAC190+dwLoadOffset) = 0x90C301B0;
+	*(DWORD *)(0xBAC1C0+dwLoadOffset) = 0x90C301B0;
+
+	Log::Debug (L"Patching OK (1.0.7.0 - update 7)\n");
 }
 
-
-void patchCode () {
+void patchCode () 
+{
 	// version check
 	DWORD signature = *(DWORD *)(0x608C34+dwLoadOffset);
+
 	if (signature == 0x831F7518)
 		patch101 ();
 	else if (signature == 0xC483FFE4) 
@@ -1315,8 +1284,10 @@ void patchCode () {
 		patch106 ();
 	else if (signature == 0x0000989e)
 		patch106r();
-	else if (signature == 0x108b1874)
-		patchRFG ();
+	else if (signature == 0x1006e857) 
+        patch107 ();
+	else if (signature == 0x1006e857) 
+        patch107r ();
 	else 
 		Log::Debug(L"Unknown game version, skipping patches (signature = 0x%08x)", signature);
 }
