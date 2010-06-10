@@ -928,7 +928,7 @@ static char * pszPath = "";
 
 // change savefile path to "%USERPROFILE%\Documents\Rockstar Games\GTA IV\savegames\"
 void getSavefilePath (int __unused, char * pBuffer, char * pszSaveName) {
-	strcpy_s (pBuffer, 256, pszPath);
+	//strcpy_s (pBuffer, 256, pszPath);
 	strcat_s (pBuffer, 256, "FMP\\savegames");
 
 	// check path and create directory if necessary
@@ -945,7 +945,7 @@ void getSavefilePath (int __unused, char * pBuffer, char * pszSaveName) {
 		strcat_s (pBuffer, 256, "\\");
 		strcat_s (pBuffer, 256, pszSaveName);
 	}
-    Log::Debug(L"[getSavefilePath]: '%s'\n", pBuffer);
+    Log::Debug(L"[getSavefilePath]: '%S'\n", pBuffer);
 }
 
 // === miscellaneous patches ===
