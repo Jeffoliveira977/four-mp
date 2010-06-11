@@ -929,7 +929,8 @@ static char * pszPath = "";
 // change savefile path to "%USERPROFILE%\Documents\Rockstar Games\GTA IV\savegames\"
 void getSavefilePath (int __unused, char * pBuffer, char * pszSaveName) {
 	//strcpy_s (pBuffer, 256, pszPath);
-	strcat_s (pBuffer, 256, "FMP\\savegames");
+	//strcat_s (pBuffer, 256, "FMP\\savegames");
+	strcpy_s (pBuffer, 256, "FMP\\savegames");
 
 	// check path and create directory if necessary
 	DWORD attrs = GetFileAttributesA (pBuffer);
