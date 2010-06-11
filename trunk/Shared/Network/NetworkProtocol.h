@@ -2,7 +2,7 @@
 
 #include "Limits.h"
 
-#define PROTOCOL_VERSION 11
+#define PROTOCOL_VERSION 12
 
 #define DEFAULT_SERVER_NETWORK_ID 0
 #define DEFAULT_CLIENT_NETWORK_ID 65534
@@ -67,7 +67,7 @@ struct NetworkPlayerFullUpdateData
 	char seatindex;
 	int score;
 	unsigned char health;
-	int armor;
+	unsigned char armor;
 	int room;
 	char weapons[8];
 	short ammo[8];
@@ -118,7 +118,7 @@ struct NetworkPlayerFireData
 	int time;
 	short target;
 	unsigned char health;
-	unsigned int armor;
+	unsigned char armor;
 };
 
 struct NetworkPlayerAimData
@@ -139,7 +139,7 @@ struct NetworkPlayerHealthAndArmorChangeData
 {
 	short client;
 	unsigned char health;
-	int armor;
+	unsigned char armor;
 };
 
 struct NetworkPlayerSpawnRequestData
@@ -157,7 +157,7 @@ struct NetworkPlayerSpawnData
 	int compT[11];
 	int compD[11];
 	unsigned char health;
-	int armor;
+	unsigned char armor;
 };
 
 struct NetworkPlayerModelChangeData

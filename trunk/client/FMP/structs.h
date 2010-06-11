@@ -29,7 +29,7 @@ struct FPlayer
 	char seatindex;
 	int score;
 	unsigned char health;
-	int armor;
+	unsigned char armor;
 	char wanted_level;
 	bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
 	bool isaiming; ///< Holds true if the player is aiming.

@@ -23,7 +23,7 @@ public:
 	short GetPlayerVehicle(const short index);
 	bool GetPlayerScore(const short index, int &score);
 	bool GetPlayerHealth(const short index, unsigned char &health);
-	bool GetPlayerArmor(const short index, int &armor);
+	bool GetPlayerArmor(const short index, unsigned char &armor);
 	char GetPlayerWantedLevel(const short index);
 	bool GetPlayerColor(const short index, unsigned char (&color)[4]);
 	unsigned char GetNumberOfPlayerClasses(void);
@@ -50,7 +50,7 @@ private:
 		char seatindex; ///< Holds the index of the seat of the vehicle the player is in.
 		int score; /// Holds the score of the player.
 		unsigned char health; ///< Holds the health of the player. 200 mean full health, 99 or lower - dead.
-		int armor; // TODO: test and reduce
+		unsigned char armor; ///< Holds the armor of the player. 0 means no armor, 100 - full.
 		char wanted_level; ///< Holds the wanted level of the player.
 		bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
 		bool isducking; ///< Holds true if the player is ducking and false otherwise.

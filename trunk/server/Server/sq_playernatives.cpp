@@ -99,7 +99,7 @@ void sq_GetPlayerArmor(HSQUIRRELVM v)
 {
 	int index;
 	sq_getinteger(v, 2, &index);
-	int armor;
+	unsigned char armor;
 	if (!playm.GetPlayerArmor(index, armor))
 	{
 		sq_pushnull(v);
