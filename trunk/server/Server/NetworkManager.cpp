@@ -127,7 +127,7 @@ void NetworkManager::Tick(void)
 				this->HandleClientDisconnection(pack->systemAddress);
 				break;
 			}
-		/*case ID_RPC_REMOTE_ERROR:
+		case ID_RPC_REMOTE_ERROR:
 			{
 				PrintToServer(L"RakNet: RPC remote error");
 				switch (pack->data[1])
@@ -136,7 +136,8 @@ void NetworkManager::Tick(void)
 					PrintToServer(L"RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
 					break;
 				case RakNet::RPC_ERROR_OBJECT_DOES_NOT_EXIST:
-					PrintToServer(L"RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
+					//TODO: Temp fix, find better.
+					//PrintToServer(L"RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
 					break;
 				case RakNet::RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
 					PrintToServer(L"RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
@@ -154,7 +155,7 @@ void NetworkManager::Tick(void)
 					PrintToServer(L"RPC_ERROR_CALLING_C_AS_CPP\n");
 					break;
 				}
-			} break;*/
+			} break;
 		}
 	}
 	if (rpcbuffer != NULL)
