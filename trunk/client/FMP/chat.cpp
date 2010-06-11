@@ -72,6 +72,7 @@ void ChatManager::AddChatMessage(const wchar_t *message)
 	{
 		return;
 	}
+	Log::Debug(L"Chat message: %s", message);
 	size_t length = wcslen(message) + 1;
 	if (length > MAX_CHAT_MESSAGE_LENGTH)
 	{
@@ -108,9 +109,10 @@ void ChatManager::SendChatMessage(void)
 		return;
 	}
 	nm.SendPlayerChat(inputbuffer);
-	free(inputbuffer);
-	inputbuffer = NULL;
+	ResizeBuffer<wchar_t *>(inputbuffer, 1);
+	inputbuffer[0] = L'\0';
 	cursorposition = 0;
+	inputbuffersize = 1;
 }
 
 void ChatManager::CreateChatFont(IDirect3DDevice9 *device)

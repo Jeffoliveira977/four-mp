@@ -135,6 +135,8 @@ void NetworkManager::Tick(void)
 			{
 #if defined (FMP_CLIENT)
 				Log::Info(L"You have been kicked from the server.");
+				clientid.localSystemAddress = DEFAULT_CLIENT_NETWORK_ID;;
+				this->SetNetworkID(clientid);
 				HOOK.PlayerDisconnect(client.GetIndex());
 				client.SetGameState(GameStateOffline);
 #elif defined (FMP_CONSOLE_CLIENT)
@@ -145,6 +147,9 @@ void NetworkManager::Tick(void)
 			{
 #if defined (FMP_CLIENT)
 				Log::Info(L"Lost connection to the server.");
+				clientid.localSystemAddress = DEFAULT_CLIENT_NETWORK_ID;;
+				this->SetNetworkID(clientid);
+				HOOK.PlayerDisconnect(client.GetIndex());
 				client.SetGameState(GameStateOffline);
 #elif defined (FMP_CONSOLE_CLIENT)
 				PrintToConsole(L"Lost connection to the server.");
