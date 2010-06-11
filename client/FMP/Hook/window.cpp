@@ -68,11 +68,6 @@ LRESULT DefWndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 		{
 			switch (Msg)
 			{
-			case WM_KEYDOWN:
-				{
-					TranslateMessage((MSG *)wParam);
-					break;
-				}
 			case WM_KEYUP:
 				{
 					switch (wParam)
