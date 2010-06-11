@@ -136,8 +136,7 @@ void NetworkManager::Tick(void)
 					PrintToServer(L"RPC_ERROR_NETWORK_ID_MANAGER_UNAVAILABLE\n");
 					break;
 				case RakNet::RPC_ERROR_OBJECT_DOES_NOT_EXIST:
-					//TODO: Temp fix, find better.
-					//PrintToServer(L"RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
+					PrintToServer(L"RPC_ERROR_OBJECT_DOES_NOT_EXIST\n");
 					break;
 				case RakNet::RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE:
 					PrintToServer(L"RPC_ERROR_FUNCTION_INDEX_OUT_OF_RANGE\n");
@@ -688,7 +687,11 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			NetworkPlayerInfoData infodata;
 			infodata.index = client;
 			infodata.sessionkey = data->playerconnectionrequest->sessionkey;
-			rpc3->CallCPP("&NetworkManager::RecieveClientInfo", defaultclientid, infodata, rpc3);
+			rpc3->SetRecipientAddress(data->playerconnectionrequest->address, false);
+			rpc3->SetRecipientObject(defaultclientid);
+			rpc3->Call("&NetworkManager::RecieveClientInfo", infodata, rpc3);
+			rpc3->SetRecipientAddress(UNASSIGNED_SYSTEM_ADDRESS, true);
+			rpc3->SetRecipientObject(UNASSIGNED_NETWORK_ID);
 			delete data->playerconnectionrequest; 
 			break;
 		}
@@ -1224,7 +1227,11 @@ void NetworkManager::SendConnectionError(const SystemAddress address, const Netw
 {
 	NetworkPlayerConnectionErrorData data;
 	data.error = error;
-	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionError", defaultclientid, data, rpc3);
+	rpc3->SetRecipientAddress(address, false);
+	rpc3->SetRecipientObject(defaultclientid);
+	rpc3->Call("&NetworkManager::RecieveClientConnectionError", data, rpc3);
+	rpc3->SetRecipientAddress(UNASSIGNED_SYSTEM_ADDRESS, true);
+	rpc3->SetRecipientObject(UNASSIGNED_NETWORK_ID);
 }
 
 NetworkPlayerFullUpdateData *NetworkManager::GetPlayerFullUpdateData(const short index)
@@ -1290,9 +1297,13 @@ void NetworkManager::SendDataToAll(const char *RPC, const DATATYPE *data)
 	{
 		if (clientbuffer[i] != NULL)
 		{
-			rpc3->CallCPP(RPC, clientbuffer[i]->id, *data, rpc3);
+			rpc3->SetRecipientAddress(clientbuffer[i]->address, false);
+			rpc3->SetRecipientObject(clientbuffer[i]->id);
+			rpc3->Call(RPC, *data, rpc3);
 		}
 	}
+	rpc3->SetRecipientAddress(UNASSIGNED_SYSTEM_ADDRESS, true);
+	rpc3->SetRecipientObject(UNASSIGNED_NETWORK_ID);
 }
 
 template <typename DATATYPE>
@@ -1306,7 +1317,11 @@ bool NetworkManager::SendDataToOne(const char *RPC, const short index, const DAT
 	{
 		return false;
 	}
-	rpc3->CallCPP(RPC, clientbuffer[index]->id, *data, rpc3);
+	rpc3->SetRecipientAddress(clientbuffer[index]->address, false);
+	rpc3->SetRecipientObject(clientbuffer[index]->id);
+	rpc3->Call(RPC, *data, rpc3);
+	rpc3->SetRecipientAddress(UNASSIGNED_SYSTEM_ADDRESS, true);
+	rpc3->SetRecipientObject(UNASSIGNED_NETWORK_ID);
 	return true;
 }
 
@@ -1318,9 +1333,13 @@ void NetworkManager::SendDataToAllExceptOne(const char *RPC, const short index, 
 	{
 		if ((i != index) && (clientbuffer[i] != NULL))
 		{
-			rpc3->CallCPP(RPC, clientbuffer[i]->id, *data, rpc3);
+			rpc3->SetRecipientAddress(clientbuffer[i]->address, false);
+			rpc3->SetRecipientObject(clientbuffer[i]->id);
+			rpc3->Call(RPC, *data, rpc3);
 		}
 	}
+	rpc3->SetRecipientAddress(UNASSIGNED_SYSTEM_ADDRESS, true);
+	rpc3->SetRecipientObject(UNASSIGNED_NETWORK_ID);
 }
 
 //void NetworkManager::SendClassInfo(const short client)
