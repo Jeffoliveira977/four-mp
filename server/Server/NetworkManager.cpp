@@ -127,7 +127,7 @@ void NetworkManager::Tick(void)
 				this->HandleClientDisconnection(pack->systemAddress);
 				break;
 			}
-		case ID_RPC_REMOTE_ERROR:
+		/*case ID_RPC_REMOTE_ERROR:
 			{
 				PrintToServer(L"RakNet: RPC remote error");
 				switch (pack->data[1])
@@ -154,7 +154,7 @@ void NetworkManager::Tick(void)
 					PrintToServer(L"RPC_ERROR_CALLING_C_AS_CPP\n");
 					break;
 				}
-			} break;
+			} break;*/
 		}
 	}
 	if (rpcbuffer != NULL)

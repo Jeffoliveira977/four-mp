@@ -483,7 +483,7 @@ void NetworkManager::RecieveClientDisconnection(NetworkPlayerDisconnectionData d
 	this->WriteToRPCBuffer(NetworkRPCPlayerDisconnection, &data);
 }
 
-void NetworkManager::RecieveGameTimeChange(NetworkGameTimeChangeData data, RakNet::RPC3 *serverrpc)
+void NetworkManager::RecieveGameTimeChange(NetworkGameTimeChangeData data, RakNet::RPC3 *serverrpc3)
 {
 	this->WriteToRPCBuffer(NetworkRPCGameTimeChange, &data);
 }
@@ -848,9 +848,9 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			clientid.localSystemAddress = data->playerinfo->index + 1;
 			this->SetNetworkID(clientid);
 			client.SetIndex(data->playerinfo->index);
-			delete data->playerinfo;
 			NetworkPlayerConnectionConfirmationData data2;
 			rpc3->CallCPP("&NetworkManager::RecieveClientConnectionConfirmation", serverid, data2, rpc3);
+			delete data->playerinfo;
 			break;
 		}
 	case NetworkRPCPlayerDisconnection:
@@ -886,11 +886,10 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			memcpy(gPlayer[data->playerfullupdate->index].ammo, data->playerfullupdate->ammo, sizeof(short) * 8);
 			memcpy(gPlayer[data->playerfullupdate->index].color, data->playerfullupdate->color, sizeof(unsigned char) * 4);
 
-			Log::Info(L"Player full update. Name is %s", data->playerfullupdate->name);
+			Log::Info(L"Recieving player full update. Name is %s", data->playerfullupdate->name);
 			HOOK.PlayerConnect(data->playerfullupdate->name, data->playerfullupdate->index, gPlayer[data->playerfullupdate->index].model, gPlayer[data->playerfullupdate->index].position);
 #elif defined (FMP_CONSOLE_CLIENT)
-			PrintToConsole(L"Player full update. Name is %s", data->playerfullupdate->name);
-			PrintToConsole(L"Position is %f %f %f", data->playerfullupdate->position[0], data->playerfullupdate->position[1], data->playerfullupdate->position[2]);
+			PrintToConsole(L"Recieving player full update. Name is %s", data->playerfullupdate->name);
 #endif
 			delete data->playerfullupdate;
 			break;
