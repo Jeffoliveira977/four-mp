@@ -439,6 +439,24 @@ void VirtualMachineManager::OnPlayerSpawn(const short playerindex)
 	}
 }
 
+void VirtualMachineManager::OnPlayerDeath(const short playerindex, const short killerindex, const char reason)
+{
+	for (unsigned char i = 0; i < vmbuffersize; i++)
+	{
+		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
+		{
+			switch (vmbuffer[i]->lang)
+			{
+			case VMLanguageSquirrel:
+				{
+					sc_OnPlayerDeath(*vmbuffer[i]->ptr.squirrel, playerindex, killerindex, reason);
+					break;
+				}
+			}
+		}
+	}
+}
+
 bool VirtualMachineManager::OnPlayerText(const short playerindex, const wchar_t *data)
 {
 	for (unsigned char i = 0; i < vmbuffersize; i++)

@@ -156,6 +156,13 @@ public:
 	/// \return No return.
 	void OnPlayerSpawn(const short playerindex);
 
+	/// \brief Called when a player dies.
+	/// \param[in] playerindex Index of the player who have died.
+	/// \param[in] killerindex Index of the killer, INVALID_PLAYER_INDEX otherwise.
+	/// \param[in] reason Reason of the death. //TODO: Should this be enum?
+	/// \return No return.
+	void OnPlayerDeath(const short playerindex, const short killerindex, const char reason);
+
 	///
 	///
 	///

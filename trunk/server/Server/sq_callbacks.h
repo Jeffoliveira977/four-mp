@@ -1,3 +1,8 @@
+/// \file
+/// \brief Header file that describes the Squirrel callbacks.
+/// \details These are the functions that host calls from outside.
+/// \author WNeZRoS, FaTony
+
 #include "sq/squirrel.h"
 
 // SQ Callbacks
@@ -26,15 +31,22 @@ bool sc_OnPlayerConnect(HSQUIRRELVM v, const short index, const wchar_t *name);
 void sc_OnPlayerDisconnect(HSQUIRRELVM v, const short index);
 
 /// \brief Called when a player is spawning.
-/// \param[in] playerindex Index of the player.
+/// \param[in] index Index of the player.
 /// \return No return.
-void sc_OnPlayerSpawn(HSQUIRRELVM v, const short playerindex);
+void sc_OnPlayerSpawn(HSQUIRRELVM v, const short index);
+
+/// \brief Called when a player dies.
+/// \param[in] playerindex Index of the player who have died.
+/// \param[in] killerindex Index of the killer, INVALID_PLAYER_INDEX otherwise.
+/// \param[in] reason Reason of the death. //TODO: Should this be enum?
+/// \return No return.
+void sc_OnPlayerDeath(HSQUIRRELVM v, const short playerindex, const short killerindex, const char reason);
 
 /// \brief Called when send message in chat
-/// \param[in] playersindex
+/// \param[in] index
 /// \param[in] text
 /// \return No return
-bool sc_OnPlayerText(HSQUIRRELVM v, const short playerindex, const wchar_t *text);
+bool sc_OnPlayerText(HSQUIRRELVM v, const short index, const wchar_t *text);
 
 /// \brief Fires a dynamic command callback.
 /// \param[in] callback Name of the callback to call.

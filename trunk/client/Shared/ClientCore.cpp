@@ -9,6 +9,7 @@
 #include "NetworkManager.h"
 #if defined (FMP_CLIENT)
 #include "../FMP/log.h"
+#include "../FMP/con_debugcommands.h"
 #include "../FMP/ConsoleWindow.h"
 #elif defined (FMP_CONSOLE_CLIENT)
 #include "../ConsoleClient/logging.h"
@@ -62,6 +63,9 @@ bool ClientCore::Load(void)
 	concore.RegisterStandardLibrary();
 	concore.AddConCmd(L"connect", ConCmdConnect, L"Connect to specified server.", 0);
 	concore.AddConCmd(L"exit", ConCmdQuit, L"Exit the engine.", 0);
+#if defined (FMP_CLIENT)
+	concore.AddConCmd(L"hurtme", ConCmdHurtme, L"Hurts the player. Arguments: <health to lose>");
+#endif
 	namecvar = concore.AddConVar(L"name", L"unnamed", L"Current user name.", 0);
 	namecvar->HookChange(ConVarHookName);
 	concore.AddConCmd(L"quit", ConCmdQuit, L"Exit the engine.", 0);
