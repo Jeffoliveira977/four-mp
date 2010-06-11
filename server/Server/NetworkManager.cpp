@@ -854,6 +854,10 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 				}
 				playm.playerbuffer[data->playerfire->target]->health = data->playerfire->health;
 				playm.playerbuffer[data->playerfire->target]->armor = data->playerfire->armor;
+				if (playm.playerbuffer[data->playerfire->target]->health <= 0)
+				{
+					vmm.OnPlayerDeath(data->playerfire->target, data->playerfire->client, data->playerfire->weapon);
+				}
 			}
 			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerFire", data->playerfire->client, data->playerfire);
 			delete data->playerfire;

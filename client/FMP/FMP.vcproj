@@ -191,6 +191,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\con_debugcommands.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\Shared\con_sharedcommands.cpp"
 				>
 			</File>
@@ -294,6 +298,10 @@
 			</File>
 			<File
 				RelativePath="..\Shared\ClientCore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\con_debugcommands.h"
 				>
 			</File>
 			<File
