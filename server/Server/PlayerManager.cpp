@@ -168,7 +168,7 @@ bool PlayerManager::GetPlayerScore(const short index, int &score)
 	return true;
 }
 
-bool PlayerManager::GetPlayerHealth(const short index, int &health)
+bool PlayerManager::GetPlayerHealth(const short index, unsigned char &health)
 {
 	if ((index < 0) || (index >= playerbuffersize))
 	{
