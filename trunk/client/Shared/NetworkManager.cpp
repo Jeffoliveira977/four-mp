@@ -69,6 +69,7 @@ void NetworkManager::Load(void)
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientConnectionError);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientInfo);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveClientDisconnection);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveGameTimeChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFullUpdate);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveVehicleFullUpdate);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerMove);
@@ -81,10 +82,10 @@ void NetworkManager::Load(void)
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerAim);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerWeaponChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerHealthAndArmorChange);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerSpawnPositionChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerSpawn);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerModelChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerComponentsChange);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveGameTime);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerChat);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerPosition);
 
@@ -482,6 +483,11 @@ void NetworkManager::RecieveClientDisconnection(NetworkPlayerDisconnectionData d
 	this->WriteToRPCBuffer(NetworkRPCPlayerDisconnection, &data);
 }
 
+void NetworkManager::RecieveGameTimeChange(NetworkGameTimeChangeData data, RakNet::RPC3 *serverrpc)
+{
+	this->WriteToRPCBuffer(NetworkRPCGameTimeChange, &data);
+}
+
 void NetworkManager::RecievePlayerFullUpdate(NetworkPlayerFullUpdateData data, RakNet::RPC3 *serverrpc3)
 {
 	this->WriteToRPCBuffer(NetworkRPCPlayerFullUpdate, &data);
@@ -542,6 +548,11 @@ void NetworkManager::RecievePlayerHealthAndArmorChange(NetworkPlayerHealthAndArm
 	this->WriteToRPCBuffer(NetworkRPCPlayerHealthAndArmorChange, &data);
 }
 
+void NetworkManager::RecievePlayerSpawnPositionChange(NetworkPlayerSpawnPositionChangeData data, RakNet::RPC3 *serverrpc3)
+{
+	this->WriteToRPCBuffer(NetworkRPCPlayerSpawnPositionChange, &data);
+}
+
 void NetworkManager::RecievePlayerSpawn(NetworkPlayerSpawnData data, RakNet::RPC3 *serverrpc3)
 {
 	this->WriteToRPCBuffer(NetworkRPCPlayerSpawn, &data);
@@ -565,11 +576,6 @@ void NetworkManager::RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 
 void NetworkManager::RecieveNewVehicle(NetworkVehicleFullUpdateData data, RakNet::RPC3 *serverrpc3)
 {
 	this->WriteToRPCBuffer(NetworkRPCNewVehicle, &data);
-}
-
-void NetworkManager::RecieveGameTime(NetworkTimeData data, RakNet::RPC3 *serverrpc)
-{
-	this->WriteToRPCBuffer(NetworkRPCTime, &data);
 }
 
 void NetworkManager::RecievePlayerPosition(NetworkPlayerPositionData data, RakNet::RPC3 *serverrpc3)
@@ -614,6 +620,12 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 		{
 			rpcbuffer[rpcbuffersize].data.playerdisconnection = (NetworkPlayerDisconnectionData *)new DATATYPE;
 			memcpy(rpcbuffer[rpcbuffersize].data.playerdisconnection, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCGameTimeChange:
+		{
+			rpcbuffer[rpcbuffersize].data.gametimechange = (NetworkGameTimeChangeData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.gametimechange, data, sizeof(DATATYPE));
 			break;
 		}
 	case NetworkRPCPlayerFullUpdate:
@@ -688,6 +700,12 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 			memcpy(rpcbuffer[rpcbuffersize].data.playerhealthandarmorchange, data, sizeof(DATATYPE));
 			break;
 		}
+	case NetworkRPCPlayerSpawnPositionChange:
+		{
+			rpcbuffer[rpcbuffersize].data.playerspawnpositionchange = (NetworkPlayerSpawnPositionChangeData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerspawnpositionchange, data, sizeof(DATATYPE));
+			break;
+		}
 	case NetworkRPCPlayerSpawn:
 		{
 			rpcbuffer[rpcbuffersize].data.playerspawn = (NetworkPlayerSpawnData *)new DATATYPE;
@@ -716,12 +734,6 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 		{
 			rpcbuffer[rpcbuffersize].data.newvehicle = (NetworkVehicleFullUpdateData *)new DATATYPE;
 			memcpy(rpcbuffer[rpcbuffersize].data.newvehicle, data, sizeof(DATATYPE));
-			break;
-		}
-	case NetworkRPCTime:
-		{
-			rpcbuffer[rpcbuffersize].data.time = (NetworkTimeData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.time, data, sizeof(DATATYPE));
 			break;
 		}
 	case NetworkRPCPlayerPosition:
@@ -849,6 +861,14 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			delete data->playerdisconnection;
 			break;
 		}
+	case NetworkRPCGameTimeChange:
+		{
+#if defined (FMP_CLIENT)
+			HOOK.SetTime(data->gametimechange->time);
+#endif
+			delete data->gametimechange;
+			break;
+		}
 	case NetworkRPCPlayerFullUpdate:
 		{
 #if defined (FMP_CLIENT)
@@ -973,13 +993,21 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			delete data->playerhealthandarmorchange;
 			break;
 		}
+	case NetworkRPCPlayerSpawnPositionChange:
+		{
+#if defined (FMP_CLIENT)
+			HOOK.SetSpawnPosition(data->playerspawnpositionchange->position);
+#endif
+			delete data->playerspawnpositionchange;
+			break;
+		}
 	case NetworkRPCPlayerSpawn:
 		{
 #if defined (FMP_CLIENT)
 			Log::Info(L"Setup player spawn info %d", data->playerspawn->client);
 			gPlayer[data->playerspawn->client].want_spawn = 0;
-			memcpy(&gPlayer[data->playerspawn->client].spawn_pos, &data->playerspawn->position, sizeof(float) * 3);
-			gPlayer[data->playerspawn->client].spawn_pos[3] = data->playerspawn->angle;
+
+			HOOK.SetSpawnPosition(data->playerspawn->position);
 			gPlayer[data->playerspawn->client].model = data->playerspawn->model;
 			memcpy(&gPlayer[data->playerspawn->client].compD, &data->playerspawn->compD, 11 * sizeof(int));
 			memcpy(&gPlayer[data->playerspawn->client].compT, &data->playerspawn->compT, 11 * sizeof(int));
@@ -1023,14 +1051,6 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			delete data->newvehicle;
 			break;
 		}
-	case NetworkRPCTime:
-		{
-#if defined (FMP_CLIENT)
-			HOOK.SetTime(data->time->time);
-#endif
-			delete data->time;
-			break;
-		}
 	case NetworkRPCPlayerPosition:
 		{
 #if defined (FMP_CLIENT)
@@ -1070,6 +1090,11 @@ void NetworkManager::FreeRPCBuffer(void)
 		case NetworkRPCPlayerDisconnection:
 			{
 				delete rpcbuffer[i].data.playerdisconnection;
+				break;
+			}
+		case NetworkRPCGameTimeChange:
+			{
+				delete rpcbuffer[i].data.gametimechange;
 				break;
 			}
 		case NetworkRPCPlayerFullUpdate:
@@ -1132,6 +1157,11 @@ void NetworkManager::FreeRPCBuffer(void)
 				delete rpcbuffer[i].data.playerhealthandarmorchange;
 				break;
 			}
+		case NetworkRPCPlayerSpawnPositionChange:
+			{
+				delete rpcbuffer[i].data.playerspawnpositionchange;
+				break;
+			}
 		case NetworkRPCPlayerSpawn:
 			{
 				delete rpcbuffer[i].data.playerspawn;
@@ -1155,11 +1185,6 @@ void NetworkManager::FreeRPCBuffer(void)
 		case NetworkRPCNewVehicle:
 			{
 				delete rpcbuffer[i].data.newvehicle;
-				break;
-			}
-		case NetworkRPCTime:
-			{
-				delete rpcbuffer[i].data.time;
 				break;
 			}
 		case NetworkRPCPlayerPosition:

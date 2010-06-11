@@ -348,7 +348,7 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	PlayerSyncSkinVariation(data.client, data.compD, data.compT);
 
 	Log::Info(L"Set UP");
-	Natives::SetCharHeading(gPlayer[data.client].PedID, data.angle);
+	Natives::SetCharHeading(gPlayer[data.client].PedID, data.position[3]);
 	Natives::SetCharHealth(gPlayer[data.client].PedID, data.health);
 	Natives::AddArmourToChar(gPlayer[data.client].PedID, data.armor);
 	Natives::SetCharInvincible(gPlayer[data.client].PedID, 1);

@@ -9,6 +9,8 @@
 #include "Hook/types.h"
 //#include "Hook/scripting.h"
 
+struct Vector4 { float X, Y, Z, W; };
+
 struct FPlayer
 {
 	Ped PedID;
@@ -37,7 +39,6 @@ struct FPlayer
 	int room;
 	unsigned char color[4];
 	int compT[11], compD[11];
-	float spawn_pos[4];
 	bool want_spawn;
 };
 

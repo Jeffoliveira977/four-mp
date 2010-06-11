@@ -260,7 +260,7 @@ void ServerCore::SetTime(const unsigned char time[2])
 		return;
 	}
 	memcpy(gametime.time, &time, sizeof(unsigned char) * 2);
-	nm.SendTime(gametime.time);
+	nm.SendGameTimeChangeToAll(gametime.time);
 }
 
 void ServerCore::IncrementGameTime(void)

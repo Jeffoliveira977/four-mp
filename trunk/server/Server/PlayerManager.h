@@ -26,12 +26,13 @@ public:
 	bool GetPlayerArmor(const short index, unsigned char &armor);
 	char GetPlayerWantedLevel(const short index);
 	bool GetPlayerColor(const short index, unsigned char (&color)[4]);
+	bool GetPlayerSpawnPosition(const short index, float (&position)[4]);
+	bool SetPlayerModel(const short index, const unsigned int model);
+	bool SetPlayerPosition(const short index, const float position[3]);
+	bool SetPlayerSpawnPosition(const short index, const float position[4]);
 	unsigned char GetNumberOfPlayerClasses(void);
 	bool AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index);
 	bool GetPlayerClassData(const unsigned char index, unsigned int &model, float (&position)[3], float &angle, char (&weapons)[8], short (&ammo)[8]);
-	void SetPlayerSpawnPos(const short index, const float pos[4]);
-	void SetPlayerModel(const short index, const unsigned int model);
-	void SetPlayerPosition(const short index, const float pos[3]);
 private:
 	struct Player
 	{
@@ -58,8 +59,7 @@ private:
 		bool car_enter;
 		unsigned char color[4]; ///< Holds the color of the player.
 		int compT[11], compD[11];
-		float spawn_pos[4];
-		bool want_spawn;
+		float spawnposition[4];
 	};
 	short maxplayerbuffersize;
 	short playerbuffersize;

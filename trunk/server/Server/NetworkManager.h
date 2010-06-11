@@ -50,10 +50,11 @@ public:
 	void RecievePlayerComponentsChange(NetworkPlayerComponentsChangeData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 *clientrpc3);
 
+	bool SendGameTimeChangeToAll(const unsigned char time[2]);
+	bool SendPlayerModelChangeToAll(const short index);
+	bool SendPlayerSpawnPositionChange(const short index);
 	bool SendNewVehicleInfoToAll(const short index);
-	bool SendTime(const unsigned char time[2]);
 	bool SendPlayerPosition(const short index, const float pos[3], const float angle);
-	bool SendPlayerModel(const short index, const unsigned int model);
 private:
 	unsigned short serverport;
 	NetworkIDManager *manager;
@@ -138,7 +139,7 @@ private:
 	template <typename DATATYPE>
 	void SendDataToAll(const char *RPC, const DATATYPE *data);
 	template <typename DATATYPE>
-	void SendDataToOne(const char *RPC, const short index, const DATATYPE *data);
+	bool SendDataToOne(const char *RPC, const short index, const DATATYPE *data);
 	template <typename DATATYPE>
 	void SendDataToAllExceptOne(const char *RPC, const short index, const DATATYPE *data);
 	//void SendClassInfo(const short client);
