@@ -976,7 +976,7 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 
 			NetworkGameTimeChangeData timedata;
 			server.GetTime(timedata.time);
-			this->SendDataToOne("&NetworkManager::RecieveGameTime", data->playerspawnrequest->client, &timedata);
+			this->SendDataToOne("&NetworkManager::RecieveGameTimeChange", data->playerspawnrequest->client, &timedata);
 
 			delete data->playerspawnrequest;
 			break;
