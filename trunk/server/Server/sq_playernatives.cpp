@@ -86,7 +86,7 @@ void sq_GetPlayerHealth(HSQUIRRELVM v)
 {
 	int index;
 	sq_getinteger(v, 2, &index);
-	int health;
+	unsigned char health;
 	if (!playm.GetPlayerHealth(index, health))
 	{
 		sq_pushnull(v);

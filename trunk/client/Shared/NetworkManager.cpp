@@ -380,7 +380,7 @@ void NetworkManager::SendPlayerExitFromVehicle(void)
 	rpc3->CallCPP("&NetworkManager::RecievePlayerExitFromVehicle", serverid, data, rpc3);
 }
 
-void NetworkManager::SendPlayerFire(const float position[3], const int time, const short target, const unsigned int health, const unsigned int armor)
+void NetworkManager::SendPlayerFire(const float position[3], const int time, const short target, const unsigned char health, const unsigned int armor)
 {
 	NetworkPlayerFireData data;
 #if defined (FMP_CLIENT)

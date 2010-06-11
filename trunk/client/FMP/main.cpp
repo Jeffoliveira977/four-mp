@@ -561,7 +561,6 @@ void FMPHook::GameThread()
 
 	while(IsThreadAlive() && client.IsRunning())
 	{
-		Log::Info(L"GameThread Tick");
 		client.Tick();
 		GameState state = client.GetGameState();
 		switch (state)
@@ -590,7 +589,6 @@ void FMPHook::GameThread()
 				//	Natives::PrintStringWithLiteralStringNow("STRING", "SERVER NOT SEND INFO TO YOU", 5000, 1);
 				//}
 
-				Log::Info(L"Our index is %d", client.GetIndex());
 				if(gPlayer[client.GetIndex()].want_spawn)
 				{
 					if(gPlayer[client.GetIndex()].sync_state == 1) break;
@@ -613,17 +611,12 @@ void FMPHook::GameThread()
 				}
 
 				CheckAndCheck();
-				Log::Info(L"Check and check");
-
+				
 				MoveSync();
-				Log::Info(L"MoveSync");
 				CarDoSync();
-				Log::Info(L"CarSync");
 				GunSync();
-				Log::Info(L"GunSync");
 				StatusSync();
-				Log::Info(L"StatusSync");
-
+				
 				gPlayer[client.GetIndex()].last_active = GetTickCount();
 				break;
 			}

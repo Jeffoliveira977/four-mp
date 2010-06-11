@@ -28,7 +28,7 @@ public:
 	void SendPlayerEntranceInVehicle(const char seat);
 	void SendPlayerCancelEntranceInVehicle(void);
 	void SendPlayerExitFromVehicle(void);
-	void SendPlayerFire(const float position[3], const int time, const short target, const unsigned int health, const unsigned int armor);
+	void SendPlayerFire(const float position[3], const int time, const short target, const unsigned char health, const unsigned int armor);
 	void SendPlayerAim(const float position[3], const int time);
 	void SendPlayerWeaponChange(void);
 	void SendPlayerHealthAndArmorChange(void);

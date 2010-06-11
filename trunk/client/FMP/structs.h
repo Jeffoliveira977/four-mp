@@ -28,7 +28,8 @@ struct FPlayer
 	short vehicleindex;
 	char seatindex;
 	int score;
-	int health, armor;
+	unsigned char health;
+	int armor;
 	char wanted_level;
 	bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
 	bool isaiming; ///< Holds true if the player is aiming.
