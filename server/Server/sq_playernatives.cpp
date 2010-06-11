@@ -31,19 +31,18 @@ void sq_GetPlayerPosition(HSQUIRRELVM v)
 {
 	int index;
 	sq_getinteger(v, 2, &index);
-	float pos[3];
-	if (!playm.GetPlayerPosition(index, pos))
+	float position[3];
+	if (!playm.GetPlayerPosition(index, position))
 	{
 		sq_pushnull(v);
 		return;
 	}
-
 	sq_newarray(v, 0);
-	sq_pushfloat(v, pos[0]);
+	sq_pushfloat(v, position[0]);
 	sq_arrayappend(v, -2);
-	sq_pushfloat(v, pos[1]);
+	sq_pushfloat(v, position[1]);
 	sq_arrayappend(v, -2);
-	sq_pushfloat(v, pos[2]);
+	sq_pushfloat(v, position[2]);
 	sq_arrayappend(v, -2);
 	sq_push(v, -1);
 }
@@ -116,19 +115,26 @@ void sq_GetPlayerWantedLevel(HSQUIRRELVM v)
 	sq_pushinteger(v, wantedlevel);
 }
 
-void sq_SetPlayerSpawnPos(HSQUIRRELVM v)
+void sq_GetPlayerSpawnPosition(HSQUIRRELVM v)
 {
-	int index = 0;
-	float pos[4];
+	int index;
 	sq_getinteger(v, 2, &index);
-	sq_getfloat(v, 3, &pos[0]);
-	sq_getfloat(v, 4, &pos[1]);
-	sq_getfloat(v, 5, &pos[2]);
-	sq_getfloat(v, 6, &pos[3]);
-
-	PrintToServer(L"SPAWN POS %d: %f %f %f %f", index, pos[0], pos[1], pos[2], pos[3]);
-
-	playm.SetPlayerSpawnPos(index, pos);
+	float position[4];
+	if (!playm.GetPlayerSpawnPosition(index, position))
+	{
+		sq_pushnull(v);
+		return;
+	}
+	sq_newarray(v, 0);
+	sq_pushfloat(v, position[0]);
+	sq_arrayappend(v, -2);
+	sq_pushfloat(v, position[1]);
+	sq_arrayappend(v, -2);
+	sq_pushfloat(v, position[2]);
+	sq_arrayappend(v, -2);
+	sq_pushfloat(v, position[3]);
+	sq_arrayappend(v, -2);
+	sq_push(v, -1);
 }
 
 void sq_SetPlayerModel(HSQUIRRELVM v)
@@ -137,6 +143,20 @@ void sq_SetPlayerModel(HSQUIRRELVM v)
 	int model = 0;
 	sq_getinteger(v, 2, &index);
 	sq_getinteger(v, 3, &model);
+	sq_pushbool(v, playm.SetPlayerModel(index, model));
+}
 
-	playm.SetPlayerModel(index, model);
+void sq_SetPlayerSpawnPosition(HSQUIRRELVM v)
+{
+	int index = 0;
+	float position[4];
+	sq_getinteger(v, 2, &index);
+	sq_getfloat(v, 3, &position[0]);
+	sq_getfloat(v, 4, &position[1]);
+	sq_getfloat(v, 5, &position[2]);
+	sq_getfloat(v, 6, &position[3]);
+
+	PrintToServer(L"SPAWN POS %d: %f %f %f %f", index, position[0], position[1], position[2], position[3]);
+
+	sq_pushbool(v, playm.SetPlayerSpawnPosition(index, position));
 }

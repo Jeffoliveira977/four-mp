@@ -439,6 +439,48 @@ void NetworkManager::RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 
 	this->WriteToRPCBuffer(NetworkRPCPlayerChat, &data);
 }
 
+bool NetworkManager::SendGameTimeChangeToAll(const unsigned char time[2])
+{
+	NetworkGameTimeChangeData data;
+	memcpy(data.time, time, sizeof(unsigned char) * 2);
+
+	this->SendDataToAll("&NetworkManager::RecieveGameTimeChange", &data);
+	return true;
+}
+
+bool NetworkManager::SendPlayerModelChangeToAll(const short index)
+{
+	if ((index < 0) || (index >= playm.playerbuffersize))
+	{
+		return false;
+	}
+	if (playm.playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	NetworkPlayerModelChangeData data;
+	data.client = index;
+	data.model = playm.playerbuffer[index]->model;
+
+	SendDataToAll("&NetworkManager::RecievePlayerModelChange", &data);
+	return true;
+}
+
+bool NetworkManager::SendPlayerSpawnPositionChange(const short index)
+{
+	if ((index < 0) || (index >= playm.playerbuffersize))
+	{
+		return false;
+	}
+	if (playm.playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	NetworkPlayerSpawnPositionChangeData data;
+	memcpy(data.position, playm.playerbuffer[index]->spawnposition, sizeof(float) * 4);
+	return SendDataToOne("&NetworkManager::RecievePlayerSpawnPositionChange", index, &data);
+}
+
 bool NetworkManager::SendNewVehicleInfoToAll(const short index)
 {
 	if ((index < 0) || (index >= vm.vehiclebuffersize))
@@ -462,33 +504,15 @@ bool NetworkManager::SendNewVehicleInfoToAll(const short index)
 	return true;
 }
 
-bool NetworkManager::SendTime(const unsigned char time[2])
-{
-	NetworkTimeData data;
-	memcpy(data.time, time, sizeof(unsigned char) * 2);
-
-	this->SendDataToAll("&NetworkManager::RecieveGameTime", &data);
-	return true;
-}
-
 bool NetworkManager::SendPlayerPosition(const short index, const float pos[3], const float angle)
 {
+	//TODO: Redo.
 	NetworkPlayerPositionData data;
 	data.client = index;
 	memcpy(data.pos, pos, 3 * sizeof(float));
 	data.angle = angle;
 
 	SendDataToAll("&NetworkManager::RecievePlayerPosition", &data);
-	return true;
-}
-
-bool NetworkManager::SendPlayerModel(const short index, const unsigned int model)
-{
-	NetworkPlayerModelChangeData data;
-	data.client = index;
-	data.model = model;
-
-	SendDataToAll("&NetworkManager::RecievePlayerModelChange", &data);
 	return true;
 }
 
@@ -669,9 +693,9 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		}
 	case NetworkRPCPlayerConnectionConfirmation:
 		{
-			NetworkTimeData timedata;
+			NetworkGameTimeChangeData timedata;
 			server.GetTime(timedata.time);
-			this->SendDataToOne("&NetworkManager::RecieveGameTime", data->playerconnectionconfirmation->client, &timedata);
+			this->SendDataToOne("&NetworkManager::RecieveGameTimeChange", data->playerconnectionconfirmation->client, &timedata);
 
 			NetworkPlayerFullUpdateData *playerdata;
 			//TODO: Optimize using currently connected players, not buffer size.
@@ -932,25 +956,21 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			playm.playerbuffer[data->playerspawnrequest->client]->armor = 0;
 			playm.playerbuffer[data->playerspawnrequest->client]->health = 200;
 			playm.playerbuffer[data->playerspawnrequest->client]->room = 0;
-			playm.playerbuffer[data->playerspawnrequest->client]->want_spawn = 1;
-
-			PrintToServer(L"Spawn RPC %d", data->playerspawnrequest->client);
+			
 			vmm.OnPlayerSpawn(data->playerspawnrequest->client);
 
-			playm.playerbuffer[data->playerspawnrequest->client]->want_spawn = 0;
 			data2.armor = playm.playerbuffer[data->playerspawnrequest->client]->armor;
 			data2.health = playm.playerbuffer[data->playerspawnrequest->client]->health;
 			data2.model = playm.playerbuffer[data->playerspawnrequest->client]->model;
-			data2.angle = playm.playerbuffer[data->playerspawnrequest->client]->spawn_pos[3];
+			memcpy(data2.position, playm.playerbuffer[data->playerspawnrequest->client]->spawnposition, sizeof(float) * 4);
 			data2.room = playm.playerbuffer[data->playerspawnrequest->client]->room;
-			memcpy(data2.position, playm.playerbuffer[data->playerspawnrequest->client]->spawn_pos, sizeof(float) * 3);
 			memcpy(data2.compD, playm.playerbuffer[data->playerspawnrequest->client]->compD, sizeof(int) * 11);
 			memcpy(data2.compT, playm.playerbuffer[data->playerspawnrequest->client]->compT, sizeof(int) * 11);
 			data2.client = data->playerspawnrequest->client;
 
 			this->SendDataToAll("&NetworkManager::RecievePlayerSpawn", &data2);
 
-			NetworkTimeData timedata;
+			NetworkGameTimeChangeData timedata;
 			server.GetTime(timedata.time);
 			this->SendDataToOne("&NetworkManager::RecieveGameTime", data->playerspawnrequest->client, &timedata);
 
@@ -1271,17 +1291,18 @@ void NetworkManager::SendDataToAll(const char *RPC, const DATATYPE *data)
 }
 
 template <typename DATATYPE>
-void NetworkManager::SendDataToOne(const char *RPC, const short index, const DATATYPE *data)
+bool NetworkManager::SendDataToOne(const char *RPC, const short index, const DATATYPE *data)
 {
 	if((index < 0) && (index >= clientbuffersize))
 	{
-		return;
+		return false;
 	}
 	if (clientbuffer[index] == NULL)
 	{
-		return;
+		return false;
 	}
 	rpc3->CallCPP(RPC, clientbuffer[index]->id, *data, rpc3);
+	return true;
 }
 
 template <typename DATATYPE>

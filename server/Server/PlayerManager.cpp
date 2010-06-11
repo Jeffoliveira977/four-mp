@@ -223,6 +223,63 @@ bool PlayerManager::GetPlayerColor(const short index, unsigned char (&color)[4])
 	return true;
 }
 
+bool PlayerManager::GetPlayerSpawnPosition(const short index, float (&position)[4])
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return false;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	memcpy(position, playerbuffer[index]->spawnposition, sizeof(float) * 4);
+	return true;
+}
+
+bool PlayerManager::SetPlayerModel(const short index, const unsigned int model)
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return false;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	playerbuffer[index]->model = model;
+	return nm.SendPlayerModelChangeToAll(index);
+}
+
+bool PlayerManager::SetPlayerPosition(const short index, const float position[3])
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return false;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	memcpy(playerbuffer[index]->position, position, sizeof(float) * 3);
+	nm.SendPlayerPosition(index, position, playerbuffer[index]->angle);
+	return true;
+}
+
+bool PlayerManager::SetPlayerSpawnPosition(const short index, const float position[4])
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return false;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	memcpy(playerbuffer[index]->spawnposition, position, 4 * sizeof(float));
+	return nm.SendPlayerSpawnPositionChange(index);
+}
+
 unsigned char PlayerManager::GetNumberOfPlayerClasses(void)
 {
 	unsigned char numclasses = 0;
@@ -234,24 +291,6 @@ unsigned char PlayerManager::GetNumberOfPlayerClasses(void)
 		}
 	}
 	return numclasses;
-}
-
-void PlayerManager::SetPlayerSpawnPos(const short index, const float pos[4])
-{
-	memcpy(playerbuffer[index]->spawn_pos, pos, 4 * sizeof(float));
-}
-
-void PlayerManager::SetPlayerModel(const short index, const unsigned int model)
-{
-	playerbuffer[index]->model = model;
-	if(!playerbuffer[index]->want_spawn) 
-		nm.SendPlayerModel(index, model);
-}
-void PlayerManager::SetPlayerPosition(const short index, const float pos[3])
-{
-	memcpy(playerbuffer[index]->position, pos, sizeof(float)*3);
-	if(!playerbuffer[index]->want_spawn)
-		nm.SendPlayerPosition(index, pos, playerbuffer[index]->angle);
 }
 
 bool PlayerManager::AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index)
@@ -396,6 +435,10 @@ bool PlayerManager::RegisterNewPlayer(const short index, wchar_t (&name)[MAX_PLA
 	playerbuffer[index]->color[1] = 0xFF;
 	playerbuffer[index]->color[2] = 0x00;
 	playerbuffer[index]->color[3] = 0x00;
+	playerbuffer[index]->spawnposition[0] = 0;
+	playerbuffer[index]->spawnposition[1] = 0;
+	playerbuffer[index]->spawnposition[2] = 0;
+	playerbuffer[index]->spawnposition[3] = 0;
 	playerbuffer[index]->currentweapon = 0;
 	numplayers++;
 	return true;

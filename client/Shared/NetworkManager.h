@@ -41,6 +41,7 @@ public:
 	void RecieveClientConnectionError(NetworkPlayerConnectionErrorData data, RakNet::RPC3 *serverrpc3);
 	void RecieveClientInfo(NetworkPlayerInfoData data, RakNet::RPC3 *serverrpc3);
 	void RecieveClientDisconnection(NetworkPlayerDisconnectionData data, RakNet::RPC3 *serverrpc3);
+	void RecieveGameTimeChange(NetworkGameTimeChangeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerFullUpdate(NetworkPlayerFullUpdateData data, RakNet::RPC3 *serverrpc3);
 	void RecieveVehicleFullUpdate(NetworkVehicleFullUpdateData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *serverrpc3);
@@ -53,12 +54,12 @@ public:
 	void RecievePlayerAim(NetworkPlayerAimData, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerWeaponChange(NetworkPlayerWeaponChangeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerHealthAndArmorChange(NetworkPlayerHealthAndArmorChangeData data, RakNet::RPC3 *serverrpc3);
+	void RecievePlayerSpawnPositionChange(NetworkPlayerSpawnPositionChangeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerSpawn(NetworkPlayerSpawnData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerModelChange(NetworkPlayerModelChangeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerComponentsChange(NetworkPlayerComponentsChangeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerChat(NetworkPlayerChatData data, RakNet::RPC3 *serverrpc3);
 	void RecieveNewVehicle(NetworkVehicleFullUpdateData data, RakNet::RPC3 *serverrpc3);
-	void RecieveGameTime(NetworkTimeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerPosition(NetworkPlayerPositionData data, RakNet::RPC3 *serverrpc3);
 private:
 	NetworkIDManager *manager;
@@ -73,6 +74,7 @@ private:
 		NetworkRPCPlayerConnectionError,
 		NetworkRPCPlayerInfo,
 		NetworkRPCPlayerDisconnection,
+		NetworkRPCGameTimeChange,
 		NetworkRPCPlayerFullUpdate,
 		NetworkRPCVehicleFullUpdate,
 		NetworkRPCPlayerMove,
@@ -85,12 +87,12 @@ private:
 		NetworkRPCPlayerAim,
 		NetworkRPCPlayerWeaponChange,
 		NetworkRPCPlayerHealthAndArmorChange,
+		NetworkRPCPlayerSpawnPositionChange,
 		NetworkRPCPlayerSpawn,
 		NetworkRPCPlayerModelChange,
 		NetworkRPCPlayerComponentsChange,
 		NetworkRPCPlayerChat,
 		NetworkRPCNewVehicle,
-		NetworkRPCTime,
 		NetworkRPCPlayerPosition
 	};
 	union NetworkRPCUnion
@@ -99,6 +101,7 @@ private:
 		NetworkPlayerConnectionErrorData *playerconnectionerror;
 		NetworkPlayerInfoData *playerinfo;
 		NetworkPlayerDisconnectionData *playerdisconnection;
+		NetworkGameTimeChangeData *gametimechange;
 		NetworkPlayerFullUpdateData *playerfullupdate;
 		NetworkVehicleFullUpdateData *vehiclefullupdate;
 		NetworkPlayerMoveData *playermove;
@@ -111,12 +114,12 @@ private:
 		NetworkPlayerAimData *playeraim;
 		NetworkPlayerWeaponChangeData *playerweaponchange;
 		NetworkPlayerHealthAndArmorChangeData *playerhealthandarmorchange;
+		NetworkPlayerSpawnPositionChangeData *playerspawnpositionchange;
 		NetworkPlayerSpawnData *playerspawn;
 		NetworkPlayerModelChangeData *playermodelchange;
 		NetworkPlayerComponentsChangeData *playercomponentschange;
 		NetworkPlayerChatData *playerchat;
 		NetworkVehicleFullUpdateData *newvehicle;
-		NetworkTimeData *time;
 		NetworkPlayerPositionData *playerpos;
 	};
 	struct NetworkRPCData

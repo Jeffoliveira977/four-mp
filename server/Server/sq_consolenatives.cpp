@@ -138,7 +138,7 @@ void sq_ResetConVar(HSQUIRRELVM v)
 	unsigned char index;
 	if (!vmm.FindVirtualMachine(&v, index))
 	{
-		sq_pushinteger(v, INVALID_HANDLE);
+		sq_pushbool(v, false);
 		return;
 	}
 	sq_pushbool(v, chtm.ResetConVar(index + 1, handle));

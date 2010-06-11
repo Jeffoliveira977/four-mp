@@ -135,6 +135,7 @@ private:
 
 	static void _stdcall FiberStart(void* parameter);
 	Camera freeCam;
+	Vector4 spawnposition;
 
 protected:
 	ThreadStates Reset(unsigned int hash,int v2,int i3);
@@ -162,6 +163,8 @@ public:
 	void KillMe();
 	void SetFreeCam(bool);
 	bool IsFreeCam();
+	Vector4 GetSpawnPosition(void);
+	void SetSpawnPosition(const float position[4]);
 
 	void GetTime();
 	void SetTimeScale(float ts);

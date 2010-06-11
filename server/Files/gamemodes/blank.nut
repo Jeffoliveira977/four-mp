@@ -37,7 +37,6 @@ function OnPlayerSpawn(playerid)
 {
 	print("hello spawn");
 	//SetPlayerHP(playerid,200);
-	SetPlayerSpawnPos(playerid, -106.500755, 764.368164, 15.337303, 180.0);
 	if(playerid == 0) SetPlayerModel(playerid, 0x6AF081E8); // Playboy X
 	else if(playerid == 1) SetPlayerModel(playerid, 0x58A1E271); // Liljacob
 	else if(playerid == 2) SetPlayerModel(playerid, 0x89395FC9); // Roman
@@ -46,6 +45,7 @@ function OnPlayerSpawn(playerid)
 
 function OnPlayerDeath(playerid, killerid, reason)
 {
+	SetPlayerSpawnPosition(playerid, -106.500755, 764.368164, 15.337303, 180.0);
 	SendClientMessageToAll(GetPlayerName(killerid) + " [" + killerid + "]" + " kill " + GetPlayerName(playerid) + " [" + playerid + "]" + " reason: " + reason);
 }	
 

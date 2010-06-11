@@ -131,6 +131,19 @@ void FMPHook::SetFreeCam(bool on)
 	}
 }
 
+Vector4 FMPHook::GetSpawnPosition(void)
+{
+	return spawnposition;
+}
+
+void FMPHook::SetSpawnPosition(const float position[4])
+{
+	spawnposition.X = position[0];
+	spawnposition.Y = position[1];
+	spawnposition.Z = position[2];
+	spawnposition.W = position[3];
+}
+
 void FMPHook::CreateCar(short index, unsigned int model, float position[3], float angle, unsigned char color[2])
 {
 	Log::Info(L"CREATE CAR %d", index);
@@ -600,9 +613,10 @@ void FMPHook::GameThread()
 					Log::Info(L"Changed player model");
 					Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
 
-					Natives::SetCharCoordinates(gPlayer[index].PedID, gPlayer[index].spawn_pos[0], gPlayer[index].spawn_pos[1], gPlayer[index].spawn_pos[2]);
+					Vector4 position = GetSpawnPosition();
+					Natives::SetCharCoordinates(gPlayer[index].PedID, position.X, position.Y, position.Z);
 					Log::Info(L"Teleported player");
-					Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].spawn_pos[3]);
+					Natives::SetCharHeading(gPlayer[index].PedID, position.W);
 					Natives::SetCharHealth(gPlayer[index].PedID, gPlayer[index].health);
 					Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
 					Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
@@ -766,23 +780,12 @@ bool IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE(int a1)
 	return 0;
 }
 
-struct Vector4 { float X, Y, Z, W; };
-
 Vector4 GetSpawnPos(Vector4 *pos, float angle, Vector4 *result) //8E6840
 {
 	Log::Info(L"GetSpawnPos");
-	short index = client.GetIndex();
-	gPlayer[index].want_spawn = 1;
+	gPlayer[client.GetIndex()].want_spawn = 1;
 	nm.SendPlayerSpawnRequest();
-
-	while(gPlayer[index].want_spawn) 
-    {
-        client.Tick();
-        Sleep(25);
-    }
-
-	memcpy(result, gPlayer[client.GetIndex()].spawn_pos, sizeof(Vector4));
-	gPlayer[index].want_spawn = 1;
+	memcpy(result, &HOOK.GetSpawnPosition(), sizeof(Vector4));
 	Log::Info(L"GetSpawnPos end");
 	return *result;
 }
