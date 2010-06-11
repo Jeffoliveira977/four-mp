@@ -182,7 +182,7 @@ bool PlayerManager::GetPlayerHealth(const short index, unsigned char &health)
 	return true;
 }
 
-bool PlayerManager::GetPlayerArmor(const short index, int &armor)
+bool PlayerManager::GetPlayerArmor(const short index, unsigned char &armor)
 {
 	if ((index < 0) || (index >= playerbuffersize))
 	{

@@ -64,6 +64,8 @@ bool ClientCore::Load(void)
 	concore.AddConCmd(L"connect", ConCmdConnect, L"Connect to specified server.", 0);
 	concore.AddConCmd(L"exit", ConCmdQuit, L"Exit the engine.", 0);
 #if defined (FMP_CLIENT)
+	concore.AddConCmd(L"addarmor", ConCmdAddarmor);
+	concore.AddConCmd(L"getarmor", ConCmdGetarmor);
 	concore.AddConCmd(L"gethealth", ConCmdGethealth);
 	concore.AddConCmd(L"hurtme", ConCmdHurtme, L"Hurts the player. Arguments: <health to lose>");
 #endif
