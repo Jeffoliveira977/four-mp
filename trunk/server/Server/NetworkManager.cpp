@@ -935,6 +935,10 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			}
 			playm.playerbuffer[data->playerhealthandarmorchange->client]->health = data->playerhealthandarmorchange->health;
 			playm.playerbuffer[data->playerhealthandarmorchange->client]->armor = data->playerhealthandarmorchange->armor;
+			if (playm.playerbuffer[data->playerhealthandarmorchange->client]->health < 100)
+			{
+				vmm.OnPlayerDeath(data->playerhealthandarmorchange->client, INVALID_PLAYER_INDEX, 46);
+			}
 			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerHealthAndArmorChange", data->playerhealthandarmorchange->client, data->playerhealthandarmorchange);
 			delete data->playerhealthandarmorchange;
 			break;

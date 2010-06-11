@@ -404,9 +404,9 @@ bool PlayerManager::RegisterNewPlayer(const short index, wchar_t (&name)[MAX_PLA
 	wcscpy(playerbuffer[index]->name, name);
 	playerbuffer[index]->classindex = 0;
 	playerbuffer[index]->model = 0x98E29920;
-	playerbuffer[index]->position[0] = 0;
-	playerbuffer[index]->position[1] = 0;
-	playerbuffer[index]->position[2] = 0;
+	playerbuffer[index]->position[0] = -43.250000;
+	playerbuffer[index]->position[1] = -2.875000;
+	playerbuffer[index]->position[2] = 14.818866;
 	playerbuffer[index]->angle = 0;
 	playerbuffer[index]->last_active = 0;
 	playerbuffer[index]->sync_state = 0;
@@ -435,9 +435,9 @@ bool PlayerManager::RegisterNewPlayer(const short index, wchar_t (&name)[MAX_PLA
 	playerbuffer[index]->color[1] = 0xFF;
 	playerbuffer[index]->color[2] = 0x00;
 	playerbuffer[index]->color[3] = 0x00;
-	playerbuffer[index]->spawnposition[0] = 0;
-	playerbuffer[index]->spawnposition[1] = 0;
-	playerbuffer[index]->spawnposition[2] = 0;
+	playerbuffer[index]->spawnposition[0] = -43.250000;
+	playerbuffer[index]->spawnposition[1] = -2.875000;
+	playerbuffer[index]->spawnposition[2] = 14.818866;
 	playerbuffer[index]->spawnposition[3] = 0;
 	playerbuffer[index]->currentweapon = 0;
 	numplayers++;
