@@ -39,9 +39,9 @@ FMPHook::FMPHook(): FMPThread()
 	m_pScriptFiber = NULL;
 	m_bKillRequested = false;
 	m_nWaitTick = 0;
-	spawnposition.X = 0;
-	spawnposition.Y = 0;
-	spawnposition.Z = 0;
+	spawnposition.X = -43.250000;
+	spawnposition.Y = -2.875000;
+	spawnposition.Z = 14.818866;
 	spawnposition.W = 0;
 }
 
