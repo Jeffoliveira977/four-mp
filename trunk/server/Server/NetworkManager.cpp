@@ -1027,6 +1027,11 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 				delete data->playerchat;
 				return;
 			}
+			wchar_t tempstring[MAX_CHAT_MESSAGE_LENGTH];
+			_snwprintf(tempstring, MAX_CHAT_MESSAGE_LENGTH, L"%s: %s", playm.playerbuffer[data->playerchat->client]->name, data->playerchat->message);
+			tempstring[MAX_CHAT_MESSAGE_LENGTH-1] = L'\0';
+			PrintToServer(tempstring);
+			wcscpy(data->playerchat->message, tempstring);
 			this->SendDataToAll("&NetworkManager::RecievePlayerChat", data->playerchat);
 			delete data->playerchat;
 			break;
