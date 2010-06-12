@@ -120,12 +120,12 @@ void MasterServerManager::ReadPacket(const RakString data)
 		} break;
 	case MSS_WAIT_CLAN_CHECK:
 		{
-			printf("%s\n", data.C_String());
+			debug(L"%S\n", data.C_String());
 
 			if(data.C_String()[1] == 'O') state = MSS_NONE;
 			else state = MSS_ERROR;
 		} break;
-	default: printf("?????"); break;
+	default: PrintToServer(L"Recieved unknown packet from the master server."); break;
 	}
 }
 
@@ -144,7 +144,7 @@ void MasterServerManager::Process(void)
 		int code;
 		RakNet::RakString data;
 		if(http->HasBadResponse(&code, &data))
-			printf("Error code %d: %s", code, data.C_String());
+			PrintToServer(L"Master server error %d: %S", code, data.C_String());
 		else
 			ReadPacket(http->Read());
 	}
