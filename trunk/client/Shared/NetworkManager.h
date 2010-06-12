@@ -25,9 +25,11 @@ public:
 	void SendPlayerMove(const float speed);
 	void SendPlayerJump(void);
 	void SendPlayerDuck(void);
-	void SendPlayerEntranceInVehicle(const char seat);
+	void SendPlayerStartEntranceInVehicle(void);
 	void SendPlayerCancelEntranceInVehicle(void);
-	void SendPlayerExitFromVehicle(void);
+	void SendPlayerFinishEntranceInVehicle(void);
+	void SendPlayerStartExitFromVehicle(void);
+	void SendPlayerFinishExitFromVehicle(void);
 	void SendPlayerFire(const float position[3], const int time, const short target, const unsigned char health, const unsigned int armor);
 	void SendPlayerAim(const float position[3], const int time);
 	void SendPlayerWeaponChange(void);
@@ -47,9 +49,11 @@ public:
 	void RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerJump(NetworkPlayerJumpData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerDuck(NetworkPlayerDuckData data, RakNet::RPC3 *serverrpc3);
-	void RecievePlayerEntranceInVehicle(NetworkPlayerEntranceInVehicleData data, RakNet::RPC3 *serverrpc3);
+	void RecievePlayerStartEntranceInVehicle(NetworkPlayerStartEntranceInVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerCancelEntranceInVehicle(NetworkPlayerCancelEntranceInVehicleData data, RakNet::RPC3 *serverrpc3);
-	void RecievePlayerExitFromVehicle(NetworkPlayerExitFromVehicleData data, RakNet::RPC3 *serverrpc3);
+	void RecievePlayerFinishEntranceInVehicle(NetworkPlayerFinishEntranceInVehicleData data, RakNet::RPC3 *serverrpc3);
+	void RecievePlayerStartExitFromVehicle(NetworkPlayerStartExitFromVehicleData data, RakNet::RPC3 *serverrpc3);
+	void RecievePlayerFinishExitFromVehicle(NetworkPlayerFinishExitFromVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerAim(NetworkPlayerAimData, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerWeaponChange(NetworkPlayerWeaponChangeData data, RakNet::RPC3 *serverrpc3);
@@ -80,9 +84,11 @@ private:
 		NetworkRPCPlayerMove,
 		NetworkRPCPlayerJump,
 		NetworkRPCPlayerDuck,
-		NetworkRPCPlayerEntranceInVehicle,
+		NetworkRPCPlayerStartEntranceInVehicle,
 		NetworkRPCPlayerCancelEntranceInVehicle,
-		NetworkRPCPlayerExitFromVehicle,
+		NetworkRPCPlayerFinishEntranceInVehicle,
+		NetworkRPCPlayerStartExitFromVehicle,
+		NetworkRPCPlayerFinishExitFromVehicle,
 		NetworkRPCPlayerFire,
 		NetworkRPCPlayerAim,
 		NetworkRPCPlayerWeaponChange,
@@ -107,9 +113,11 @@ private:
 		NetworkPlayerMoveData *playermove;
 		NetworkPlayerJumpData *playerjump;
 		NetworkPlayerDuckData *playerduck;
-		NetworkPlayerEntranceInVehicleData *playerentranceinvehicle;
+		NetworkPlayerStartEntranceInVehicleData *playerstartentranceinvehicle;
 		NetworkPlayerCancelEntranceInVehicleData *playercancelentranceinvehicle;
-		NetworkPlayerExitFromVehicleData *playerexitfromvehicle;
+		NetworkPlayerFinishEntranceInVehicleData *playerfinishentranceinvehicle;
+		NetworkPlayerStartExitFromVehicleData *playerstartexitfromvehicle;
+		NetworkPlayerFinishExitFromVehicleData *playerfinishexitfromvehicle;
 		NetworkPlayerFireData *playerfire;
 		NetworkPlayerAimData *playeraim;
 		NetworkPlayerWeaponChangeData *playerweaponchange;

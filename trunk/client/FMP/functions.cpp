@@ -2,8 +2,10 @@
 #include "Hook\types.h"
 #include "Hook\classes.h"
 #include "Hook\scripting.h"
-#include "main.h"
 #include "log.h"
+#include "VehicleManager.h"
+
+extern FVehicle gVehicle[MAX_VEHICLES];
 
 using namespace Natives;
 
@@ -84,12 +86,12 @@ float GetDist(float x1,float y1,float z1,float x2, float y2, float z2)
 short _GetClosestCar(float x, float y, float z, float r)
 {
 	float min = r;
-	int id = -1;
-	for(int i = 0; i < MAX_CARS; i++)
+	short id = INVALID_VEHICLE_INDEX;
+	for (short i = 0; i < MAX_VEHICLES; i++)
 	{
-		if(gCar[i].exist == 1)
+		if(gVehicle[i].exist == 1)
 		{
-			float d = GetDist(x, y, z, gCar[i].position[0], gCar[i].position[1], gCar[i].position[2]);
+			float d = GetDist(x, y, z, gVehicle[i].position[0], gVehicle[i].position[1], gVehicle[i].position[2]);
 			if(d < min)
 			{
 				min = d;
@@ -102,11 +104,11 @@ short _GetClosestCar(float x, float y, float z, float r)
 
 short GetPlayerCar(Vehicle car)
 {
-	for(int i = 0; i < MAX_CARS; i++)
+	for(int i = 0; i < MAX_VEHICLES; i++)
 	{
-		if(gCar[i].exist == 1)
+		if(gVehicle[i].exist == 1)
 		{
-			if(car == gCar[i].CarID)
+			if(car == gVehicle[i].CarID)
 				return i;
 		}
 	}

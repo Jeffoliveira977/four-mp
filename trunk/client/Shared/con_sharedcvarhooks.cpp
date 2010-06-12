@@ -17,10 +17,10 @@ void ConVarHookName(ConVar *convar, const ConVarType oldtype, void *oldvalue, co
 	if (newtype == ConVarTypeString)
 	{
 		size_t length = wcslen((wchar_t *)newvalue);
-		if (length > MAX_PLAYER_NAME_LENGTH - 1)
+		if (length > MAX_CLIENT_NAME_LENGTH - 1)
 		{
-			wcsncpy(client.name, (wchar_t *)newvalue, MAX_PLAYER_NAME_LENGTH - 1);
-			client.name[MAX_PLAYER_NAME_LENGTH-1] = L'\0';
+			wcsncpy(client.name, (wchar_t *)newvalue, MAX_CLIENT_NAME_LENGTH - 1);
+			client.name[MAX_CLIENT_NAME_LENGTH-1] = L'\0';
 			return;
 		}
 		wcsncpy(client.name, (wchar_t *)newvalue, length);
@@ -33,10 +33,10 @@ void ConVarHookName(ConVar *convar, const ConVarType oldtype, void *oldvalue, co
 		return;
 	}
 	size_t length = wcslen(value);
-	if (length > MAX_PLAYER_NAME_LENGTH - 1)
+	if (length > MAX_CLIENT_NAME_LENGTH - 1)
 	{
-		wcsncpy(client.name, value, MAX_PLAYER_NAME_LENGTH - 1);
-		client.name[MAX_PLAYER_NAME_LENGTH - 1] = L'\0';
+		wcsncpy(client.name, value, MAX_CLIENT_NAME_LENGTH - 1);
+		client.name[MAX_CLIENT_NAME_LENGTH - 1] = L'\0';
 		return;
 	}
 	wcsncpy(client.name, value, length);

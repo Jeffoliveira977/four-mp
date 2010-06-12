@@ -1,11 +1,10 @@
 #include <windows.h>
-#include "../main.h"
 #include "window.h"
 #include "../../Shared/ClientCore.h"
 #include "../Hook/classes.h"
 #include "../d3d9/Gui.h"
 #include "../ConsoleWindow.h"
-#include "../chat.h"
+#include "../ChatManager.h"
 
 extern ClientCore client;
 extern FMPHook HOOK;

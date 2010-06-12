@@ -6,9 +6,9 @@
 //#include "Hook\hook.h"
 #include "Hook/scripting.h"
 #include "functions.h"
-#include "structs.h"
-#include "main.h"
 #include "../Shared/ClientCore.h"
+#include "PlayerManager.h"
+#include "VehicleManager.h"
 #include "../Shared/NetworkManager.h"
 
 scrThread* GetActiveThread();
@@ -17,6 +17,9 @@ void SetActiveThread(scrThread* thread);
 extern ClientCore client;
 extern FMPHook HOOK;
 extern NetworkManager nm;
+
+extern FPlayer gPlayer[MAX_PLAYERS];
+extern FVehicle gVehicle[MAX_VEHICLES];
 
 void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, float position[3], bool start)
 {
@@ -92,6 +95,7 @@ void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, floa
 		wcstombs(tempname, name, length);
 		Natives::GivePedFakeNetworkName(gPlayer[index].PedID, tempname, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
 		free(tempname);
+		Natives::AddBlipForChar(gPlayer[index].PedID, &gPlayer[index].radarblip);
 		Log::Info(L"Player NAME: %s 0x%x%x%x alpha:%x",name, gPlayer[index].color[1],gPlayer[index].color[2],gPlayer[index].color[3],gPlayer[index].color[0]);
 		Natives::SetBlockingOfNonTemporaryEvents(gPlayer[index].PedID, 1);
 		Natives::SetCharInvincible(gPlayer[index].PedID, 1);
@@ -104,8 +108,8 @@ void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, floa
 
 	if(gPlayer[index].vehicleindex != -1)
 	{
-		if(gPlayer[index].seatindex == -1) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gCar[gPlayer[index].vehicleindex].CarID, 0);
-		else Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gCar[gPlayer[index].vehicleindex].CarID, 0, gPlayer[index].seatindex);
+		if(gPlayer[index].seatindex == -1) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID, 0);
+		else Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID, 0, gPlayer[index].seatindex);
 	}
 
 	for(int i = 0; i < 8; i++)
@@ -199,10 +203,10 @@ void FMPHook::PlayerMove(short index, float position[3], float speed)
 		if(speed * 3 < d)
 		{
 			Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
-			Natives::SetCarHeading(gCar[gPlayer[index].vehicleindex].CarID, gCar[gPlayer[index].vehicleindex].angle);
+			Natives::SetCarHeading(gVehicle[gPlayer[index].vehicleindex].CarID, gVehicle[gPlayer[index].vehicleindex].angle);
 		}
 
-		Natives::TaskCarDriveToCoord(gPlayer[index].PedID, gCar[gPlayer[index].vehicleindex].CarID, position[0], position[1], position[2], speed, vect, 2, 3, 2, 45000000);
+		Natives::TaskCarDriveToCoord(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID, position[0], position[1], position[2], speed, vect, 2, 3, 2, 45000000);
 	}
 	gPlayer[index].last_active = GetTickCount();
 }
@@ -224,11 +228,23 @@ void FMPHook::PlayerDisconnect(short index)
 	if(!SafeCheckPlayer(index)) return;
 
 	Log::Info(L"DELETE CHAR %d", index);
+	Natives::RemoveBlip(gPlayer[index].radarblip);
 	Natives::DeleteChar(&gPlayer[index].PedID);
 	gPlayer[index].connected = 0;
 }
 
-void FMPHook::CancelEnterInVehicle(short index)
+void FMPHook::StartEnterInVehicle(const short playerindex, const short vehicleindex, const char seatindex)
+{
+	if(!SafeCheckPlayer(playerindex)) return;
+	if(!SafeCheckVehicle(vehicleindex)) return;
+
+	if(seatindex == 0) Natives::TaskEnterCarAsDriver(gPlayer[playerindex].PedID, gVehicle[vehicleindex].CarID, -1);
+	else if(seatindex > 0) Natives::TaskEnterCarAsPassenger(gPlayer[playerindex].PedID, gVehicle[vehicleindex].CarID, -1, seatindex - 1);
+	gPlayer[playerindex].vehicleindex = vehicleindex;
+	gPlayer[playerindex].seatindex = seatindex;
+}
+
+void FMPHook::CancelEnterInVehicle(const short index)
 {
 	if(!SafeCheckPlayer(index)) return;
 
@@ -237,24 +253,31 @@ void FMPHook::CancelEnterInVehicle(short index)
 	gPlayer[index].vehicleindex = -1;
 }
 
-void FMPHook::ExitFromVehicle(short index)
+void FMPHook::FinishEnterInVehicle(const short index)
 {
 	if(!SafeCheckPlayer(index)) return;
 
-	Log::Info(L"ExitFromVehicle %d", index);
-	Natives::TaskLeaveAnyCar(gPlayer[index].PedID);
-	gPlayer[index].vehicleindex = -1;
+	if(gPlayer[index].seatindex == 0) Natives::WarpCharIntoCar(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID);
+	else if(gPlayer[index].seatindex > 0) Natives::WarpCharIntoCarAsPassenger(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID, gPlayer[index].seatindex - 1);
 }
 
-void FMPHook::EnterInVehicle(short index, int car, int seat)
+void FMPHook::StartExitFromVehicle(const short index)
+{
+	if(!SafeCheckPlayer(index)) return;
+	if(!SafeCheckVehicle(gPlayer[index].vehicleindex)) return;
+
+	Log::Info(L"StartExitFromVehicle %d", index);
+	Natives::TaskLeaveAnyCar(gPlayer[index].PedID);
+}
+
+void FMPHook::FinishExitFromVehicle(const short index)
 {
 	if(!SafeCheckPlayer(index)) return;
 
-	Log::Info(L"EnterInVehicle %d, %d, %d", index, car, seat);
-	if(seat == 0) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gCar[car].CarID, -1);
-	else if(seat > 0) Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gCar[car].CarID, -1, seat-1);
-	gPlayer[index].vehicleindex = car;
-	gPlayer[index].seatindex = seat;
+	Log::Info(L"FinishExitFromVehicle %d", index);
+	
+	Natives::SetCharCoordinates(gPlayer[index].PedID, gPlayer[index].position[0], gPlayer[index].position[1], gPlayer[index].position[2]);
+	gPlayer[index].vehicleindex = INVALID_VEHICLE_INDEX;
 }
 
 void FMPHook::PlayerFireAim(short index, int gun, int time, float x, float y, float z, bool fire)

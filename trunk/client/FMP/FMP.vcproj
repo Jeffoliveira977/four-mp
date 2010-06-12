@@ -183,7 +183,7 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\chat.cpp"
+				RelativePath=".\ChatManager.cpp"
 				>
 			</File>
 			<File
@@ -235,7 +235,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PlayerManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PlayersSync.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\VehicleManager.cpp"
 				>
 			</File>
 			<File
@@ -293,7 +301,7 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\chat.h"
+				RelativePath=".\ChatManager.h"
 				>
 			</File>
 			<File
@@ -329,10 +337,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\main.h"
-				>
-			</File>
-			<File
 				RelativePath=".\masterserver.h"
 				>
 			</File>
@@ -341,7 +345,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\structs.h"
+				RelativePath=".\PlayerManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VehicleManager.h"
 				>
 			</File>
 			<Filter
@@ -447,11 +455,23 @@
 			Name="Shared"
 			>
 			<File
+				RelativePath="..\..\Shared\Network\ClientDefines.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Shared\Network\Limits.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\Shared\Network\NetworkProtocol.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Shared\Network\PlayerDefines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Shared\Network\VehicleDefines.h"
 				>
 			</File>
 		</Filter>

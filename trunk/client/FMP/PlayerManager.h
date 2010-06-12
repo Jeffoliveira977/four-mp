@@ -1,23 +1,24 @@
-/*
-*	Created:			29.10.09
-*	Created by:			WNeZRoS
-*	Last Modifed:		-
-*/
-
 #pragma once
-#include "../../Shared/Network/Limits.h"
-#include "Hook/types.h"
-//#include "Hook/scripting.h"
 
-struct Vector4 { float X, Y, Z, W; };
+#include "Hook/types.h"
+#include "../../Shared/Network/ClientDefines.h"
+#include "../../Shared/Network/PlayerDefines.h"
+
+class PlayerManager
+{
+public:
+	PlayerManager(void);
+	~PlayerManager(void);
+};
 
 struct FPlayer
 {
 	Ped PedID;
+	Blip radarblip;
 	bool connected;
 	char ip[16];
 	unsigned short port;
-	wchar_t name[MAX_PLAYER_NAME_LENGTH];
+	wchar_t name[MAX_CLIENT_NAME_LENGTH];
 	unsigned int model;
 	float position[3];
 	float angle;
@@ -40,20 +41,4 @@ struct FPlayer
 	unsigned char color[4];
 	int compT[11], compD[11];
 	bool want_spawn;
-};
-
-struct FVehicle
-{
-	Vehicle CarID;
-	bool exist;
-	unsigned int model;
-	float position[3];
-	float angle;
-	short health;
-	short enginehealth;
-	bool doorexists[6];
-	bool doorlock[6];
-	float doorangle[6];
-	unsigned char color[4];
-	bool sirenon;
 };

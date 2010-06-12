@@ -1,11 +1,10 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include "chat.h"
+#include "ChatManager.h"
 #include "../../Shared/Network/Limits.h"
 #include "../../Shared/Console/common.h"
 #include "log.h"
-#include "main.h"
 #include "d3d9/d3d9int.h"
 #include "../Shared/ClientCore.h"
 #include "../Shared/NetworkManager.h"

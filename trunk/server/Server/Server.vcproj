@@ -343,11 +343,23 @@
 			Name="Shared"
 			>
 			<File
+				RelativePath="..\..\Shared\Network\ClientDefines.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Shared\Network\Limits.h"
 				>
 			</File>
 			<File
 				RelativePath="..\..\Shared\Network\NetworkProtocol.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Shared\Network\PlayerDefines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Shared\Network\VehicleDefines.h"
 				>
 			</File>
 		</Filter>

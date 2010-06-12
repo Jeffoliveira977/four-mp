@@ -1,7 +1,6 @@
 #pragma once
 
-#define INVALID_VEHICLE_INDEX -1
-#define INVALID_VEHICLE_MODEL 0;
+#include "../../Shared/Network/VehicleDefines.h"
 
 class VehicleManager
 {

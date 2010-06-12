@@ -2,10 +2,9 @@
 
 #include <windows.h>
 #include "../../Shared/ClientCore.h"
-#include "../main.h"
 #include "d3d9hook.h"
 #include "gui.h"
-#include "../chat.h"
+#include "../ChatManager.h"
 
 #define D3DHOOK_TEXTURES //comment this to disable texture hooking
 
