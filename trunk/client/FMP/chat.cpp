@@ -72,33 +72,44 @@ void ChatManager::AddChatMessage(const wchar_t *message)
 	{
 		return;
 	}
-	Log::Debug(L"Chat message: %s", message);
 	size_t length = wcslen(message) + 1;
+	wchar_t *tempmessage;
 	if (length > MAX_CHAT_MESSAGE_LENGTH)
 	{
-		//TODO: truncate it instead.
-		return;
+		tempmessage = (wchar_t *)calloc(MAX_CHAT_MESSAGE_LENGTH, sizeof(wchar_t));
+		wcsncpy(tempmessage, message, MAX_CHAT_MESSAGE_LENGTH);
+		tempmessage[MAX_CHAT_MESSAGE_LENGTH-1] = L'\0';
+		length = MAX_CHAT_MESSAGE_LENGTH;
 	}
+	else
+	{
+		tempmessage = (wchar_t *)calloc(length, sizeof(wchar_t));
+		wcscpy(tempmessage, message);
+	}
+	Log::Void(tempmessage);
 	if (outputbuffersize < maxoutputbuffersize)
 	{
 		if (!ResizeBuffer<wchar_t **>(outputbuffer, outputbuffersize + 1))
 		{
+			free(tempmessage);
 			return;
 		}
-		outputbuffer[outputbuffersize] = (wchar_t *)calloc(wcslen(message) + 1, sizeof(wchar_t));
-		wcscpy(outputbuffer[outputbuffersize], message);
+		outputbuffer[outputbuffersize] = (wchar_t *)calloc(length, sizeof(wchar_t));
+		wcscpy(outputbuffer[outputbuffersize], tempmessage);
 		outputbuffersize++;
+		free(tempmessage);
 		return;
 	}
 	for(unsigned char i = 0; i > (outputbuffersize - 1); i++)
 	{
 		outputbuffer[i] = outputbuffer[i+1];
 	}
-	if (!ResizeBuffer<wchar_t *>(outputbuffer[outputbuffersize-1], wcslen(message) + 1))
+	if (!ResizeBuffer<wchar_t *>(outputbuffer[outputbuffersize-1], length))
 	{
 		return;
 	}
-	wcscpy(outputbuffer[outputbuffersize-1], message);
+	wcscpy(outputbuffer[outputbuffersize-1], tempmessage);
+	free(tempmessage);
 	return;
 }
 
@@ -148,7 +159,7 @@ void ChatManager::Render(void)
 	{
 		i = 0;
 	}
-	for(; i > outputbuffersize; i++)
+	for(; i < outputbuffersize; i++)
 	{
 		font->DrawText(0, outputbuffer[i], -1, &rc, DT_TOP|DT_LEFT, D3DCOLOR_XRGB(255, 255, 0));
 		rc.top += 11;
