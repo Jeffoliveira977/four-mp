@@ -6,7 +6,6 @@
 #include "../../GUI/CGUI.h"
 
 #include "gui.h"
-#include "../main.h"
 #include "../log.h"
 #include "../../Shared/ClientCore.h"
 #include "../ConsoleWindow.h"

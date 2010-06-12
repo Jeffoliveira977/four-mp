@@ -7,8 +7,9 @@
 #include <windows.h>
 #include <process.h>
 #include <stdio.h>
-#include "../structs.h"
-#include "..\..\..\Shared\Network\NetworkProtocol.h"
+#include "types.h"
+#include "../../../Shared/Network/PlayerDefines.h"
+#include "../../../Shared/Network/NetworkProtocol.h"
 /* ----------------------------------------------------------------------------------------------------- */
 /*					             Классы и структуры работы с потоками                                    */
 /* ----------------------------------------------------------------------------------------------------- */
@@ -124,6 +125,8 @@ public:
 	void AttachGtaThread(char*);
 };
 
+struct Vector4 { float X, Y, Z, W; };
+
 class FMPHook: 
 	public FMPThread
 {
@@ -136,6 +139,7 @@ private:
 	static void _stdcall FiberStart(void* parameter);
 	Camera freeCam;
 	Vector4 spawnposition;
+	PlayerState playerstate;
 
 protected:
 	ThreadStates Reset(unsigned int hash,int v2,int i3);
@@ -201,9 +205,11 @@ public:
 	void PlayerFireAim(short index, int, int, float, float, float, bool);
 	void PlayerSwapGun(short index, int);
 
-	void CancelEnterInVehicle(short index);
-	void ExitFromVehicle(short index);
-	void EnterInVehicle(short index, int, int);
+	void StartEnterInVehicle(const short playerindex, const short vehicleindex, const char seatindex);
+	void CancelEnterInVehicle(const short index);
+	void FinishEnterInVehicle(const short index);
+	void StartExitFromVehicle(const short index);
+	void FinishExitFromVehicle(const short index);
 
 	void PlayerSyncSkin(short index, unsigned int);
 	void PlayerSyncSkinVariation(short index, int*, int*);

@@ -1,11 +1,10 @@
 /*	Direct3D9 Interface */
 
 #include <windows.h>
-#include "../main.h"
 #include "../Hook/window.h"
 #include "d3d9hook.h"
 #include "gui.h"
-#include "../chat.h"
+#include "../ChatManager.h"
 
 extern LPD3DXFONT fFMP;
 //extern LPDIRECT3DTEXTURE9 g_Texture;

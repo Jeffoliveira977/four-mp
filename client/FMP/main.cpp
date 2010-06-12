@@ -20,8 +20,9 @@
 #include "Hook\hook.h"
 #include "Hook\scripting.h"
 #include "functions.h"
-#include "main.h"
 #include "../Shared/ClientCore.h"
+#include "PlayerManager.h"
+#include "VehicleManager.h"
 #include "../Shared/NetworkManager.h"
 #include "masterserver.h"
 #include "Check\check.h"
@@ -29,7 +30,7 @@
 #include "d3d9/d3d9hook.h"
 #include "d3d9/gui.h"
 #include "ConsoleWindow.h"
-#include "chat.h"
+#include "ChatManager.h"
 
 /* ----------------------------------------------------------------------------------------------------- */
 /*                                     Потоки для работы с игрой                                         */
@@ -46,11 +47,10 @@ FMPGUI Gui;
 ConsoleWindow conwindow;
 ChatManager chat;
 
-bool myEnter = 0;
 bool cheats = 0;
 
 FPlayer gPlayer[MAX_PLAYERS];
-FVehicle gCar[MAX_CARS];
+FVehicle gVehicle[MAX_VEHICLES];
 
 void patchCode();
 extern DWORD dwGameVersion;
@@ -150,13 +150,13 @@ void FMPHook::CreateCar(short index, unsigned int model, float position[3], floa
 	Natives::RequestModel((eModel)model);
 	while(!Natives::HasModelLoaded((eModel)model)) wait(0);
 	Log::Info(L"Model LOADED");
-	Natives::CreateCar(model, position[0], position[1], position[2], &gCar[index].CarID, 1);
-	Natives::SetCarHeading(gCar[index].CarID, angle);
-	gCar[index].exist = 1;
-	gCar[index].model = model;
-	memcpy(gCar[index].position, position, sizeof(float) * 3);
-	gCar[index].angle = angle;
-	memcpy(gCar[index].color, color, sizeof(unsigned char) * 2);
+	Natives::CreateCar(model, position[0], position[1], position[2], &gVehicle[index].CarID, 1);
+	Natives::SetCarHeading(gVehicle[index].CarID, angle);
+	gVehicle[index].exist = 1;
+	gVehicle[index].model = model;
+	memcpy(gVehicle[index].position, position, sizeof(float) * 3);
+	gVehicle[index].angle = angle;
+	memcpy(gVehicle[index].color, color, sizeof(unsigned char) * 2);
 }
 
 Ped FMPHook::_GetPlayerPed()
@@ -241,19 +241,19 @@ bool FMPHook::SafeCreatePlayer(short index)
 
 	if(gPlayer[index].vehicleindex != -1)
 	{
-		if(gCar[gPlayer[index].vehicleindex].exist == 0)
+		if(gVehicle[gPlayer[index].vehicleindex].exist == 0)
 		{
 			Log::Warning(L"Player car not register");
 			return 0;
 		}
-		if(!Natives::DoesVehicleExist( gCar[gPlayer[index].vehicleindex].CarID ))
+		if(!Natives::DoesVehicleExist( gVehicle[gPlayer[index].vehicleindex].CarID ))
 		{
 			Log::Warning(L"Player car not created");
 			return 0;
 		}
 
-		if(gPlayer[index].seatindex == -1) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gCar[gPlayer[index].vehicleindex].CarID, 0);
-		else Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gCar[gPlayer[index].vehicleindex].CarID, 0, gPlayer[index].seatindex);
+		if(gPlayer[index].seatindex == -1) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID, 0);
+		else Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID, 0, gPlayer[index].seatindex);
 	}
 
 	for(int i = 0; i < 8; i++)
@@ -286,59 +286,59 @@ bool FMPHook::SafeCreateVehicle(short index)
 {
 	Log::Info(L"SafeCreateVehicle requested");
 
-	if(gCar[index].exist == 0) 
+	if(gVehicle[index].exist == 0) 
 	{
 		Log::Warning(L"Haven't vehicle data for create");
 		return 0;
 	}
 
-	if(Natives::DoesVehicleExist(gCar[index].CarID))
+	if(Natives::DoesVehicleExist(gVehicle[index].CarID))
 	{
 		Log::Warning(L"Vehicle already exist");
 		return 0;
 	}
 	
-	if(!Natives::IsThisModelAVehicle((eModel)gCar[index].model))
+	if(!Natives::IsThisModelAVehicle((eModel)gVehicle[index].model))
 	{
 		Log::Warning(L"This model not a vehicle");
 		return 0;
 	}
 
-	Natives::RequestModel((eModel)gCar[index].model);
-	while(!Natives::HasModelLoaded((eModel)gCar[index].model)) wait(0);
+	Natives::RequestModel((eModel)gVehicle[index].model);
+	while(!Natives::HasModelLoaded((eModel)gVehicle[index].model)) wait(0);
 
-	Natives::CreateCar(gCar[index].model, gCar[index].position[0], gCar[index].position[1], gCar[index].position[2], &gCar[index].CarID, 1);
+	Natives::CreateCar(gVehicle[index].model, gVehicle[index].position[0], gVehicle[index].position[1], gVehicle[index].position[2], &gVehicle[index].CarID, 1);
 
-	while(!Natives::DoesVehicleExist(gCar[index].CarID)) wait(0);
+	while(!Natives::DoesVehicleExist(gVehicle[index].CarID)) wait(0);
 
-	Natives::SetCarHeading(gCar[index].CarID, gCar[index].angle);
-	Natives::SetCarHealth(gCar[index].CarID, gCar[index].health);
-	Natives::SetEngineHealth(gCar[index].CarID, gCar[index].enginehealth);
-	Natives::SetExtraCarColours(gCar[index].CarID, gCar[index].color[2], gCar[index].color[3]);
-	Natives::ChangeCarColour(gCar[index].CarID, gCar[index].color[0], gCar[index].color[1]);
-
-	for(int i = 0; i < 6; i++)
-		if(gCar[index].doorexists[i] == 0)
-			Natives::BreakCarDoor(gCar[index].CarID, (eVehicleDoor)i, 0);
+	Natives::SetCarHeading(gVehicle[index].CarID, gVehicle[index].angle);
+	Natives::SetCarHealth(gVehicle[index].CarID, gVehicle[index].health);
+	Natives::SetEngineHealth(gVehicle[index].CarID, gVehicle[index].enginehealth);
+	Natives::SetExtraCarColours(gVehicle[index].CarID, gVehicle[index].color[2], gVehicle[index].color[3]);
+	Natives::ChangeCarColour(gVehicle[index].CarID, gVehicle[index].color[0], gVehicle[index].color[1]);
 
 	for(int i = 0; i < 6; i++)
-		Natives::ControlCarDoor(gCar[index].CarID, (eVehicleDoor)i, gCar[index].doorlock[i], gCar[index].doorangle[i]);
+		if(gVehicle[index].doorexists[i] == 0)
+			Natives::BreakCarDoor(gVehicle[index].CarID, (eVehicleDoor)i, 0);
+
+	for(int i = 0; i < 6; i++)
+		Natives::ControlCarDoor(gVehicle[index].CarID, (eVehicleDoor)i, gVehicle[index].doorlock[i], gVehicle[index].doorangle[i]);
 
 	for(int i = 0; i < 5; i++)
-		if(gCar[index].doorlock[i])
-			Natives::LockCarDoors(gCar[index].CarID, (eVehicleDoorLock)i);
+		if(gVehicle[index].doorlock[i])
+			Natives::LockCarDoors(gVehicle[index].CarID, (eVehicleDoorLock)i);
 
-	return Natives::DoesVehicleExist( gCar[index].CarID );
+	return Natives::DoesVehicleExist( gVehicle[index].CarID );
 }
 
 bool FMPHook::SafeCheckVehicle(short index, bool bReCreateOnFalse)
 {
-	if(gCar[index].exist == 0) 
+	if(gVehicle[index].exist == 0) 
 	{
 		Log::Error(L"Vehicle not created");
 		return 0;
 	}
-	if(!Natives::DoesVehicleExist(gCar[index].CarID))
+	if(!Natives::DoesVehicleExist(gVehicle[index].CarID))
 	{
 		Log::Error(L"Vehicle doesn't exist");
 		if(bReCreateOnFalse) return SafeCreateVehicle(index);
@@ -373,14 +373,14 @@ void FMPHook::SafeCleanPlayers()
 
 void FMPHook::SafeCleanVehicles()
 {
-	for(int i = 0; i < MAX_CARS; i++)
+	for(int i = 0; i < MAX_VEHICLES; i++)
 	{
-		if(!gCar[i].exist) continue;
-		if(Natives::DoesVehicleExist(gCar[i].CarID))
-			Natives::DeleteCar(&gCar[i].CarID);
+		if(!gVehicle[i].exist) continue;
+		if(Natives::DoesVehicleExist(gVehicle[i].CarID))
+			Natives::DeleteCar(&gVehicle[i].CarID);
 	}
 
-	memset(gCar, 0, sizeof(FVehicle) * MAX_CARS);
+	memset(gVehicle, 0, sizeof(FVehicle) * MAX_VEHICLES);
 }
 
 void FMPHook::SafeRequestModel(unsigned int model)
@@ -391,9 +391,9 @@ void FMPHook::SafeRequestModel(unsigned int model)
 
 void FMPHook::CheckAndCheck()
 {
-	for(short i = 0; i < MAX_CARS; i++)
-		if(gCar[i].exist)
-			if(!Natives::DoesVehicleExist( gCar[i].CarID ))
+	for(short i = 0; i < MAX_VEHICLES; i++)
+		if(gVehicle[i].exist)
+			if(!Natives::DoesVehicleExist( gVehicle[i].CarID ))
 			{
 				Log::Warning(L"Check: Car not exist");
 				SafeCreateVehicle(i);

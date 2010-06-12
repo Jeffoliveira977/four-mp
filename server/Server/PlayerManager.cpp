@@ -373,7 +373,7 @@ bool PlayerManager::GetPlayerClassData(const unsigned char index, unsigned int &
 	return true;
 }
 
-bool PlayerManager::RegisterNewPlayer(const short index, wchar_t (&name)[MAX_PLAYER_NAME_LENGTH])
+bool PlayerManager::RegisterNewPlayer(const short index, wchar_t (&name)[MAX_CLIENT_NAME_LENGTH])
 {
 	if ((index < 0) || (index >= maxplayerbuffersize))
 	{
@@ -403,19 +403,19 @@ bool PlayerManager::RegisterNewPlayer(const short index, wchar_t (&name)[MAX_PLA
 	playerbuffer[index] = new Player;
 	wcscpy(playerbuffer[index]->name, name);
 	playerbuffer[index]->classindex = 0;
-	playerbuffer[index]->model = 0x98E29920;
-	playerbuffer[index]->position[0] = -43.250000;
-	playerbuffer[index]->position[1] = -2.875000;
-	playerbuffer[index]->position[2] = 14.818866;
+	playerbuffer[index]->model = DEFAULT_PLAYER_MODEL;
+	playerbuffer[index]->position[0] = DEFAULT_PLAYER_X;
+	playerbuffer[index]->position[1] = DEFAULT_PLAYER_Y;
+	playerbuffer[index]->position[2] = DEFAULT_PLAYER_Z;
 	playerbuffer[index]->angle = 0;
-	playerbuffer[index]->last_active = 0;
-	playerbuffer[index]->sync_state = 0;
+	playerbuffer[index]->isducking = false;
 	for(unsigned char i = 0; i < 8; i++)
 	{
 		playerbuffer[index]->weapons[i] = 0;
 		playerbuffer[index]->ammo[i] = 0;
 	}
 	playerbuffer[index]->animation[0] = 0;
+	playerbuffer[index]->state = PlayerStateOnFoot;
 	playerbuffer[index]->vehicleindex = INVALID_VEHICLE_INDEX;
 	playerbuffer[index]->seatindex = INVALID_PLAYER_SEAT_INDEX;
 	playerbuffer[index]->score = 0;
@@ -428,16 +428,14 @@ bool PlayerManager::RegisterNewPlayer(const short index, wchar_t (&name)[MAX_PLA
 	playerbuffer[index]->edUseCover = 1;
 	playerbuffer[index]->edConrol = 1;
 	playerbuffer[index]->edFreeze = 0;
-	playerbuffer[index]->isducking = 0;
 	playerbuffer[index]->room = 0;
-	playerbuffer[index]->car_enter = 0;
 	playerbuffer[index]->color[0] = 0xFF;
 	playerbuffer[index]->color[1] = 0xFF;
 	playerbuffer[index]->color[2] = 0x00;
 	playerbuffer[index]->color[3] = 0x00;
-	playerbuffer[index]->spawnposition[0] = -43.250000;
-	playerbuffer[index]->spawnposition[1] = -2.875000;
-	playerbuffer[index]->spawnposition[2] = 14.818866;
+	playerbuffer[index]->spawnposition[0] = DEFAULT_PLAYER_X;
+	playerbuffer[index]->spawnposition[1] = DEFAULT_PLAYER_Y;
+	playerbuffer[index]->spawnposition[2] = DEFAULT_PLAYER_Z;
 	playerbuffer[index]->spawnposition[3] = 0;
 	playerbuffer[index]->currentweapon = 0;
 	numplayers++;
@@ -461,7 +459,7 @@ short PlayerManager::GetPlayerFreeSlot(void)
 	return index;
 }
 
-bool PlayerManager::AssignPlayerName(wchar_t (&name)[MAX_PLAYER_NAME_LENGTH])
+bool PlayerManager::AssignPlayerName(wchar_t (&name)[MAX_CLIENT_NAME_LENGTH])
 {
 	if (wcslen(name) == 0)
 	{
@@ -474,9 +472,9 @@ bool PlayerManager::AssignPlayerName(wchar_t (&name)[MAX_PLAYER_NAME_LENGTH])
 	}
 	bool stop;
 	short j = 1;
-	wchar_t tempname[MAX_PLAYER_NAME_LENGTH];
-	wcsncpy(tempname, name, MAX_PLAYER_NAME_LENGTH - 1);
-	tempname[MAX_PLAYER_NAME_LENGTH-1] = L'\0';
+	wchar_t tempname[MAX_CLIENT_NAME_LENGTH];
+	wcsncpy(tempname, name, MAX_CLIENT_NAME_LENGTH - 1);
+	tempname[MAX_CLIENT_NAME_LENGTH-1] = L'\0';
 	do
 	{
 		stop = true;
@@ -485,8 +483,8 @@ bool PlayerManager::AssignPlayerName(wchar_t (&name)[MAX_PLAYER_NAME_LENGTH])
 			if ((playerbuffer[i] != NULL) && (wcscmp(playerbuffer[i]->name, tempname) == 0))
 			{
 				stop = false;
-				_snwprintf(tempname, MAX_PLAYER_NAME_LENGTH - 1, L"(%d)%s", j, name);
-				tempname[MAX_PLAYER_NAME_LENGTH-1] = L'\0';
+				_snwprintf(tempname, MAX_CLIENT_NAME_LENGTH - 1, L"(%d)%s", j, name);
+				tempname[MAX_CLIENT_NAME_LENGTH-1] = L'\0';
 				j++;
 			}
 		}

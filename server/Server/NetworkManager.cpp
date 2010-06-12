@@ -76,9 +76,11 @@ void NetworkManager::Load(const short maxclients, const unsigned short port)
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerMove);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerJump);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerDuck);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerEntranceInVehicle);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerStartEntranceInVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerCancelEntranceInVehicle);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerExitFromVehicle);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFinishEntranceInVehicle);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerStartExitFromVehicle);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFinishExitFromVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFire);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerAim);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerWeaponChange);
@@ -318,7 +320,7 @@ void NetworkManager::RecievePlayerDuck(NetworkPlayerDuckData data, RakNet::RPC3 
 	this->WriteToRPCBuffer(NetworkRPCPlayerDuck, &data);
 }
 
-void NetworkManager::RecievePlayerEntranceInVehicle(NetworkPlayerEntranceInVehicleData data, RakNet::RPC3 *clientrpc3)
+void NetworkManager::RecievePlayerStartEntranceInVehicle(NetworkPlayerStartEntranceInVehicleData data, RakNet::RPC3 *clientrpc3)
 {
 	short client = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
 	if (client == INVALID_PLAYER_INDEX)
@@ -326,7 +328,7 @@ void NetworkManager::RecievePlayerEntranceInVehicle(NetworkPlayerEntranceInVehic
 		return;
 	}
 	data.client = client;
-	this->WriteToRPCBuffer(NetworkRPCPlayerEntranceInVehicle, &data);
+	this->WriteToRPCBuffer(NetworkRPCPlayerStartEntranceInVehicle, &data);
 }
 
 void NetworkManager::RecievePlayerCancelEntranceInVehicle(NetworkPlayerCancelEntranceInVehicleData data, RakNet::RPC3 *clientrpc3)
@@ -340,7 +342,7 @@ void NetworkManager::RecievePlayerCancelEntranceInVehicle(NetworkPlayerCancelEnt
 	this->WriteToRPCBuffer(NetworkRPCPlayerCancelEntranceInVehicle, &data);
 }
 
-void NetworkManager::RecievePlayerExitFromVehicle(NetworkPlayerExitFromVehicleData data, RakNet::RPC3 *clientrpc3)
+void NetworkManager::RecievePlayerFinishEntranceInVehicle(NetworkPlayerFinishEntranceInVehicleData data, RakNet::RPC3 *clientrpc3)
 {
 	short client = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
 	if (client == INVALID_PLAYER_INDEX)
@@ -348,7 +350,29 @@ void NetworkManager::RecievePlayerExitFromVehicle(NetworkPlayerExitFromVehicleDa
 		return;
 	}
 	data.client = client;
-	this->WriteToRPCBuffer(NetworkRPCPlayerExitFromVehicle, &data);
+	this->WriteToRPCBuffer(NetworkRPCPlayerFinishEntranceInVehicle, &data);
+}
+
+void NetworkManager::RecievePlayerStartExitFromVehicle(NetworkPlayerStartExitFromVehicleData data, RakNet::RPC3 *clientrpc3)
+{
+	short client = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
+	if (client == INVALID_PLAYER_INDEX)
+	{
+		return;
+	}
+	data.client = client;
+	this->WriteToRPCBuffer(NetworkRPCPlayerStartExitFromVehicle, &data);
+}
+
+void NetworkManager::RecievePlayerFinishExitFromVehicle(NetworkPlayerFinishExitFromVehicleData data, RakNet::RPC3 *clientrpc3)
+{
+	short client = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
+	if (client == INVALID_PLAYER_INDEX)
+	{
+		return;
+	}
+	data.client = client;
+	this->WriteToRPCBuffer(NetworkRPCPlayerFinishExitFromVehicle, &data);
 }
 
 void NetworkManager::RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 *clientrpc3)
@@ -563,10 +587,10 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 			memcpy(rpcbuffer[rpcbuffersize].data.playerduck, data, sizeof(DATATYPE));
 			break;
 		}
-	case NetworkRPCPlayerEntranceInVehicle:
+	case NetworkRPCPlayerStartEntranceInVehicle:
 		{
-			rpcbuffer[rpcbuffersize].data.playerentranceinvehicle = (NetworkPlayerEntranceInVehicleData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playerentranceinvehicle, data, sizeof(DATATYPE));
+			rpcbuffer[rpcbuffersize].data.playerstartentranceinvehicle = (NetworkPlayerStartEntranceInVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerstartentranceinvehicle, data, sizeof(DATATYPE));
 			break;
 		}
 	case NetworkRPCPlayerCancelEntranceInVehicle:
@@ -575,10 +599,22 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 			memcpy(rpcbuffer[rpcbuffersize].data.playercancelentranceinvehicle, data, sizeof(DATATYPE));
 			break;
 		}
-	case NetworkRPCPlayerExitFromVehicle:
+	case NetworkRPCPlayerFinishEntranceInVehicle:
 		{
-			rpcbuffer[rpcbuffersize].data.playerexitfromvehicle = (NetworkPlayerExitFromVehicleData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playerexitfromvehicle, data, sizeof(DATATYPE));
+			rpcbuffer[rpcbuffersize].data.playerfinishentranceinvehicle = (NetworkPlayerFinishEntranceInVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerfinishentranceinvehicle, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerStartExitFromVehicle:
+		{
+			rpcbuffer[rpcbuffersize].data.playerstartexitfromvehicle = (NetworkPlayerStartExitFromVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerstartexitfromvehicle, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerFinishExitFromVehicle:
+		{
+			rpcbuffer[rpcbuffersize].data.playerfinishexitfromvehicle = (NetworkPlayerFinishExitFromVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerfinishexitfromvehicle, data, sizeof(DATATYPE));
 			break;
 		}
 	case NetworkRPCPlayerFire:
@@ -646,393 +682,109 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 	{
 	case NetworkRPCPlayerConnectionRequest:
 		{
-			short client = this->GetClientIndex(data->playerconnectionrequest->address);
-			if (client != INVALID_PLAYER_INDEX)
-			{
-				PrintToServer(L"Player %s has tried to connect twice.", playm.playerbuffer[client]->name);
-				this->SendConnectionError(data->playerconnectionrequest->address, NetworkPlayerConnectionErrorAlreadyConnected);
-				net->CloseConnection(data->playerconnectionrequest->address, true);
-				return;
-			}
-			client = this->RegisterNewClient(data->playerconnectionrequest->address);
-			if (client == INVALID_PLAYER_INDEX)
-			{
-				PrintToServer(L"Unable to register new client.");
-				this->SendConnectionError(data->playerconnectionrequest->address, NetworkPlayerConnectionErrorAllocationError);
-				net->CloseConnection(data->playerconnectionrequest->address, true);
-				delete data->playerconnectionrequest;
-				return;
-			}
-			if (!vmm.OnPlayerConnect(client, data->playerconnectionrequest->name))
-			{
-				PrintToServer(L"Server script has disabled new client.");
-				this->SendConnectionError(data->playerconnectionrequest->address, NetworkPlayerConnectionErrorScriptLock);
-				net->CloseConnection(data->playerconnectionrequest->address, true);
-				delete clientbuffer[client];
-				clientbuffer[client] = NULL;
-				delete data->playerconnectionrequest;
-				return;
-			}
-			if (!playm.RegisterNewPlayer(client, data->playerconnectionrequest->name))
-			{
-				PrintToServer(L"Unable to register new client.");
-				this->SendConnectionError(data->playerconnectionrequest->address, NetworkPlayerConnectionErrorAllocationError);
-				net->CloseConnection(data->playerconnectionrequest->address, true);
-				delete clientbuffer[client];
-				clientbuffer[client] = NULL;
-				delete data->playerconnectionrequest;
-				return;
-			}
-			PrintToServer(L"Player %s[%d] connected", playm.playerbuffer[client]->name, client);
-			NetworkPlayerInfoData infodata;
-			infodata.index = client;
-			infodata.sessionkey = data->playerconnectionrequest->sessionkey;
-			rpc3->SetRecipientAddress(data->playerconnectionrequest->address, false);
-			rpc3->SetRecipientObject(defaultclientid);
-			rpc3->Call("&NetworkManager::RecieveClientInfo", infodata, rpc3);
-			rpc3->SetRecipientAddress(UNASSIGNED_SYSTEM_ADDRESS, true);
-			rpc3->SetRecipientObject(UNASSIGNED_NETWORK_ID);
-			delete data->playerconnectionrequest; 
+			this->HandleClientConnectionRequest(data->playerconnectionrequest);
+			delete data->playerconnectionrequest;
 			break;
 		}
 	case NetworkRPCPlayerConnectionConfirmation:
 		{
-			NetworkGameTimeChangeData timedata;
-			server.GetTime(timedata.time);
-			this->SendDataToOne("&NetworkManager::RecieveGameTimeChange", data->playerconnectionconfirmation->client, &timedata);
-
-			NetworkPlayerFullUpdateData *playerdata;
-			//TODO: Optimize using currently connected players, not buffer size.
-			for (short i = 0; i < clientbuffersize; i++)
-			{
-				if (i != data->playerconnectionconfirmation->client)
-				{
-					playerdata = this->GetPlayerFullUpdateData(i);
-					if (playerdata != NULL)
-					{
-						this->SendDataToOne("&NetworkManager::RecievePlayerFullUpdate", data->playerconnectionconfirmation->client, playerdata);
-						delete playerdata;
-					}
-				}
-			}
-			NetworkVehicleFullUpdateData *vehicledata;
-			for (short i = 0; i < vm.vehiclebuffersize; i++)
-			{
-				vehicledata = this->GetVehicleFullUpdateData(i);
-				if (vehicledata != NULL)
-				{
-					this->SendDataToOne("&NetworkManager::RecieveVehicleFullUpdate", data->playerconnectionconfirmation->client, vehicledata);
-					delete vehicledata;
-				}
-			}
-			playerdata = this->GetPlayerFullUpdateData(data->playerconnectionconfirmation->client);
-			if (playerdata == NULL)
-			{
-				PrintToServer(L"Unable to read player data.");
-				this->SendConnectionError(clientbuffer[data->playerconnectionconfirmation->client]->address, NetworkPlayerConnectionErrorAllocationError);
-				net->CloseConnection(clientbuffer[data->playerconnectionconfirmation->client]->address, true);
-				delete clientbuffer[data->playerconnectionconfirmation->client];
-				clientbuffer[data->playerconnectionconfirmation->client] = NULL;
-				delete data->playerconnectionconfirmation;
-				return;
-			}
-			this->SendDataToAll("&NetworkManager::RecieveClientConnection", playerdata);
-			delete playerdata;
-			server.UpdateServerInfo();
-
+			this->HandleClientConnectionConfirmation(data->playerconnectionconfirmation);
 			delete data->playerconnectionconfirmation;
 			break;
 		}
 	case NetworkRPCPlayerMove:
 		{
-			if ((data->playermove->client < 0) || (data->playermove->client >= playm.playerbuffersize))
-			{
-				delete data->playermove;
-				return;
-			}
-			if (playm.playerbuffer[data->playermove->client] == NULL)
-			{
-				delete data->playermove;
-				return;
-			}
-			memcpy(playm.playerbuffer[data->playermove->client]->position, data->playermove->position, sizeof(float) * 3);
-			playm.playerbuffer[data->playermove->client]->angle = data->playermove->angle;
-			if (playm.playerbuffer[data->playermove->client]->car_enter == true)
-			{
-				delete data->playermove;
-				return;
-			}
-			if (playm.playerbuffer[data->playermove->client]->vehicleindex != INVALID_VEHICLE_INDEX)
-			{
-
-				vm.SetVehiclePositionInternal(playm.playerbuffer[data->playermove->client]->vehicleindex, data->playermove->position);
-				vm.SetVehicleAngleInternal(playm.playerbuffer[data->playermove->client]->vehicleindex, data->playermove->angle);
-			}
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerMove", data->playermove->client, data->playermove);
+			this->HandlePlayerMove(data->playermove);
 			delete data->playermove;
 			break;
 		}
 	case NetworkRPCPlayerJump:
 		{
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerJump", data->playerjump->client, data->playerjump);
+			this->HandlePlayerJump(data->playerjump);
 			delete data->playerjump;
 			break;
 		}
 	case NetworkRPCPlayerDuck:
 		{
-			if ((data->playerduck->client < 0) || (data->playerduck->client >= playm.playerbuffersize))
-			{
-				delete data->playerduck;
-				return;
-			}
-			if (playm.playerbuffer[data->playerduck->client] == NULL)
-			{
-				delete data->playerduck;
-				return;
-			}
-			playm.playerbuffer[data->playerduck->client]->isducking = data->playerduck->shouldduck;
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerDuck", data->playerduck->client, data->playerduck);
+			this->HandlePlayerDuck(data->playerduck);
 			delete data->playerduck;
 			break;
 		}
-	case NetworkRPCPlayerEntranceInVehicle:
+	case NetworkRPCPlayerStartEntranceInVehicle:
 		{
-			if ((data->playerentranceinvehicle->client < 0) || (data->playerentranceinvehicle->client >= playm.playerbuffersize))
-			{
-				delete data->playerentranceinvehicle;
-				return;
-			}
-			if (playm.playerbuffer[data->playerentranceinvehicle->client] == NULL)
-			{
-				delete data->playerentranceinvehicle;
-				return;
-			}
-			if (data->playerentranceinvehicle->seat == INVALID_PLAYER_SEAT_INDEX)
-			{
-				playm.playerbuffer[data->playerentranceinvehicle->client]->car_enter = false;
-				delete data->playerentranceinvehicle;
-				return;
-			}
-			playm.playerbuffer[data->playerentranceinvehicle->client]->car_enter = true;
-			playm.playerbuffer[data->playerentranceinvehicle->client]->seatindex = data->playerentranceinvehicle->seat;
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerEntranceInVehicle", data->playerentranceinvehicle->client, data->playerentranceinvehicle);
-			delete data->playerentranceinvehicle;
+			this->HandlePlayerStartEntranceInVehicle(data->playerstartentranceinvehicle);
+			delete data->playerstartentranceinvehicle;
 			break;
 		}
 	case NetworkRPCPlayerCancelEntranceInVehicle:
 		{
-			if ((data->playercancelentranceinvehicle->client < 0) || (data->playercancelentranceinvehicle->client >= playm.playerbuffersize))
-			{
-				delete data->playercancelentranceinvehicle;
-				return;
-			}
-			if (playm.playerbuffer[data->playercancelentranceinvehicle->client] == NULL)
-			{
-				delete data->playercancelentranceinvehicle;
-				return;
-			}
-			playm.playerbuffer[data->playercancelentranceinvehicle->client]->vehicleindex = INVALID_VEHICLE_INDEX;
-			playm.playerbuffer[data->playercancelentranceinvehicle->client]->car_enter = false;
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerCancelEntranceInVehicle", data->playercancelentranceinvehicle->client, data->playercancelentranceinvehicle);
+			this->HandlePlayerCancelEntranceInVehicle(data->playercancelentranceinvehicle);
 			delete data->playercancelentranceinvehicle;
 			break;
 		}
-	case NetworkRPCPlayerExitFromVehicle:
+	case NetworkRPCPlayerFinishEntranceInVehicle:
 		{
-			if ((data->playerexitfromvehicle->client < 0) || (data->playerexitfromvehicle->client >= playm.playerbuffersize))
-			{
-				delete data->playerexitfromvehicle;
-				return;
-			}
-			if (playm.playerbuffer[data->playerexitfromvehicle->client] == NULL)
-			{
-				delete data->playerexitfromvehicle;
-				return;
-			}
-			playm.playerbuffer[data->playerexitfromvehicle->client]->vehicleindex = INVALID_VEHICLE_INDEX;
-			playm.playerbuffer[data->playerexitfromvehicle->client]->car_enter = false;
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerExitFromVehicle", data->playerexitfromvehicle->client, data->playerexitfromvehicle);
-			delete data->playerexitfromvehicle;
+			this->HandlePlayerFinishEntranceInVehicle(data->playerfinishentranceinvehicle);
+			delete data->playerfinishentranceinvehicle;
+			break;
+		}
+	case NetworkRPCPlayerStartExitFromVehicle:
+		{
+			this->HandlePlayerStartExitFromVehicle(data->playerstartexitfromvehicle);
+			delete data->playerstartexitfromvehicle;
+			break;
+		}
+	case NetworkRPCPlayerFinishExitFromVehicle:
+		{
+			this->HandlePlayerFinishExitFromVehicle(data->playerfinishexitfromvehicle);
+			delete data->playerfinishexitfromvehicle;
 			break;
 		}
 	case NetworkRPCPlayerFire:
 		{
-			if ((data->playerfire->client < 0) || (data->playerfire->client >= playm.playerbuffersize))
-			{
-				delete data->playerfire;
-				return;
-			}
-			if (playm.playerbuffer[data->playerfire->client] == NULL)
-			{
-				delete data->playerfire;
-				return;
-			}
-			playm.playerbuffer[data->playerfire->client]->currentweapon = data->playerfire->weapon;
-			if (data->playerfire->target != INVALID_PLAYER_INDEX)
-			{
-				if (data->playerfire->target >= playm.playerbuffersize)
-				{
-					delete data->playerfire;
-					return;
-				}
-				if (playm.playerbuffer[data->playerfire->target] == NULL)
-				{
-					delete data->playerfire;
-					return;
-				}
-				playm.playerbuffer[data->playerfire->target]->health = data->playerfire->health;
-				playm.playerbuffer[data->playerfire->target]->armor = data->playerfire->armor;
-				if (playm.playerbuffer[data->playerfire->target]->health < 100)
-				{
-					vmm.OnPlayerDeath(data->playerfire->target, data->playerfire->client, data->playerfire->weapon);
-				}
-			}
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerFire", data->playerfire->client, data->playerfire);
+			this->HandlePlayerFire(data->playerfire);
 			delete data->playerfire;
 			break;
 		}
 	case NetworkRPCPlayerAim:
 		{
-			if ((data->playeraim->client < 0) || (data->playeraim->client >= playm.playerbuffersize))
-			{
-				delete data->playeraim;
-				return;
-			}
-			if (playm.playerbuffer[data->playeraim->client] == NULL)
-			{
-				delete data->playeraim;
-				return;
-			}
-			playm.playerbuffer[data->playeraim->client]->currentweapon = data->playeraim->weapon;
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerAim", data->playeraim->client, data->playeraim);
+			this->HandlePlayerAim(data->playeraim);
 			delete data->playeraim;
 			break;
 		}
 	case NetworkRPCPlayerWeaponChange:
 		{
-			if ((data->playerweaponchange->client < 0) || (data->playerweaponchange->client >= playm.playerbuffersize))
-			{
-				delete data->playerweaponchange;
-				return;
-			}
-			if (playm.playerbuffer[data->playerweaponchange->client] == NULL)
-			{
-				delete data->playerweaponchange;
-				return;
-			}
-			playm.playerbuffer[data->playerweaponchange->client]->currentweapon = data->playerweaponchange->weapon;
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerWeaponChange", data->playerweaponchange->client, data->playerweaponchange);
+			this->HandlePlayerWeaponChange(data->playerweaponchange);
 			delete data->playerweaponchange;
 			break;
 		}
 	case NetworkRPCPlayerHealthAndArmorChange:
 		{
-			if ((data->playerhealthandarmorchange->client < 0) || (data->playerhealthandarmorchange->client >= playm.playerbuffersize))
-			{
-				delete data->playerhealthandarmorchange;
-				return;
-			}
-			if (playm.playerbuffer[data->playerhealthandarmorchange->client] == NULL)
-			{
-				delete data->playerhealthandarmorchange;
-				return;
-			}
-			playm.playerbuffer[data->playerhealthandarmorchange->client]->health = data->playerhealthandarmorchange->health;
-			playm.playerbuffer[data->playerhealthandarmorchange->client]->armor = data->playerhealthandarmorchange->armor;
-			if (playm.playerbuffer[data->playerhealthandarmorchange->client]->health < 100)
-			{
-				vmm.OnPlayerDeath(data->playerhealthandarmorchange->client, INVALID_PLAYER_INDEX, 46);
-			}
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerHealthAndArmorChange", data->playerhealthandarmorchange->client, data->playerhealthandarmorchange);
+			this->HandlePlayerHealthAndArmorChange(data->playerhealthandarmorchange);
 			delete data->playerhealthandarmorchange;
 			break;
 		}
 	case NetworkRPCPlayerSpawnRequest:
 		{
-			if ((data->playerspawnrequest->client < 0) || (data->playerspawnrequest->client >= playm.playerbuffersize))
-			{
-				delete data->playerspawnrequest;
-				return;
-			}
-			if (playm.playerbuffer[data->playerspawnrequest->client] == NULL)
-			{
-				delete data->playerspawnrequest;
-				return;
-			}
-			NetworkPlayerSpawnData data2;
-
-			playm.playerbuffer[data->playerspawnrequest->client]->armor = 0;
-			playm.playerbuffer[data->playerspawnrequest->client]->health = 200;
-			playm.playerbuffer[data->playerspawnrequest->client]->room = 0;
-			
-			vmm.OnPlayerSpawn(data->playerspawnrequest->client);
-
-			data2.armor = playm.playerbuffer[data->playerspawnrequest->client]->armor;
-			data2.health = playm.playerbuffer[data->playerspawnrequest->client]->health;
-			data2.model = playm.playerbuffer[data->playerspawnrequest->client]->model;
-			memcpy(data2.position, playm.playerbuffer[data->playerspawnrequest->client]->spawnposition, sizeof(float) * 4);
-			data2.room = playm.playerbuffer[data->playerspawnrequest->client]->room;
-			memcpy(data2.compD, playm.playerbuffer[data->playerspawnrequest->client]->compD, sizeof(int) * 11);
-			memcpy(data2.compT, playm.playerbuffer[data->playerspawnrequest->client]->compT, sizeof(int) * 11);
-			data2.client = data->playerspawnrequest->client;
-
-			this->SendDataToAll("&NetworkManager::RecievePlayerSpawn", &data2);
-
-			NetworkGameTimeChangeData timedata;
-			server.GetTime(timedata.time);
-			this->SendDataToOne("&NetworkManager::RecieveGameTimeChange", data->playerspawnrequest->client, &timedata);
-
+			this->HandlePlayerSpawnRequest(data->playerspawnrequest);
 			delete data->playerspawnrequest;
 			break;
 		}
 	case NetworkRPCPlayerModelChange:
 		{
-			if ((data->playermodelchange->client < 0) || (data->playermodelchange->client >= playm.playerbuffersize))
-			{
-				delete data->playermodelchange;
-				return;
-			}
-			if (playm.playerbuffer[data->playermodelchange->client] == NULL)
-			{
-				delete data->playermodelchange;
-				return;
-			}
-			playm.playerbuffer[data->playermodelchange->client]->model = data->playermodelchange->model;
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerModelChange", data->playermodelchange->client, data->playermodelchange);
+			this->HandlePlayerModelChange(data->playermodelchange);
 			delete data->playermodelchange;
 			break;
 		}
 	case NetworkRPCPlayerComponentsChange:
 		{
-			if ((data->playercomponentschange->client < 0) || (data->playercomponentschange->client >= playm.playerbuffersize))
-			{
-				delete data->playercomponentschange;
-				return;
-			}
-			if (playm.playerbuffer[data->playercomponentschange->client] == NULL)
-			{
-				delete data->playercomponentschange;
-				return;
-			}
-			memcpy(playm.playerbuffer[data->playercomponentschange->client]->compD, data->playercomponentschange->compD, sizeof(int) * 11);
-			memcpy(playm.playerbuffer[data->playercomponentschange->client]->compT, data->playercomponentschange->compT, sizeof(int) * 11);
-			this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerComponentsChange", data->playercomponentschange->client, data->playercomponentschange);
+			this->HandlePlayerComponentsChange(data->playercomponentschange);
 			delete data->playercomponentschange;
 			break;
 		}
 	case NetworkRPCPlayerChat:
 		{
-			if (!vmm.OnPlayerText(data->playerchat->client, data->playerchat->message))
-			{
-				delete data->playerchat;
-				return;
-			}
-			wchar_t tempstring[MAX_CHAT_MESSAGE_LENGTH];
-			_snwprintf(tempstring, MAX_CHAT_MESSAGE_LENGTH, L"%s: %s", playm.playerbuffer[data->playerchat->client]->name, data->playerchat->message);
-			tempstring[MAX_CHAT_MESSAGE_LENGTH-1] = L'\0';
-			PrintToServer(tempstring);
-			wcscpy(data->playerchat->message, tempstring);
-			this->SendDataToAll("&NetworkManager::RecievePlayerChat", data->playerchat);
+			this->HandlePlayerChat(data->playerchat);
 			delete data->playerchat;
 			break;
 		}
@@ -1074,9 +826,9 @@ void NetworkManager::FreeRPCBuffer(void)
 				delete rpcbuffer[i].data.playerduck;
 				break;
 			}
-		case NetworkRPCPlayerEntranceInVehicle:
+		case NetworkRPCPlayerStartEntranceInVehicle:
 			{
-				delete rpcbuffer[i].data.playerentranceinvehicle;
+				delete rpcbuffer[i].data.playerstartentranceinvehicle;
 				break;
 			}
 		case NetworkRPCPlayerCancelEntranceInVehicle:
@@ -1084,9 +836,19 @@ void NetworkManager::FreeRPCBuffer(void)
 				delete rpcbuffer[i].data.playercancelentranceinvehicle;
 				break;
 			}
-		case NetworkRPCPlayerExitFromVehicle:
+		case NetworkRPCPlayerFinishEntranceInVehicle:
 			{
-				delete rpcbuffer[i].data.playerexitfromvehicle;
+				delete rpcbuffer[i].data.playerfinishentranceinvehicle;
+				break;
+			}
+		case NetworkRPCPlayerStartExitFromVehicle:
+			{
+				delete rpcbuffer[i].data.playerstartexitfromvehicle;
+				break;
+			}
+		case NetworkRPCPlayerFinishExitFromVehicle:
+			{
+				delete rpcbuffer[i].data.playerfinishexitfromvehicle;
 				break;
 			}
 		case NetworkRPCPlayerFire:
@@ -1134,6 +896,397 @@ void NetworkManager::FreeRPCBuffer(void)
 	free(rpcbuffer);
 	rpcbuffer = NULL;
 	rpcbuffersize = 0;
+}
+
+void NetworkManager::HandleClientConnectionRequest(NetworkManager::NetworkPlayerConnectionRequestDataInternal *data)
+{
+	short client = this->GetClientIndex(data->address);
+	if (client != INVALID_PLAYER_INDEX)
+	{
+		PrintToServer(L"Player %s has tried to connect twice.", playm.playerbuffer[client]->name);
+		this->SendConnectionError(data->address, NetworkPlayerConnectionErrorAlreadyConnected);
+		net->CloseConnection(data->address, true);
+		return;
+	}
+	client = this->RegisterNewClient(data->address);
+	if (client == INVALID_PLAYER_INDEX)
+	{
+		PrintToServer(L"Unable to register new client.");
+		this->SendConnectionError(data->address, NetworkPlayerConnectionErrorAllocationError);
+		net->CloseConnection(data->address, true);
+		return;
+	}
+	if (!vmm.OnPlayerConnect(client, data->name))
+	{
+		PrintToServer(L"Server script has disabled new client.");
+		this->SendConnectionError(data->address, NetworkPlayerConnectionErrorScriptLock);
+		net->CloseConnection(data->address, true);
+		delete clientbuffer[client];
+		clientbuffer[client] = NULL;
+		return;
+	}
+	if (!playm.RegisterNewPlayer(client, data->name))
+	{
+		PrintToServer(L"Unable to register new client.");
+		this->SendConnectionError(data->address, NetworkPlayerConnectionErrorAllocationError);
+		net->CloseConnection(data->address, true);
+		delete clientbuffer[client];
+		clientbuffer[client] = NULL;
+		return;
+	}
+	PrintToServer(L"Player %s[%d] connected", playm.playerbuffer[client]->name, client);
+	NetworkPlayerInfoData infodata;
+	infodata.index = client;
+	infodata.sessionkey = data->sessionkey;
+	rpc3->SetRecipientAddress(data->address, false);
+	rpc3->SetRecipientObject(defaultclientid);
+	rpc3->Call("&NetworkManager::RecieveClientInfo", infodata, rpc3);
+	rpc3->SetRecipientAddress(UNASSIGNED_SYSTEM_ADDRESS, true);
+	rpc3->SetRecipientObject(UNASSIGNED_NETWORK_ID); 
+}
+
+void NetworkManager::HandleClientConnectionConfirmation(const NetworkPlayerConnectionConfirmationData *data)
+{
+	NetworkGameTimeChangeData timedata;
+	server.GetTime(timedata.time);
+	this->SendDataToOne("&NetworkManager::RecieveGameTimeChange", data->client, &timedata);
+	NetworkPlayerFullUpdateData *playerdata;
+	//TODO: Optimize using currently connected players, not buffer size.
+	for (short i = 0; i < clientbuffersize; i++)
+	{
+		if (i != data->client)
+		{
+			playerdata = this->GetPlayerFullUpdateData(i);
+			if (playerdata != NULL)
+			{
+				this->SendDataToOne("&NetworkManager::RecievePlayerFullUpdate", data->client, playerdata);
+				delete playerdata;
+			}
+		}
+	}
+	NetworkVehicleFullUpdateData *vehicledata;
+	for (short i = 0; i < vm.vehiclebuffersize; i++)
+	{
+		vehicledata = this->GetVehicleFullUpdateData(i);
+		if (vehicledata != NULL)
+		{
+			this->SendDataToOne("&NetworkManager::RecieveVehicleFullUpdate", data->client, vehicledata);
+			delete vehicledata;
+		}
+	}
+	playerdata = this->GetPlayerFullUpdateData(data->client);
+	if (playerdata == NULL)
+	{
+		PrintToServer(L"Unable to read player data.");
+		this->SendConnectionError(clientbuffer[data->client]->address, NetworkPlayerConnectionErrorAllocationError);
+		net->CloseConnection(clientbuffer[data->client]->address, true);
+		delete clientbuffer[data->client];
+		clientbuffer[data->client] = NULL;
+		return;
+	}
+	this->SendDataToAll("&NetworkManager::RecieveClientConnection", playerdata);
+	delete playerdata;
+	server.UpdateServerInfo();
+}
+
+void NetworkManager::HandlePlayerMove(const NetworkPlayerMoveData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	memcpy(playm.playerbuffer[data->client]->position, data->position, sizeof(float) * 3);
+	playm.playerbuffer[data->client]->angle = data->angle;
+	if (playm.playerbuffer[data->client]->state == PlayerStateEnteringVehicle)
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client]->vehicleindex != INVALID_VEHICLE_INDEX)
+	{
+		vm.SetVehiclePositionInternal(playm.playerbuffer[data->client]->vehicleindex, data->position);
+		vm.SetVehicleAngleInternal(playm.playerbuffer[data->client]->vehicleindex, data->angle);
+	}
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerMove", data->client, data);
+}
+
+void NetworkManager::HandlePlayerJump(const NetworkPlayerJumpData *data)
+{
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerJump", data->client, data);
+}
+
+void NetworkManager::HandlePlayerDuck(const NetworkPlayerDuckData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->isducking = data->shouldduck;
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerDuck", data->client, data);
+}
+
+void NetworkManager::HandlePlayerStartEntranceInVehicle(const NetworkPlayerStartEntranceInVehicleData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client]->state != PlayerStateOnFoot)
+	{
+		return;
+	}
+	if ((data->vehicleindex < 0) || (data->vehicleindex >= vm.vehiclebuffersize))
+	{
+		return;
+	}
+	if (vm.vehiclebuffer[data->vehicleindex] == NULL)
+	{
+		return;
+	}
+	if (data->seatindex < 0)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->state = PlayerStateEnteringVehicle;
+	playm.playerbuffer[data->client]->vehicleindex = data->vehicleindex;
+	playm.playerbuffer[data->client]->seatindex = data->seatindex;
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerStartEntranceInVehicle", data->client, data);
+}
+
+void NetworkManager::HandlePlayerCancelEntranceInVehicle(const NetworkPlayerCancelEntranceInVehicleData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client]->state != PlayerStateEnteringVehicle)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->state = PlayerStateOnFoot;
+	playm.playerbuffer[data->client]->vehicleindex = INVALID_VEHICLE_INDEX;
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerCancelEntranceInVehicle", data->client, data);
+}
+
+void NetworkManager::HandlePlayerFinishEntranceInVehicle(const NetworkPlayerFinishEntranceInVehicleData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client]->state != PlayerStateEnteringVehicle)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->state = PlayerStateInVehicle;
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerFinishEntranceInVehicle", data->client, data);
+}
+
+void NetworkManager::HandlePlayerStartExitFromVehicle(const NetworkPlayerStartExitFromVehicleData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client]->state != PlayerStateInVehicle)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->state = PlayerStateExitingVehicle;
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerStartExitFromVehicle", data->client, data);
+}
+
+void NetworkManager::HandlePlayerFinishExitFromVehicle(const NetworkPlayerFinishExitFromVehicleData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client]->state != PlayerStateExitingVehicle)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->state = PlayerStateOnFoot;
+	playm.playerbuffer[data->client]->vehicleindex = INVALID_VEHICLE_INDEX;
+	playm.playerbuffer[data->client]->seatindex = INVALID_VEHICLE_INDEX;
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerFinishExitFromVehicle", data->client, data);
+}
+
+void NetworkManager::HandlePlayerFire(const NetworkPlayerFireData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->currentweapon = data->weapon;
+	if (data->target != INVALID_PLAYER_INDEX)
+	{
+		if ((data->target < INVALID_PLAYER_INDEX) && (data->target >= playm.playerbuffersize))
+		{
+			return;
+		}
+		if (playm.playerbuffer[data->target] == NULL)
+		{
+			return;
+		}
+		playm.playerbuffer[data->target]->health = data->health;
+		playm.playerbuffer[data->target]->armor = data->armor;
+		if (playm.playerbuffer[data->target]->health < 100)
+		{
+			vmm.OnPlayerDeath(data->target, data->client, data->weapon);
+		}
+	}
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerFire", data->client, data);
+}
+
+void NetworkManager::HandlePlayerAim(const NetworkPlayerAimData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->currentweapon = data->weapon;
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerAim", data->client, data);
+}
+
+void NetworkManager::HandlePlayerWeaponChange(const NetworkPlayerWeaponChangeData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->currentweapon = data->weapon;
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerWeaponChange", data->client, data);
+}
+
+void NetworkManager::HandlePlayerHealthAndArmorChange(const NetworkPlayerHealthAndArmorChangeData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->health = data->health;
+	playm.playerbuffer[data->client]->armor = data->armor;
+	if (playm.playerbuffer[data->client]->health < 100)
+	{
+		vmm.OnPlayerDeath(data->client, INVALID_PLAYER_INDEX, 46);
+	}
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerHealthAndArmorChange", data->client, data);
+}
+
+void NetworkManager::HandlePlayerSpawnRequest(const NetworkPlayerSpawnRequestData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	NetworkPlayerSpawnData data2;
+	playm.playerbuffer[data->client]->armor = 0;
+	playm.playerbuffer[data->client]->health = 200;
+	playm.playerbuffer[data->client]->room = 0;
+	vmm.OnPlayerSpawn(data->client);
+	data2.armor = playm.playerbuffer[data->client]->armor;
+	data2.health = playm.playerbuffer[data->client]->health;
+	data2.model = playm.playerbuffer[data->client]->model;
+	memcpy(data2.position, playm.playerbuffer[data->client]->spawnposition, sizeof(float) * 4);
+	data2.room = playm.playerbuffer[data->client]->room;
+	memcpy(data2.compD, playm.playerbuffer[data->client]->compD, sizeof(int) * 11);
+	memcpy(data2.compT, playm.playerbuffer[data->client]->compT, sizeof(int) * 11);
+	data2.client = data->client;
+	this->SendDataToAll("&NetworkManager::RecievePlayerSpawn", &data2);
+	NetworkGameTimeChangeData timedata;
+	server.GetTime(timedata.time);
+	this->SendDataToOne("&NetworkManager::RecieveGameTimeChange", data->client, &timedata);
+}
+
+void NetworkManager::HandlePlayerModelChange(const NetworkPlayerModelChangeData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	playm.playerbuffer[data->client]->model = data->model;
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerModelChange", data->client, data);
+}
+
+void NetworkManager::HandlePlayerComponentsChange(const NetworkPlayerComponentsChangeData *data)
+{
+	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[data->client] == NULL)
+	{
+		return;
+	}
+	memcpy(playm.playerbuffer[data->client]->compD, data->compD, sizeof(int) * 11);
+	memcpy(playm.playerbuffer[data->client]->compT, data->compT, sizeof(int) * 11);
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerComponentsChange", data->client, data);
+}
+
+void NetworkManager::HandlePlayerChat(NetworkPlayerChatData *data)
+{
+	if (!vmm.OnPlayerText(data->client, data->message))
+	{
+		return;
+	}
+	wchar_t tempstring[MAX_CHAT_MESSAGE_LENGTH];
+	_snwprintf(tempstring, MAX_CHAT_MESSAGE_LENGTH, L"%s: %s", playm.playerbuffer[data->client]->name, data->message);
+	tempstring[MAX_CHAT_MESSAGE_LENGTH-1] = L'\0';
+	PrintToServer(tempstring);
+	wcscpy(data->message, tempstring);
+	this->SendDataToAll("&NetworkManager::RecievePlayerChat", data);
 }
 
 short NetworkManager::RegisterNewClient(const SystemAddress address)

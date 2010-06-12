@@ -1,11 +1,12 @@
 #include "con_debugcommands.h"
 #include "../Shared/ClientCore.h"
-#include "main.h"
 #include "Hook\scripting.h"
 #include "Hook\classes.h"
+#include "PlayerManager.h"
 
 extern ClientCore client;
 extern FMPHook HOOK;
+extern FPlayer gPlayer[MAX_PLAYERS];
 
 void ConCmdAddarmor(ConsoleCore *concore, const unsigned char numargs)
 {

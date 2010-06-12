@@ -6,6 +6,7 @@
 #include "../../Shared/Console/ConsoleCore.h"
 #include "con_sharedcommands.h"
 #include "con_sharedcvarhooks.h"
+#include "../../Shared/Network/PlayerDefines.h"
 #include "NetworkManager.h"
 #if defined (FMP_CLIENT)
 #include "../FMP/log.h"
@@ -25,11 +26,11 @@ extern ConsoleScreen conscreen;
 ClientCore::ClientCore(void)
 {
 	gamestate = GameStateLoading;
-	wcscpy(name, L"unnamed");
+	wcscpy(name, DEFAULT_CLIENT_NAME);
 	namecvar = NULL;
-	index = -1; // Should be defined in PlayerManager.h
+	index = INVALID_PLAYER_INDEX;
 	rand_s(&sessionkey);
-	fmpid = -1;
+	fmpid = INVALID_FMPID;
 #if defined (FMP_CLIENT)
 	inputstate = InputStateGame;
 #endif
@@ -147,7 +148,7 @@ bool ClientCore::SetGameState(const GameState state)
 	return true;
 }
 
-bool ClientCore::SetName(const wchar_t string[MAX_PLAYER_NAME_LENGTH])
+bool ClientCore::SetName(const wchar_t string[MAX_CLIENT_NAME_LENGTH])
 {
 	if (name == NULL)
 	{

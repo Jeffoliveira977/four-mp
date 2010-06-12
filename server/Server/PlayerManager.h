@@ -1,11 +1,7 @@
 #pragma once
 
-#include "../../Shared/Network/Limits.h"
-
-#define INVALID_PLAYER_INDEX -1
-#define INVALID_PLAYER_MODEL 0
-#define INVALID_PLAYER_SEAT_INDEX -1
-#define INVALID_PLAYER_WANTED_LEVEL -1
+#include "../../Shared/Network/ClientDefines.h"
+#include "../../Shared/Network/PlayerDefines.h"
 
 class PlayerManager
 {
@@ -36,17 +32,17 @@ public:
 private:
 	struct Player
 	{
-		wchar_t name[MAX_PLAYER_NAME_LENGTH]; ///< Holds the name of the player.
+		wchar_t name[MAX_CLIENT_NAME_LENGTH]; ///< Holds the name of the player.
 		unsigned char classindex; ///< Holds the index of the player's class.
 		unsigned int model; ///< Holds the model hash of the player.
 		float position[3]; ///< Holds the position of the player.
 		float angle; ///< Holds the angle of the player.
-		int last_active;
-		int sync_state;
+		bool isducking; ///< Holds true if the player is ducking and false otherwise.
 		char currentweapon;
 		char weapons[8];
 		short ammo[8];
 		char animation[128];
+		PlayerState state; ///< Holds the state of the player.
 		short vehicleindex; ///< Holds the index of the vehicle the player is in.
 		char seatindex; ///< Holds the index of the seat of the vehicle the player is in.
 		int score; /// Holds the score of the player.
@@ -54,9 +50,7 @@ private:
 		unsigned char armor; ///< Holds the armor of the player. 0 means no armor, 100 - full.
 		char wanted_level; ///< Holds the wanted level of the player.
 		bool edSprint, edLockon, edDoDriveBy, edUseCover, edConrol, edFreeze; // enable / disable
-		bool isducking; ///< Holds true if the player is ducking and false otherwise.
 		int room;
-		bool car_enter;
 		unsigned char color[4]; ///< Holds the color of the player.
 		int compT[11], compD[11];
 		float spawnposition[4];
@@ -76,9 +70,9 @@ private:
 	unsigned char maxclassbuffersize;
 	unsigned char classbuffersize;
 	PlayerClass **classbuffer;
-	bool RegisterNewPlayer(const short index, wchar_t (&name)[MAX_PLAYER_NAME_LENGTH]);
+	bool RegisterNewPlayer(const short index, wchar_t (&name)[MAX_CLIENT_NAME_LENGTH]);
 	short GetPlayerFreeSlot(void);
-	bool AssignPlayerName(wchar_t (&name)[MAX_PLAYER_NAME_LENGTH]);
+	bool AssignPlayerName(wchar_t (&name)[MAX_CLIENT_NAME_LENGTH]);
 	bool GetClassFreeSlot(unsigned char &index);
 	friend class NetworkManager;
 };

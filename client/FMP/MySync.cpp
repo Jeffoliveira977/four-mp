@@ -6,19 +6,20 @@ Syncronizashion this player
 #include <math.h>
 
 #include "log.h"
-#include "main.h"
 #include "../Shared/ClientCore.h"
 #include "Hook\classes.h"
 #include "Hook\scripting.h"
 #include "functions.h"
 
+#include "PlayerManager.h"
+#include "VehicleManager.h"
 #include "../Shared/NetworkManager.h"
 
 extern ClientCore client;
 extern NetworkManager nm;
 
-extern bool myEnter;
-
+extern FPlayer gPlayer[MAX_PLAYERS];
+extern FVehicle gVehicle[MAX_VEHICLES];
 
 void FMPHook::MoveSync()
 {
@@ -30,7 +31,7 @@ void FMPHook::MoveSync()
 	float x,y,z,a;
 	Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &x, &y, &z);
 	Natives::GetCharHeading(gPlayer[client.GetIndex()].PedID, &a);
-	if(gPlayer[client.GetIndex()].position[0] != x && gPlayer[client.GetIndex()].position[1] != y && gPlayer[client.GetIndex()].position[2] != z && myEnter == 0)
+	if (((gPlayer[client.GetIndex()].position[0] != x) || (gPlayer[client.GetIndex()].position[1] != y) || (gPlayer[client.GetIndex()].position[2] != z)) && (playerstate != PlayerStateEnteringVehicle))
 	{
 		float lx,ly,lz;
 		Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &lx, &ly, &lz);
@@ -38,10 +39,10 @@ void FMPHook::MoveSync()
 		float t = (GetTickCount()-gPlayer[client.GetIndex()].last_active);
 		float speed = (d / t)*10000;
 
-		if(Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && gPlayer[client.GetIndex()].vehicleindex != -1) 
+		if ((Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && (gPlayer[client.GetIndex()].vehicleindex != -1)))
 		{
 			int pl_car = gPlayer[client.GetIndex()].vehicleindex;
-			Vehicle car = gCar[pl_car].CarID;
+			Vehicle car = gVehicle[pl_car].CarID;
 
 			float cs;
 			Natives::GetCarSpeed(car, &cs);
@@ -88,12 +89,76 @@ void FMPHook::MoveSync()
 
 void FMPHook::CarDoSync()
 {
-	if (Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && gPlayer[client.GetIndex()].vehicleindex == -1)
+	bool enterpressed = false;
+	if ((Natives::IsControlPressed(0, 3)) || (Natives::IsControlPressed(0, 43)))
+	{
+		//Log::Debug(L"Enter/exit vehicle pressed");
+		enterpressed = true;
+	}
+	//bool getting = Natives::IsCharGettingInToACar(gPlayer[client.GetIndex()].PedID);
+	bool invehicle = Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID);
+	bool sitting = Natives::IsCharSittingInAnyCar(gPlayer[client.GetIndex()].PedID);
+	bool onfoot = Natives::IsCharOnFoot(gPlayer[client.GetIndex()].PedID);
+	//Log::Debug(L"In vehicle: %d. Sitting: %d. On foot: %d", invehicle, sitting, onfoot);
+	switch (playerstate)
+	{
+	case PlayerStateOnFoot:
+		{
+			if ((!invehicle) && (!onfoot))
+			{
+				short vehicleindex;
+				float x, y, z;
+				Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &x, &y, &z);
+				vehicleindex = _GetClosestCar(x, y, z, 10);
+				if (vehicleindex != INVALID_VEHICLE_INDEX)
+				{
+					playerstate = PlayerStateEnteringVehicle;
+					gPlayer[client.GetIndex()].vehicleindex = vehicleindex;
+					gPlayer[client.GetIndex()].seatindex = 0;
+					nm.SendPlayerStartEntranceInVehicle();
+				}
+			}
+			break;
+		}
+	case PlayerStateEnteringVehicle:
+		{
+			if ((invehicle) && (sitting))
+			{
+				playerstate = PlayerStateInVehicle;
+				nm.SendPlayerFinishEntranceInVehicle();
+			}
+			else if (onfoot)
+			{
+				playerstate = PlayerStateOnFoot;
+				nm.SendPlayerCancelEntranceInVehicle();
+			}
+			break;
+		}
+	case PlayerStateInVehicle:
+		{
+			if ((invehicle) && (!sitting))
+			{
+				playerstate = PlayerStateExitingVehicle;
+				nm.SendPlayerStartExitFromVehicle();
+			}
+			break;
+		}
+	case PlayerStateExitingVehicle:
+		{
+			if (onfoot)
+			{
+				playerstate = PlayerStateOnFoot;
+				nm.SendPlayerFinishExitFromVehicle();
+			}
+			break;
+		}
+	}
+	/*if ( && gPlayer[client.GetIndex()].vehicleindex == -1)
 	{
 		gPlayer[client.GetIndex()].vehicleindex = GetPlayerCar(_GetPedVehicle(gPlayer[client.GetIndex()].PedID));
 		nm.SendPlayerEntranceInVehicle(0);
-	}
-	else if(!Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && gPlayer[client.GetIndex()].vehicleindex != -1)
+	}*/
+	/*else if(!Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && gPlayer[client.GetIndex()].vehicleindex != -1)
 	{
 		gPlayer[client.GetIndex()].vehicleindex = -1;
 		nm.SendPlayerExitFromVehicle();
@@ -102,18 +167,7 @@ void FMPHook::CarDoSync()
 	{
 		if(!Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID))
 		{
-			short carid;
-			float x, y, z;
-			Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &x, &y, &z);
-
-			carid = _GetClosestCar(x, y, z, 10);
-			if(carid != -1)
-			{
-				gPlayer[client.GetIndex()].vehicleindex = carid;
-				gPlayer[client.GetIndex()].seatindex = 0;
-				nm.SendPlayerEntranceInVehicle(0);
-				myEnter = 1;
-			}
+			
 		} 
 		else 
 		{
@@ -134,12 +188,12 @@ void FMPHook::CarDoSync()
 		carid = _GetClosestCar(x, y, z, 10);
 		if(carid != -1)
 		{
-			Natives::GetMaximumNumberOfPassengers(gCar[carid].CarID, &max);
+			Natives::GetMaximumNumberOfPassengers(gVehicle[carid].CarID, &max);
 			if(max > 2)
 			{
 				float cx, cy, cz, al;
-				Natives::GetCarCoordinates(gCar[carid].CarID, &cx, &cy, &cz);
-				Natives::GetCarHeading(gCar[carid].CarID, &al);
+				Natives::GetCarCoordinates(gVehicle[carid].CarID, &cx, &cy, &cz);
+				Natives::GetCarHeading(gVehicle[carid].CarID, &al);
 
 				float sx,sy, br = 1000;
 				int min = -1;
@@ -169,7 +223,7 @@ void FMPHook::CarDoSync()
 			{
 				gPlayer[client.GetIndex()].vehicleindex = carid;
 				gPlayer[client.GetIndex()].seatindex = seatid+1;
-				Natives::TaskEnterCarAsPassenger(gPlayer[client.GetIndex()].PedID, gCar[carid].CarID, -1, seatid);
+				Natives::TaskEnterCarAsPassenger(gPlayer[client.GetIndex()].PedID, gVehicle[carid].CarID, -1, seatid);
 				nm.SendPlayerEntranceInVehicle(seatid+1);
 			}
 		}
@@ -197,7 +251,7 @@ void FMPHook::CarDoSync()
 				nm.SendPlayerCancelEntranceInVehicle();
 			}
 		}
-	}
+	}*/
 }
 
 void FMPHook::GunSync()

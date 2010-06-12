@@ -43,6 +43,7 @@ FMPHook::FMPHook(): FMPThread()
 	spawnposition.Y = -2.875000;
 	spawnposition.Z = 14.818866;
 	spawnposition.W = 0;
+	playerstate = PlayerStateOnFoot;
 }
 
 FMPHook::~FMPHook()

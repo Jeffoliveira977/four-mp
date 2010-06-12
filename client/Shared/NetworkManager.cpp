@@ -8,12 +8,13 @@
 #include "ClientCore.h"
 #include "../../Shared/Console/common.h"
 #if defined (FMP_CLIENT)
-#include "../FMP/main.h"
 #include "../FMP/log.h"
 #include "../FMP/Hook/classes.h"
+#include "../FMP/PlayerManager.h"
+#include "../FMP/VehicleManager.h"
 #include "../FMP/masterserver.h"
-#include "../FMP/chat.h"
 #include "../FMP/d3d9/gui.h"
+#include "../FMP/ChatManager.h"
 #elif defined (FMP_CONSOLE_CLIENT)
 #include "../ConsoleClient/logging.h"
 #include "../../Shared/Console/ConsoleScreen.h"
@@ -24,6 +25,9 @@ extern ClientCore client;
 extern FMPHook HOOK;
 extern FMPGUI Gui;
 extern ChatManager chat;
+
+extern FPlayer gPlayer[MAX_PLAYERS];
+extern FVehicle gVehicle[MAX_VEHICLES];
 #endif
 
 NetworkManager::NetworkManager(void)
@@ -75,9 +79,11 @@ void NetworkManager::Load(void)
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerMove);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerJump);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerDuck);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerEntranceInVehicle);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerStartEntranceInVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerCancelEntranceInVehicle);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerExitFromVehicle);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFinishEntranceInVehicle);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerStartExitFromVehicle);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFinishExitFromVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFire);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerAim);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerWeaponChange);
@@ -364,14 +370,14 @@ void NetworkManager::SendPlayerDuck(void)
 	rpc3->CallCPP("&NetworkManager::RecievePlayerDuck", serverid, data, rpc3);
 }
 
-void NetworkManager::SendPlayerEntranceInVehicle(const char seat)
+void NetworkManager::SendPlayerStartEntranceInVehicle(void)
 {
-	NetworkPlayerEntranceInVehicleData data;
+	NetworkPlayerStartEntranceInVehicleData data;
 #if defined (FMP_CLIENT)
 	data.vehicleindex = gPlayer[client.GetIndex()].vehicleindex;
-	data.seat = seat;
+	data.seatindex = gPlayer[client.GetIndex()].seatindex;
 #endif
-	rpc3->CallCPP("&NetworkManager::RecievePlayerEntranceInVehicle", serverid, data, rpc3);
+	rpc3->CallCPP("&NetworkManager::RecievePlayerStartEntranceInVehicle", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerCancelEntranceInVehicle(void)
@@ -380,10 +386,22 @@ void NetworkManager::SendPlayerCancelEntranceInVehicle(void)
 	rpc3->CallCPP("&NetworkManager::RecievePlayerCancelEntranceInVehicle", serverid, data, rpc3);
 }
 
-void NetworkManager::SendPlayerExitFromVehicle(void)
+void NetworkManager::SendPlayerFinishEntranceInVehicle(void)
 {
-	NetworkPlayerExitFromVehicleData data;
-	rpc3->CallCPP("&NetworkManager::RecievePlayerExitFromVehicle", serverid, data, rpc3);
+	NetworkPlayerFinishEntranceInVehicleData data;
+	rpc3->CallCPP("&NetworkManager::RecievePlayerFinishEntranceInVehicle", serverid, data, rpc3);
+}
+
+void NetworkManager::SendPlayerStartExitFromVehicle(void)
+{
+	NetworkPlayerStartExitFromVehicleData data;
+	rpc3->CallCPP("&NetworkManager::RecievePlayerStartExitFromVehicle", serverid, data, rpc3);
+}
+
+void NetworkManager::SendPlayerFinishExitFromVehicle(void)
+{
+	NetworkPlayerFinishExitFromVehicleData data;
+	rpc3->CallCPP("&NetworkManager::RecievePlayerFinishExitFromVehicle", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerFire(const float position[3], const int time, const short target, const unsigned char health, const unsigned int armor)
@@ -518,9 +536,9 @@ void NetworkManager::RecievePlayerDuck(NetworkPlayerDuckData data, RakNet::RPC3 
 	this->WriteToRPCBuffer(NetworkRPCPlayerDuck, &data);
 }
 
-void NetworkManager::RecievePlayerEntranceInVehicle(NetworkPlayerEntranceInVehicleData data, RakNet::RPC3 *serverrpc3)
+void NetworkManager::RecievePlayerStartEntranceInVehicle(NetworkPlayerStartEntranceInVehicleData data, RakNet::RPC3 *serverrpc3)
 {
-	this->WriteToRPCBuffer(NetworkRPCPlayerEntranceInVehicle, &data);
+	this->WriteToRPCBuffer(NetworkRPCPlayerStartEntranceInVehicle, &data);
 }
 
 void NetworkManager::RecievePlayerCancelEntranceInVehicle(NetworkPlayerCancelEntranceInVehicleData data, RakNet::RPC3 *serverrpc3)
@@ -528,9 +546,19 @@ void NetworkManager::RecievePlayerCancelEntranceInVehicle(NetworkPlayerCancelEnt
 	this->WriteToRPCBuffer(NetworkRPCPlayerCancelEntranceInVehicle, &data);
 }
 
-void NetworkManager::RecievePlayerExitFromVehicle(NetworkPlayerExitFromVehicleData data, RakNet::RPC3 *serverrpc3)
+void NetworkManager::RecievePlayerFinishEntranceInVehicle(NetworkPlayerFinishEntranceInVehicleData data, RakNet::RPC3 *serverrpc3)
 {
-	this->WriteToRPCBuffer(NetworkRPCPlayerExitFromVehicle, &data);
+	this->WriteToRPCBuffer(NetworkRPCPlayerFinishEntranceInVehicle, &data);
+}
+
+void NetworkManager::RecievePlayerStartExitFromVehicle(NetworkPlayerStartExitFromVehicleData data, RakNet::RPC3 *serverrpc3)
+{
+	this->WriteToRPCBuffer(NetworkRPCPlayerStartExitFromVehicle, &data);
+}
+
+void NetworkManager::RecievePlayerFinishExitFromVehicle(NetworkPlayerFinishExitFromVehicleData data, RakNet::RPC3 *serverrpc3)
+{
+	this->WriteToRPCBuffer(NetworkRPCPlayerFinishExitFromVehicle, &data);
 }
 
 void NetworkManager::RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 *serverrpc3)
@@ -663,10 +691,10 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 			memcpy(rpcbuffer[rpcbuffersize].data.playerduck, data, sizeof(DATATYPE));
 			break;
 		}
-	case NetworkRPCPlayerEntranceInVehicle:
+	case NetworkRPCPlayerStartEntranceInVehicle:
 		{
-			rpcbuffer[rpcbuffersize].data.playerentranceinvehicle = (NetworkPlayerEntranceInVehicleData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playerentranceinvehicle, data, sizeof(DATATYPE));
+			rpcbuffer[rpcbuffersize].data.playerstartentranceinvehicle = (NetworkPlayerStartEntranceInVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerstartentranceinvehicle, data, sizeof(DATATYPE));
 			break;
 		}
 	case NetworkRPCPlayerCancelEntranceInVehicle:
@@ -675,10 +703,22 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 			memcpy(rpcbuffer[rpcbuffersize].data.playercancelentranceinvehicle, data, sizeof(DATATYPE));
 			break;
 		}
-	case NetworkRPCPlayerExitFromVehicle:
+	case NetworkRPCPlayerFinishEntranceInVehicle:
 		{
-			rpcbuffer[rpcbuffersize].data.playerexitfromvehicle = (NetworkPlayerExitFromVehicleData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playerexitfromvehicle, data, sizeof(DATATYPE));
+			rpcbuffer[rpcbuffersize].data.playerfinishentranceinvehicle = (NetworkPlayerFinishEntranceInVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerfinishentranceinvehicle, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerStartExitFromVehicle:
+		{
+			rpcbuffer[rpcbuffersize].data.playerstartexitfromvehicle = (NetworkPlayerStartExitFromVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerstartexitfromvehicle, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerFinishExitFromVehicle:
+		{
+			rpcbuffer[rpcbuffersize].data.playerfinishexitfromvehicle = (NetworkPlayerFinishExitFromVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerfinishexitfromvehicle, data, sizeof(DATATYPE));
 			break;
 		}
 	case NetworkRPCPlayerFire:
@@ -923,8 +963,8 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			Log::Debug(L"Recieving player move");
 			if(gPlayer[data->playermove->client].vehicleindex != -1)
 			{
-				memcpy(gCar[gPlayer[data->playermove->client].vehicleindex].position, data->playermove->position, sizeof(float) * 3);
-				gCar[gPlayer[data->playermove->client].vehicleindex].angle = data->playermove->angle;
+				memcpy(gVehicle[gPlayer[data->playermove->client].vehicleindex].position, data->playermove->position, sizeof(float) * 3);
+				gVehicle[gPlayer[data->playermove->client].vehicleindex].angle = data->playermove->angle;
 			}
 
 			memcpy(gPlayer[data->playermove->client].position, data->playermove->position, sizeof(float) * 3);
@@ -951,12 +991,12 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			delete data->playerduck;
 			break;
 		}
-	case NetworkRPCPlayerEntranceInVehicle:
+	case NetworkRPCPlayerStartEntranceInVehicle:
 		{
 #if defined (FMP_CLIENT)
-			HOOK.EnterInVehicle(data->playerentranceinvehicle->client, data->playerentranceinvehicle->vehicleindex, data->playerentranceinvehicle->seat);
+			HOOK.StartEnterInVehicle(data->playerstartentranceinvehicle->client, data->playerstartentranceinvehicle->vehicleindex, data->playerstartentranceinvehicle->seatindex);
 #endif
-			delete data->playerentranceinvehicle;
+			delete data->playerstartentranceinvehicle;
 			break;
 		}
 	case NetworkRPCPlayerCancelEntranceInVehicle:
@@ -967,12 +1007,28 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			delete data->playercancelentranceinvehicle;
 			break;
 		}
-	case NetworkRPCPlayerExitFromVehicle:
+	case NetworkRPCPlayerFinishEntranceInVehicle:
 		{
 #if defined (FMP_CLIENT)
-			HOOK.ExitFromVehicle(data->playerexitfromvehicle->client);
+			HOOK.FinishEnterInVehicle(data->playerfinishentranceinvehicle->client);
 #endif
-			delete data->playerexitfromvehicle;
+			delete data->playerfinishentranceinvehicle;
+			break;
+		}
+	case NetworkRPCPlayerStartExitFromVehicle:
+		{
+#if defined (FMP_CLIENT)
+			HOOK.StartExitFromVehicle(data->playerstartexitfromvehicle->client);
+#endif
+			delete data->playerstartexitfromvehicle;
+			break;
+		}
+	case NetworkRPCPlayerFinishExitFromVehicle:
+		{
+#if defined (FMP_CLIENT)
+			HOOK.FinishExitFromVehicle(data->playerfinishexitfromvehicle->client);
+#endif
+			delete data->playerfinishexitfromvehicle;
 			break;
 		}
 	case NetworkRPCPlayerFire:
@@ -1135,9 +1191,9 @@ void NetworkManager::FreeRPCBuffer(void)
 				delete rpcbuffer[i].data.playerduck;
 				break;
 			}
-		case NetworkRPCPlayerEntranceInVehicle:
+		case NetworkRPCPlayerStartEntranceInVehicle:
 			{
-				delete rpcbuffer[i].data.playerentranceinvehicle;
+				delete rpcbuffer[i].data.playerstartentranceinvehicle;
 				break;
 			}
 		case NetworkRPCPlayerCancelEntranceInVehicle:
@@ -1145,9 +1201,19 @@ void NetworkManager::FreeRPCBuffer(void)
 				delete rpcbuffer[i].data.playercancelentranceinvehicle;
 				break;
 			}
-		case NetworkRPCPlayerExitFromVehicle:
+		case NetworkRPCPlayerFinishEntranceInVehicle:
 			{
-				delete rpcbuffer[i].data.playerexitfromvehicle;
+				delete rpcbuffer[i].data.playerfinishentranceinvehicle;
+				break;
+			}
+		case NetworkRPCPlayerStartExitFromVehicle:
+			{
+				delete rpcbuffer[i].data.playerstartexitfromvehicle;
+				break;
+			}
+		case NetworkRPCPlayerFinishExitFromVehicle:
+			{
+				delete rpcbuffer[i].data.playerfinishexitfromvehicle;
 				break;
 			}
 		case NetworkRPCPlayerFire:

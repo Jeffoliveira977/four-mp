@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Limits.h"
+#include "ClientDefines.h"
 
-#define PROTOCOL_VERSION 14
+#define PROTOCOL_VERSION 15
 
 #define DEFAULT_SERVER_NETWORK_ID 0
 #define DEFAULT_CLIENT_NETWORK_ID 65534
@@ -10,7 +11,7 @@
 struct NetworkPlayerConnectionRequestData
 {
 	short protocol;
-	wchar_t name[MAX_PLAYER_NAME_LENGTH];
+	wchar_t name[MAX_CLIENT_NAME_LENGTH];
 	unsigned int sessionkey;
 	int fmpid;
 };
@@ -60,7 +61,7 @@ struct NetworkGameTimeChangeData
 struct NetworkPlayerFullUpdateData
 {
 	short index;
-	wchar_t name[MAX_PLAYER_NAME_LENGTH];
+	wchar_t name[MAX_CLIENT_NAME_LENGTH];
 	unsigned int model;
 	float position[3];
 	float angle;
@@ -94,11 +95,11 @@ struct NetworkPlayerDuckData
 	bool shouldduck;
 };
 
-struct NetworkPlayerEntranceInVehicleData
+struct NetworkPlayerStartEntranceInVehicleData
 {
 	short client;
 	short vehicleindex;
-	char seat;
+	char seatindex;
 };
 
 struct NetworkPlayerCancelEntranceInVehicleData
@@ -106,7 +107,17 @@ struct NetworkPlayerCancelEntranceInVehicleData
 	short client;
 };
 
-struct NetworkPlayerExitFromVehicleData
+struct NetworkPlayerFinishEntranceInVehicleData
+{
+	short client;
+};
+
+struct NetworkPlayerStartExitFromVehicleData
+{
+	short client;
+};
+
+struct NetworkPlayerFinishExitFromVehicleData
 {
 	short client;
 };
