@@ -257,7 +257,7 @@ void NetworkManager::RecieveClientConnectionRequest(NetworkPlayerConnectionReque
 		if(!msm.QueryUserCheck(data.fmpid, clientrpc3->GetLastSenderAddress().ToString(0), data.sessionkey))
 		{
 			PrintToServer(L"Client has failed to pass an authentication.");
-			this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorAlreadyConnected);
+			this->SendConnectionError(clientrpc3->GetLastSenderAddress(), NetworkPlayerConnectionErrorInvalidAuth);
 			net->CloseConnection(clientrpc3->GetLastSenderAddress(), true);
 			return;
 		}
