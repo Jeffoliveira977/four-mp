@@ -577,7 +577,7 @@ namespace Natives
     //static bool IsCarStopped(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_STOPPED, bool>(vehicle); }
     static bool IsCarStoppedAtTrafficLights(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_STOPPED_AT_TRAFFIC_LIGHTS, bool>(vehicle); }
     static bool IsCarStuckOnRoof(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_STUCK_ON_ROOF, bool>(vehicle); }
-    static bool IsCarTouchingVehicle(Vehicle vehicle, Vehicle otherCar) { return NativeInvoke::Invoke<NATIVE_IS_CAR_TOUCHING_CAR, bool>(vehicle, otherCar); }
+    static bool IsCarTouchingCar(Vehicle vehicle, Vehicle otherCar) { return NativeInvoke::Invoke<NATIVE_IS_CAR_TOUCHING_CAR, bool>(vehicle, otherCar); }
     static bool IsCarTyreBurst(Vehicle vehicle, eVehicleTyre tyre) { return NativeInvoke::Invoke<NATIVE_IS_CAR_TYRE_BURST, bool>(vehicle, tyre); }
     static bool IsCarUpright(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_UPRIGHT, bool>(vehicle); }
     static bool IsCarUpsidedown(Vehicle vehicle) { return NativeInvoke::Invoke<NATIVE_IS_CAR_UPSIDEDOWN, bool>(vehicle); }
