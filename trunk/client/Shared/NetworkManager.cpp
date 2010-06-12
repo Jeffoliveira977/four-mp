@@ -812,6 +812,15 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 #endif
 					break;
 				}
+			case NetworkPlayerConnectionErrorInvalidAuth:
+				{
+#if defined (FMP_CLIENT)
+					Log::Info(L"Connection error: You have failed to pass an authentication.");
+#elif defined (FMP_CONSOLE_CLIENT)
+					PrintToConsole(L"Connection error: You have failed to pass an authentication.");
+#endif
+					break;
+				}
 			case NetworkPlayerConnectionErrorAlreadyConnected:
 				{
 #if defined (FMP_CLIENT)

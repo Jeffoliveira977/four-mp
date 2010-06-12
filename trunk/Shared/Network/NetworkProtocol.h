@@ -2,7 +2,7 @@
 
 #include "Limits.h"
 
-#define PROTOCOL_VERSION 13
+#define PROTOCOL_VERSION 14
 
 #define DEFAULT_SERVER_NETWORK_ID 0
 #define DEFAULT_CLIENT_NETWORK_ID 65534
@@ -20,6 +20,7 @@ enum NetworkPlayerConnectionError
 	NetworkPlayerConnectionErrorServerFull,
 	NetworkPlayerConnectionErrorInvalidProtocol,
 	NetworkPlayerConnectionErrorInvalidName,
+	NetworkPlayerConnectionErrorInvalidAuth,
 	NetworkPlayerConnectionErrorAlreadyConnected,
 	NetworkPlayerConnectionErrorAllocationError,
 	NetworkPlayerConnectionErrorScriptLock
