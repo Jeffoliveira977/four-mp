@@ -49,7 +49,7 @@ void FMPHook::MoveSync()
 
 			int dr = 1;
 			if(!Natives::DoesVehicleExist(car)) { Log::Debug(L"DOES"); }
-			if(Natives::IsCarStopped(car)) { Log::Debug(L"STOP"); dr = 0; }
+			//if(Natives::IsCarStopped(car)) { Log::Debug(L"STOP"); dr = 0; }
 			Vector3 v;
 			Natives::GetCarSpeedVector(car, &v, 1);
 			float x = floor(v.X * 1000 + 0.5)/1000;
@@ -98,7 +98,7 @@ void FMPHook::CarDoSync()
 		gPlayer[client.GetIndex()].vehicleindex = -1;
 		nm.SendPlayerExitFromVehicle();
 	}
-	if(myEnter == 0 && GetAsyncKeyState(70) != 0)
+	if ((myEnter == 0) && (GetAsyncKeyState(70) != 0) && (client.GetInputState() == InputStateGame))
 	{
 		if(!Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID))
 		{
