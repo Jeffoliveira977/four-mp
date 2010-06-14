@@ -68,6 +68,7 @@ bool ClientCore::Load(void)
 	concore.AddConCmd(L"addarmor", ConCmdAddarmor);
 	concore.AddConCmd(L"getarmor", ConCmdGetarmor);
 	concore.AddConCmd(L"gethealth", ConCmdGethealth);
+	concore.AddConCmd(L"give", ConCmdGive, L"Give weapon to player. Arguments: <weapon_index>");
 	concore.AddConCmd(L"hurtme", ConCmdHurtme, L"Hurts the player. Arguments: <health to lose>");
 #endif
 	namecvar = concore.AddConVar(L"name", L"unnamed", L"Current user name.", 0);

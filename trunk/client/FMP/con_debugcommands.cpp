@@ -56,6 +56,27 @@ void ConCmdGethealth(ConsoleCore *concore, const unsigned char numargs)
 	return;
 }
 
+void ConCmdGive(ConsoleCore *concore, const unsigned char numargs)
+{
+	if (client.GetGameState() != GameStateInGame)
+	{
+		return;
+	}
+	int weapon;
+	if (numargs == 0)
+	{
+		concore->Output(L"Usage: give <weapon_index>");
+		return;
+	}
+	if (!concore->GetCmdArg(1, weapon))
+	{
+		concore->Output(L"Usage: give <weapon_index>");
+		return;
+	}
+	Natives::GiveWeaponToChar(gPlayer[client.GetIndex()].PedID, (eWeapon)weapon, 9999, 0);
+	return;
+}
+
 void ConCmdHurtme(ConsoleCore *concore, const unsigned char numargs)
 {
 	if (client.GetGameState() != GameStateInGame)

@@ -960,7 +960,6 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 	case NetworkRPCPlayerMove:
 		{
 #if defined (FMP_CLIENT)
-			Log::Debug(L"Recieving player move");
 			if(gPlayer[data->playermove->client].vehicleindex != -1)
 			{
 				memcpy(gVehicle[gPlayer[data->playermove->client].vehicleindex].position, data->playermove->position, sizeof(float) * 3);
