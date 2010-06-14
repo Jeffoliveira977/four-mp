@@ -18,8 +18,8 @@ public:
 	wchar_t *GetHostname(void);
 	bool GetComponentSelectStatus(void);
 	void EnableComponentSelect(bool enable);
-	void GetTime(unsigned char (&timebuffer)[2]);
-	void SetTime(const unsigned char time[2]);
+	void GetGameTime(unsigned char (&timebuffer)[2]);
+	bool SetGameTime(const unsigned char time[2]);
 private:
 	bool isrunning;
 	short sleepcount;

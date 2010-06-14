@@ -12,7 +12,7 @@ function OnGameModeInit()
 	CreateCar(0x79FBB0C5, -58.267639, 799.859314, 14.659676, 0.0, 0, 0);
 	CreateCar(0xEE6024BC, -58.164066, 772.126892, 14.707888, 0.0, 0, 0);
 	
-	SetGameTime(12, 0);
+	SetGameTime([12, 0]);
 
 	addPlayerClass(0x98E29920, 0, 0, 0, 0, 16, 100, 0, 0, 0, 0); // Not using
 }
