@@ -948,7 +948,7 @@ void NetworkManager::HandleClientConnectionRequest(NetworkManager::NetworkPlayer
 void NetworkManager::HandleClientConnectionConfirmation(const NetworkPlayerConnectionConfirmationData *data)
 {
 	NetworkGameTimeChangeData timedata;
-	server.GetTime(timedata.time);
+	server.GetGameTime(timedata.time);
 	this->SendDataToOne("&NetworkManager::RecieveGameTimeChange", data->client, &timedata);
 	NetworkPlayerFullUpdateData *playerdata;
 	//TODO: Optimize using currently connected players, not buffer size.
@@ -1242,7 +1242,7 @@ void NetworkManager::HandlePlayerSpawnRequest(const NetworkPlayerSpawnRequestDat
 	data2.client = data->client;
 	this->SendDataToAll("&NetworkManager::RecievePlayerSpawn", &data2);
 	NetworkGameTimeChangeData timedata;
-	server.GetTime(timedata.time);
+	server.GetGameTime(timedata.time);
 	this->SendDataToOne("&NetworkManager::RecieveGameTimeChange", data->client, &timedata);
 }
 

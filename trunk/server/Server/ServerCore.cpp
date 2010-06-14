@@ -248,19 +248,20 @@ void ServerCore::EnableComponentSelect(bool enable)
 	componentselectcvar->SetValue(enable);
 }
 
-void ServerCore::GetTime(unsigned char (&time)[2])
+void ServerCore::GetGameTime(unsigned char (&time)[2])
 {
 	memcpy(time, &gametime.time, sizeof(unsigned char) * 2);
 }
 
-void ServerCore::SetTime(const unsigned char time[2])
+bool ServerCore::SetGameTime(const unsigned char time[2])
 {
 	if ((time[0] >= 24) || (time[1] >= 60))
 	{
-		return;
+		return false;
 	}
-	memcpy(gametime.time, &time, sizeof(unsigned char) * 2);
+	memcpy(gametime.time, time, sizeof(unsigned char) * 2);
 	nm.SendGameTimeChangeToAll(gametime.time);
+	return true;
 }
 
 void ServerCore::IncrementGameTime(void)
