@@ -282,6 +282,7 @@ void FMPHook::FinishExitFromVehicle(const short index)
 
 void FMPHook::PlayerRecieveWeapon(const short index, const eWeapon weapon, const short ammo)
 {
+	Log::Debug(L"Recieving weapon %d %d", weapon, ammo);
 	if(!SafeCheckPlayer(index)) return;
 	eWeaponSlot slot;
 	switch (weapon)
@@ -348,6 +349,7 @@ void FMPHook::PlayerRecieveWeapon(const short index, const eWeapon weapon, const
 	gPlayer[index].ammo[slot] = ammo;
 	Natives::GiveWeaponToChar(gPlayer[index].PedID, weapon, ammo, 0);
 	Natives::SetCharAmmo(gPlayer[index].PedID, weapon, ammo);
+	Log::Debug(L"Recieved weapon %d %d", weapon, ammo);
 }
 
 void FMPHook::PlayerFireAim(short index, int gun, int time, float x, float y, float z, bool fire)
