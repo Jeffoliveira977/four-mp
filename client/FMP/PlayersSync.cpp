@@ -280,6 +280,76 @@ void FMPHook::FinishExitFromVehicle(const short index)
 	gPlayer[index].vehicleindex = INVALID_VEHICLE_INDEX;
 }
 
+void FMPHook::PlayerRecieveWeapon(const short index, const eWeapon weapon, const short ammo)
+{
+	if(!SafeCheckPlayer(index)) return;
+	eWeaponSlot slot;
+	switch (weapon)
+	{
+	case WEAPON_UNARMED:
+		{
+			return;
+			break;
+		}
+	case WEAPON_BASEBALLBAT:
+	case WEAPON_KNIFE:
+		{
+			slot = WEAPON_SLOT_MELEE;
+			break;
+		}
+	case WEAPON_GRENADE:
+	case WEAPON_MOLOTOV:
+		{
+			slot = WEAPON_SLOT_THROWN;
+			break;
+		}
+	case WEAPON_PISTOL:
+	case WEAPON_DEAGLE:
+		{
+			slot = WEAPON_SLOT_HANDGUN;
+			break;
+		}
+	case WEAPON_SHOTGUN:
+	case WEAPON_BARETTA:
+		{
+			slot = WEAPON_SLOT_SHOTGUN;
+			break;
+		}
+	case WEAPON_MICRO_UZI:
+	case WEAPON_MP5:
+		{
+			slot = WEAPON_SLOT_SMG;
+			break;
+		}
+	case WEAPON_AK47:
+	case WEAPON_M4:
+		{
+			slot = WEAPON_SLOT_RIFLE;
+			break;
+		}
+	case WEAPON_SNIPERRIFLE:
+	case WEAPON_M40A1:
+		{
+			slot = WEAPON_SLOT_SNIPER;
+			break;
+		}
+	case WEAPON_RLAUNCHER:
+		{
+			slot = WEAPON_SLOT_HEAVY;
+			break;
+		}
+	default:
+		{
+			return;
+			break;
+		}
+	}
+	gPlayer[index].weapons[slot] = weapon;
+	gPlayer[index].ammo[slot] = ammo;
+	Natives::GiveWeaponToChar(gPlayer[index].PedID, weapon, ammo, 0);
+	Natives::SetCharAmmo(gPlayer[index].PedID, weapon, ammo);
+}
+
 void FMPHook::PlayerFireAim(short index, int gun, int time, float x, float y, float z, bool fire)
 {
 	if(!SafeCheckPlayer(index)) return;

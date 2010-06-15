@@ -9,7 +9,6 @@
 
 // SQ Script Functions
 void sq_CreateCar(HSQUIRRELVM v);
-void sq_GiveWeapon(HSQUIRRELVM v);
 void sq_addPlayerClass(HSQUIRRELVM v);
 void sq_enableComponentSelect(HSQUIRRELVM v);
 

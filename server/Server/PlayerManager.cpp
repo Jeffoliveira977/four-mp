@@ -266,6 +266,97 @@ bool PlayerManager::SetPlayerPosition(const short index, const float position[3]
 	return true;
 }
 
+bool PlayerManager::GivePlayerWeapon(const short index, const eWeapon weapon, const unsigned short ammo)
+{
+	if ((index < 0) || (index >= playerbuffersize))
+	{
+		return false;
+	}
+	if (playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	if (ammo == 0)
+	{
+		return true;
+	}
+	eWeaponSlot slot;
+	switch (weapon)
+	{
+	case WEAPON_UNARMED:
+		{
+			return true;
+			break;
+		}
+	case WEAPON_BASEBALLBAT:
+	case WEAPON_KNIFE:
+		{
+			slot = WEAPON_SLOT_MELEE;
+			break;
+		}
+	case WEAPON_GRENADE:
+	case WEAPON_MOLOTOV:
+		{
+			slot = WEAPON_SLOT_THROWN;
+			break;
+		}
+	case WEAPON_PISTOL:
+	case WEAPON_DEAGLE:
+		{
+			slot = WEAPON_SLOT_HANDGUN;
+			break;
+		}
+	case WEAPON_SHOTGUN:
+	case WEAPON_BARETTA:
+		{
+			slot = WEAPON_SLOT_SHOTGUN;
+			break;
+		}
+	case WEAPON_MICRO_UZI:
+	case WEAPON_MP5:
+		{
+			slot = WEAPON_SLOT_SMG;
+			break;
+		}
+	case WEAPON_AK47:
+	case WEAPON_M4:
+		{
+			slot = WEAPON_SLOT_RIFLE;
+			break;
+		}
+	case WEAPON_SNIPERRIFLE:
+	case WEAPON_M40A1:
+		{
+			slot = WEAPON_SLOT_SNIPER;
+			break;
+		}
+	case WEAPON_RLAUNCHER:
+		{
+			slot = WEAPON_SLOT_HEAVY;
+			break;
+		}
+	default:
+		{
+			return false;
+			break;
+		}
+	}
+	playerbuffer[index]->weapons[slot] = weapon;
+	if (ammo >= MaxAmmoPerWeaponSlot[slot])
+	{
+		playerbuffer[index]->ammo[slot] = MaxAmmoPerWeaponSlot[slot];
+	}
+	else if ((playerbuffer[index]->ammo[slot] + ammo ) >= MaxAmmoPerWeaponSlot[slot])
+	{
+		playerbuffer[index]->ammo[slot] = MaxAmmoPerWeaponSlot[slot];
+	}
+	else
+	{
+		playerbuffer[index]->ammo[slot] = playerbuffer[index]->ammo[slot] + ammo;
+	}
+	return nm.SendPlayerWeaponGiftToAll(index, slot);
+}
+
 bool PlayerManager::SetPlayerSpawnPosition(const short index, const float position[4])
 {
 	if ((index < 0) || (index >= playerbuffersize))
@@ -411,7 +502,7 @@ bool PlayerManager::RegisterNewPlayer(const short index, wchar_t (&name)[MAX_CLI
 	playerbuffer[index]->isducking = false;
 	for(unsigned char i = 0; i < 8; i++)
 	{
-		playerbuffer[index]->weapons[i] = 0;
+		playerbuffer[index]->weapons[i] = WEAPON_UNARMED;
 		playerbuffer[index]->ammo[i] = 0;
 	}
 	playerbuffer[index]->animation[0] = 0;

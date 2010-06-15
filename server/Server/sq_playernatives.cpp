@@ -139,18 +139,29 @@ void sq_GetPlayerSpawnPosition(HSQUIRRELVM v)
 
 void sq_SetPlayerModel(HSQUIRRELVM v)
 {
-	int index = 0;
-	int model = 0;
+	int index;
 	sq_getinteger(v, 2, &index);
+	int model;
 	sq_getinteger(v, 3, &model);
 	sq_pushbool(v, playm.SetPlayerModel(index, model));
 }
 
+void sq_GivePlayerWeapon(HSQUIRRELVM v) 
+{
+	int index;
+	sq_getinteger(v, 2, &index);
+	int weapon;
+	int ammo;
+	sq_getinteger(v, 3, &weapon);
+	sq_getinteger(v, 4, &ammo);
+	sq_pushbool(v, playm.GivePlayerWeapon(index, (eWeapon)weapon, ammo));
+}
+
 void sq_SetPlayerSpawnPosition(HSQUIRRELVM v)
 {
-	int index = 0;
-	float position[4];
+	int index;
 	sq_getinteger(v, 2, &index);
+	float position[4];
 	sq_getfloat(v, 3, &position[0]);
 	sq_getfloat(v, 4, &position[1]);
 	sq_getfloat(v, 5, &position[2]);

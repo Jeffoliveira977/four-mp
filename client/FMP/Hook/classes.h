@@ -202,6 +202,7 @@ public:
 	void PlayerMove(short index, float position[3], float speed);
 	void Jump(short index);
 	void Duck(short index, bool);
+	void PlayerRecieveWeapon(const short index, const eWeapon weapon, const short ammo);
 	void PlayerFireAim(short index, int, int, float, float, float, bool);
 	void PlayerSwapGun(short index, int);
 

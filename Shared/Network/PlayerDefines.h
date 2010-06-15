@@ -9,6 +9,19 @@
 #define DEFAULT_PLAYER_Y -2.875000
 #define DEFAULT_PLAYER_Z 14.818866
 
+const short MaxAmmoPerWeaponSlot[] =
+{
+	0, //Unarmed
+	1, //Melee
+	1500, //Handgun
+	80, //Shotgun
+	1200, //SMG
+	600, //Rifle
+	50, //Sniper
+	8, //Heavy
+	25 //Thrown
+};
+
 enum PlayerState
 {
 	PlayerStateOnFoot,

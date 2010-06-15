@@ -54,6 +54,7 @@ public:
 	void RecievePlayerFinishEntranceInVehicle(NetworkPlayerFinishEntranceInVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerStartExitFromVehicle(NetworkPlayerStartExitFromVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerFinishExitFromVehicle(NetworkPlayerFinishExitFromVehicleData data, RakNet::RPC3 *serverrpc3);
+	void RecievePlayerWeaponGift(NetworkPlayerWeaponGiftData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerAim(NetworkPlayerAimData, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerWeaponChange(NetworkPlayerWeaponChangeData data, RakNet::RPC3 *serverrpc3);
@@ -89,6 +90,7 @@ private:
 		NetworkRPCPlayerFinishEntranceInVehicle,
 		NetworkRPCPlayerStartExitFromVehicle,
 		NetworkRPCPlayerFinishExitFromVehicle,
+		NetworkRPCPlayerWeaponGift,
 		NetworkRPCPlayerFire,
 		NetworkRPCPlayerAim,
 		NetworkRPCPlayerWeaponChange,
@@ -118,6 +120,7 @@ private:
 		NetworkPlayerFinishEntranceInVehicleData *playerfinishentranceinvehicle;
 		NetworkPlayerStartExitFromVehicleData *playerstartexitfromvehicle;
 		NetworkPlayerFinishExitFromVehicleData *playerfinishexitfromvehicle;
+		NetworkPlayerWeaponGiftData *playerweapongift;
 		NetworkPlayerFireData *playerfire;
 		NetworkPlayerAimData *playeraim;
 		NetworkPlayerWeaponChangeData *playerweaponchange;

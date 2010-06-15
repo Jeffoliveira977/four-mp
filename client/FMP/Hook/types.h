@@ -4,7 +4,7 @@
 *	Last Modifed:		-
 */
 #pragma once
-#include "enums.h"
+#include "../../../Shared/Network/GtaEnums.h"
 
 #define DefineScriptHandle(name) typedef struct : FMPHookHandle {} name
 #define DefineInheritedScriptHandle(name, baseName) typedef struct : baseName {} name

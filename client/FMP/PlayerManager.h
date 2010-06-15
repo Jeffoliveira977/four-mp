@@ -24,8 +24,8 @@ struct FPlayer
 	float angle;
 	int last_active;
 	int sync_state;
-	char currentweapon;
-	char weapons[8];
+	eWeapon currentweapon;
+	eWeapon weapons[8];
 	short ammo[8];
 	char animation[128];
 	short vehicleindex;

@@ -14,4 +14,5 @@ void sq_GetPlayerWantedLevel(HSQUIRRELVM v);
 void sq_GetPlayerSpawnPosition(HSQUIRRELVM v);
 
 void sq_SetPlayerModel(HSQUIRRELVM v);
+void sq_GivePlayerWeapon(HSQUIRRELVM v);
 void sq_SetPlayerSpawnPosition(HSQUIRRELVM v);

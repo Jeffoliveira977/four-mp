@@ -1,9 +1,10 @@
 #pragma once
 
+#include "GtaEnums.h"
 #include "Limits.h"
 #include "ClientDefines.h"
 
-#define PROTOCOL_VERSION 15
+#define PROTOCOL_VERSION 16
 
 #define DEFAULT_SERVER_NETWORK_ID 0
 #define DEFAULT_CLIENT_NETWORK_ID 65534
@@ -71,7 +72,7 @@ struct NetworkPlayerFullUpdateData
 	unsigned char health;
 	unsigned char armor;
 	int room;
-	char weapons[8];
+	eWeapon weapons[8];
 	short ammo[8];
 	unsigned char color[4];
 };
@@ -122,11 +123,18 @@ struct NetworkPlayerFinishExitFromVehicleData
 	short client;
 };
 
+struct NetworkPlayerWeaponGiftData
+{
+	short client;
+	eWeapon weapon;
+	short ammo;
+};
+
 struct NetworkPlayerFireData
 {
 	short client;
 	float position[3];
-	char weapon;
+	eWeapon weapon;
 	int time;
 	short target;
 	unsigned char health;
@@ -137,14 +145,14 @@ struct NetworkPlayerAimData
 {
 	short client;
 	float position[3];
-	char weapon;
+	eWeapon weapon;
 	int time;
 };
 
 struct NetworkPlayerWeaponChangeData
 {
 	short client;
-	char weapon;
+	eWeapon weapon;
 };
 
 struct NetworkPlayerHealthAndArmorChangeData

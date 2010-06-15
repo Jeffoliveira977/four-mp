@@ -2,6 +2,7 @@
 
 #include "../../Shared/Network/ClientDefines.h"
 #include "../../Shared/Network/PlayerDefines.h"
+#include "../../Shared/Network/GtaEnums.h"
 
 class PlayerManager
 {
@@ -25,6 +26,7 @@ public:
 	bool GetPlayerSpawnPosition(const short index, float (&position)[4]);
 	bool SetPlayerModel(const short index, const unsigned int model);
 	bool SetPlayerPosition(const short index, const float position[3]);
+	bool GivePlayerWeapon(const short index, const eWeapon weapon, const unsigned short ammo);
 	bool SetPlayerSpawnPosition(const short index, const float position[4]);
 	unsigned char GetNumberOfPlayerClasses(void);
 	bool AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index);
@@ -39,7 +41,7 @@ private:
 		float angle; ///< Holds the angle of the player.
 		bool isducking; ///< Holds true if the player is ducking and false otherwise.
 		char currentweapon;
-		char weapons[8];
+		eWeapon weapons[8];
 		short ammo[8];
 		char animation[128];
 		PlayerState state; ///< Holds the state of the player.
