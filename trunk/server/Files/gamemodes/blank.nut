@@ -25,7 +25,6 @@ function OnGameModeExit()
 function OnPlayerConnect(playerid, name)
 {
 	SendClientMessageToAll(name + " connected");
-	//GiveWeapon(playerid, 15, 150); // Not working
 }
 
 function OnPlayerDisconnect(playerid)
@@ -41,6 +40,7 @@ function OnPlayerSpawn(playerid)
 	else if(playerid == 1) SetPlayerModel(playerid, 0x58A1E271); // Liljacob
 	else if(playerid == 2) SetPlayerModel(playerid, 0x89395FC9); // Roman
 	else SetPlayerModel(playerid, 0x98E29920);
+	GivePlayerWeapon(playerid, 15, 150);
 }
 
 function OnPlayerDeath(playerid, killerid, reason)

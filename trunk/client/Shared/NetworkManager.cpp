@@ -84,6 +84,7 @@ void NetworkManager::Load(void)
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFinishEntranceInVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerStartExitFromVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFinishExitFromVehicle);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerWeaponGift);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFire);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerAim);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerWeaponChange);
@@ -561,6 +562,11 @@ void NetworkManager::RecievePlayerFinishExitFromVehicle(NetworkPlayerFinishExitF
 	this->WriteToRPCBuffer(NetworkRPCPlayerFinishExitFromVehicle, &data);
 }
 
+void NetworkManager::RecievePlayerWeaponGift(NetworkPlayerWeaponGiftData data, RakNet::RPC3 *serverrpc3)
+{
+	this->WriteToRPCBuffer(NetworkRPCPlayerWeaponGift, &data);
+}
+
 void NetworkManager::RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 *serverrpc3)
 {
 	this->WriteToRPCBuffer(NetworkRPCPlayerFire, &data);
@@ -719,6 +725,12 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 		{
 			rpcbuffer[rpcbuffersize].data.playerfinishexitfromvehicle = (NetworkPlayerFinishExitFromVehicleData *)new DATATYPE;
 			memcpy(rpcbuffer[rpcbuffersize].data.playerfinishexitfromvehicle, data, sizeof(DATATYPE));
+			break;
+		}
+	case NetworkRPCPlayerWeaponGift:
+		{
+			rpcbuffer[rpcbuffersize].data.playerweapongift = (NetworkPlayerWeaponGiftData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerweapongift, data, sizeof(DATATYPE));
 			break;
 		}
 	case NetworkRPCPlayerFire:
@@ -1030,6 +1042,14 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			delete data->playerfinishexitfromvehicle;
 			break;
 		}
+	case NetworkRPCPlayerWeaponGift:
+		{
+#if defined (FMP_CLIENT)
+			HOOK.PlayerRecieveWeapon(data->playerweapongift->client, data->playerweapongift->weapon, data->playerweapongift->ammo);
+#endif
+			delete data->playerweapongift;
+			break;
+		}
 	case NetworkRPCPlayerFire:
 		{
 #if defined (FMP_CLIENT)
@@ -1213,6 +1233,11 @@ void NetworkManager::FreeRPCBuffer(void)
 		case NetworkRPCPlayerFinishExitFromVehicle:
 			{
 				delete rpcbuffer[i].data.playerfinishexitfromvehicle;
+				break;
+			}
+		case NetworkRPCPlayerWeaponGift:
+			{
+				delete rpcbuffer[i].data.playerweapongift;
 				break;
 			}
 		case NetworkRPCPlayerFire:

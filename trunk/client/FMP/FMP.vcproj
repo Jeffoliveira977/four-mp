@@ -360,10 +360,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Hook\enums.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Hook\hook.h"
 					>
 				</File>
@@ -456,6 +452,10 @@
 			>
 			<File
 				RelativePath="..\..\Shared\Network\ClientDefines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Shared\Network\GtaEnums.h"
 				>
 			</File>
 			<File

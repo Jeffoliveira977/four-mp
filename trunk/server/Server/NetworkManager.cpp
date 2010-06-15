@@ -467,7 +467,6 @@ bool NetworkManager::SendGameTimeChangeToAll(const unsigned char time[2])
 {
 	NetworkGameTimeChangeData data;
 	memcpy(data.time, time, sizeof(unsigned char) * 2);
-
 	this->SendDataToAll("&NetworkManager::RecieveGameTimeChange", &data);
 	return true;
 }
@@ -485,8 +484,29 @@ bool NetworkManager::SendPlayerModelChangeToAll(const short index)
 	NetworkPlayerModelChangeData data;
 	data.client = index;
 	data.model = playm.playerbuffer[index]->model;
-
 	SendDataToAll("&NetworkManager::RecievePlayerModelChange", &data);
+	return true;
+}
+
+bool NetworkManager::SendPlayerWeaponGiftToAll(const short index, const eWeaponSlot slot)
+{
+	if ((index < 0) || (index >= playm.playerbuffersize))
+	{
+		return false;
+	}
+	if (playm.playerbuffer[index] == NULL)
+	{
+		return false;
+	}
+	if (playm.playerbuffer[index]->ammo[slot] == 0)
+	{
+		return false;
+	}
+	NetworkPlayerWeaponGiftData data;
+	data.client = index;
+	data.weapon = playm.playerbuffer[index]->weapons[slot];
+	data.ammo = playm.playerbuffer[index]->ammo[slot];
+	SendDataToAll("&NetworkManager::RecievePlayerWeaponGift", &data);
 	return true;
 }
 

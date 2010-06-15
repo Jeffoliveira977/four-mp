@@ -39,35 +39,6 @@ void sq_CreateCar(HSQUIRRELVM v)
 	sq_pushinteger(v, index);
 }
 
-void sq_GiveWeapon(HSQUIRRELVM v) 
-{ 
-	int gun = 0;
-	int ammo = 0;
-	int index;
-
-	sq_getinteger(v, 2, &index);
-	sq_getinteger(v, 3, &gun);
-	sq_getinteger(v, 4, &ammo);
-
-	/*gPlayer[index].gWeapons[0] = gun;
-	gPlayer[index].gAmmo[0] = ammo;
-	
-	if(gPlayer[index].connected == 0) return;
-
-	RakNet::BitStream bsSend;
-	bsSend.Write(index);
-	bsSend.Write(gun);
-	bsSend.Write(ammo);
-
-	for(int i = 0; i < MAX_PLAYERS; i++)
-	{
-		if(gPlayer[i].connected == 1)
-		{
-			net->RPC("GiveGun",&bsSend,HIGH_PRIORITY,RELIABLE,0,gPlayer[i].sa ,false, 0, UNASSIGNED_NETWORK_ID, 0);
-		}
-	}*/
-} 
-
 void sq_addPlayerClass(HSQUIRRELVM v) 
 {
 	int model;

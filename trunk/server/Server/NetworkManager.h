@@ -7,6 +7,7 @@
 
 #include "NetworkIDObject.h"
 
+#include "../../Shared/Network/GtaEnums.h"
 #include "../../Shared/Network/NetworkProtocol.h"
 
 #ifdef WIN32
@@ -54,6 +55,7 @@ public:
 
 	bool SendGameTimeChangeToAll(const unsigned char time[2]);
 	bool SendPlayerModelChangeToAll(const short index);
+	bool SendPlayerWeaponGiftToAll(const short index, const eWeaponSlot slot);
 	bool SendPlayerSpawnPositionChange(const short index);
 	bool SendNewVehicleInfoToAll(const short index);
 	bool SendPlayerPosition(const short index, const float pos[3], const float angle);
