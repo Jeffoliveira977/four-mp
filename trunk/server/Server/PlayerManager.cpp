@@ -276,6 +276,10 @@ bool PlayerManager::GivePlayerWeapon(const short index, const eWeapon weapon, co
 	{
 		return false;
 	}
+	if (playerbuffer[index]->health < 100)
+	{
+		return false;
+	}
 	if (ammo == 0)
 	{
 		return true;
