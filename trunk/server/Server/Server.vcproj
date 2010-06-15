@@ -347,6 +347,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Shared\Network\GtaEnums.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Shared\Network\Limits.h"
 				>
 			</File>
