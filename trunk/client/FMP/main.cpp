@@ -605,18 +605,21 @@ void FMPHook::GameThread()
 				if(gPlayer[client.GetIndex()].want_spawn)
 				{
 					if(gPlayer[client.GetIndex()].sync_state == 1) break;
-					Log::Info(L"NextSpawn");
+					Log::Info(L"Spawning");
 
 					short index = client.GetIndex();
 
-					SafeChangeModel(gPlayer[index].model);
+					//SafeChangeModel(gPlayer[index].model);
 					Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
-					Vector4 position = GetSpawnPosition();
-					Natives::SetCharCoordinates(gPlayer[index].PedID, position.X, position.Y, position.Z);
-					Natives::SetCharHeading(gPlayer[index].PedID, position.W);
-					Natives::SetCharHealth(gPlayer[index].PedID, gPlayer[index].health);
-					Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
-					Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
+					float position[3];
+					Natives::GetCharCoordinates(gPlayer[index].PedID, &position[0], &position[1], &position[2]);
+					Log::Debug(L"Spawn position is %f %f %f", position[0], position[1], position[2]);
+					//Vector4 position = GetSpawnPosition();
+					//Natives::SetCharCoordinates(gPlayer[index].PedID, position.X, position.Y, position.Z);
+					//Natives::SetCharHeading(gPlayer[index].PedID, position.W);
+					//Natives::SetCharHealth(gPlayer[index].PedID, gPlayer[index].health);
+					//Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
+					//Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
 					gPlayer[index].want_spawn = 0;
 				}
 
@@ -780,8 +783,10 @@ Vector4 GetSpawnPos(Vector4 *pos, float angle, Vector4 *result) //8E6840
 {
 	Log::Info(L"GetSpawnPos");
 	gPlayer[client.GetIndex()].want_spawn = 1;
-	nm.SendPlayerSpawnRequest();
-	memcpy(result, &HOOK.GetSpawnPosition(), sizeof(Vector4));
+	Vector4 vector = HOOK.GetSpawnPosition();
+	Log::Debug(L"Spawn position is %f %f %f %f", vector.X, vector.Y, vector.Z, vector.W);
+	memcpy(result, &vector, sizeof(Vector4));
+	Log::Debug(L"Set spawn position to %f %f %f %f", result->X, result->Y, result->Z, result->W);
 	Log::Info(L"GetSpawnPos end");
 	return *result;
 }

@@ -334,6 +334,7 @@ void FMPHook::StatusSync()
 {
 	unsigned int hp, arm;
 	Natives::GetCharHealth(gPlayer[client.GetIndex()].PedID, &hp);
+	//Log::Debug(L"Health: %d", hp);
 	Natives::GetCharArmour(gPlayer[client.GetIndex()].PedID, &arm);
 	if(hp != gPlayer[client.GetIndex()].health || arm != gPlayer[client.GetIndex()].armor)
 	{
