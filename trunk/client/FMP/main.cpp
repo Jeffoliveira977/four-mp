@@ -781,14 +781,8 @@ bool IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE(int a1)
 
 Vector4 GetSpawnPos(Vector4 *pos, float angle, Vector4 *result) //8E6840
 {
-	Log::Info(L"GetSpawnPos");
-	gPlayer[client.GetIndex()].want_spawn = 1;
-	Vector4 vector = HOOK.GetSpawnPosition();
-	Log::Debug(L"Spawn position is %f %f %f %f", vector.X, vector.Y, vector.Z, vector.W);
-	memcpy(result, &vector, sizeof(Vector4));
-	Log::Debug(L"Set spawn position to %f %f %f %f", result->X, result->Y, result->Z, result->W);
-	Log::Info(L"GetSpawnPos end");
-	return *result;
+	memcpy(pos, &HOOK.GetSpawnPosition(), sizeof(Vector4));
+	return *pos; //return *result;
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved) 
