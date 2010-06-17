@@ -40,5 +40,4 @@ struct FPlayer
 	int room;
 	unsigned char color[4];
 	int compT[11], compD[11];
-	bool want_spawn;
 };

@@ -1228,8 +1228,17 @@ void NetworkManager::HandlePlayerHealthAndArmorChange(const NetworkPlayerHealthA
 	{
 		return;
 	}
-	playm.playerbuffer[data->client]->health = data->health;
-	playm.playerbuffer[data->client]->armor = data->armor;
+	if ((playm.playerbuffer[data->client]->health < 100) && (data->health >= 100))
+	{
+		playm.playerbuffer[data->client]->health = data->health;
+		playm.playerbuffer[data->client]->armor = data->armor;
+		vmm.OnPlayerSpawn(data->client);
+	}
+	else
+	{
+		playm.playerbuffer[data->client]->health = data->health;
+		playm.playerbuffer[data->client]->armor = data->armor;
+	}
 	if (playm.playerbuffer[data->client]->health < 100)
 	{
 		vmm.OnPlayerDeath(data->client, INVALID_PLAYER_INDEX, 46);

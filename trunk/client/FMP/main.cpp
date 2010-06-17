@@ -274,9 +274,18 @@ bool FMPHook::SafeCheckPlayer(short index, bool bReCreateOnFalse)
 	}
 	if(!Natives::DoesCharExist(gPlayer[index].PedID))
 	{
-		Log::Error(L"Player doesn't exist");
-		if(bReCreateOnFalse) return SafeCreatePlayer(index);
-		return 0;
+		if (index == client.GetIndex())
+		{
+			Log::Warning(L"Outdated player ped data. Updating...");
+			Natives::GetPlayerChar(_GetPlayer(), &gPlayer[client.GetIndex()].PedID);
+			return 1;
+		}
+		else
+		{
+			Log::Error(L"Player doesn't exist");
+			if(bReCreateOnFalse) return SafeCreatePlayer(index);
+			return 0;
+		}
 	}
 
 	return 1;
@@ -601,27 +610,6 @@ void FMPHook::GameThread()
 				//	// Disconnect: Not info from server
 				//	Natives::PrintStringWithLiteralStringNow("STRING", "SERVER NOT SEND INFO TO YOU", 5000, 1);
 				//}
-
-				if(gPlayer[client.GetIndex()].want_spawn)
-				{
-					if(gPlayer[client.GetIndex()].sync_state == 1) break;
-					Log::Info(L"Spawning");
-
-					short index = client.GetIndex();
-
-					//SafeChangeModel(gPlayer[index].model);
-					Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
-					float position[3];
-					Natives::GetCharCoordinates(gPlayer[index].PedID, &position[0], &position[1], &position[2]);
-					Log::Debug(L"Spawn position is %f %f %f", position[0], position[1], position[2]);
-					//Vector4 position = GetSpawnPosition();
-					//Natives::SetCharCoordinates(gPlayer[index].PedID, position.X, position.Y, position.Z);
-					//Natives::SetCharHeading(gPlayer[index].PedID, position.W);
-					//Natives::SetCharHealth(gPlayer[index].PedID, gPlayer[index].health);
-					//Natives::AddArmourToChar(gPlayer[index].PedID, gPlayer[index].armor);
-					//Natives::SetCharDefaultComponentVariation(gPlayer[index].PedID);
-					gPlayer[index].want_spawn = 0;
-				}
 
 				CheckAndCheck();
 				

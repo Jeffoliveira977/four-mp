@@ -1093,9 +1093,6 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 		{
 #if defined (FMP_CLIENT)
 			Log::Info(L"Setup player spawn info %d", data->playerspawn->client);
-			gPlayer[data->playerspawn->client].want_spawn = 0;
-
-			HOOK.SetSpawnPosition(data->playerspawn->position);
 			gPlayer[data->playerspawn->client].model = data->playerspawn->model;
 			memcpy(&gPlayer[data->playerspawn->client].compD, &data->playerspawn->compD, 11 * sizeof(int));
 			memcpy(&gPlayer[data->playerspawn->client].compT, &data->playerspawn->compT, 11 * sizeof(int));
