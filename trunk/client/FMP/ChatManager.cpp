@@ -99,12 +99,16 @@ void ChatManager::AddChatMessage(const wchar_t *message)
 		free(tempmessage);
 		return;
 	}
-	for(unsigned char i = 0; i > (outputbuffersize - 1); i++)
+	wchar_t *tempstring = outputbuffer[0];
+	for(unsigned char i = 0; i < (outputbuffersize - 1); i++)
 	{
 		outputbuffer[i] = outputbuffer[i+1];
 	}
+	outputbuffer[outputbuffersize-1] = tempstring;
+	tempstring = NULL;
 	if (!ResizeBuffer<wchar_t *>(outputbuffer[outputbuffersize-1], length))
 	{
+		free(tempmessage);
 		return;
 	}
 	wcscpy(outputbuffer[outputbuffersize-1], tempmessage);
