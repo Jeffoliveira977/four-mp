@@ -43,7 +43,7 @@ void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, floa
 		{
 			//Natives::SetCharHealth(_GetPlayerPed(), 0);
 			nm.SendPlayerSpawnRequest();
-			gPlayer[index].want_spawn = 1;
+			//gPlayer[index].want_spawn = 1;
 			gPlayer[index].sync_state = 1;
 
 			wcscpy(gPlayer[index].name, name);
@@ -108,8 +108,8 @@ void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, floa
 
 	if(gPlayer[index].vehicleindex != -1)
 	{
-		if(gPlayer[index].seatindex == -1) Natives::TaskEnterCarAsDriver(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID, 0);
-		else Natives::TaskEnterCarAsPassenger(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID, 0, gPlayer[index].seatindex);
+		if(gPlayer[index].seatindex == -1) Natives::WarpCharIntoCar(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID);
+		else Natives::WarpCharIntoCarAsPassenger(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID, gPlayer[index].seatindex);
 	}
 
 	for(int i = 0; i < 8; i++)
@@ -422,12 +422,10 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 		Log::Info(L"Its me");
 		if(gPlayer[client.GetIndex()].sync_state == 1) SetFreeCam(0);
 		gPlayer[client.GetIndex()].sync_state = 0;
-		gPlayer[data.client].want_spawn = 1;
 		return;
 	}
 	if(!SafeCheckPlayer(data.client)) 
 	{
-		gPlayer[data.client].want_spawn = 0;
 		return;
 	}
 	Log::Info(L"Player Spawn START");
@@ -453,5 +451,4 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	Log::Info(L"Player SPAWN END");
 	if(Natives::DoesCharExist(old)) Natives::DeleteChar(&old);
 	Log::Info(L"Player Old Delete END");
-	gPlayer[data.client].want_spawn = 0;
 }
