@@ -21,7 +21,7 @@ extern NetworkManager nm;
 extern FPlayer gPlayer[MAX_PLAYERS];
 extern FVehicle gVehicle[MAX_VEHICLES];
 
-void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, float position[3], bool start)
+void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, float position[3])
 {
 	Log::Debug(L"PlayerConnect: Start");
 	if(name == 0)
@@ -39,44 +39,20 @@ void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, floa
 	if(client.GetIndex() == index) // My connect
 	{
 		Log::Debug(L"Our PlayerConnect");
-		if(start)
-		{
-			//Natives::SetCharHealth(_GetPlayerPed(), 0);
-			nm.SendPlayerSpawnRequest();
-			//gPlayer[index].want_spawn = 1;
-			gPlayer[index].sync_state = 1;
-
-			wcscpy(gPlayer[index].name, name);
-			gPlayer[index].last_active = GetTickCount();
-			gPlayer[index].connected = 1;
-
-			client.SetGameState(GameStateInGame);
-			client.SetInputState(InputStateGame);
-			
-			InputFreeze(0);
-			//SetFreeCam(0);
-
-			Log::Debug(L"PlayerConnect: fastEnd");
-			return;
-		}
-		else
-		{
-			Log::Info(L"Local player %d", Natives::IsThisModelAPed((eModel)model));
-			Natives::RequestModel((eModel)model);
-			Log::Debug(L"PlayerConnect: RequestModel");
-			while(!Natives::HasModelLoaded((eModel)model)) wait(1);
-			Log::Debug(L"PlayerConnect: ModelLoaded");
-			Natives::ChangePlayerModel(_GetPlayer(), (eModel)model);
-			Log::Debug(L"PlayerConnect: ChangeModel");
-			Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
-			Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
-			Log::Debug(L"PlayerConnect: SetCoords");
-		}
-
+		wcscpy(gPlayer[index].name, name);
+		InputFreeze(0);
+		Log::Info(L"Local player %d", Natives::IsThisModelAPed((eModel)model));
+		Natives::RequestModel((eModel)model);
+		Log::Debug(L"PlayerConnect: RequestModel");
+		while(!Natives::HasModelLoaded((eModel)model)) wait(1);
+		Log::Debug(L"PlayerConnect: ModelLoaded");
+		Natives::ChangePlayerModel(_GetPlayer(), (eModel)model);
+		Log::Debug(L"PlayerConnect: ChangeModel");
+		Natives::GetPlayerChar(_GetPlayer(), &gPlayer[index].PedID);
+		Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
+		Log::Debug(L"PlayerConnect: SetCoords");
 		client.SetGameState(GameStateInGame);
 		client.SetInputState(InputStateGame);
-		
-		InputFreeze(0);
 		SetFreeCam(0);
 	}
 	else // Other player connect
@@ -420,8 +396,6 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	if(data.client == client.GetIndex()) 
 	{
 		Log::Info(L"Its me");
-		if(gPlayer[client.GetIndex()].sync_state == 1) SetFreeCam(0);
-		gPlayer[client.GetIndex()].sync_state = 0;
 		return;
 	}
 	if(!SafeCheckPlayer(data.client)) 

@@ -1007,6 +1007,7 @@ void NetworkManager::HandleClientConnectionConfirmation(const NetworkPlayerConne
 	this->SendDataToAll("&NetworkManager::RecieveClientConnection", playerdata);
 	delete playerdata;
 	server.UpdateServerInfo();
+	vmm.OnPlayerSpawn(data->client);
 }
 
 void NetworkManager::HandlePlayerMove(const NetworkPlayerMoveData *data)
