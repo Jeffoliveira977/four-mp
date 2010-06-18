@@ -482,12 +482,13 @@ void ConsoleScreen::AppendToOutputBuffer(const conchar *string)
 		}
 	else
 	{
-		free(outputbuffer[0]);
+		conchar *tempstring = outputbuffer[0];
 		for (unsigned short i = 0; i < (maxoutputbuffersize - 1); i++)
 		{
 			outputbuffer[i] = outputbuffer[i+1];
 		}
-		outputbuffer[maxoutputbuffersize-1] = (conchar *)calloc(81, sizeof(conchar));
+		outputbuffer[maxoutputbuffersize-1] = tempstring;
+		tempstring = NULL;
 		con_strcpy(outputbuffer[maxoutputbuffersize-1], string);
 	}
 }
@@ -632,11 +633,14 @@ void ConsoleScreen::WriteToInputBuffer(void)
 		}
 	else
 	{
-		free(inputbuffer[0]);
+		conchar *tempstring = inputbuffer[0];
 		for (unsigned short i = 0; i < (maxinputbuffersize - 1); i++)
 		{
 			inputbuffer[i] = inputbuffer[i+1];
 		}
-		inputbuffer[maxinputbuffersize-1] = (conchar *)calloc(1, sizeof(conchar));
+		inputbuffer[maxinputbuffersize-1] = tempstring;
+		tempstring = NULL;
+		ResizeBuffer<conchar *>(inputbuffer[maxinputbuffersize-1], 1);
+		inputbuffer[maxinputbuffersize-1][0] = CONSTRING('\0');
 	}
 }
