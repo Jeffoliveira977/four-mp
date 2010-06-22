@@ -38,7 +38,7 @@ private:
 		unsigned char classindex; ///< Holds the index of the player's class.
 		unsigned int model; ///< Holds the model hash of the player.
 		float position[3]; ///< Holds the position of the player.
-		float angle[3]; ///< Holds the angle of the player.
+		float angle; ///< Holds the angle of the player.
 		bool isducking; ///< Holds true if the player is ducking and false otherwise.
 		char currentweapon;
 		eWeapon weapons[8];
