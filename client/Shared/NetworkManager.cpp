@@ -76,19 +76,14 @@ void NetworkManager::Load(void)
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveGameTimeChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFullUpdate);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecieveVehicleFullUpdate);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerMove);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerJump);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerDuck);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFootSync);
+	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerVehicleSync);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerStartEntranceInVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerCancelEntranceInVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFinishEntranceInVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerStartExitFromVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFinishExitFromVehicle);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerWeaponGift);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerFire);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerAim);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerWeaponChange);
-	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerHealthAndArmorChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerSpawnPositionChange);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerSpawn);
 	RPC3_REGISTER_FUNCTION(rpc3, &NetworkManager::RecievePlayerModelChange);
@@ -345,30 +340,14 @@ void NetworkManager::SendClientConnectionRequest(void)
 	rpc3->CallCPP("&NetworkManager::RecieveClientConnectionRequest", serverid, data, rpc3);
 }
 
-void NetworkManager::SendPlayerMove(const float speed)
+void NetworkManager::SendPlayerFootSync(NetworkPlayerFootData data)
 {
-	NetworkPlayerMoveData data;
-#if defined (FMP_CLIENT)
-	memcpy(data.position, gPlayer[client.GetIndex()].position, sizeof(float) * 3);
-	data.angle = gPlayer[client.GetIndex()].angle;
-	data.speed = speed;
-#endif
-	rpc3->CallCPP("&NetworkManager::RecievePlayerMove", serverid, data, rpc3);
+	rpc3->CallCPP("&NetworkManager::RecievePlayerFootSync", serverid, data, rpc3);
 }
 
-void NetworkManager::SendPlayerJump(void)
+void NetworkManager::SendPlayerVehicleSync(NetworkPlayerVehicleData data)
 {
-	NetworkPlayerJumpData data;
-	rpc3->CallCPP("&NetworkManager::RecievePlayerJump", serverid, data, rpc3);
-}
-
-void NetworkManager::SendPlayerDuck(void)
-{
-	NetworkPlayerDuckData data;
-#if defined (FMP_CLIENT)
-	data.shouldduck = gPlayer[client.GetIndex()].isducking;
-#endif
-	rpc3->CallCPP("&NetworkManager::RecievePlayerDuck", serverid, data, rpc3);
+	rpc3->CallCPP("&NetworkManager::RecievePlayerVehicleSync", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerStartEntranceInVehicle(void)
@@ -403,50 +382,6 @@ void NetworkManager::SendPlayerFinishExitFromVehicle(void)
 {
 	NetworkPlayerFinishExitFromVehicleData data;
 	rpc3->CallCPP("&NetworkManager::RecievePlayerFinishExitFromVehicle", serverid, data, rpc3);
-}
-
-void NetworkManager::SendPlayerFire(const float position[3], const int time, const short target, const unsigned char health, const unsigned int armor)
-{
-	NetworkPlayerFireData data;
-#if defined (FMP_CLIENT)
-	memcpy(data.position, position, sizeof(float) * 3);
-	data.weapon = gPlayer[client.GetIndex()].currentweapon;
-	data.time = time;
-	data.target = target;
-	data.health = health;
-	data.armor = armor;
-#endif
-	rpc3->CallCPP("&NetworkManager::RecievePlayerFire", serverid, data, rpc3);
-}
-
-void NetworkManager::SendPlayerAim(const float position[3], const int time)
-{
-	NetworkPlayerAimData data;
-#if defined (FMP_CLIENT)
-	memcpy(data.position, position, sizeof(float) * 3);
-	data.weapon = gPlayer[client.GetIndex()].currentweapon;
-	data.time = time;
-#endif
-	rpc3->CallCPP("&NetworkManager::RecievePlayerAim", serverid, data, rpc3);
-}
-
-void NetworkManager::SendPlayerWeaponChange(void)
-{
-	NetworkPlayerWeaponChangeData data;
-#if defined (FMP_CLIENT)
-	data.weapon = gPlayer[client.GetIndex()].currentweapon;
-#endif
-	rpc3->CallCPP("&NetworkManager::RecievePlayerWeaponChange", serverid, data, rpc3);
-}
-
-void NetworkManager::SendPlayerHealthAndArmorChange(void)
-{
-	NetworkPlayerHealthAndArmorChangeData data;
-#if defined (FMP_CLIENT)
-	data.health = gPlayer[client.GetIndex()].health;
-	data.armor = gPlayer[client.GetIndex()].armor;
-#endif
-	rpc3->CallCPP("&NetworkManager::RecievePlayerHealthAndArmorChange", serverid, data, rpc3);
 }
 
 void NetworkManager::SendPlayerSpawnRequest(void)
@@ -522,19 +457,14 @@ void NetworkManager::RecieveVehicleFullUpdate(NetworkVehicleFullUpdateData data,
 	this->WriteToRPCBuffer(NetworkRPCVehicleFullUpdate, &data);
 }
 
-void NetworkManager::RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *serverrpc3)
+void NetworkManager::RecievePlayerFootSync(NetworkPlayerFootData data, RakNet::RPC3 *serverrpc3)
 {
-	this->WriteToRPCBuffer(NetworkRPCPlayerMove, &data);
+	this->WriteToRPCBuffer(NetworkRPCPlayerFootSync, &data);
 }
 
-void NetworkManager::RecievePlayerJump(NetworkPlayerJumpData data, RakNet::RPC3 *serverrpc3)
+void NetworkManager::RecievePlayerVehicleSync(NetworkPlayerVehicleData data, RakNet::RPC3 *serverrpc3)
 {
-	this->WriteToRPCBuffer(NetworkRPCPlayerJump, &data);
-}
-
-void NetworkManager::RecievePlayerDuck(NetworkPlayerDuckData data, RakNet::RPC3 *serverrpc3)
-{
-	this->WriteToRPCBuffer(NetworkRPCPlayerDuck, &data);
+	this->WriteToRPCBuffer(NetworkRPCPlayerVehicleSync, &data);
 }
 
 void NetworkManager::RecievePlayerStartEntranceInVehicle(NetworkPlayerStartEntranceInVehicleData data, RakNet::RPC3 *serverrpc3)
@@ -565,26 +495,6 @@ void NetworkManager::RecievePlayerFinishExitFromVehicle(NetworkPlayerFinishExitF
 void NetworkManager::RecievePlayerWeaponGift(NetworkPlayerWeaponGiftData data, RakNet::RPC3 *serverrpc3)
 {
 	this->WriteToRPCBuffer(NetworkRPCPlayerWeaponGift, &data);
-}
-
-void NetworkManager::RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 *serverrpc3)
-{
-	this->WriteToRPCBuffer(NetworkRPCPlayerFire, &data);
-}
-
-void NetworkManager::RecievePlayerAim(NetworkPlayerAimData data, RakNet::RPC3 *serverrpc3)
-{
-	this->WriteToRPCBuffer(NetworkRPCPlayerAim, &data);
-}
-
-void NetworkManager::RecievePlayerWeaponChange(NetworkPlayerWeaponChangeData data, RakNet::RPC3 *serverrpc3)
-{
-	this->WriteToRPCBuffer(NetworkRPCPlayerWeaponChange, &data);
-}
-
-void NetworkManager::RecievePlayerHealthAndArmorChange(NetworkPlayerHealthAndArmorChangeData data, RakNet::RPC3 *serverrpc3)
-{
-	this->WriteToRPCBuffer(NetworkRPCPlayerHealthAndArmorChange, &data);
 }
 
 void NetworkManager::RecievePlayerSpawnPositionChange(NetworkPlayerSpawnPositionChangeData data, RakNet::RPC3 *serverrpc3)
@@ -679,22 +589,16 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 			memcpy(rpcbuffer[rpcbuffersize].data.vehiclefullupdate, data, sizeof(DATATYPE));
 			break;
 		}
-	case NetworkRPCPlayerMove:
+	case NetworkRPCPlayerFootSync:
 		{
-			rpcbuffer[rpcbuffersize].data.playermove = (NetworkPlayerMoveData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playermove, data, sizeof(DATATYPE));
+			rpcbuffer[rpcbuffersize].data.playerfoot = (NetworkPlayerFootData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playerfoot, data, sizeof(DATATYPE));
 			break;
 		}
-	case NetworkRPCPlayerJump:
+	case NetworkRPCPlayerVehicleSync:
 		{
-			rpcbuffer[rpcbuffersize].data.playerjump = (NetworkPlayerJumpData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playerjump, data, sizeof(DATATYPE));
-			break;
-		}
-	case NetworkRPCPlayerDuck:
-		{
-			rpcbuffer[rpcbuffersize].data.playerduck = (NetworkPlayerDuckData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playerduck, data, sizeof(DATATYPE));
+			rpcbuffer[rpcbuffersize].data.playervehicle = (NetworkPlayerVehicleData *)new DATATYPE;
+			memcpy(rpcbuffer[rpcbuffersize].data.playervehicle, data, sizeof(DATATYPE));
 			break;
 		}
 	case NetworkRPCPlayerStartEntranceInVehicle:
@@ -731,30 +635,6 @@ void NetworkManager::WriteToRPCBuffer(const NetworkManager::NetworkRPCType type,
 		{
 			rpcbuffer[rpcbuffersize].data.playerweapongift = (NetworkPlayerWeaponGiftData *)new DATATYPE;
 			memcpy(rpcbuffer[rpcbuffersize].data.playerweapongift, data, sizeof(DATATYPE));
-			break;
-		}
-	case NetworkRPCPlayerFire:
-		{
-			rpcbuffer[rpcbuffersize].data.playerfire = (NetworkPlayerFireData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playerfire, data, sizeof(DATATYPE));
-			break;
-		}
-	case NetworkRPCPlayerAim:
-		{
-			rpcbuffer[rpcbuffersize].data.playeraim = (NetworkPlayerAimData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playeraim, data, sizeof(DATATYPE));
-			break;
-		}
-	case NetworkRPCPlayerWeaponChange:
-		{
-			rpcbuffer[rpcbuffersize].data.playerweaponchange = (NetworkPlayerWeaponChangeData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playerweaponchange, data, sizeof(DATATYPE));
-			break;
-		}
-	case NetworkRPCPlayerHealthAndArmorChange:
-		{
-			rpcbuffer[rpcbuffersize].data.playerhealthandarmorchange = (NetworkPlayerHealthAndArmorChangeData *)new DATATYPE;
-			memcpy(rpcbuffer[rpcbuffersize].data.playerhealthandarmorchange, data, sizeof(DATATYPE));
 			break;
 		}
 	case NetworkRPCPlayerSpawnPositionChange:
@@ -969,37 +849,20 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			delete data->vehiclefullupdate;
 			break;
 		}
-	case NetworkRPCPlayerMove:
+	case NetworkRPCPlayerFootSync:
 		{
 #if defined (FMP_CLIENT)
-			if(gPlayer[data->playermove->client].vehicleindex != -1)
-			{
-				memcpy(gVehicle[gPlayer[data->playermove->client].vehicleindex].position, data->playermove->position, sizeof(float) * 3);
-				gVehicle[gPlayer[data->playermove->client].vehicleindex].angle = data->playermove->angle;
-			}
-
-			memcpy(gPlayer[data->playermove->client].position, data->playermove->position, sizeof(float) * 3);
-			gPlayer[data->playermove->client].angle = data->playermove->angle;
-
-			HOOK.PlayerMove(data->playermove->client, data->playermove->position, data->playermove->speed);
+			HOOK.PlayerFootSync(data->playerfoot);
 #endif
-			delete data->playermove;
+			delete data->playerfoot;
 			break;
 		}
-	case NetworkRPCPlayerJump:
+	case NetworkRPCPlayerVehicleSync:
 		{
 #if defined (FMP_CLIENT)
-			HOOK.Jump(data->playerjump->client);
+			HOOK.PlayerVehicleSync(data->playervehicle);
 #endif
-			delete data->playerjump;
-			break;
-		}
-	case NetworkRPCPlayerDuck:
-		{
-#if defined (FMP_CLIENT)
-			HOOK.Duck(data->playerduck->client, data->playerduck->shouldduck);
-#endif
-			delete data->playerduck;
+			delete data->playervehicle;
 			break;
 		}
 	case NetworkRPCPlayerStartEntranceInVehicle:
@@ -1048,37 +911,6 @@ void NetworkManager::HandleRPCData(const NetworkRPCType type, const NetworkRPCUn
 			HOOK.PlayerRecieveWeapon(data->playerweapongift->client, data->playerweapongift->weapon, data->playerweapongift->ammo);
 #endif
 			delete data->playerweapongift;
-			break;
-		}
-	case NetworkRPCPlayerFire:
-		{
-#if defined (FMP_CLIENT)
-			HOOK.PlayerFireAim(data->playerfire->client, data->playerfire->weapon, data->playerfire->time, data->playerfire->position[0], data->playerfire->position[1], data->playerfire->position[2], 1);
-#endif
-			delete data->playerfire;
-			break;
-		}
-	case NetworkRPCPlayerAim:
-		{
-#if defined (FMP_CLIENT)
-			HOOK.PlayerFireAim(data->playeraim->client, data->playeraim->weapon, data->playeraim->time, data->playeraim->position[0], data->playeraim->position[1], data->playeraim->position[2], 0);
-#endif
-			delete data->playeraim;
-			break;
-		}
-	case NetworkRPCPlayerWeaponChange:
-		{
-#if defined (FMP_CLIENT)
-			HOOK.PlayerSwapGun(data->playerweaponchange->client, data->playerweaponchange->weapon);
-#endif
-			delete data->playerweaponchange;
-			break;
-		}
-	case NetworkRPCPlayerHealthAndArmorChange:
-		{
-#if defined (FMP_CLIENT)
-#endif
-			delete data->playerhealthandarmorchange;
 			break;
 		}
 	case NetworkRPCPlayerSpawnPositionChange:
@@ -1192,19 +1024,14 @@ void NetworkManager::FreeRPCBuffer(void)
 				delete rpcbuffer[i].data.vehiclefullupdate;
 				break;
 			}
-		case NetworkRPCPlayerMove:
+		case NetworkRPCPlayerFootSync:
 			{
-				delete rpcbuffer[i].data.playermove;
+				delete rpcbuffer[i].data.playerfoot;
 				break;
 			}
-		case NetworkRPCPlayerJump:
+		case NetworkRPCPlayerVehicleSync:
 			{
-				delete rpcbuffer[i].data.playerjump;
-				break;
-			}
-		case NetworkRPCPlayerDuck:
-			{
-				delete rpcbuffer[i].data.playerduck;
+				delete rpcbuffer[i].data.playervehicle;
 				break;
 			}
 		case NetworkRPCPlayerStartEntranceInVehicle:
@@ -1235,26 +1062,6 @@ void NetworkManager::FreeRPCBuffer(void)
 		case NetworkRPCPlayerWeaponGift:
 			{
 				delete rpcbuffer[i].data.playerweapongift;
-				break;
-			}
-		case NetworkRPCPlayerFire:
-			{
-				delete rpcbuffer[i].data.playerfire;
-				break;
-			}
-		case NetworkRPCPlayerAim:
-			{
-				delete rpcbuffer[i].data.playeraim;
-				break;
-			}
-		case NetworkRPCPlayerWeaponChange:
-			{
-				delete rpcbuffer[i].data.playerweaponchange;
-				break;
-			}
-		case NetworkRPCPlayerHealthAndArmorChange:
-			{
-				delete rpcbuffer[i].data.playerhealthandarmorchange;
 				break;
 			}
 		case NetworkRPCPlayerSpawnPositionChange:

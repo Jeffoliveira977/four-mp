@@ -38,9 +38,10 @@ using namespace Natives;
 	return 1;
 }*/
 
+float a, b, c, s;
+
 void GetTarget(float ax, float az, float *x, float *y, float *z, float mn = 5)
 {
-	float a, b, c, s;
 
 	c = sqrt(2.8f * 2.0f)*mn;
 	

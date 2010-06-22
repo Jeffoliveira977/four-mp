@@ -11,6 +11,7 @@
 
 extern DWORD dwLoadOffset;
 
+
 namespace Natives
 {
 	// rebuild

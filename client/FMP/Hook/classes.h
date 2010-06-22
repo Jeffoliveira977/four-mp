@@ -141,6 +141,15 @@ private:
 	Vector4 spawnposition;
 	PlayerState playerstate;
 
+	// temps
+	short						t_index;
+	Vehicle						t_car;
+	Camera						t_cam;
+	float						t_cam_position[6];
+	Vector3						t_vec3;
+	NetworkPlayerFootData		own_foot_sync;
+	NetworkPlayerVehicleData	own_veh_sync;
+
 protected:
 	ThreadStates Reset(unsigned int hash,int v2,int i3);
 	ThreadStates Run(int i1);
@@ -199,9 +208,8 @@ public:
 	void PlayerConnect(wchar_t *name, short index, unsigned int model, float position[3]);
 
 	void PlayerDisconnect(short index);
-	void PlayerMove(short index, float position[3], float speed);
-	void Jump(short index);
-	void Duck(short index, bool);
+	void PlayerFootSync(NetworkPlayerFootData* data);
+	void PlayerVehicleSync(NetworkPlayerVehicleData* data);
 	void PlayerRecieveWeapon(const short index, const eWeapon weapon, const short ammo);
 	void PlayerFireAim(short index, int, int, float, float, float, bool);
 	void PlayerSwapGun(short index, int);
@@ -220,8 +228,6 @@ public:
 	void InputFreeze(bool);
 
 	// -- My sync
-	void CarDoSync();
-	void MoveSync();
-	void GunSync();
-	void StatusSync();
+	void FootSync();
+	void VehicleSync();
 };

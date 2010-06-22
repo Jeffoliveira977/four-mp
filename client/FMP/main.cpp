@@ -613,10 +613,8 @@ void FMPHook::GameThread()
 
 				CheckAndCheck();
 				
-				MoveSync();
-				CarDoSync();
-				GunSync();
-				StatusSync();
+				if(Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID)) VehicleSync();
+				else FootSync();
 				
 				gPlayer[client.GetIndex()].last_active = GetTickCount();
 				break;

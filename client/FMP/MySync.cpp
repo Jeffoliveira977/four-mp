@@ -21,325 +21,80 @@ extern NetworkManager nm;
 extern FPlayer gPlayer[MAX_PLAYERS];
 extern FVehicle gVehicle[MAX_VEHICLES];
 
-void FMPHook::MoveSync()
+void FMPHook::FootSync()
 {
 	if(client.GetIndex() < 0 || !Natives::DoesCharExist(gPlayer[client.GetIndex()].PedID)) 
 	{
 		Natives::GetPlayerChar(_GetPlayer(), &gPlayer[client.GetIndex()].PedID);
 		return;
 	}
-	float x,y,z,a;
-	Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &x, &y, &z);
-	Natives::GetCharHeading(gPlayer[client.GetIndex()].PedID, &a);
-	if (((gPlayer[client.GetIndex()].position[0] != x) || (gPlayer[client.GetIndex()].position[1] != y) || (gPlayer[client.GetIndex()].position[2] != z)) && (playerstate != PlayerStateEnteringVehicle))
+	// write info in our temp sync struct
+	Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &own_foot_sync.position[0],&own_foot_sync.position[1],&own_foot_sync.position[2]);
+	own_foot_sync.position[2] -= 1.0; // z correction
+	Natives::GetCharVelocity(gPlayer[client.GetIndex()].PedID, &own_foot_sync.velocity[0],&own_foot_sync.velocity[1],&own_foot_sync.velocity[2]);
+	Natives::GetCharHeading(gPlayer[client.GetIndex()].PedID, &own_foot_sync.angle);
+	Natives::GetCharHealth(gPlayer[client.GetIndex()].PedID, &own_foot_sync.health);
+	Natives::GetCharArmour(gPlayer[client.GetIndex()].PedID, &own_foot_sync.armour);
+	Natives::GetCharSpeed(gPlayer[client.GetIndex()].PedID, &own_foot_sync.speed);
+	Natives::GetCurrentCharWeapon(gPlayer[client.GetIndex()].PedID, &own_foot_sync.weapon);
+	//Natives::GetAmmoInCharWeapon(gPlayer[client.GetIndex()].PedID, own_foot_sync.weapon, &own_foot_sync.ammo);
+	if(Natives::IsCharDucking(gPlayer[client.GetIndex()].PedID)) own_foot_sync.is_dunk = 1;
+	else own_foot_sync.is_dunk = 0;
+	if(Natives::IsCharInAir(gPlayer[client.GetIndex()].PedID)) own_foot_sync.is_jump = 1;
+	else own_foot_sync.is_jump = 0;
+	if(!Natives::IsControlPressed(0, 137)) // Fire
 	{
-		float lx,ly,lz;
-		Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &lx, &ly, &lz);
-		float d = GetDist(lx, ly, lz, gPlayer[client.GetIndex()].position[0], gPlayer[client.GetIndex()].position[1], gPlayer[client.GetIndex()].position[2]);
-		float t = (GetTickCount()-gPlayer[client.GetIndex()].last_active);
-		float speed = (d / t)*10000;
+		own_foot_sync.shot_time = GetTickCount() - gPlayer[client.GetIndex()].last_active;
 
-		if ((Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && (gPlayer[client.GetIndex()].vehicleindex != -1)))
-		{
-			int pl_car = gPlayer[client.GetIndex()].vehicleindex;
-			Vehicle car = gVehicle[pl_car].CarID;
+		Natives::GetGameCam(&t_cam);
+		Natives::GetCamRot(t_cam, &t_cam_position[0],&t_cam_position[1],&t_cam_position[2]);
+		GetTarget(t_cam_position[0],t_cam_position[2], &t_cam_position[3], &t_cam_position[4], &t_cam_position[5], 5);
+		Natives::GetCamPos(t_cam, &t_cam_position[0],&t_cam_position[1],&t_cam_position[2]);
+		t_cam_position[0] += t_cam_position[3];
+		t_cam_position[1] += t_cam_position[4];
+		t_cam_position[2] += t_cam_position[5];
 
-			float cs;
-			Natives::GetCarSpeed(car, &cs);
-			if(cs > speed) speed = cs;
-
-			int dr = 1;
-			if(!Natives::DoesVehicleExist(car)) { Log::Debug(L"DOES"); }
-			//if(Natives::IsCarStopped(car)) { Log::Debug(L"STOP"); dr = 0; }
-			Vector3 v;
-			Natives::GetCarSpeedVector(car, &v, 1);
-			float x = floor(v.X * 1000 + 0.5)/1000;
-			float y = floor(v.Y * 1000 + 0.5)/1000;
-			if(abs(x) > abs(y))
-			{
-				// ось движения Х (основная)
-				if(x < 0)
-					dr = -1;
-			}
-			else
-			{
-				// ось движения Y
-				if(y < 0)
-					dr = -1;
-			}
-			speed = speed * dr;
-			Natives::GetCarHeading(car, &a);
-		}
-		gPlayer[client.GetIndex()].position[0] = x;
-		gPlayer[client.GetIndex()].position[1] = y;
-		gPlayer[client.GetIndex()].position[2] = z;
-		gPlayer[client.GetIndex()].angle = a;
-		nm.SendPlayerMove(speed);
+		own_foot_sync.aim_sync = 2; // fire id
 	}
-	if(Natives::IsCharInAir(gPlayer[client.GetIndex()].PedID))
+	else if(!Natives::IsControlPressed(0, 138)) // Aim
 	{
-		nm.SendPlayerJump();
+		own_foot_sync.shot_time = GetTickCount() - gPlayer[client.GetIndex()].last_active;
+
+		Natives::GetGameCam(&t_cam);
+		Natives::GetCamRot(t_cam, &t_cam_position[0],&t_cam_position[1],&t_cam_position[2]);
+		GetTarget(t_cam_position[0],t_cam_position[2], &t_cam_position[3], &t_cam_position[4], &t_cam_position[5], 5);
+		Natives::GetCamPos(t_cam, &t_cam_position[0],&t_cam_position[1],&t_cam_position[2]);
+		t_cam_position[0] += t_cam_position[3];
+		t_cam_position[1] += t_cam_position[4];
+		t_cam_position[2] += t_cam_position[5];
+
+		own_foot_sync.aim_sync = 1; // aim id
 	}
-	if(Natives::IsCharDucking(gPlayer[client.GetIndex()].PedID) != gPlayer[client.GetIndex()].isducking)
-	{
-		gPlayer[client.GetIndex()].isducking = Natives::IsCharDucking(gPlayer[client.GetIndex()].PedID);
-		nm.SendPlayerDuck();
-	}
+	else own_foot_sync.aim_sync = 0;
+	// send sync to server
+	nm.SendPlayerFootSync(own_foot_sync);
 }
 
-void FMPHook::CarDoSync()
+void FMPHook::VehicleSync()
 {
-	bool enterpressed = false;
-	if ((Natives::IsControlPressed(0, 3)) || (Natives::IsControlPressed(0, 43)))
+	if(client.GetIndex() < 0 || !Natives::DoesCharExist(gPlayer[client.GetIndex()].PedID)) 
 	{
-		//Log::Debug(L"Enter/exit vehicle pressed");
-		enterpressed = true;
+		Natives::GetPlayerChar(_GetPlayer(), &gPlayer[client.GetIndex()].PedID);
+		return;
 	}
-	//bool getting = Natives::IsCharGettingInToACar(gPlayer[client.GetIndex()].PedID);
-	bool invehicle = Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID);
-	bool sitting = Natives::IsCharSittingInAnyCar(gPlayer[client.GetIndex()].PedID);
-	bool onfoot = Natives::IsCharOnFoot(gPlayer[client.GetIndex()].PedID);
-	//Log::Debug(L"In vehicle: %d. Sitting: %d. On foot: %d", invehicle, sitting, onfoot);
-	switch (playerstate)
-	{
-	case PlayerStateOnFoot:
-		{
-			if ((!invehicle) && (!onfoot))
-			{
-				short vehicleindex;
-				float x, y, z;
-				Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &x, &y, &z);
-				vehicleindex = _GetClosestCar(x, y, z, 10);
-				if (vehicleindex != INVALID_VEHICLE_INDEX)
-				{
-					playerstate = PlayerStateEnteringVehicle;
-					gPlayer[client.GetIndex()].vehicleindex = vehicleindex;
-					gPlayer[client.GetIndex()].seatindex = 0;
-					nm.SendPlayerStartEntranceInVehicle();
-				}
-			}
-			break;
-		}
-	case PlayerStateEnteringVehicle:
-		{
-			if ((invehicle) && (sitting))
-			{
-				playerstate = PlayerStateInVehicle;
-				nm.SendPlayerFinishEntranceInVehicle();
-			}
-			else if (onfoot)
-			{
-				playerstate = PlayerStateOnFoot;
-				nm.SendPlayerCancelEntranceInVehicle();
-			}
-			break;
-		}
-	case PlayerStateInVehicle:
-		{
-			if ((invehicle) && (!sitting))
-			{
-				playerstate = PlayerStateExitingVehicle;
-				nm.SendPlayerStartExitFromVehicle();
-			}
-			break;
-		}
-	case PlayerStateExitingVehicle:
-		{
-			if (onfoot)
-			{
-				playerstate = PlayerStateOnFoot;
-				nm.SendPlayerFinishExitFromVehicle();
-			}
-			break;
-		}
-	}
-	/*if ( && gPlayer[client.GetIndex()].vehicleindex == -1)
-	{
-		gPlayer[client.GetIndex()].vehicleindex = GetPlayerCar(_GetPedVehicle(gPlayer[client.GetIndex()].PedID));
-		nm.SendPlayerEntranceInVehicle(0);
-	}*/
-	/*else if(!Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && gPlayer[client.GetIndex()].vehicleindex != -1)
-	{
-		gPlayer[client.GetIndex()].vehicleindex = -1;
-		nm.SendPlayerExitFromVehicle();
-	}
-	if ((myEnter == 0) && (GetAsyncKeyState(70) != 0) && (client.GetInputState() == InputStateGame))
-	{
-		if(!Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID))
-		{
-			
-		} 
-		else 
-		{
-			gPlayer[client.GetIndex()].vehicleindex = -1;
-			gPlayer[client.GetIndex()].seatindex = -1;
-			myEnter = 0;
-			nm.SendPlayerExitFromVehicle();
-		}
-	}
-	else if(GetAsyncKeyState(71) != 0 && !Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID) && myEnter == 0)
-	{
-		short carid;
-		char seatid = 0; 
-		unsigned int max;
-		float x, y, z;
-		Natives::GetCharCoordinates(gPlayer[client.GetIndex()].PedID, &x, &y, &z);
-
-		carid = _GetClosestCar(x, y, z, 10);
-		if(carid != -1)
-		{
-			Natives::GetMaximumNumberOfPassengers(gVehicle[carid].CarID, &max);
-			if(max > 2)
-			{
-				float cx, cy, cz, al;
-				Natives::GetCarCoordinates(gVehicle[carid].CarID, &cx, &cy, &cz);
-				Natives::GetCarHeading(gVehicle[carid].CarID, &al);
-
-				float sx,sy, br = 1000;
-				int min = -1;
-				for(char i=0; i<4; i++)
-				{
-					if(i != 2)
-					{
-						float r, angle = 45+(90*i)+al;
-						if(angle > 360) angle -=360;
-						angle -= 180;
-						GetTarget(0, angle, &sx, &sy, &z, 0.5f);
-						sx+=cx;
-						sy+=cy;
-						r = GetDist(x, y, 0, sx, sy, 0);
-						if(r < br)
-						{
-							br = r;
-							min = i;
-						}
-					}
-				}
-				if(min == 0) seatid = 2;
-				else if(min == 1) seatid = 0;
-				else if(min == 3) seatid = 1;
-			}
-			if(seatid >= 0)
-			{
-				gPlayer[client.GetIndex()].vehicleindex = carid;
-				gPlayer[client.GetIndex()].seatindex = seatid+1;
-				Natives::TaskEnterCarAsPassenger(gPlayer[client.GetIndex()].PedID, gVehicle[carid].CarID, -1, seatid);
-				nm.SendPlayerEntranceInVehicle(seatid+1);
-			}
-		}
-	}
-	else if(myEnter == 1)
-	{
-		int incar = Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID);
-		incar += Natives::IsCharSittingInAnyCar(gPlayer[client.GetIndex()].PedID);
-		incar = incar * Natives::IsCharOnFoot(gPlayer[client.GetIndex()].PedID);
-		if(incar == 0)
-			myEnter = 0;
-		else
-		{
-			int control = Natives::IsControlPressed(0, 2);
-			control += Natives::IsControlPressed(0, 40);
-			control += Natives::IsControlPressed(0, 41);
-			control += Natives::IsControlPressed(0, 91);
-			control += Natives::IsControlPressed(0, 144);
-
-			if(control != 0)
-			{
-				myEnter = 0;
-				gPlayer[client.GetIndex()].vehicleindex = -1;
-				gPlayer[client.GetIndex()].seatindex = -1;
-				nm.SendPlayerCancelEntranceInVehicle();
-			}
-		}
-	}*/
-}
-
-void FMPHook::GunSync()
-{
-	eWeapon gun;
-	Natives::GetCurrentCharWeapon(gPlayer[client.GetIndex()].PedID, &gun);
-	if(gun != gPlayer[client.GetIndex()].currentweapon)
-	{
-		gPlayer[client.GetIndex()].currentweapon = gun;
-		nm.SendPlayerWeaponChange();
-	}
-	if(Natives::IsControlPressed(0, 137)!=0) // Fire
-	{
-		//FreezeCharPosition(gPlayer[client.GetIndex()].PedID, 1); //Why the hell should we freeze him?
-		gPlayer[client.GetIndex()].isaiming = true;
-
-		int time;
-		float position[3];
-		time = GetTickCount()-gPlayer[client.GetIndex()].last_active;
-		//GetCamTargetedCoords(&x, &y, &z);
-		Camera cam;
-		float cx, cy, cz;
-		float ax, ay, az;
-		float a, b, c;
-		Natives::GetGameCam(&cam);
-		Natives::GetCamPos(cam, &cx, &cy, &cz);
-		Natives::GetCamRot(cam, &ax, &ay, &az);
-		GetTarget(ax, az, &a, &b, &c, 5);
-		position[0] = a + cx;
-		position[1] = b + cy;
-		position[2] = c + cz;
-
-		short pid = -1;
-		unsigned int hp, ar;
-		for (short i = 0; i < MAX_PLAYERS; i++)
-		{
-			if(gPlayer[i].connected == 1)
-			{
-				Natives::GetCharHealth(gPlayer[i].PedID, &hp);
-				Natives::GetCharArmour(gPlayer[i].PedID, &ar);
-				if(ar != gPlayer[i].armor || hp != gPlayer[i].health)
-				{
-					pid = i;
-					break;
-				}
-			}
-		}
-		nm.SendPlayerFire(position, time, pid, hp, ar);		
-	}
-	else if(Natives::IsControlPressed(0, 138)!=0) // Aim
-	{
-		//FreezeCharPosition(gPlayer[client.GetIndex()].PedID, 1); //Why the hell should we freeze him?
-		gPlayer[client.GetIndex()].isaiming = true;
-		int time;
-		float position[3];
-		time = GetTickCount()-gPlayer[client.GetIndex()].last_active;
-		//GetCamTargetedCoords(&x, &y, &z);
-		Camera cam;
-		float cx, cy, cz;
-		float ax, ay, az;
-		float a, b, c;
-		Natives::GetGameCam(&cam);
-		Natives::GetCamPos(cam, &cx, &cy, &cz);
-		Natives::GetCamRot(cam, &ax, &ay, &az);
-		GetTarget(ax, az, &a, &b, &c, 5);
-		position[0] = a + cx;
-		position[1] = b + cy;
-		position[2] = c + cz;
-		nm.SendPlayerAim(position, time);
-	}
-	/*else if(gPlayer[client.GetIndex()].isaiming)
-	{
-		if(gPlayer[client.GetIndex()].edFreeze == 0)
-			FreezeCharPosition(gPlayer[client.GetIndex()].PedID, 0);
-		gPlayer[client.GetIndex()].Aim = 0;
-	}*/
-}
-
-void FMPHook::StatusSync()
-{
-	unsigned int hp, arm;
-	Natives::GetCharHealth(gPlayer[client.GetIndex()].PedID, &hp);
-	//Log::Debug(L"Health: %d", hp);
-	Natives::GetCharArmour(gPlayer[client.GetIndex()].PedID, &arm);
-	if(hp != gPlayer[client.GetIndex()].health || arm != gPlayer[client.GetIndex()].armor)
-	{
-		gPlayer[client.GetIndex()].health = hp;
-		gPlayer[client.GetIndex()].armor = arm;
-		nm.SendPlayerHealthAndArmorChange();
-	}
+	// write info in our temp sync struct
+	Natives::GetCarCharIsUsing(gPlayer[client.GetIndex()].PedID, &t_car);
+	own_veh_sync.v_id = GetPlayerCar(t_car);
+	Natives::GetCarCoordinates(t_car, &own_veh_sync.position[0],&own_veh_sync.position[1],&own_veh_sync.position[2]);
+	Natives::GetCarSpeedVector(t_car,&t_vec3,false);
+	own_veh_sync.velocity[0] = t_vec3.X;
+	own_veh_sync.velocity[1] = t_vec3.Y;
+	own_veh_sync.velocity[2] = t_vec3.Z;
+	Natives::GetCarSpeed(t_car,&own_veh_sync.speed);
+	Natives::GetCarHeading(t_car, &own_veh_sync.angle);
+	Natives::GetCarHealth(t_car, &own_veh_sync.v_health);
+	Natives::GetCharHealth(gPlayer[client.GetIndex()].PedID, &own_veh_sync.health);
+	Natives::GetCharArmour(gPlayer[client.GetIndex()].PedID, &own_veh_sync.armour);
+	// send sync to server
+	nm.SendPlayerVehicleSync(own_veh_sync);
 }

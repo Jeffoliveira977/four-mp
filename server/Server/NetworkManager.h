@@ -36,18 +36,13 @@ public:
 
 	void RecieveClientConnectionRequest(NetworkPlayerConnectionRequestData data, RakNet::RPC3 *clientrpc3);
 	void RecieveClientConnectionConfirmation(NetworkPlayerConnectionConfirmationData data, RakNet::RPC3 *clientrpc3);
-	void RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *clientrpc3);
-	void RecievePlayerJump(NetworkPlayerJumpData data, RakNet::RPC3 *clientrpc3);
-	void RecievePlayerDuck(NetworkPlayerDuckData data, RakNet::RPC3 *clientrpc3);
+	void RecievePlayerFootSync(NetworkPlayerFootData data, RakNet::RPC3 *serverrpc3);
+	void RecievePlayerVehicleSync(NetworkPlayerVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerStartEntranceInVehicle(NetworkPlayerStartEntranceInVehicleData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerCancelEntranceInVehicle(NetworkPlayerCancelEntranceInVehicleData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerFinishEntranceInVehicle(NetworkPlayerFinishEntranceInVehicleData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerStartExitFromVehicle(NetworkPlayerStartExitFromVehicleData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerFinishExitFromVehicle(NetworkPlayerFinishExitFromVehicleData data, RakNet::RPC3 *clientrpc3);
-	void RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 *clientrpc3);
-	void RecievePlayerAim(NetworkPlayerAimData data, RakNet::RPC3 *clientrpc3);
-	void RecievePlayerWeaponChange(NetworkPlayerWeaponChangeData data, RakNet::RPC3 *clientrpc3);
-	void RecievePlayerHealthAndArmorChange(NetworkPlayerHealthAndArmorChangeData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerSpawnRequest(NetworkPlayerSpawnRequestData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerModelChange(NetworkPlayerModelChangeData data, RakNet::RPC3 *clientrpc3);
 	void RecievePlayerComponentsChange(NetworkPlayerComponentsChangeData data, RakNet::RPC3 *clientrpc3);
@@ -78,18 +73,13 @@ private:
 	{
 		NetworkRPCPlayerConnectionRequest,
 		NetworkRPCPlayerConnectionConfirmation,
-		NetworkRPCPlayerMove,
-		NetworkRPCPlayerJump,
-		NetworkRPCPlayerDuck,
+		NetworkRPCPlayerFootSync,
+		NetworkRPCPlayerVehicleSync,
 		NetworkRPCPlayerStartEntranceInVehicle,
 		NetworkRPCPlayerCancelEntranceInVehicle,
 		NetworkRPCPlayerFinishEntranceInVehicle,
 		NetworkRPCPlayerStartExitFromVehicle,
 		NetworkRPCPlayerFinishExitFromVehicle,
-		NetworkRPCPlayerFire,
-		NetworkRPCPlayerAim,
-		NetworkRPCPlayerWeaponChange,
-		NetworkRPCPlayerHealthAndArmorChange,
 		NetworkRPCPlayerSpawnRequest,
 		NetworkRPCPlayerModelChange,
 		NetworkRPCPlayerComponentsChange,
@@ -105,18 +95,13 @@ private:
 	{
 		NetworkPlayerConnectionRequestDataInternal *playerconnectionrequest;
 		NetworkPlayerConnectionConfirmationData *playerconnectionconfirmation;
-		NetworkPlayerMoveData *playermove;
-		NetworkPlayerJumpData *playerjump;
-		NetworkPlayerDuckData *playerduck;
+		NetworkPlayerFootData *playerfoot;
+		NetworkPlayerVehicleData *playervehicle;
 		NetworkPlayerStartEntranceInVehicleData *playerstartentranceinvehicle;
 		NetworkPlayerCancelEntranceInVehicleData *playercancelentranceinvehicle;
 		NetworkPlayerFinishEntranceInVehicleData *playerfinishentranceinvehicle;
 		NetworkPlayerStartExitFromVehicleData *playerstartexitfromvehicle;
 		NetworkPlayerFinishExitFromVehicleData *playerfinishexitfromvehicle;
-		NetworkPlayerFireData *playerfire;
-		NetworkPlayerAimData *playeraim;
-		NetworkPlayerWeaponChangeData *playerweaponchange;
-		NetworkPlayerHealthAndArmorChangeData *playerhealthandarmorchange;
 		NetworkPlayerSpawnRequestData *playerspawnrequest;
 		NetworkPlayerModelChangeData *playermodelchange;
 		NetworkPlayerComponentsChangeData *playercomponentschange;
@@ -140,18 +125,13 @@ private:
 	//TODO: Make this handlers work on raw arguments instead of structs.
 	void HandleClientConnectionRequest(NetworkPlayerConnectionRequestDataInternal *data); //TODO: Should be const.
 	void HandleClientConnectionConfirmation(const NetworkPlayerConnectionConfirmationData *data);
-	void HandlePlayerMove(const NetworkPlayerMoveData *data);
-	void HandlePlayerJump(const NetworkPlayerJumpData *data);
-	void HandlePlayerDuck(const NetworkPlayerDuckData *data);
+	void HandlePlayerFootSync(const NetworkPlayerFootData *data);
+	void HandlePlayerVehicleSync(const NetworkPlayerVehicleData *data);
 	void HandlePlayerStartEntranceInVehicle(const NetworkPlayerStartEntranceInVehicleData *data);
 	void HandlePlayerCancelEntranceInVehicle(const NetworkPlayerCancelEntranceInVehicleData *data);
 	void HandlePlayerFinishEntranceInVehicle(const NetworkPlayerFinishEntranceInVehicleData *data);
 	void HandlePlayerStartExitFromVehicle(const NetworkPlayerStartExitFromVehicleData *data);
 	void HandlePlayerFinishExitFromVehicle(const NetworkPlayerFinishExitFromVehicleData *data);
-	void HandlePlayerFire(const NetworkPlayerFireData *data);
-	void HandlePlayerAim(const NetworkPlayerAimData *data);
-	void HandlePlayerWeaponChange(const NetworkPlayerWeaponChangeData *data);
-	void HandlePlayerHealthAndArmorChange(const NetworkPlayerHealthAndArmorChangeData *data);
 	void HandlePlayerSpawnRequest(const NetworkPlayerSpawnRequestData *data);
 	void HandlePlayerModelChange(const NetworkPlayerModelChangeData *data);
 	void HandlePlayerComponentsChange(const NetworkPlayerComponentsChangeData *data);
