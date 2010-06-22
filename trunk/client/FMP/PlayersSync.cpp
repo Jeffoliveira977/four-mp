@@ -100,91 +100,71 @@ void FMPHook::PlayerConnect(wchar_t *name, short index, unsigned int model, floa
 	Log::Debug(L"PlayerConnect: End");
 }
 
-void FMPHook::Jump(short index)
+void FMPHook::PlayerFootSync(NetworkPlayerFootData* data)
 {
-	if(!SafeCheckPlayer(index)) return;
-
-	Log::Info(L"Jump %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID), gPlayer[index].PedID);
-	Natives::TaskJump(gPlayer[index].PedID, 1);
-	gPlayer[index].last_active = GetTickCount();
-}
-
-void FMPHook::Duck(short index, bool duck)
-{
-	if(!SafeCheckPlayer(index)) return;
-
-	Log::Info(L"Duck %d(%d) = %d", index, Natives::DoesCharExist(gPlayer[index].PedID) ,gPlayer[index].PedID);
-	Natives::TaskToggleDuck(gPlayer[index].PedID, duck);
-	gPlayer[index].last_active = GetTickCount();
-	gPlayer[index].isducking = duck;
-}
-
-void FMPHook::PlayerMove(short index, float position[3], float speed)
-{
-	Log::Info(L"PlayerMOVE HOOK");
-	Log::Info(L"Index: %d, position: %f %f %f, speed: %f", index, position[0], position[1], position[2], speed);
+	t_index = data->client;
 	
-	if(!SafeCheckPlayer(index)) return;
+	if(!SafeCheckPlayer(t_index)) return;
 
-	float lx,ly,lz;
-	Natives::GetCharCoordinates(gPlayer[index].PedID, &lx, &ly, &lz);
-
-	float d = GetDist(lx, ly, lz, position[0], position[1], position[2]);
-	if(gPlayer[index].vehicleindex == -1) // Если пешком
+	// read sync
+	// if in vehicle - remove
+	if(Natives::IsCharInAnyCar(gPlayer[t_index].PedID)) Natives::WarpCharFromCarToCoord(gPlayer[t_index].PedID,data->position[0],data->position[1],data->position[2]);
+	else Natives::SetCharCoordinates(gPlayer[t_index].PedID,data->position[0],data->position[1],data->position[2]);
+	Natives::SetCharVelocity(gPlayer[t_index].PedID,data->velocity[0],data->velocity[1],data->velocity[2]);
+	Natives::SetCharHeading(gPlayer[t_index].PedID,data->angle);
+	Natives::SetCharHealth(gPlayer[t_index].PedID,data->health);
+	Natives::AddArmourToChar(gPlayer[t_index].PedID,data->armour);
+	Natives::SetCurrentCharWeapon(gPlayer[t_index].PedID,data->weapon,true);
+	Natives::SetAmmoInClip(gPlayer[t_index].PedID,data->weapon,data->ammo);
+	// show anim (try...)
+	if((data->is_dunk) && (!Natives::IsCharDucking(gPlayer[t_index].PedID))) Natives::TaskToggleDuck(gPlayer[t_index].PedID,true);
+	else if(Natives::IsCharDucking(gPlayer[t_index].PedID)) Natives::TaskToggleDuck(gPlayer[t_index].PedID,false);
+	if((data->is_jump) && (!Natives::IsCharInAir(gPlayer[t_index].PedID))) Natives::TaskJump(gPlayer[t_index].PedID,true);
+	else if(Natives::IsCharInAir(gPlayer[t_index].PedID)) Natives::TaskJump(gPlayer[t_index].PedID,false);
+	if(data->aim_sync == 2)
 	{
-		Log::Info(L"MovePlayer (HOOK) %s", "Start");
-		int ms = 4;
-		Log::Info(L"Before Move");
-		if(speed < 3)
-		{
-			ms = 2;
-			if(d > 10)
-			{
-				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
-				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
-				Log::Info(L"PORTAL or TIMESHIFT");
-			}
-		}
-		else if(speed < 5)
-		{
-			ms = 3;
-			if(d > 20)
-			{
-				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
-				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
-				Log::Info(L"PORTAL or TIMESHIFT");
-			}
-		}
-		else
-		{
-			ms = 4;
-			if(d > 30)
-			{
-				Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
-				Natives::SetCharHeading(gPlayer[index].PedID, gPlayer[index].angle);
-				Log::Info(L"PORTAL or TIMESHIFT");
-			}
-		}
-
-		Natives::TaskGoStraightToCoord(gPlayer[index].PedID, position[0], position[1], position[2], ms, 45000);
-		wait(1);
-		memcpy(gPlayer[index].position, position, sizeof(float) * 3);
+		Natives::TaskShootAtCoord(gPlayer[t_index].PedID,data->shot_position[0],data->shot_position[1],data->shot_position[2],5000, 5);
 	}
-	else // Если на машине
+	else if(data->aim_sync == 1)
 	{
-		if(!SafeCheckVehicle(gPlayer[index].vehicleindex)) return;
-
-		int vect = 1;
-		if(speed < 0) { vect = 2; speed = speed*-1; }
-		if(speed * 3 < d)
-		{
-			Natives::SetCharCoordinates(gPlayer[index].PedID, position[0], position[1], position[2]);
-			Natives::SetCarHeading(gVehicle[gPlayer[index].vehicleindex].CarID, gVehicle[gPlayer[index].vehicleindex].angle);
-		}
-
-		Natives::TaskCarDriveToCoord(gPlayer[index].PedID, gVehicle[gPlayer[index].vehicleindex].CarID, position[0], position[1], position[2], speed, vect, 2, 3, 2, 45000000);
+		Natives::TaskAimGunAtCoord(gPlayer[t_index].PedID,data->shot_position[0],data->shot_position[1],data->shot_position[2],5000);
 	}
-	gPlayer[index].last_active = GetTickCount();
+	else if(data->speed < 3)
+	{
+		Natives::TaskGoStraightToCoord(gPlayer[t_index].PedID,(data->position[0] + (data->velocity[0] * 10)),(data->position[1] + (data->velocity[1] * 10)),(data->position[2] + (data->velocity[2] * 10)),2,45000);   
+	}
+	else if(data->speed < 5)
+	{
+		Natives::TaskGoStraightToCoord(gPlayer[t_index].PedID,(data->position[0] + (data->velocity[0] * 10)),(data->position[1] + (data->velocity[1] * 10)),(data->position[2] + (data->velocity[2] * 10)),3,45000);   
+	}
+	else
+	{
+		Natives::TaskGoStraightToCoord(gPlayer[t_index].PedID,(data->position[0] + (data->velocity[0] * 10)),(data->position[1] + (data->velocity[1] * 10)),(data->position[2] + (data->velocity[2] * 10)),4,45000);   
+	}
+	
+	gPlayer[t_index].last_active = GetTickCount();
+}
+
+void FMPHook::PlayerVehicleSync(NetworkPlayerVehicleData* data)
+{
+	t_index = data->client;
+	
+	if(!SafeCheckPlayer(t_index)) return;
+
+	// read sync
+	t_car = gVehicle[data->v_id].CarID;
+
+	if(!Natives::IsCharInCar(gPlayer[t_index].PedID,t_car)) Natives::WarpCharIntoCar(gPlayer[t_index].PedID,t_car);
+	
+	Natives::SetCarCoordinates(t_car, data->position[0],data->position[1],data->position[2]);
+	Natives::SetCarHealth(t_car, data->v_health);
+	Natives::SetCarHeading(t_car, data->angle);
+	Natives::SetCharHealth(gPlayer[t_index].PedID, data->health);
+	Natives::AddArmourToChar(gPlayer[t_index].PedID, data->armour);
+	// show drive (try...)
+	Natives::TaskCarDriveToCoord(gPlayer[t_index].PedID,t_car,(data->position[0] + (data->velocity[0] * 10)),(data->position[1] + (data->velocity[1] * 10)),(data->position[2] + (data->velocity[2] * 10)),data->speed,1,1,1,1,45000);
+	
+	gPlayer[t_index].last_active = GetTickCount();
 }
 
 void FMPHook::PlayerDisconnect(short index)
@@ -420,7 +400,7 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	Natives::AddArmourToChar(gPlayer[data.client].PedID, data.armor);
 	Natives::SetCharInvincible(gPlayer[data.client].PedID, 1);
 	Natives::SetBlockingOfNonTemporaryEvents(gPlayer[data.client].PedID, 1);
-
+	
 	if(data.room != 0) Natives::SetRoomForCharByKey(gPlayer[data.client].PedID, (eInteriorRoomKey)data.room);
 	Log::Info(L"Player SPAWN END");
 	if(Natives::DoesCharExist(old)) Natives::DeleteChar(&old);

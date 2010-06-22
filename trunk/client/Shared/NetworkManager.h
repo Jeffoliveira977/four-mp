@@ -22,18 +22,14 @@ public:
 	void ConnectToServer(const char *hostname = "", const unsigned short port = 7777);
 
 	void SendClientConnectionRequest(void);
-	void SendPlayerMove(const float speed);
-	void SendPlayerJump(void);
-	void SendPlayerDuck(void);
+	void SendPlayerFootSync(NetworkPlayerFootData data);
+	void SendPlayerVehicleSync(NetworkPlayerVehicleData data);
+
 	void SendPlayerStartEntranceInVehicle(void);
 	void SendPlayerCancelEntranceInVehicle(void);
 	void SendPlayerFinishEntranceInVehicle(void);
 	void SendPlayerStartExitFromVehicle(void);
 	void SendPlayerFinishExitFromVehicle(void);
-	void SendPlayerFire(const float position[3], const int time, const short target, const unsigned char health, const unsigned int armor);
-	void SendPlayerAim(const float position[3], const int time);
-	void SendPlayerWeaponChange(void);
-	void SendPlayerHealthAndArmorChange(void);
 	void SendPlayerSpawnRequest(void);
 	void SendPlayerModelChange(void);
 	void SendPlayerComponentsChange(void);
@@ -46,19 +42,14 @@ public:
 	void RecieveGameTimeChange(NetworkGameTimeChangeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerFullUpdate(NetworkPlayerFullUpdateData data, RakNet::RPC3 *serverrpc3);
 	void RecieveVehicleFullUpdate(NetworkVehicleFullUpdateData data, RakNet::RPC3 *serverrpc3);
-	void RecievePlayerMove(NetworkPlayerMoveData data, RakNet::RPC3 *serverrpc3);
-	void RecievePlayerJump(NetworkPlayerJumpData data, RakNet::RPC3 *serverrpc3);
-	void RecievePlayerDuck(NetworkPlayerDuckData data, RakNet::RPC3 *serverrpc3);
+	void RecievePlayerFootSync(NetworkPlayerFootData data, RakNet::RPC3 *serverrpc3);
+	void RecievePlayerVehicleSync(NetworkPlayerVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerStartEntranceInVehicle(NetworkPlayerStartEntranceInVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerCancelEntranceInVehicle(NetworkPlayerCancelEntranceInVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerFinishEntranceInVehicle(NetworkPlayerFinishEntranceInVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerStartExitFromVehicle(NetworkPlayerStartExitFromVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerFinishExitFromVehicle(NetworkPlayerFinishExitFromVehicleData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerWeaponGift(NetworkPlayerWeaponGiftData data, RakNet::RPC3 *serverrpc3);
-	void RecievePlayerFire(NetworkPlayerFireData data, RakNet::RPC3 *serverrpc3);
-	void RecievePlayerAim(NetworkPlayerAimData, RakNet::RPC3 *serverrpc3);
-	void RecievePlayerWeaponChange(NetworkPlayerWeaponChangeData data, RakNet::RPC3 *serverrpc3);
-	void RecievePlayerHealthAndArmorChange(NetworkPlayerHealthAndArmorChangeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerSpawnPositionChange(NetworkPlayerSpawnPositionChangeData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerSpawn(NetworkPlayerSpawnData data, RakNet::RPC3 *serverrpc3);
 	void RecievePlayerModelChange(NetworkPlayerModelChangeData data, RakNet::RPC3 *serverrpc3);
@@ -82,19 +73,14 @@ private:
 		NetworkRPCGameTimeChange,
 		NetworkRPCPlayerFullUpdate,
 		NetworkRPCVehicleFullUpdate,
-		NetworkRPCPlayerMove,
-		NetworkRPCPlayerJump,
-		NetworkRPCPlayerDuck,
+		NetworkRPCPlayerFootSync,
+		NetworkRPCPlayerVehicleSync,
 		NetworkRPCPlayerStartEntranceInVehicle,
 		NetworkRPCPlayerCancelEntranceInVehicle,
 		NetworkRPCPlayerFinishEntranceInVehicle,
 		NetworkRPCPlayerStartExitFromVehicle,
 		NetworkRPCPlayerFinishExitFromVehicle,
 		NetworkRPCPlayerWeaponGift,
-		NetworkRPCPlayerFire,
-		NetworkRPCPlayerAim,
-		NetworkRPCPlayerWeaponChange,
-		NetworkRPCPlayerHealthAndArmorChange,
 		NetworkRPCPlayerSpawnPositionChange,
 		NetworkRPCPlayerSpawn,
 		NetworkRPCPlayerModelChange,
@@ -112,19 +98,14 @@ private:
 		NetworkGameTimeChangeData *gametimechange;
 		NetworkPlayerFullUpdateData *playerfullupdate;
 		NetworkVehicleFullUpdateData *vehiclefullupdate;
-		NetworkPlayerMoveData *playermove;
-		NetworkPlayerJumpData *playerjump;
-		NetworkPlayerDuckData *playerduck;
+		NetworkPlayerFootData *playerfoot;
+		NetworkPlayerVehicleData *playervehicle;
 		NetworkPlayerStartEntranceInVehicleData *playerstartentranceinvehicle;
 		NetworkPlayerCancelEntranceInVehicleData *playercancelentranceinvehicle;
 		NetworkPlayerFinishEntranceInVehicleData *playerfinishentranceinvehicle;
 		NetworkPlayerStartExitFromVehicleData *playerstartexitfromvehicle;
 		NetworkPlayerFinishExitFromVehicleData *playerfinishexitfromvehicle;
 		NetworkPlayerWeaponGiftData *playerweapongift;
-		NetworkPlayerFireData *playerfire;
-		NetworkPlayerAimData *playeraim;
-		NetworkPlayerWeaponChangeData *playerweaponchange;
-		NetworkPlayerHealthAndArmorChangeData *playerhealthandarmorchange;
 		NetworkPlayerSpawnPositionChangeData *playerspawnpositionchange;
 		NetworkPlayerSpawnData *playerspawn;
 		NetworkPlayerModelChangeData *playermodelchange;

@@ -4,7 +4,7 @@
 #include "Limits.h"
 #include "ClientDefines.h"
 
-#define PROTOCOL_VERSION 16
+#define PROTOCOL_VERSION 17
 
 #define DEFAULT_SERVER_NETWORK_ID 0
 #define DEFAULT_CLIENT_NETWORK_ID 65534
@@ -77,23 +77,37 @@ struct NetworkPlayerFullUpdateData
 	unsigned char color[4];
 };
 
-struct NetworkPlayerMoveData
+struct NetworkPlayerFootData
 {
-	short client;
-	float position[3];
-	float angle;
-	float speed;
+	short			client;
+	float			position[3];
+	float			velocity[3];
+	int				keys[3];
+	float			angle;
+	float			speed;
+	unsigned int	health;
+	unsigned int	armour;
+	eWeapon			weapon;
+	unsigned int	ammo;
+	char			is_dunk;
+	char			is_jump;
+	char			aim_sync;
+	char			shot_time;
+	float			shot_position[3];
 };
 
-struct NetworkPlayerJumpData
+struct NetworkPlayerVehicleData
 {
-	short client;
-};
-
-struct NetworkPlayerDuckData
-{
-	short client;
-	bool shouldduck;
+	short			client;
+	float			position[3];
+	float			velocity[3];
+	int				keys[3];
+	float			angle;
+	float			speed;
+	unsigned int	health;
+	unsigned int	armour;
+	unsigned int	v_health;
+	int				v_id;
 };
 
 struct NetworkPlayerStartEntranceInVehicleData
