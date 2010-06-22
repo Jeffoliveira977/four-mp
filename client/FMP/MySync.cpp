@@ -38,10 +38,8 @@ void FMPHook::FootSync()
 	Natives::GetCharSpeed(gPlayer[client.GetIndex()].PedID, &own_foot_sync.speed);
 	Natives::GetCurrentCharWeapon(gPlayer[client.GetIndex()].PedID, &own_foot_sync.weapon);
 	//Natives::GetAmmoInCharWeapon(gPlayer[client.GetIndex()].PedID, own_foot_sync.weapon, &own_foot_sync.ammo);
-	if(Natives::IsCharDucking(gPlayer[client.GetIndex()].PedID)) own_foot_sync.is_dunk = 1;
-	else own_foot_sync.is_dunk = 0;
-	if(Natives::IsCharInAir(gPlayer[client.GetIndex()].PedID)) own_foot_sync.is_jump = 1;
-	else own_foot_sync.is_jump = 0;
+	own_foot_sync.is_dunk = Natives::IsCharDucking(gPlayer[client.GetIndex()].PedID);
+	own_foot_sync.is_jump = Natives::IsCharInAir(gPlayer[client.GetIndex()].PedID);
 	if(!Natives::IsControlPressed(0, 137)) // Fire
 	{
 		own_foot_sync.shot_time = GetTickCount() - gPlayer[client.GetIndex()].last_active;
@@ -84,6 +82,12 @@ void FMPHook::VehicleSync()
 	}
 	// write info in our temp sync struct
 	Natives::GetCarCharIsUsing(gPlayer[client.GetIndex()].PedID, &t_car);
+	if(!Natives::DoesVehicleExist(t_car))
+	{
+		Log::Warning(L"Vehicle nto exist");
+		return;
+	}
+
 	own_veh_sync.v_id = GetPlayerCar(t_car);
 	Natives::GetCarCoordinates(t_car, &own_veh_sync.position[0],&own_veh_sync.position[1],&own_veh_sync.position[2]);
 	Natives::GetCarSpeedVector(t_car,&t_vec3,false);
@@ -91,10 +95,21 @@ void FMPHook::VehicleSync()
 	own_veh_sync.velocity[1] = t_vec3.Y;
 	own_veh_sync.velocity[2] = t_vec3.Z;
 	Natives::GetCarSpeed(t_car,&own_veh_sync.speed);
-	Natives::GetCarHeading(t_car, &own_veh_sync.angle);
+	//Natives::GetCarHeading(t_car, &own_veh_sync.angle);
 	Natives::GetCarHealth(t_car, &own_veh_sync.v_health);
+	own_veh_sync.v_e_health = Natives::GetEngineHealth(t_car);
 	Natives::GetCharHealth(gPlayer[client.GetIndex()].PedID, &own_veh_sync.health);
 	Natives::GetCharArmour(gPlayer[client.GetIndex()].PedID, &own_veh_sync.armour);
+	own_veh_sync.siren = Natives::IsCarSirenOn(t_car);
+	Natives::GetVehicleQuaternion(t_car, &own_veh_sync.angle[0], &own_veh_sync.angle[1], &own_veh_sync.angle[2]);
+	Log::Debug(L"QUA: %f %f %f", own_veh_sync.angle[0], own_veh_sync.angle[1], own_veh_sync.angle[2]);
+
+	for(char door_id = 0; door_id < 6; door_id++)
+		Natives::GetDoorAngleRatio(t_car, (eVehicleDoor)door_id, &own_veh_sync.door_angle[door_id]);
+
+	for(char tyre_id = 0; tyre_id < 4; tyre_id++)
+		own_veh_sync.is_tyre_burst[tyre_id] = Natives::IsCarTyreBurst(t_car, (eVehicleTyre)tyre_id);
+
 	// send sync to server
 	nm.SendPlayerVehicleSync(own_veh_sync);
 }
