@@ -37,10 +37,11 @@ void FMPHook::FootSync()
 	Natives::GetCharArmour(gPlayer[client.GetIndex()].PedID, &own_foot_sync.armour);
 	Natives::GetCharSpeed(gPlayer[client.GetIndex()].PedID, &own_foot_sync.speed);
 	Natives::GetCurrentCharWeapon(gPlayer[client.GetIndex()].PedID, &own_foot_sync.weapon);
-	//Natives::GetAmmoInCharWeapon(gPlayer[client.GetIndex()].PedID, own_foot_sync.weapon, &own_foot_sync.ammo);
+	if(own_foot_sync.weapon != WEAPON_UNARMED) Natives::GetAmmoInCharWeapon(gPlayer[client.GetIndex()].PedID, own_foot_sync.weapon, &own_foot_sync.ammo);
+	else own_foot_sync.ammo = 0;
 	own_foot_sync.is_dunk = Natives::IsCharDucking(gPlayer[client.GetIndex()].PedID);
 	own_foot_sync.is_jump = Natives::IsCharInAir(gPlayer[client.GetIndex()].PedID);
-	if(!Natives::IsControlPressed(0, 137)) // Fire
+	if(Natives::IsControlPressed(0, 137)) // Fire
 	{
 		own_foot_sync.shot_time = GetTickCount() - gPlayer[client.GetIndex()].last_active;
 
@@ -54,7 +55,7 @@ void FMPHook::FootSync()
 
 		own_foot_sync.aim_sync = 2; // fire id
 	}
-	else if(!Natives::IsControlPressed(0, 138)) // Aim
+	else if(Natives::IsControlPressed(0, 138)) // Aim
 	{
 		own_foot_sync.shot_time = GetTickCount() - gPlayer[client.GetIndex()].last_active;
 
@@ -95,17 +96,19 @@ void FMPHook::VehicleSync()
 	own_veh_sync.velocity[1] = t_vec3.Y;
 	own_veh_sync.velocity[2] = t_vec3.Z;
 	Natives::GetCarSpeed(t_car,&own_veh_sync.speed);
-	//Natives::GetCarHeading(t_car, &own_veh_sync.angle);
 	Natives::GetCarHealth(t_car, &own_veh_sync.v_health);
 	own_veh_sync.v_e_health = Natives::GetEngineHealth(t_car);
 	Natives::GetCharHealth(gPlayer[client.GetIndex()].PedID, &own_veh_sync.health);
 	Natives::GetCharArmour(gPlayer[client.GetIndex()].PedID, &own_veh_sync.armour);
 	own_veh_sync.siren = Natives::IsCarSirenOn(t_car);
-	Natives::GetVehicleQuaternion(t_car, &own_veh_sync.angle[0], &own_veh_sync.angle[1], &own_veh_sync.angle[2]);
-	Log::Debug(L"QUA: %f %f %f", own_veh_sync.angle[0], own_veh_sync.angle[1], own_veh_sync.angle[2]);
+	Natives::GetVehicleQuaternion(t_car,&own_veh_sync.qua[0],&own_veh_sync.qua[1],&own_veh_sync.qua[2],&own_veh_sync.qua[3]);
+	Natives::GetCarHeading(t_car, &own_veh_sync.angle);
 
 	for(char door_id = 0; door_id < 6; door_id++)
+	{
+		own_veh_sync.door_open[door_id] = Natives::IsCarDoorFullyOpen(t_car, (eVehicleDoor)door_id);
 		Natives::GetDoorAngleRatio(t_car, (eVehicleDoor)door_id, &own_veh_sync.door_angle[door_id]);
+	}
 
 	for(char tyre_id = 0; tyre_id < 4; tyre_id++)
 		own_veh_sync.is_tyre_burst[tyre_id] = Natives::IsCarTyreBurst(t_car, (eVehicleTyre)tyre_id);

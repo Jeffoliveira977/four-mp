@@ -147,6 +147,7 @@ private:
 	Camera						t_cam;
 	float						t_cam_position[6];
 	Vector3						t_vec3;
+	unsigned int				t_uint;
 	NetworkPlayerFootData		own_foot_sync;
 	NetworkPlayerVehicleData	own_veh_sync;
 

@@ -614,8 +614,8 @@ namespace Natives
     static void ShutCarDoor(Vehicle vehicle, eVehicleDoor door) { NativeInvoke::Invoke<NATIVE_SHUT_CAR_DOOR, ScriptVoid>(vehicle, door); }
     static void SoundCarHorn(Vehicle vehicle, unsigned int duration) { NativeInvoke::Invoke<NATIVE_SOUND_CAR_HORN, ScriptVoid>(vehicle, duration); }
     static void WashVehicleTextures(Vehicle vehicle, unsigned int intensity) { NativeInvoke::Invoke<NATIVE_WASH_VEHICLE_TEXTURES, ScriptVoid>(vehicle, intensity); }
-    static void GetVehicleQuaternion(Vehicle vehicle, float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_VEHICLE_QUATERNION, ScriptVoid>(vehicle, pX, pY, pZ); }
-    static void SetVehicleQuaternion(Vehicle vehicle, float pX, float pY, float pZ) { NativeInvoke::Invoke<NATIVE_SET_VEHICLE_QUATERNION, ScriptVoid>(vehicle, pX, pY, pZ); }
+    static void GetVehicleQuaternion(Vehicle vehicle, float *pX, float *pY, float *pZ, float *scal) { NativeInvoke::Invoke<NATIVE_GET_VEHICLE_QUATERNION, ScriptVoid>(vehicle, pX, pY, pZ, scal); }
+    static void SetVehicleQuaternion(Vehicle vehicle, float pX, float pY, float pZ, float scal) { NativeInvoke::Invoke<NATIVE_SET_VEHICLE_QUATERNION, ScriptVoid>(vehicle, pX, pY, pZ, scal); }
 	static void SwitchCarSiren(Vehicle vehicle, bool siren) { NativeInvoke::Invoke<NATIVE_SWITCH_CAR_SIREN, ScriptVoid>(vehicle, siren); }
 
     // Train

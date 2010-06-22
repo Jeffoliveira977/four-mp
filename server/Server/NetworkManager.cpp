@@ -863,7 +863,6 @@ void NetworkManager::HandleClientConnectionConfirmation(const NetworkPlayerConne
 	delete playerdata;
 	server.UpdateServerInfo();
 
-	vmm.OnPlayerSpawn(data->client);
 	NetworkPlayerSpawnData data2;
 	data2.armor = playm.playerbuffer[data->client]->armor;
 	data2.health = playm.playerbuffer[data->client]->health;
@@ -874,6 +873,7 @@ void NetworkManager::HandleClientConnectionConfirmation(const NetworkPlayerConne
 	memcpy(data2.compT, playm.playerbuffer[data->client]->compT, sizeof(int) * 11);
 	data2.client = data->client;
 	this->SendDataToAll("&NetworkManager::RecievePlayerSpawn", &data2);
+	//vmm.OnPlayerSpawn(data->client);
 }
 
 void NetworkManager::HandlePlayerFootSync(const NetworkPlayerFootData *data)
@@ -892,7 +892,7 @@ void NetworkManager::HandlePlayerFootSync(const NetworkPlayerFootData *data)
 		playm.playerbuffer[data->client]->armor = data->armour;
 		vmm.OnPlayerSpawn(data->client);
 	}
-	else
+	else if(playm.playerbuffer[data->client]->health != -1) // already death
 	{
 		playm.playerbuffer[data->client]->health = data->health;
 		playm.playerbuffer[data->client]->armor = data->armour;
@@ -900,9 +900,10 @@ void NetworkManager::HandlePlayerFootSync(const NetworkPlayerFootData *data)
 	if (playm.playerbuffer[data->client]->health < 100)
 	{
 		vmm.OnPlayerDeath(data->client, INVALID_PLAYER_INDEX, 46);
+		playm.playerbuffer[data->client]->health = -1;
 	}
 	memcpy(playm.playerbuffer[data->client]->position, data->position, sizeof(float) * 3);
-	playm.playerbuffer[data->client]->angle[2] = data->angle;
+	playm.playerbuffer[data->client]->angle = data->angle;
 	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerFootSync", data->client, data);
 }
 
@@ -917,10 +918,10 @@ void NetworkManager::HandlePlayerVehicleSync(const NetworkPlayerVehicleData *dat
 		return;
 	}
 	memcpy(playm.playerbuffer[data->client]->position, data->position, sizeof(float) * 3);
-	memcpy(playm.playerbuffer[data->client]->angle, data->angle, sizeof(float)*3);
+	playm.playerbuffer[data->client]->angle = data->angle;
 	playm.playerbuffer[data->client]->vehicleindex = data->v_id;
 	vm.SetVehiclePositionInternal(playm.playerbuffer[data->client]->vehicleindex, data->position);
-	vm.SetVehicleAngleInternal(playm.playerbuffer[data->client]->vehicleindex, data->angle[2]);
+	vm.SetVehicleAngleInternal(playm.playerbuffer[data->client]->vehicleindex, data->angle);
 	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerVehicleSync", data->client, data);
 }
 
@@ -1229,7 +1230,7 @@ NetworkPlayerFullUpdateData *NetworkManager::GetPlayerFullUpdateData(const short
 	wcscpy(data->name, playm.playerbuffer[index]->name);
 	data->model = playm.playerbuffer[index]->model;
 	memcpy(data->position, playm.playerbuffer[index]->position, sizeof(float) * 3);
-	data->angle = playm.playerbuffer[index]->angle[2];
+	data->angle = playm.playerbuffer[index]->angle;
 	data->vehicleindex = playm.playerbuffer[index]->vehicleindex;
 	data->seatindex = playm.playerbuffer[index]->seatindex;
 	data->score = playm.playerbuffer[index]->score;

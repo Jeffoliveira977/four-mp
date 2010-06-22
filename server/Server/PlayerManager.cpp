@@ -137,7 +137,7 @@ bool PlayerManager::GetPlayerAngle(const short index, float &angle)
 	{
 		return false;
 	}
-	angle = playerbuffer[index]->angle[2];
+	angle = playerbuffer[index]->angle;
 	return true;
 }
 
@@ -262,7 +262,7 @@ bool PlayerManager::SetPlayerPosition(const short index, const float position[3]
 		return false;
 	}
 	memcpy(playerbuffer[index]->position, position, sizeof(float) * 3);
-	nm.SendPlayerPosition(index, position, playerbuffer[index]->angle[2]);
+	nm.SendPlayerPosition(index, position, playerbuffer[index]->angle);
 	return true;
 }
 
@@ -502,7 +502,7 @@ bool PlayerManager::RegisterNewPlayer(const short index, wchar_t (&name)[MAX_CLI
 	playerbuffer[index]->position[0] = DEFAULT_PLAYER_X;
 	playerbuffer[index]->position[1] = DEFAULT_PLAYER_Y;
 	playerbuffer[index]->position[2] = DEFAULT_PLAYER_Z;
-	memset(playerbuffer[index]->angle, 0, sizeof(float)*3);
+	playerbuffer[index]->angle = 0.0;
 	playerbuffer[index]->isducking = false;
 	for(unsigned char i = 0; i < 8; i++)
 	{
