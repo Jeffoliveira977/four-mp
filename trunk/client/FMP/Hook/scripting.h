@@ -614,6 +614,9 @@ namespace Natives
     static void ShutCarDoor(Vehicle vehicle, eVehicleDoor door) { NativeInvoke::Invoke<NATIVE_SHUT_CAR_DOOR, ScriptVoid>(vehicle, door); }
     static void SoundCarHorn(Vehicle vehicle, unsigned int duration) { NativeInvoke::Invoke<NATIVE_SOUND_CAR_HORN, ScriptVoid>(vehicle, duration); }
     static void WashVehicleTextures(Vehicle vehicle, unsigned int intensity) { NativeInvoke::Invoke<NATIVE_WASH_VEHICLE_TEXTURES, ScriptVoid>(vehicle, intensity); }
+    static void GetVehicleQuaternion(Vehicle vehicle, float *pX, float *pY, float *pZ) { NativeInvoke::Invoke<NATIVE_GET_VEHICLE_QUATERNION, ScriptVoid>(vehicle, pX, pY, pZ); }
+    static void SetVehicleQuaternion(Vehicle vehicle, float pX, float pY, float pZ) { NativeInvoke::Invoke<NATIVE_SET_VEHICLE_QUATERNION, ScriptVoid>(vehicle, pX, pY, pZ); }
+	static void SwitchCarSiren(Vehicle vehicle, bool siren) { NativeInvoke::Invoke<NATIVE_SWITCH_CAR_SIREN, ScriptVoid>(vehicle, siren); }
 
     // Train
     static void CreateMissionTrain(unsigned int unknown1, float x, float y, float z, bool unknown2, Train *pTrain) { NativeInvoke::Invoke<NATIVE_CREATE_MISSION_TRAIN, ScriptVoid>(unknown1, x, y, z, unknown2, pTrain); }

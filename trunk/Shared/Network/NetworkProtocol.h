@@ -102,12 +102,16 @@ struct NetworkPlayerVehicleData
 	float			position[3];
 	float			velocity[3];
 	int				keys[3];
-	float			angle;
+	float			angle[3];
+	float			door_angle[6];
 	float			speed;
 	unsigned int	health;
 	unsigned int	armour;
 	unsigned int	v_health;
+	unsigned int	v_e_health;
 	int				v_id;
+	bool			siren;
+	bool			is_tyre_burst[4];
 };
 
 struct NetworkPlayerStartEntranceInVehicleData

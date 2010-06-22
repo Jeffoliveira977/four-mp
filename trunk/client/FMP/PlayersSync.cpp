@@ -158,7 +158,17 @@ void FMPHook::PlayerVehicleSync(NetworkPlayerVehicleData* data)
 	
 	Natives::SetCarCoordinates(t_car, data->position[0],data->position[1],data->position[2]);
 	Natives::SetCarHealth(t_car, data->v_health);
-	Natives::SetCarHeading(t_car, data->angle);
+	//Natives::SetCarHeading(t_car, data->angle);
+	Natives::SetEngineHealth(t_car, data->v_e_health);
+	Natives::SwitchCarSiren(t_car, data->siren);
+	Natives::SetVehicleQuaternion(t_car, data->angle[0], data->angle[1], data->angle[2]);
+
+	for(char door_id = 0; door_id < 6; door_id++)
+		Natives::ControlCarDoor(t_car, (eVehicleDoor)door_id, 1, data->door_angle[door_id]);
+
+	for(char tyre_id = 0; tyre_id < 4; tyre_id++)
+		if(data->is_tyre_burst[tyre_id]) Natives::BurstCarTyre(t_car, (eVehicleTyre)tyre_id);
+
 	Natives::SetCharHealth(gPlayer[t_index].PedID, data->health);
 	Natives::AddArmourToChar(gPlayer[t_index].PedID, data->armour);
 	// show drive (try...)
@@ -373,11 +383,11 @@ void FMPHook::PlayerSyncSkinVariation(short index, int sm[11], int st[11])
 void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 {
 	Log::Info(L"Spawn %d (%d)", data.client, client.GetIndex());
-	if(data.client == client.GetIndex()) 
+	/*if(data.client == client.GetIndex()) 
 	{
 		Log::Info(L"Its me");
 		return;
-	}
+	}*/
 	if(!SafeCheckPlayer(data.client)) 
 	{
 		return;
@@ -387,7 +397,15 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	Ped old = gPlayer[data.client].PedID;
 	
 	SafeRequestModel(data.model);
-	Natives::CreateChar(1, (eModel)data.model, data.position[0], data.position[1], data.position[2], &gPlayer[data.client].PedID, 1);
+	if(data.client == client.GetIndex()) 
+	{
+		Natives::ChangePlayerModel(_GetPlayer(), (eModel)data.model);
+		wait(100);
+		gPlayer[data.client].PedID = _GetPlayerPed();
+		Natives::SetCharCoordinates(_GetPlayerPed(), data.position[0], data.position[1], data.position[2]);
+	}
+	else
+		Natives::CreateChar(1, (eModel)data.model, data.position[0], data.position[1], data.position[2], &gPlayer[data.client].PedID, 1);
 
 	while(!Natives::DoesCharExist(gPlayer[data.client].PedID)) wait(0);
 
@@ -403,6 +421,6 @@ void FMPHook::xPlayerSpawn(NetworkPlayerSpawnData data)
 	
 	if(data.room != 0) Natives::SetRoomForCharByKey(gPlayer[data.client].PedID, (eInteriorRoomKey)data.room);
 	Log::Info(L"Player SPAWN END");
-	if(Natives::DoesCharExist(old)) Natives::DeleteChar(&old);
+	if(Natives::DoesCharExist(old) && data.client != client.GetIndex()) Natives::DeleteChar(&old);
 	Log::Info(L"Player Old Delete END");
 }
