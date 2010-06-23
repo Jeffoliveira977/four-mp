@@ -171,6 +171,7 @@ public:
 	Vehicle _GetPedVehicle(Ped p);
 	Player _GetPlayer();
 	int GetCarDrive(Vehicle car);
+	void GetTarget(float ax, float az, float *x, float *y, float *z, float mn = 5);
 	void GetCamTargetedCoords(float *x, float *y, float *z);
 	void GetMyPos();
 	void SetMyPos(float x, float y, float z);
