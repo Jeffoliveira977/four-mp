@@ -182,14 +182,23 @@ void FMPHook::PlayerVehicleSync(NetworkPlayerVehicleData* data)
 	Natives::SwitchCarSiren(t_car, data->siren);
 	Natives::SetVehicleQuaternion(t_car, data->qua[0], data->qua[1], data->qua[2], data->qua[3]);
 
+	bool closeall = 1;
 	for(char door_id = 0; door_id < 6; door_id++)
 	{
 		if(data->door_open[door_id] == 1) Natives::ControlCarDoor(t_car, (eVehicleDoor)door_id, 1, data->door_angle[door_id]);
 		else Natives::ControlCarDoor(t_car, (eVehicleDoor)door_id, 0, data->door_angle[door_id]);
+
+		if(data->door_open[door_id] != 0) closeall = 0;
+
+		if(data->door_damaged[door_id]) Natives::BreakCarDoor(t_car, (eVehicleDoor)door_id, 0);
 	}
 
-	for(char tyre_id = 0; tyre_id < 4; tyre_id++)
+	if(closeall) Natives::CloseAllCarDoors(t_car);
+
+	for(char tyre_id = 0; tyre_id < 8; tyre_id++)
 		if(data->is_tyre_burst[tyre_id]) Natives::BurstCarTyre(t_car, (eVehicleTyre)tyre_id);
+
+	if(data->is_dead) Natives::ExplodeCar(t_car, 1, 0);
 
 	Natives::SetCharHealth(gPlayer[t_index].PedID, data->health);
 	Natives::AddArmourToChar(gPlayer[t_index].PedID, data->armour);

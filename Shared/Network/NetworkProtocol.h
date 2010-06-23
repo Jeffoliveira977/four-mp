@@ -113,7 +113,9 @@ struct NetworkPlayerVehicleData
 	unsigned int	v_e_health;
 	int				v_id;
 	char			siren;
-	char			is_tyre_burst[4];
+	char			is_tyre_burst[8];
+	char			door_damaged[6];	
+	bool			is_dead;
 };
 
 struct NetworkPlayerStartEntranceInVehicleData
