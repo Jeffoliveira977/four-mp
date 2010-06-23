@@ -9,19 +9,19 @@ extern FVehicle gVehicle[MAX_VEHICLES];
 
 using namespace Natives;
 
-/*int FMPHook::GetCarDrive(Vehicle car)
+int FMPHook::GetCarDrive(Vehicle car)
 {
-	Log::Debug("CraDrive %d", car);
-	if(!DoesVehicleExist(car)) { Log::Debug("DOES"); return 1; }
-	Log::Debug("CarDrive x%dx", 1);
-	if(IsCarStopped(car)) { Log::Debug("STOP"); return 0; }
+	Log::Debug(L"CraDrive %d", car);
+	if(!DoesVehicleExist(car)) { Log::Debug(L"DOES"); return 1; }
+	Log::Debug(L"CarDrive x%dx", 1);
+	if(IsCarStopped(car)) { Log::Debug(L"STOP"); return 0; }
 	Vector3 v;
-	Log::Debug("CarDrive x%dx", 2);
+	Log::Debug(L"CarDrive x%dx", 2);
 	GetCarSpeedVector(car, &v, 1);
-	Log::Debug("CarDrive x%dx", 3);
+	Log::Debug(L"CarDrive x%dx", 3);
 	float x = floor(v.X * 1000 + 0.5)/1000;
 	float y = floor(v.Y * 1000 + 0.5)/1000;
-	Log::Debug("CarDrive x%dx - %fx%f", x, y);
+	Log::Debug(L"CarDrive x%dx - %fx%f", x, y);
 	if(abs(x) > abs(y))
 	{
 		// ось движения Х (основная)
@@ -34,21 +34,20 @@ using namespace Natives;
 		if(y < 0)
 			return -1;
 	}
-	Log::Debug("CarDrive x%dx", 5);
+	Log::Debug(L"CarDrive x%dx", 5);
 	return 1;
-}*/
+}
 
-float a, b, c, s;
-
-void GetTarget(float ax, float az, float *x, float *y, float *z, float mn = 5)
+void FMPHook::GetTarget(float ax, float az, float *x, float *y, float *z, float mn)
 {
+	float a, b, c, s;
 
-	c = sqrt(2.8f * 2.0f)*mn;
+	c = Sqrt(2.8f * 2.0f)*mn;
 	
-	s = c * cos(ax);
-	b = s * cos(az);
-	a = sqrt( (b*b) + (s*s) - ( 2*b*s * cos(az) ) );
-	c = sqrt( ((s*s)/(cos(ax)*cos(ax))) - (s*s) );
+	s = c * Cos(ax);
+	b = s * Cos(az);
+	a = Sqrt( (b*b) + (s*s) - ( 2*b*s * Cos(az) ) );
+	c = Sqrt( ((s*s)/(Cos(ax)*Cos(ax))) - (s*s) );
 
 	if(ax < 0 || ax >= 180) c = -c;
 	if(((az >= 90 && az <= 270) || az <= -90) && b > 0) b=-b;
@@ -57,27 +56,22 @@ void GetTarget(float ax, float az, float *x, float *y, float *z, float mn = 5)
 	*x=a; *y=b; *z=c;
 }
 
-/*void FMPHook::GetCamTargetedCoords(float *x, float *y, float *z)
+void FMPHook::GetCamTargetedCoords(float *x, float *y, float *z)
 {
-	Log::Info("TARGET %d", 0);
 	Camera cam;
 	float cx, cy, cz;
 	float ax, ay, az;
 	float a, b, c;
-	Log::Info("TARGET %d", 1);
+
 	GetGameCam(&cam);
-	Log::Info("TARGET %d", 11);
 	GetCamPos(cam, &cx, &cy, &cz);
-	Log::Info("TARGET %d", 12);
 	GetCamRot(cam, &ax, &ay, &az);
-	Log::Info("TARGET %d", 2);
+
 	GetTarget(ax, az, &a, &b, &c);
-	Log::Info("TARGET %d", 3);
 	*x = a + cx;
 	*y = b + cy;
 	*z = c + cz;
-	Log::Info("TARGET %d", 4);
-}*/
+}
 
 float GetDist(float x1,float y1,float z1,float x2, float y2, float z2)
 {

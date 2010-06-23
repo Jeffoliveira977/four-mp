@@ -45,13 +45,14 @@ void FMPHook::FootSync()
 	{
 		own_foot_sync.shot_time = GetTickCount() - gPlayer[client.GetIndex()].last_active;
 
-		Natives::GetGameCam(&t_cam);
+		/*Natives::GetGameCam(&t_cam);
 		Natives::GetCamRot(t_cam, &t_cam_position[0],&t_cam_position[1],&t_cam_position[2]);
 		GetTarget(t_cam_position[0],t_cam_position[2], &t_cam_position[3], &t_cam_position[4], &t_cam_position[5], 5);
 		Natives::GetCamPos(t_cam, &t_cam_position[0],&t_cam_position[1],&t_cam_position[2]);
 		t_cam_position[0] += t_cam_position[3];
 		t_cam_position[1] += t_cam_position[4];
-		t_cam_position[2] += t_cam_position[5];
+		t_cam_position[2] += t_cam_position[5];*/
+		GetCamTargetedCoords(&own_foot_sync.shot_position[0], &own_foot_sync.shot_position[1], &own_foot_sync.shot_position[2]);
 
 		own_foot_sync.aim_sync = 2; // fire id
 	}
@@ -59,13 +60,14 @@ void FMPHook::FootSync()
 	{
 		own_foot_sync.shot_time = GetTickCount() - gPlayer[client.GetIndex()].last_active;
 
-		Natives::GetGameCam(&t_cam);
+		/*Natives::GetGameCam(&t_cam);
 		Natives::GetCamRot(t_cam, &t_cam_position[0],&t_cam_position[1],&t_cam_position[2]);
 		GetTarget(t_cam_position[0],t_cam_position[2], &t_cam_position[3], &t_cam_position[4], &t_cam_position[5], 5);
 		Natives::GetCamPos(t_cam, &t_cam_position[0],&t_cam_position[1],&t_cam_position[2]);
 		t_cam_position[0] += t_cam_position[3];
 		t_cam_position[1] += t_cam_position[4];
-		t_cam_position[2] += t_cam_position[5];
+		t_cam_position[2] += t_cam_position[5];*/
+		GetCamTargetedCoords(&own_foot_sync.shot_position[0], &own_foot_sync.shot_position[1], &own_foot_sync.shot_position[2]);
 
 		own_foot_sync.aim_sync = 1; // aim id
 	}

@@ -115,7 +115,7 @@ struct NetworkPlayerVehicleData
 	char			siren;
 	char			is_tyre_burst[8];
 	char			door_damaged[6];	
-	bool			is_dead;
+	char			is_dead;
 };
 
 struct NetworkPlayerStartEntranceInVehicleData
