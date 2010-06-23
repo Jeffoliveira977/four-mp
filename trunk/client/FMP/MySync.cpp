@@ -104,13 +104,16 @@ void FMPHook::VehicleSync()
 	Natives::GetVehicleQuaternion(t_car,&own_veh_sync.qua[0],&own_veh_sync.qua[1],&own_veh_sync.qua[2],&own_veh_sync.qua[3]);
 	Natives::GetCarHeading(t_car, &own_veh_sync.angle);
 
+	own_veh_sync.is_dead = Natives::IsCarDead(t_car);
+
 	for(char door_id = 0; door_id < 6; door_id++)
 	{
 		own_veh_sync.door_open[door_id] = Natives::IsCarDoorFullyOpen(t_car, (eVehicleDoor)door_id);
 		Natives::GetDoorAngleRatio(t_car, (eVehicleDoor)door_id, &own_veh_sync.door_angle[door_id]);
+		own_veh_sync.door_damaged[door_id] = Natives::IsCarDoorDamaged(t_car, (eVehicleDoor)door_id);
 	}
 
-	for(char tyre_id = 0; tyre_id < 4; tyre_id++)
+	for(char tyre_id = 0; tyre_id < 8; tyre_id++)
 		own_veh_sync.is_tyre_burst[tyre_id] = Natives::IsCarTyreBurst(t_car, (eVehicleTyre)tyre_id);
 
 	// send sync to server
