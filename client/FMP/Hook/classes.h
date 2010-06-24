@@ -186,9 +186,9 @@ public:
 
 	// -- Safe func
 	void CheckAndCheck();
-	bool SafeCheckPlayer(short index, bool bReCreateOnFalse = 1);
+	bool SafeCheckPlayer(short index, float radius = 250, bool bReCreateOnFalse = 1);
 	bool SafeCreatePlayer(short index);
-	bool SafeCheckVehicle(short index, bool bReCreateOnFalse = 1);
+	bool SafeCheckVehicle(short index, float radius = 250, bool bReCreateOnFalse = 1);
 	bool SafeCreateVehicle(short index);
 	bool SafeChangeModel(unsigned int model);
 	void SafeCleanVehicles();
@@ -231,5 +231,5 @@ public:
 
 	// -- My sync
 	void FootSync();
-	void VehicleSync();
+	void VehicleSync(short);
 };
