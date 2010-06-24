@@ -282,9 +282,9 @@ bool FMPHook::SafeCheckPlayer(short index, float radius, bool bReCreateOnFalse)
 		}
 		else
 		{
-			if(!FloatRange(gPlayer[index].position[0], gPlayer[client.GetIndex()].position[0], radius) return 0;
-			if(!FloatRange(gPlayer[index].position[1], gPlayer[client.GetIndex()].position[1], radius) return 0;
-			if(!FloatRange(gPlayer[index].position[2], gPlayer[client.GetIndex()].position[2], radius) return 0;
+			if(!FloatRange(gPlayer[index].position[0], gPlayer[client.GetIndex()].position[0], radius)) return 0;
+			if(!FloatRange(gPlayer[index].position[1], gPlayer[client.GetIndex()].position[1], radius)) return 0;
+			if(!FloatRange(gPlayer[index].position[2], gPlayer[client.GetIndex()].position[2], radius)) return 0;
 
 			Log::Error(L"Player doesn't exist");
 			if(bReCreateOnFalse) return SafeCreatePlayer(index);
@@ -353,9 +353,9 @@ bool FMPHook::SafeCheckVehicle(short index, float radius, bool bReCreateOnFalse)
 	}
 	if(!Natives::DoesVehicleExist(gVehicle[index].CarID))
 	{
-		if(!FloatRange(gVehicle[index].position[0], gPlayer[client.GetIndex()].position[0], radius) return 0;
-		if(!FloatRange(gVehicle[index].position[1], gPlayer[client.GetIndex()].position[1], radius) return 0;
-		if(!FloatRange(gVehicle[index].position[2], gPlayer[client.GetIndex()].position[2], radius) return 0;
+		if(!FloatRange(gVehicle[index].position[0], gPlayer[client.GetIndex()].position[0], radius)) return 0;
+		if(!FloatRange(gVehicle[index].position[1], gPlayer[client.GetIndex()].position[1], radius)) return 0;
+		if(!FloatRange(gVehicle[index].position[2], gPlayer[client.GetIndex()].position[2], radius)) return 0;
 
 		Log::Warning(L"Vehicle doesn't exist");
 		if(bReCreateOnFalse) return SafeCreateVehicle(index);
@@ -722,6 +722,7 @@ void MainThread(void* dummy)
 	concore.AddConCmd(L"ts", SetTS);
 
 	memset(&gPlayer, 0, sizeof(FPlayer) * MAX_PLAYERS);
+	memset(&gVehicle, 0, sizeof(FVehicle) * MAX_VEHICLES);
 
 	Sleep(10000);
 	HOOK.AttachGtaThread("FOURMP");

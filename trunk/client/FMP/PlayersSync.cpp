@@ -175,18 +175,17 @@ void FMPHook::PlayerVehicleSync(NetworkPlayerVehicleData* data)
 	data->driver--;
 	t_car = gVehicle[data->v_id].CarID;
 
-	if(!Natives::DoesVehicleExist(t_car))
+	if(!SafeCheckVehicle(data->v_id))
 	{
 		Log::Warning(L"Vehicle not exist");
 		return;
 	}
 
-	if(Natives::IsCharInAnyCar(_GetPlayerPed()))
-		if(t_car == _GetPedVehicle(_GetPlayerPed()))
-		{
-			Log::Warning(L"My car");
-			return;
-		}
+	if(data->v_id == gPlayer[client.GetIndex()].vehicleindex)
+	{
+		Log::Warning(L"My car");
+		return;
+	}
 
 	Natives::SetCarCoordinates(t_car, data->position[0],data->position[1],data->position[2]);
 	Natives::SetCarHealth(t_car, data->v_health);
