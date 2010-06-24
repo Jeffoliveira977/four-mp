@@ -265,7 +265,7 @@ bool FMPHook::SafeCreatePlayer(short index)
 	return Natives::DoesCharExist( gPlayer[index].PedID );
 }
 
-bool FMPHook::SafeCheckPlayer(short index, bool bReCreateOnFalse)
+bool FMPHook::SafeCheckPlayer(short index, float radius, bool bReCreateOnFalse)
 {
 	if(gPlayer[index].connected == 0) 
 	{
@@ -282,6 +282,10 @@ bool FMPHook::SafeCheckPlayer(short index, bool bReCreateOnFalse)
 		}
 		else
 		{
+			if(!FloatRange(gPlayer[index].position[0], gPlayer[client.GetIndex()].position[0], radius) return 0;
+			if(!FloatRange(gPlayer[index].position[1], gPlayer[client.GetIndex()].position[1], radius) return 0;
+			if(!FloatRange(gPlayer[index].position[2], gPlayer[client.GetIndex()].position[2], radius) return 0;
+
 			Log::Error(L"Player doesn't exist");
 			if(bReCreateOnFalse) return SafeCreatePlayer(index);
 			return 0;
@@ -340,16 +344,20 @@ bool FMPHook::SafeCreateVehicle(short index)
 	return Natives::DoesVehicleExist( gVehicle[index].CarID );
 }
 
-bool FMPHook::SafeCheckVehicle(short index, bool bReCreateOnFalse)
+bool FMPHook::SafeCheckVehicle(short index, float radius, bool bReCreateOnFalse)
 {
 	if(gVehicle[index].exist == 0) 
 	{
-		Log::Error(L"Vehicle not created");
+		Log::Warning(L"Vehicle not created");
 		return 0;
 	}
 	if(!Natives::DoesVehicleExist(gVehicle[index].CarID))
 	{
-		Log::Error(L"Vehicle doesn't exist");
+		if(!FloatRange(gVehicle[index].position[0], gPlayer[client.GetIndex()].position[0], radius) return 0;
+		if(!FloatRange(gVehicle[index].position[1], gPlayer[client.GetIndex()].position[1], radius) return 0;
+		if(!FloatRange(gVehicle[index].position[2], gPlayer[client.GetIndex()].position[2], radius) return 0;
+
+		Log::Warning(L"Vehicle doesn't exist");
 		if(bReCreateOnFalse) return SafeCreateVehicle(index);
 		return 0;
 	}
@@ -613,8 +621,8 @@ void FMPHook::GameThread()
 
 				CheckAndCheck();
 				
-				if(Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID)) VehicleSync();
-				else FootSync();
+				for(int i = 0; i < MAX_VEHICLES; i++) if(gVehicle[i].exist) VehicleSync(i);
+				FootSync();
 				
 				gPlayer[client.GetIndex()].last_active = GetTickCount();
 				break;

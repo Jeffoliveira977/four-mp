@@ -41,6 +41,21 @@ void FMPHook::FootSync()
 	else own_foot_sync.ammo = 0;
 	own_foot_sync.is_dunk = Natives::IsCharDucking(gPlayer[client.GetIndex()].PedID);
 	own_foot_sync.is_jump = Natives::IsCharInAir(gPlayer[client.GetIndex()].PedID);
+
+	if(Natives::IsCharInAnyCar(gPlayer[client.GetIndex()].PedID))
+	{
+		own_foot_sync.in_veh = 1;
+		Natives::GetCarCharIsUsing(gPlayer[client.GetIndex()].PedID, &t_car);
+		own_foot_sync.veh_id = GetPlayerCar(t_car);
+		gPlayer[client.GetIndex()].vehicleindex = own_foot_sync.veh_id;
+	}
+	else
+	{
+		own_foot_sync.in_veh = 0;
+		own_foot_sync.veh_id = -1;
+		gPlayer[client.GetIndex()].vehicleindex = own_foot_sync.veh_id;
+	}
+
 	if(Natives::IsControlPressed(0, 137)) // Fire
 	{
 		own_foot_sync.shot_time = GetTickCount() - gPlayer[client.GetIndex()].last_active;
@@ -76,47 +91,104 @@ void FMPHook::FootSync()
 	nm.SendPlayerFootSync(own_foot_sync);
 }
 
-void FMPHook::VehicleSync()
+char VehicleCmp(FVehicle *a, NetworkPlayerVehicleData *b)
 {
-	if(client.GetIndex() < 0 || !Natives::DoesCharExist(gPlayer[client.GetIndex()].PedID)) 
+	if(!IntRange(a->health, b->v_health, 5)) return 1;
+	if(!IntRange(a->enginehealth, b->v_e_health, 5)) return 2;
+	if(a->sirenon != b->siren) return 3;
+	if(!FloatRange(a->angle, b->angle, 0.5f)) return 4;
+	if(!FloatRange(a->position[0], b->position[0], 0.5f)) return 5;
+	if(!FloatRange(a->position[1], b->position[1], 0.5f)) return 6; 
+	if(!FloatRange(a->position[2], b->position[2], 0.5f)) return 7;
+	if(!FloatRange(a->doorangle[0], b->door_angle[0], 0.5f)) return 8;
+	if(!FloatRange(a->doorangle[1], b->door_angle[1], 0.5f)) return 9;
+	if(!FloatRange(a->doorangle[2], b->door_angle[2], 0.5f)) return 10;
+	if(!FloatRange(a->doorangle[3], b->door_angle[3], 0.5f)) return 11;
+	if(!FloatRange(a->doorangle[4], b->door_angle[4], 0.5f)) return 12;
+	if(!FloatRange(a->doorangle[5], b->door_angle[5], 0.5f)) return 13;
+	if(!FloatRange(a->qua[0], b->qua[0], 0.5f)) return 14;
+	if(!FloatRange(a->qua[1], b->qua[1], 0.5f)) return 15;
+	if(!FloatRange(a->qua[2], b->qua[2], 0.5f)) return 16;
+	if(!FloatRange(a->qua[3], b->qua[3], 0.5f)) return 17;
+	if(!FloatRange(a->angle, b->angle, 0.5f)) return 18;
+	if(a->is_dead != b->is_dead) return 19;
+	if(memcmp(a->doorexists, b->door_damaged, sizeof(char)*6) != 0) return 20;
+	if(memcmp(a->dooropen, b->door_open, sizeof(char)*6) != 0) return 21;
+	if(memcmp(a->is_tyre_burst, b->is_tyre_burst, sizeof(char)*9) != 0) return 22;
+
+	return 0;
+}
+
+void FMPHook::VehicleSync(short car)
+{
+	/*if(client.GetIndex() < 0 || !Natives::DoesCharExist(gPlayer[client.GetIndex()].PedID)) 
 	{
 		Natives::GetPlayerChar(_GetPlayer(), &gPlayer[client.GetIndex()].PedID);
 		return;
 	}
 	// write info in our temp sync struct
-	Natives::GetCarCharIsUsing(gPlayer[client.GetIndex()].PedID, &t_car);
-	if(!Natives::DoesVehicleExist(t_car))
+	Natives::GetCarCharIsUsing(gPlayer[client.GetIndex()].PedID, &t_car);*/
+	Vehicle x_car = gVehicle[car].CarID;
+	if(!Natives::DoesVehicleExist(x_car))
 	{
-		Log::Warning(L"Vehicle nto exist");
+		Log::Warning(L"Vehicle not exist");
 		return;
 	}
 
-	own_veh_sync.v_id = GetPlayerCar(t_car);
-	Natives::GetCarCoordinates(t_car, &own_veh_sync.position[0],&own_veh_sync.position[1],&own_veh_sync.position[2]);
-	Natives::GetCarSpeedVector(t_car,&t_vec3,false);
+	own_veh_sync.v_id = car;
+
+	Ped x_ped;
+	Natives::GetDriverOfCar(x_car, &x_ped);
+
+	if(!Natives::DoesCharExist(x_ped) || x_ped == 0)
+		own_veh_sync.driver = -1;
+	else if(car == gPlayer[client.GetIndex()].vehicleindex)
+		own_veh_sync.driver = 1;
+	else 
+	{
+		Log::Warning(L"Car with driver");
+		return;
+	}
+
+	Natives::GetCarCoordinates(x_car, &own_veh_sync.position[0],&own_veh_sync.position[1],&own_veh_sync.position[2]);
+	Natives::GetCarSpeedVector(x_car,&t_vec3,false);
 	own_veh_sync.velocity[0] = t_vec3.X;
 	own_veh_sync.velocity[1] = t_vec3.Y;
 	own_veh_sync.velocity[2] = t_vec3.Z;
-	Natives::GetCarSpeed(t_car,&own_veh_sync.speed);
-	Natives::GetCarHealth(t_car, &own_veh_sync.v_health);
-	own_veh_sync.v_e_health = Natives::GetEngineHealth(t_car);
-	Natives::GetCharHealth(gPlayer[client.GetIndex()].PedID, &own_veh_sync.health);
-	Natives::GetCharArmour(gPlayer[client.GetIndex()].PedID, &own_veh_sync.armour);
-	own_veh_sync.siren = Natives::IsCarSirenOn(t_car);
-	Natives::GetVehicleQuaternion(t_car,&own_veh_sync.qua[0],&own_veh_sync.qua[1],&own_veh_sync.qua[2],&own_veh_sync.qua[3]);
-	Natives::GetCarHeading(t_car, &own_veh_sync.angle);
+	Natives::GetCarSpeed(x_car,&own_veh_sync.speed);
+	Natives::GetCarHealth(x_car, &own_veh_sync.v_health);
+	own_veh_sync.v_e_health = Natives::GetEngineHealth(x_car);
+	own_veh_sync.siren = Natives::IsCarSirenOn(x_car);
+	Natives::GetVehicleQuaternion(x_car,&own_veh_sync.qua[0],&own_veh_sync.qua[1],&own_veh_sync.qua[2],&own_veh_sync.qua[3]);
+	Natives::GetCarHeading(x_car, &own_veh_sync.angle);
 
-	own_veh_sync.is_dead = Natives::IsCarDead(t_car);
+	own_veh_sync.is_dead = Natives::IsCarDead(x_car);
 
 	for(char door_id = 0; door_id < 6; door_id++)
 	{
-		own_veh_sync.door_open[door_id] = Natives::IsCarDoorFullyOpen(t_car, (eVehicleDoor)door_id);
-		Natives::GetDoorAngleRatio(t_car, (eVehicleDoor)door_id, &own_veh_sync.door_angle[door_id]);
-		own_veh_sync.door_damaged[door_id] = Natives::IsCarDoorDamaged(t_car, (eVehicleDoor)door_id);
+		own_veh_sync.door_open[door_id] = Natives::IsCarDoorFullyOpen(x_car, (eVehicleDoor)door_id);
+		Natives::GetDoorAngleRatio(x_car, (eVehicleDoor)door_id, &own_veh_sync.door_angle[door_id]);
+		own_veh_sync.door_damaged[door_id] = Natives::IsCarDoorDamaged(x_car, (eVehicleDoor)door_id);
 	}
 
 	for(char tyre_id = 0; tyre_id < 8; tyre_id++)
-		own_veh_sync.is_tyre_burst[tyre_id] = Natives::IsCarTyreBurst(t_car, (eVehicleTyre)tyre_id);
+		own_veh_sync.is_tyre_burst[tyre_id] = Natives::IsCarTyreBurst(x_car, (eVehicleTyre)tyre_id);
+
+	if(VehicleCmp(&gVehicle[car], &own_veh_sync) == 0) return;
+	else Log::Debug(L"Car %d[%d] ok (Send data to server)", car, gPlayer[client.GetIndex()].vehicleindex);
+
+	gVehicle[car].angle = own_veh_sync.angle;
+	gVehicle[car].sirenon = own_veh_sync.siren;
+	gVehicle[car].is_dead = own_veh_sync.is_dead;
+	gVehicle[car].health = own_veh_sync.v_health;
+	gVehicle[car].enginehealth = own_veh_sync.v_e_health;
+	memcpy(gVehicle[car].position, own_veh_sync.position, sizeof(float)*3);
+	memcpy(gVehicle[car].velocity, own_veh_sync.velocity, sizeof(float)*3);
+	memcpy(gVehicle[car].qua, own_veh_sync.qua, sizeof(float)*4);
+	memcpy(gVehicle[car].doorexists, own_veh_sync.door_damaged, sizeof(char)*6);
+	memcpy(gVehicle[car].doorangle, own_veh_sync.door_angle, sizeof(char)*6);
+	memcpy(gVehicle[car].is_tyre_burst, own_veh_sync.is_tyre_burst, sizeof(char)*8);
+	memcpy(gVehicle[car].dooropen, own_veh_sync.door_open, sizeof(char)*6);
 
 	// send sync to server
 	nm.SendPlayerVehicleSync(own_veh_sync);

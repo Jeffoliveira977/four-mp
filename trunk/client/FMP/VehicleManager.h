@@ -19,9 +19,14 @@ struct FVehicle
 	float angle;
 	short health;
 	short enginehealth;
-	bool doorexists[6];
-	bool doorlock[6];
+	char doorexists[6];
+	char doorlock[6];
 	float doorangle[6];
 	unsigned char color[4];
-	bool sirenon;
+	char sirenon;
+	float velocity[3];
+	float qua[4];
+	char dooropen[6];
+	char is_tyre_burst[8];
+	char is_dead;
 };

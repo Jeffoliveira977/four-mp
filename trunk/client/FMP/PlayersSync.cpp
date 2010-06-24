@@ -114,6 +114,17 @@ void FMPHook::PlayerFootSync(NetworkPlayerFootData* data)
 	}
 	else Natives::GiveWeaponToChar(gPlayer[t_index].PedID,data->weapon,data->ammo,false);
 
+	if(data->in_veh)
+	{
+		if(SafeCheckVehicle(data->veh_id))
+			if(!Natives::IsCharInAnyCar(gPlayer[t_index].PedID)) Natives::WarpCharIntoCar(gPlayer[t_index].PedID, gVehicle[data->veh_id].CarID);
+		return;
+	}
+	else
+	{
+		if(Natives::IsCharInAnyCar(gPlayer[t_index].PedID)) Natives::WarpCharFromCarToCoord(gPlayer[t_index].PedID,data->position[0],data->position[1],data->position[2]);
+	}
+
 	// show anim (try...)
 	if(data->aim_sync == 2)
 	{
@@ -161,21 +172,22 @@ void FMPHook::PlayerFootSync(NetworkPlayerFootData* data)
 
 void FMPHook::PlayerVehicleSync(NetworkPlayerVehicleData* data)
 {
-	t_index = data->client;
-	
-	if(!SafeCheckPlayer(t_index)) return;
-
-	// read sync
+	data->driver--;
 	t_car = gVehicle[data->v_id].CarID;
 
 	if(!Natives::DoesVehicleExist(t_car))
 	{
-		Log::Warning(L"Vehicle nto exist");
+		Log::Warning(L"Vehicle not exist");
 		return;
 	}
 
-	if(!Natives::IsCharInCar(gPlayer[t_index].PedID,t_car)) Natives::WarpCharIntoCar(gPlayer[t_index].PedID,t_car);
-	
+	if(Natives::IsCharInAnyCar(_GetPlayerPed()))
+		if(t_car == _GetPedVehicle(_GetPlayerPed()))
+		{
+			Log::Warning(L"My car");
+			return;
+		}
+
 	Natives::SetCarCoordinates(t_car, data->position[0],data->position[1],data->position[2]);
 	Natives::SetCarHealth(t_car, data->v_health);
 	Natives::SetEngineHealth(t_car, data->v_e_health);
@@ -200,13 +212,25 @@ void FMPHook::PlayerVehicleSync(NetworkPlayerVehicleData* data)
 
 	if(data->is_dead) Natives::ExplodeCar(t_car, 1, 0);
 
-	Natives::SetCharHealth(gPlayer[t_index].PedID, data->health);
-	Natives::AddArmourToChar(gPlayer[t_index].PedID, data->armour);
-	
 	// show drive (try...)
-	Natives::TaskCarDriveToCoord(gPlayer[t_index].PedID,t_car,(data->position[0] + (data->velocity[0] * 10)),(data->position[1] + (data->velocity[1] * 10)),(data->position[2] + (data->velocity[2] * 10)),data->speed,1,1,1,1,45000);
+	if(data->driver >= 0 && data->driver < MAX_PLAYERS && gPlayer[data->driver].connected == 1)
+		if(SafeCheckPlayer(data->driver))
+			Natives::TaskCarDriveToCoord(gPlayer[data->driver].PedID,t_car,(data->position[0] + (data->velocity[0] * 10)),(data->position[1] + (data->velocity[1] * 10)),(data->position[2] + (data->velocity[2] * 10)),data->speed,1,1,1,1,45000);
 
 	Log::Info(L"[%d vehicle sync] Vehicle drive from %f,%f,%f to %f,%f,%f",t_index,data->position[0],data->position[1],data->position[2],(data->position[0] + (data->velocity[0] * 10)),(data->position[1] + (data->velocity[1] * 10)),(data->position[2] + (data->velocity[2] * 10)));
+
+	gVehicle[data->v_id].angle = data->angle;
+	gVehicle[data->v_id].sirenon = data->siren;
+	gVehicle[data->v_id].is_dead = data->is_dead;
+	gVehicle[data->v_id].health = data->v_health;
+	gVehicle[data->v_id].enginehealth = data->v_e_health;
+	memcpy(gVehicle[data->v_id].position, data->position, sizeof(float)*3);
+	memcpy(gVehicle[data->v_id].velocity, data->velocity, sizeof(float)*3);
+	memcpy(gVehicle[data->v_id].qua, data->qua, sizeof(float)*4);
+	memcpy(gVehicle[data->v_id].doorexists, data->door_damaged, sizeof(char)*6);
+	memcpy(gVehicle[data->v_id].doorangle, data->door_angle, sizeof(char)*6);
+	memcpy(gVehicle[data->v_id].is_tyre_burst, data->is_tyre_burst, sizeof(char)*8);
+	memcpy(gVehicle[data->v_id].dooropen, data->door_open, sizeof(char)*6);
 
 	gPlayer[t_index].last_active = GetTickCount();
 }

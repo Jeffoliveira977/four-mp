@@ -94,11 +94,13 @@ struct NetworkPlayerFootData
 	char			aim_sync;
 	char			shot_time;
 	float			shot_position[3];
+	char			in_veh;
+	short			veh_id;
 };
 
 struct NetworkPlayerVehicleData
 {
-	short			client;
+	short			driver;
 	float			position[3];
 	float			velocity[3];
 	//int				keys[3];
@@ -107,8 +109,8 @@ struct NetworkPlayerVehicleData
 	float			door_angle[6];
 	char			door_open[6];
 	float			speed;
-	unsigned int	health;
-	unsigned int	armour;
+	//unsigned int	health;
+	//unsigned int	armour;
 	unsigned int	v_health;
 	unsigned int	v_e_health;
 	int				v_id;
@@ -117,6 +119,7 @@ struct NetworkPlayerVehicleData
 	char			door_damaged[6];	
 	char			is_dead;
 };
+
 
 struct NetworkPlayerStartEntranceInVehicleData
 {

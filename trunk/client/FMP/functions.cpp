@@ -109,3 +109,13 @@ short GetPlayerCar(Vehicle car)
 	}
 	return -1;
 }
+
+bool FloatRange(float a, float x, float r)
+{
+	return (a > x-r && a < x+r);
+}
+
+bool IntRange(int a, int x, int r)
+{
+	return (a > x-r && a < x+r);
+}

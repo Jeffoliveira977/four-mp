@@ -296,11 +296,10 @@ void NetworkManager::RecievePlayerFootSync(NetworkPlayerFootData data, RakNet::R
 void NetworkManager::RecievePlayerVehicleSync(NetworkPlayerVehicleData data, RakNet::RPC3 *clientrpc3)
 {
 	short client = this->GetClientIndex(clientrpc3->GetLastSenderAddress());
-	if (client == INVALID_PLAYER_INDEX)
-	{
-		return;
-	}
-	data.client = client;
+	if (client != INVALID_PLAYER_INDEX)
+		data.driver *= client + 1;
+	else
+		data.driver = 0;
 	this->WriteToRPCBuffer(NetworkRPCPlayerVehicleSync, &data);
 }
 
@@ -909,20 +908,20 @@ void NetworkManager::HandlePlayerFootSync(const NetworkPlayerFootData *data)
 
 void NetworkManager::HandlePlayerVehicleSync(const NetworkPlayerVehicleData *data)
 {
-	if ((data->client < 0) || (data->client >= playm.playerbuffersize))
+	vm.SetVehiclePositionInternal(data->v_id, data->position);
+	vm.SetVehicleAngleInternal(data->v_id, data->angle);
+	short driver = data->driver;
+	if(driver < 0)
+		driver = -driver-1;
+	else if(driver == 0)
 	{
+		this->SendDataToAll("&NetworkManager::RecievePlayerVehicleSync", &data);
 		return;
 	}
-	if (playm.playerbuffer[data->client] == NULL)
-	{
-		return;
-	}
-	memcpy(playm.playerbuffer[data->client]->position, data->position, sizeof(float) * 3);
-	playm.playerbuffer[data->client]->angle = data->angle;
-	playm.playerbuffer[data->client]->vehicleindex = data->v_id;
-	vm.SetVehiclePositionInternal(playm.playerbuffer[data->client]->vehicleindex, data->position);
-	vm.SetVehicleAngleInternal(playm.playerbuffer[data->client]->vehicleindex, data->angle);
-	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerVehicleSync", data->client, data);
+	else
+		driver = driver - 1;
+
+	this->SendDataToAllExceptOne("&NetworkManager::RecievePlayerVehicleSync", driver, &data);
 }
 
 void NetworkManager::HandlePlayerStartEntranceInVehicle(const NetworkPlayerStartEntranceInVehicleData *data)
