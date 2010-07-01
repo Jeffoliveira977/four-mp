@@ -151,7 +151,13 @@ void FMPHook::VehicleSync(short car)
 		return;
 	}
 
-	Natives::GetCarCoordinates(t_car, &own_veh_sync.position[0],&own_veh_sync.position[1],&own_veh_sync.position[2]);
+	float tx, ty, tz;
+	Natives::GetCarCoordinates(t_car, &tx, &ty, &tz);
+	Log::Debug(L"COORDS: %f %f %f", tx, ty, tz);
+	own_veh_sync.position[0] = tx;
+	own_veh_sync.position[1] = ty;
+	own_veh_sync.position[2] = tz;
+	Log::Debug(L"COORDS S: %f %f %f", own_veh_sync.position[0], own_veh_sync.position[1], own_veh_sync.position[2]);
 	Natives::GetCarSpeedVector(t_car,&t_vec3,false);
 	own_veh_sync.velocity[0] = t_vec3.X;
 	own_veh_sync.velocity[1] = t_vec3.Y;
