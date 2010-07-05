@@ -56,8 +56,9 @@ private:
 
 	void HandleOurPacket(unsigned char *, unsigned int length, SystemAddress sa);
 
+	bool CheckClientName(const wchar_t name[MAX_CLIENT_NAME_LENGTH]);
 	short RegisterNewClient(const SystemAddress address);
-	void HandleClientDisconnection(const SystemAddress address);
+	void HandleClientDisconnection(const SystemAddress address, const DefaultMessageIDTypes type);
 	short GetClientIndex(const SystemAddress address);
 	short GetClientFreeSlot(void);
 	void SendConnectionError(const SystemAddress address, const NetworkPlayerConnectionError error);
