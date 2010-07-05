@@ -172,7 +172,6 @@ void FMPHook::PlayerFootSync(NetworkPlayerFootData* data)
 
 void FMPHook::PlayerVehicleSync(NetworkPlayerVehicleData* data)
 {
-	data->driver--;
 	t_car = gVehicle[data->v_id].CarID;
 
 	if(!SafeCheckVehicle(data->v_id))

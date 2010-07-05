@@ -4,10 +4,36 @@
 #include "Limits.h"
 #include "ClientDefines.h"
 
-#define PROTOCOL_VERSION 17
+#define PROTOCOL_VERSION 18
+#define FMP_PACKET_SIGNATURE 255
 
-#define DEFAULT_SERVER_NETWORK_ID 0
-#define DEFAULT_CLIENT_NETWORK_ID 65534
+enum NetworkPackType
+{
+	NetworkPackPlayerConnection,
+	NetworkPackPlayerConnectionRequest,
+	NetworkPackPlayerConnectionError,
+	NetworkPackPlayerConnectionConfirmation,
+	NetworkPackPlayerInfo,
+	NetworkPackPlayerDisconnection,
+	NetworkPackGameTimeChange,
+	NetworkPackPlayerFullUpdate,
+	NetworkPackVehicleFullUpdate,
+	NetworkPackPlayerFootSync,
+	NetworkPackPlayerVehicleSync,
+	NetworkPackPlayerStartEntranceInVehicle,
+	NetworkPackPlayerCancelEntranceInVehicle,
+	NetworkPackPlayerFinishEntranceInVehicle,
+	NetworkPackPlayerStartExitFromVehicle,
+	NetworkPackPlayerFinishExitFromVehicle,
+	NetworkPackPlayerWeaponGift,
+	NetworkPackPlayerSpawnPositionChange,
+	NetworkPackPlayerSpawn,
+	NetworkPackPlayerModelChange,
+	NetworkPackPlayerComponentsChange,
+	NetworkPackPlayerChat,
+	NetworkPackNewVehicle,
+	NetworkPackPlayerPosition
+};
 
 struct NetworkPlayerConnectionRequestData
 {
