@@ -122,6 +122,11 @@ void ChatManager::SendChatMessage(void)
 	{
 		return;
 	}
+	if(wcslen(inputbuffer) == 0)
+	{
+		return;
+	}
+
 	nm.SendPlayerChat(inputbuffer);
 	ResizeBuffer<wchar_t *>(inputbuffer, 1);
 	inputbuffer[0] = L'\0';
