@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <vector>
 #include "RakPeerInterface.h"
 #include "../../Shared/Network/GtaEnums.h"
 #include "../../Shared/Network/NetworkProtocol.h"
@@ -24,16 +25,25 @@ public:
 	void CheckClients(void);
 	void UpdateServerInfo(void);
 
+	void KickPlayer(short index);
+	void BanPlayer(short index);
+	void ClearBanList();
+	void ReloadBanList();
+	void LoadBanList();
+
 	bool SendGameTimeChangeToAll(const unsigned char time[2]);
 	bool SendPlayerModelChangeToAll(const short index);
 	bool SendPlayerWeaponGiftToAll(const short index, const eWeaponSlot slot);
 	bool SendPlayerSpawnPositionChange(const short index);
 	bool SendNewVehicleInfoToAll(const short index);
 	bool SendPlayerPosition(const short index, const float pos[3], const float angle);
+	void SendChatMessageToOne(short index, wchar_t * msg);
+	void SendChatMessageToAll(wchar_t * msg);
 
 private:
 	unsigned short serverport;
 	RakPeerInterface *net;
+	std::vector<wchar_t*> badnick;
 
 	struct Client
 	{

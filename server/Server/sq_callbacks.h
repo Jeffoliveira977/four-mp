@@ -45,8 +45,15 @@ void sc_OnPlayerDeath(HSQUIRRELVM v, const short playerindex, const short killer
 /// \brief Called when send message in chat
 /// \param[in] index
 /// \param[in] text
-/// \return No return
+/// \return Return bool
 bool sc_OnPlayerText(HSQUIRRELVM v, const short index, const wchar_t *text);
+
+/// \brief Called when send command in chat
+/// \param[in] index
+/// \param[in] cmd
+/// \param[in] params
+/// \return Return bool
+bool sc_OnPlayerCommandText(HSQUIRRELVM v, const short index, const wchar_t * cmd, const wchar_t *params);
 
 /// \brief Fires a dynamic command callback.
 /// \param[in] callback Name of the callback to call.

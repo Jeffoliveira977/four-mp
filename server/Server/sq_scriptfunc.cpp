@@ -6,15 +6,18 @@
 
 #include "sq/squirrel.h"
 #include "sq/sqstdsystem.h"
+#include "sq/sqstdio.h"
 
 #include "ServerCore.h"
 #include "PlayerManager.h"
 #include "VehicleManager.h"
+#include "NetworkManager.h"
 #include "logging.h"
 
 extern ServerCore server;
 extern PlayerManager playm;
 extern VehicleManager vm;
+extern NetworkManager nm;
 
 void sq_CreateCar(HSQUIRRELVM v) 
 { 
@@ -106,4 +109,65 @@ void sq_SetGameTime(HSQUIRRELVM v)
 	sq_pop(v, 1);
 	unsigned char time[2] = { h, m };
 	sq_pushbool(v, server.SetGameTime(time));
+}
+
+void sq_SetCmdCharFirst(HSQUIRRELVM v)
+{
+	wchar_t ch;
+	sq_getinteger(v, 2, (SQInteger*)&ch);
+	server.SetCmdChar(0, ch);
+}
+
+void sq_SetCmdCharSecond(HSQUIRRELVM v)
+{
+	wchar_t ch;
+	sq_getinteger(v, 2, (SQInteger*)&ch);
+	server.SetCmdChar(1, ch);
+}
+
+void sq_SendMessageToAll(HSQUIRRELVM v)
+{
+	wchar_t msg[255];
+	sq_getstring(v, 2, (const SQChar**)&msg);
+	nm.SendChatMessageToAll(msg);
+}
+
+void sq_SendMessageToPlayer(HSQUIRRELVM v)
+{
+	wchar_t msg[255];
+	short index;
+	sq_getinteger(v, 2, (SQInteger*)&index);
+	sq_getstring(v, 3, (const SQChar**)&msg);
+	nm.SendChatMessageToOne(index, msg);
+}
+
+void sq_Kick(HSQUIRRELVM v)
+{
+	short index;
+	sq_getinteger(v, 2, (SQInteger*)&index);
+	nm.KickPlayer(index);
+}
+
+void sq_Ban(HSQUIRRELVM v)
+{
+	short index;
+	sq_getinteger(v, 2, (SQInteger*)&index);
+	nm.BanPlayer(index);
+}
+
+void sq_ReloadBanList(HSQUIRRELVM v)
+{
+	nm.ReloadBanList();
+}
+
+void sq_ClearBanList(HSQUIRRELVM v)
+{
+	nm.ClearBanList();
+}
+
+void sq_include(HSQUIRRELVM v)
+{
+	SQChar filename[255];
+	sq_getstring(v, 2, (const SQChar**)&filename);
+	sqstd_dofile(v, filename, 0, SQTrue);
 }
