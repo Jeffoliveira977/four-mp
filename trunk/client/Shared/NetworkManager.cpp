@@ -246,6 +246,14 @@ void NetworkManager::HandleOurPacket(unsigned char * pack, unsigned int length, 
 					PrintToConsole(L"Connection error: Invalid user name.");
 #endif
 				} break;
+			case NetworkPlayerConnectionErrorBanned:
+				{
+#if defined (FMP_CLIENT)
+					Log::Info(L"Connection error: Banned.");
+#elif defined (FMP_CONSOLE_CLIENT)
+					PrintToConsole(L"Connection error: Banned.");
+#endif
+				} break;
 			case NetworkPlayerConnectionErrorInvalidAuth:
 				{
 #if defined (FMP_CLIENT)

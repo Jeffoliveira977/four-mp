@@ -51,6 +51,7 @@ void NetworkManager::Load(const short maxclients, const unsigned short port)
 	SocketDescriptor s(port, 0);
 	net->SetMaximumIncomingConnections(maxclients);
 	net->Startup(maxclients, 1, &s, 1);
+	this->LoadBanList();
 }
 
 void NetworkManager::Tick(void)
@@ -223,6 +224,18 @@ void NetworkManager::HandleClientConnectionRequest(NetworkPlayerConnectionReques
 		this->SendConnectionError(sa, NetworkPlayerConnectionErrorInvalidName);
 		net->CloseConnection(sa, true);
 		return;
+	}
+	for(int i = 0; i != badnick.size(); i++)
+	{
+		if(wcscmp(badnick[i], data->name) == 0)
+		{
+			PrintToServer(L"Client banned.");
+			net->AddToBanList(sa.ToString(0));
+			this->SendConnectionError(sa, NetworkPlayerConnectionErrorBanned);
+			net->CloseConnection(sa, true);
+			return;
+			break;
+		}
 	}
 	if (!server.IsLAN())
 	{
@@ -592,9 +605,29 @@ void NetworkManager::HandlePlayerChat(NetworkPlayerChatData *data, const SystemA
 
 	if(wcslen(data->message) == 0) return;
 
-	if (!vmm.OnPlayerText(client, data->message))
+	for(char i = 1; i != wcslen(data->message); i++)
 	{
+		if(data->message[i] < 32) data->message[i] = L' ';
+	}
+
+	if(data->message[0] == server.GetCmdChars(0) || data->message[0] == server.GetCmdChars(1))
+	{
+		char offset = 0;
+		for(char i = 1; i != wcslen(data->message); i++)
+		{
+			if(data->message[i] == L' ') { offset = i; data->message[i] = 0; break; }
+		}
+		if(offset == 1) return;
+
+		vmm.OnPlayerCommandText(client, data->message + 1, data->message + offset + 1);
 		return;
+	}
+	else
+	{
+		if (!vmm.OnPlayerText(client, data->message))
+		{
+			return;
+		}
 	}
 	wchar_t tempstring[MAX_CHAT_MESSAGE_LENGTH];
 	_snwprintf(tempstring, MAX_CHAT_MESSAGE_LENGTH, L"%s: %s", playm.playerbuffer[data->client]->name, data->message);
@@ -714,7 +747,7 @@ NetworkPlayerFullUpdateData *NetworkManager::GetPlayerFullUpdateData(const short
 	{
 		return NULL;
 	}
-	NetworkPlayerFullUpdateData *data = new NetworkPlayerFullUpdateData;
+	NetworkPlayerFullUpdateData *data = (NetworkPlayerFullUpdateData*)new char[sizeof(NetworkPlayerFullUpdateData)];
 	data->index = index;
 	wcscpy(data->name, playm.playerbuffer[index]->name);
 	data->model = playm.playerbuffer[index]->model;
@@ -742,13 +775,100 @@ NetworkVehicleFullUpdateData *NetworkManager::GetVehicleFullUpdateData(const sho
 	{
 		return NULL;
 	}
-	NetworkVehicleFullUpdateData *data = new NetworkVehicleFullUpdateData;
+	NetworkVehicleFullUpdateData *data = (NetworkVehicleFullUpdateData *)new char[sizeof(NetworkVehicleFullUpdateData)];
 	data->index = index;
 	data->model = vm.vehiclebuffer[index]->model;
 	memcpy(data->position, vm.vehiclebuffer[index]->position, sizeof(float) * 3);
 	data->angle = vm.vehiclebuffer[index]->angle[1];
 	memcpy(data->color, vm.vehiclebuffer[index]->color, sizeof(unsigned char) * 2);
 	return data;
+}
+
+void NetworkManager::KickPlayer(const short index)
+{
+	if ((index < 0) || (index >= clientbuffersize))
+	{
+		return;
+	}
+	if (clientbuffer[index] == NULL)
+	{
+		return;
+	}
+	if ((index < 0) || (index >= playm.playerbuffersize))
+	{
+		return;
+	}
+	if (playm.playerbuffer[index] == NULL)
+	{
+		return;
+	}
+
+	net->CloseConnection(clientbuffer[index]->address, true);
+
+	delete playm.playerbuffer[index];
+	playm.playerbuffer[index] = NULL;
+	playm.numplayers--;
+
+	delete clientbuffer[index];
+	clientbuffer[index] = NULL;
+}
+
+void NetworkManager::BanPlayer(const short index)
+{
+	if ((index < 0) || (index >= clientbuffersize))
+	{
+		return;
+	}
+	if (clientbuffer[index] == NULL)
+	{
+		return;
+	}
+
+	net->AddToBanList(clientbuffer[index]->address.ToString(0));
+	badnick.push_back(playm.GetPlayerName(index));
+	
+	FILE * banlist = fopen("ban.list", "a");
+	if(banlist) 
+	{
+		fwprintf(banlist, L"%s\t%s\n", playm.GetPlayerName(index), clientbuffer[index]->address.ToString(0));	
+		fclose(banlist);
+	}
+	this->KickPlayer(index);
+}
+
+void NetworkManager::ClearBanList()
+{
+	net->ClearBanList();
+	badnick.clear();
+
+	FILE * banlist = fopen("ban.list", "w");
+	if(banlist) fclose(banlist);
+}
+
+void NetworkManager::ReloadBanList()
+{
+	net->ClearBanList();
+	badnick.clear();
+	this->LoadBanList();
+}
+
+void NetworkManager::LoadBanList()
+{
+	FILE * banlist = fopen("ban.list", "r");
+	if(banlist)
+	{
+		int idx = 0;
+		wchar_t nick[32];
+		char ip[32];
+
+		while(!feof(banlist))
+		{
+			fwscanf(banlist, L"%s\t%s\n", &nick, &ip);
+			net->AddToBanList(ip);
+			badnick.push_back(nick);
+		}
+		fclose(banlist);
+	}
 }
 
 /*************************************************************************************************************************
@@ -862,6 +982,25 @@ void NetworkManager::SendConnectionError(const SystemAddress address, const Netw
 	this->SendDataTo(&data, NetworkPackPlayerConnectionError, address, 1);
 }
 
+void NetworkManager::SendChatMessageToOne(short index, wchar_t * msg)
+{
+	NetworkPlayerChatData data;
+	data.client = -1;
+	wcscpy(data.message, msg);
+	this->SendDataToOne(index, &data, NetworkPackPlayerChat);
+}
+
+void NetworkManager::SendChatMessageToAll(wchar_t * msg)
+{
+	NetworkPlayerChatData data;
+	data.client = -1;
+	wcscpy(data.message, msg);
+	this->SendDataToAll(&data, NetworkPackPlayerChat);
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 template <typename DATATYPE>
 void NetworkManager::SendDataToAll(const DATATYPE * data, const NetworkPackType type, const char pp)
 {
@@ -880,6 +1019,8 @@ void NetworkManager::SendDataToAll(const DATATYPE * data, const NetworkPackType 
 		}
 	}
 }
+
+#include "BitStream.h"
 
 template <typename DATATYPE>
 bool NetworkManager::SendDataToOne(const short index, const DATATYPE *data, const NetworkPackType type, const char pp)

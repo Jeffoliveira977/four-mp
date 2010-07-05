@@ -479,6 +479,29 @@ bool VirtualMachineManager::OnPlayerText(const short playerindex, const wchar_t 
 	return true;
 }
 
+bool VirtualMachineManager::OnPlayerCommandText(const short playerindex, const wchar_t *cmd, const wchar_t *data)
+{
+	for (unsigned char i = 0; i < vmbuffersize; i++)
+	{
+		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
+		{
+			switch (vmbuffer[i]->lang)
+			{
+			case VMLanguageSquirrel:
+				{
+					if (!sc_OnPlayerCommandText(*vmbuffer[i]->ptr.squirrel, playerindex, cmd, data))
+					{
+						return false;
+					}
+					break;
+				}
+			}
+		}
+	}
+	return true;
+}
+
+
 void VirtualMachineManager::FireCommandCallback(const unsigned char index, const wchar_t *callback, const unsigned char numargs)
 {
 	if (index >= vmbuffersize)
@@ -604,6 +627,19 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			// Time func
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetGameTime, L"GetGameTime");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetGameTime, L"SetGameTime");
+			// Cmd func
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetCmdCharFirst, L"SetCmdCharFirst");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetCmdCharSecond, L"SetCmdCharSecond");
+
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SendMessageToAll, L"SendMessageToAll");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SendMessageToPlayer, L"SendMessageToPlayer");
+
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_Kick, L"Kick");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_Ban, L"Ban");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ReloadBanList, L"ReloadBanList");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ClearBanList, L"ClearBanList");
+
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_include, L"include");
 
 			// Car functions
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateCar, L"CreateCar");

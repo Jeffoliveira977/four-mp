@@ -48,6 +48,7 @@ enum NetworkPlayerConnectionError
 	NetworkPlayerConnectionErrorServerFull,
 	NetworkPlayerConnectionErrorInvalidProtocol,
 	NetworkPlayerConnectionErrorInvalidName,
+	NetworkPlayerConnectionErrorBanned,
 	NetworkPlayerConnectionErrorInvalidAuth,
 	NetworkPlayerConnectionErrorAlreadyConnected,
 	NetworkPlayerConnectionErrorAllocationError,

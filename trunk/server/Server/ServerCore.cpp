@@ -42,6 +42,8 @@ ServerCore::ServerCore(void)
 	gametime.tickcount = 0;
 	gametime.time[0] = 0;
 	gametime.time[1] = 0;
+	cmd_chars[0] = L'/';
+	cmd_chars[1] = 0;
 }
 
 ServerCore::~ServerCore(void)
@@ -262,6 +264,17 @@ bool ServerCore::SetGameTime(const unsigned char time[2])
 	memcpy(gametime.time, time, sizeof(unsigned char) * 2);
 	nm.SendGameTimeChangeToAll(gametime.time);
 	return true;
+}
+
+void ServerCore::SetCmdChar(char index, wchar_t ch)
+{
+	if(index < 0 || index > 1) return;
+	cmd_chars[index] = ch;
+}
+wchar_t ServerCore::GetCmdChars(char index)
+{
+	if(index < 0 || index > 1) return 0;
+	return cmd_chars[index];
 }
 
 void ServerCore::IncrementGameTime(void)

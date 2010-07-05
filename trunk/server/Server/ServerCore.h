@@ -20,6 +20,8 @@ public:
 	void EnableComponentSelect(bool enable);
 	void GetGameTime(unsigned char (&timebuffer)[2]);
 	bool SetGameTime(const unsigned char time[2]);
+	void SetCmdChar(char index, wchar_t ch);
+	wchar_t GetCmdChars(char index);
 private:
 	bool isrunning;
 	short sleepcount;
@@ -42,6 +44,7 @@ private:
 		unsigned char time[2];
 	};
 	GameTime gametime;
+	wchar_t cmd_chars[2];
 	void IncrementGameTime(void);
 	void UpdateCaption(void);
 	friend void ConVarHookHostGamemode(ConVar *convar, const ConVarType oldtype, void *oldvalue, const ConVarType newtype, void *newvalue);

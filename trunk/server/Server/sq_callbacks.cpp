@@ -124,7 +124,25 @@ bool sc_OnPlayerText(HSQUIRRELVM v, const short index, const wchar_t *text)
 		sq_pushroottable(v);
 		sq_pushinteger(v, index);
 		sq_pushstring(v, text, -1);
-		sq_call(v, 3, 0, 0);
+		sq_call(v, 3, 1, 0);
+		sq_getinteger(v, sq_gettop(v), &result);
+	}
+	sq_settop(v, top);
+	return result != 0;
+}
+
+bool sc_OnPlayerCommandText(HSQUIRRELVM v, const short index, const wchar_t * cmd, const wchar_t *params)
+{
+	int result = 1;
+	int top = sq_gettop(v);
+	sq_pushroottable(v);
+	sq_pushstring(v, _SC("OnPlayerCommandText"), -1);
+	if(SQ_SUCCEEDED(sq_get(v, -2))) {
+		sq_pushroottable(v);
+		sq_pushinteger(v, index);
+		sq_pushstring(v, cmd, -1);
+		sq_pushstring(v, params, -1);
+		sq_call(v, 4, 1, 0);
 		sq_getinteger(v, sq_gettop(v), &result);
 	}
 	sq_settop(v, top);

@@ -213,7 +213,7 @@ void FMPHook::PlayerVehicleSync(NetworkPlayerVehicleData* data)
 	// show drive (try...)
 	if(data->driver >= 0 && data->driver < MAX_PLAYERS && gPlayer[data->driver].connected == 1)
 		if(SafeCheckPlayer(data->driver))
-			Natives::TaskCarDriveToCoord(gPlayer[data->driver].PedID,t_car,(data->position[0] + (data->velocity[0] * 10)),(data->position[1] + (data->velocity[1] * 10)),(data->position[2] + (data->velocity[2] * 10)),data->speed,1,1,1,1,45000);
+			Natives::TaskCarDriveToCoord(gPlayer[data->driver].PedID,t_car,(data->position[0] + (data->velocity[0] * 10 * data->speed)),(data->position[1] + (data->velocity[1] * 10 * data->speed)),(data->position[2] + (data->velocity[2] * 10 * data->speed)),data->speed,1,1,1,1,45000);
 
 	Log::Info(L"[%d vehicle sync] Vehicle drive from %f,%f,%f to %f,%f,%f",t_index,data->position[0],data->position[1],data->position[2],(data->position[0] + (data->velocity[0] * 10)),(data->position[1] + (data->velocity[1] * 10)),(data->position[2] + (data->velocity[2] * 10)));
 

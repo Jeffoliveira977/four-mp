@@ -33,6 +33,8 @@ private:
 
 	SystemAddress serveraddress;
 	RakPeerInterface *net;
+	char *buff;
+	short loaded;
 
 	void HandleOurPacket(unsigned char *, unsigned int length, SystemAddress sa);
 	template <typename DATATYPE>
