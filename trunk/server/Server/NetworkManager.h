@@ -38,8 +38,8 @@ public:
 	bool SendPlayerSpawnPositionChange(const short index);
 	bool SendNewVehicleInfoToAll(const short index);
 	bool SendPlayerPosition(const short index, const float pos[3], const float angle);
-	void SendChatMessageToOne(short index, wchar_t * msg);
-	void SendChatMessageToAll(wchar_t * msg);
+	void SendChatMessageToOne(short index, const wchar_t * msg);
+	void SendChatMessageToAll(const wchar_t * msg);
 
 private:
 	unsigned short serverport;

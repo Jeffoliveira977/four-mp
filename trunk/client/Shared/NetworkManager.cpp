@@ -448,6 +448,7 @@ void NetworkManager::HandleOurPacket(unsigned char * pack, unsigned int length, 
 		{
 #if defined (FMP_CLIENT)
 			NetworkPlayerChatData data = *(NetworkPlayerChatData*)(pack + 2);
+			Log::Info(L"MSG: %s", data.message);
 			chat.AddChatMessage(data.message);
 #endif
 		} break;

@@ -429,7 +429,10 @@ void FMPHook::RunMP()
 {
 	Log::Info(L"Starting up multiplayer mode.");
 
+	Natives::AllowThisScriptToBePaused(0);
 	Natives::ThisScriptShouldBeSaved();
+
+	Natives::SetPedNonCreationArea(-3000, -3000, -3000, 3000, 3000, 3000);
 
 	Natives::AllowEmergencyServices(0);
 	//Natives::SetPedDensityMultiplier(0);
