@@ -13,16 +13,16 @@ extern NetworkManager nm;
 
 void sq_SendMessageToAll(HSQUIRRELVM v)
 {
-	wchar_t msg[255];
-	sq_getstring(v, 2, (const SQChar**)&msg);
+	const wchar_t *msg;
+	sq_getstring(v, 2, &msg);
 	nm.SendChatMessageToAll(msg);
 }
 
 void sq_SendMessageToPlayer(HSQUIRRELVM v)
 {
-	wchar_t msg[255];
+	const wchar_t *msg;
 	short index;
 	sq_getinteger(v, 2, (SQInteger*)&index);
-	sq_getstring(v, 3, (const SQChar**)&msg);
+	sq_getstring(v, 3, &msg);
 	nm.SendChatMessageToOne(index, msg);
 }

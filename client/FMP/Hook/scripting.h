@@ -167,6 +167,8 @@ namespace Natives
     static void AddPoliceRestart(float x, float y, float z, float r, int num_x3) { NativeInvoke::Invoke<NATIVE_ADD_POLICE_RESTART, ScriptVoid>(x, y, z, r, num_x3); }
 	static void ThisScriptShouldBeSaved() { NativeInvoke::Invoke<NATIVE_THIS_SCRIPT_SHOULD_BE_SAVED, ScriptVoid>(); }
 	static void SetSleepModeActive(bool active) { NativeInvoke::Invoke<NATIVE_SET_SLEEP_MODE_ACTIVE, bool>(active); }
+	static void AllowThisScriptToBePaused(bool pause) { NativeInvoke::Invoke<NATIVE_ALLOW_THIS_SCRIPT_TO_BE_PAUSED, ScriptVoid>(pause); }
+	static void SetPedNonCreationArea(float sx, float sy, float sz, float ex, float ey, float ez) { NativeInvoke::Invoke<NATIVE_SET_PED_NON_CREATION_AREA, ScriptVoid>(sx, sy, sz, ex, ey, ez); }
 
     // Ped
     static void AddAmmoToChar(Ped ped, eWeapon weapon, unsigned int amount) { NativeInvoke::Invoke<NATIVE_ADD_AMMO_TO_CHAR, ScriptVoid>(ped, weapon, amount); }

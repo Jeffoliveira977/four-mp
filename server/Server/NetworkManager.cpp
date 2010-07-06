@@ -340,6 +340,8 @@ void NetworkManager::HandleClientConnectionConfirmation(NetworkPlayerConnectionC
 	delete playerdata;
 	server.UpdateServerInfo();
 
+	vmm.OnPlayerSpawn(data->client);
+
 	NetworkPlayerSpawnData data2;
 	data2.armor = playm.playerbuffer[data->client]->armor;
 	data2.health = playm.playerbuffer[data->client]->health;
@@ -350,7 +352,6 @@ void NetworkManager::HandleClientConnectionConfirmation(NetworkPlayerConnectionC
 	memcpy(data2.compT, playm.playerbuffer[data->client]->compT, sizeof(int) * 11);
 	data2.client = data->client;
 	this->SendDataToAll(&data2, NetworkPackPlayerSpawn, 1);
-	//vmm.OnPlayerSpawn(data->client);
 }
 
 void NetworkManager::HandlePlayerFootSync(NetworkPlayerFootData *data, const SystemAddress sa)
@@ -982,7 +983,7 @@ void NetworkManager::SendConnectionError(const SystemAddress address, const Netw
 	this->SendDataTo(&data, NetworkPackPlayerConnectionError, address, 1);
 }
 
-void NetworkManager::SendChatMessageToOne(short index, wchar_t * msg)
+void NetworkManager::SendChatMessageToOne(short index, const wchar_t * msg)
 {
 	NetworkPlayerChatData data;
 	data.client = -1;
@@ -990,7 +991,7 @@ void NetworkManager::SendChatMessageToOne(short index, wchar_t * msg)
 	this->SendDataToOne(index, &data, NetworkPackPlayerChat);
 }
 
-void NetworkManager::SendChatMessageToAll(wchar_t * msg)
+void NetworkManager::SendChatMessageToAll(const wchar_t * msg)
 {
 	NetworkPlayerChatData data;
 	data.client = -1;
