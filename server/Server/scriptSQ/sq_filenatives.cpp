@@ -87,11 +87,11 @@ SQInteger sq_fread(SQVM *v)
 	sq_getuserpointer(v, 2, (SQUserPointer*)&f);
 	sq_getinteger(v, 3, &size);
 
-	char * buf = new char[size+1];
-	fread(buf, 1, size, f);
+	SQChar * buf = new SQChar[size+1];
+	fread(buf, sizeof(SQChar), size, f);
 	buf[size] = 0;
 	
-	sq_pushstring(v, (SQChar*)buf, -1);
+	sq_pushstring(v, buf, -1);
 	//delete buf;
 
 	return 1;
@@ -100,14 +100,14 @@ SQInteger sq_fread(SQVM *v)
 SQInteger sq_fwrite(SQVM *v)
 {
 	FILE * f = NULL;
-	const char * data;
+	const SQChar * data;
 	int size;
 
 	sq_getuserpointer(v, 2, (SQUserPointer*)&f);
-	sq_getstring(v, 3, (const SQChar**)&data);
+	sq_getstring(v, 3, &data);
 	sq_getinteger(v, 4, &size);
 	
-	size = fwrite(data, 1, size, f);
+	size = fwrite(data, sizeof(SQChar), size, f);
 	sq_pushinteger(v, size);
 
 	return 1;
