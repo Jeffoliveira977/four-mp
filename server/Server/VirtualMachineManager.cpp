@@ -22,11 +22,7 @@
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 
-#include "sq.h"
-#include "sq_vmfunc.h"
-#include "sq_consolenatives.h"
-#include "sq_playernatives.h"
-#include "sq_callbacks.h"
+#include "scriptSQ/sq.h"
 
 extern HandleManager hm;
 extern CoreHandleTypesManager chtm;
@@ -577,8 +573,16 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			vmbuffer[index]->ptr.squirrel = new HSQUIRRELVM;
 			// Init Squirrel
 			*vmbuffer[index]->ptr.squirrel = sq_open(1024);
-			sqstd_seterrorhandlers(*vmbuffer[index]->ptr.squirrel);
 			sq_setprintfunc(*vmbuffer[index]->ptr.squirrel, sq_PrintToServer, sq_PrintToServer);
+
+			sq_pushroottable(*vmbuffer[index]->ptr.squirrel);
+
+			sqstd_register_bloblib(*vmbuffer[index]->ptr.squirrel);
+			sqstd_register_iolib(*vmbuffer[index]->ptr.squirrel);
+			sqstd_register_systemlib(*vmbuffer[index]->ptr.squirrel);
+			sqstd_register_mathlib(*vmbuffer[index]->ptr.squirrel);
+			sqstd_register_stringlib(*vmbuffer[index]->ptr.squirrel);
+
 			// Register Script Funcions
 			// Script identity functions
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptName, L"SetScriptName");
@@ -627,9 +631,6 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			// Time func
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetGameTime, L"GetGameTime");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetGameTime, L"SetGameTime");
-			// Cmd func
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetCmdCharFirst, L"SetCmdCharFirst");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetCmdCharSecond, L"SetCmdCharSecond");
 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SendMessageToAll, L"SendMessageToAll");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SendMessageToPlayer, L"SendMessageToPlayer");
@@ -639,16 +640,13 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ReloadBanList, L"ReloadBanList");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ClearBanList, L"ClearBanList");
 
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_include, L"include");
+			sq_register_file_func(*vmbuffer[index]->ptr.squirrel);
 
 			// Car functions
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateCar, L"CreateCar");
-			sq_pushroottable(*vmbuffer[index]->ptr.squirrel);
-			// Register Standard Script Functions
-			sqstd_register_stringlib(*vmbuffer[index]->ptr.squirrel);
-			sqstd_register_mathlib(*vmbuffer[index]->ptr.squirrel);
-			sqstd_register_systemlib(*vmbuffer[index]->ptr.squirrel);
+
 			sqstd_seterrorhandlers(*vmbuffer[index]->ptr.squirrel);
+
 			if(!SQ_SUCCEEDED(sqstd_dofile(*vmbuffer[index]->ptr.squirrel, string, 0, SQTrue))) 
 			{
 				sq_close(*vmbuffer[index]->ptr.squirrel);

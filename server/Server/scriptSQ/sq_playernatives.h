@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sq/squirrel.h"
+#include "../sq/squirrel.h"
 
 void sq_GetPlayerName(HSQUIRRELVM v);
 void sq_GetPlayerModel(HSQUIRRELVM v);
@@ -16,3 +16,8 @@ void sq_GetPlayerSpawnPosition(HSQUIRRELVM v);
 void sq_SetPlayerModel(HSQUIRRELVM v);
 void sq_GivePlayerWeapon(HSQUIRRELVM v);
 void sq_SetPlayerSpawnPosition(HSQUIRRELVM v);
+
+void sq_Kick(HSQUIRRELVM v);
+void sq_Ban(HSQUIRRELVM v);
+void sq_ReloadBanList(HSQUIRRELVM v);
+void sq_ClearBanList(HSQUIRRELVM v);
