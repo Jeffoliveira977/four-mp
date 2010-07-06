@@ -428,6 +428,9 @@ void FMPHook::CheckAndCheck()
 void FMPHook::RunMP()
 {
 	Log::Info(L"Starting up multiplayer mode.");
+
+	Natives::ThisScriptShouldBeSaved();
+
 	Natives::AllowEmergencyServices(0);
 	//Natives::SetPedDensityMultiplier(0);
 	//Natives::SetCarDensityMultiplier(0);
@@ -440,7 +443,7 @@ void FMPHook::RunMP()
 	Natives::SwitchRandomTrains(0);
 	Natives::SwitchGarbageTrucks(0);
 
-	//SetSleepModeActive(1);
+	Natives::SetSleepModeActive(1);
 	
 	Natives::SetIntStat(STAT_ISLANDS_UNLOCKED, 100);
 	Natives::SetIntStat(STAT_ACTIVITIES_WITH_BRUCIE, 0);
@@ -510,6 +513,16 @@ void FMPHook::RunMP()
 	Natives::TerminateAllScriptsWithThisName("computermain");
 	Natives::TerminateAllScriptsWithThisName("copbootsearch");
 	Natives::TerminateAllScriptsWithThisName("emergencycall");
+
+	Natives::TerminateAllScriptsWithThisName("taxi_trigger");
+	Natives::TerminateAllScriptsWithThisName("internet_dating");
+	Natives::TerminateAllScriptsWithThisName("speechControl");
+	Natives::TerminateAllScriptsWithThisName("statTracker");
+	Natives::TerminateAllScriptsWithThisName("happyTShirt");
+	Natives::TerminateAllScriptsWithThisName("storyTimer");
+	Natives::TerminateAllScriptsWithThisName("mpTutorialLauncher");
+	Natives::TerminateAllScriptsWithThisName("sixAxisTutLauncher"); 
+
 	/*Natives::TerminateAllScriptsWithThisName("empiredown");
 	Natives::TerminateAllScriptsWithThisName("foodserver");
 	Natives::TerminateAllScriptsWithThisName("garbage_trucks");
@@ -734,19 +747,14 @@ void MainThread(void* dummy)
 
 /*void ALLOCATE_SCRIPT_TO_OBJECT(char *script, int model, int unk1, float unk2, int unk3)
 {
-	Log::Debug("ALLOCATE_SCRIPT_TO_OBJECT");
-	Log::Debug("('%s', 0x%x, %d, %f, %d)", script, model, unk1, unk2, unk3);
+	Log::Debug(L"ALLOCATE_SCRIPT_TO_OBJECT");
+	Log::Debug(L"('%s', 0x%x, %d, %f, %d)", script, model, unk1, unk2, unk3);
 }
 
-void REGISTER_WORLD_POINT_SCRIPT_BRAIN(char *script, float unk1)
-{
-	Log::Debug("REGISTER_WORLD_POINT_SCRIPT_BRAIN");
-	Log::Debug("('%s', %f)", script, unk1);
-}
 void ALLOCATE_SCRIPT_TO_RANDOM_PED(char *script, int model, int unk1, int unk2)
 {
-	Log::Debug("ALLOCATE_SCRIPT_TO_RANDOM_PED");
-	Log::Debug("('%s', 0x%x, %d, %d)", script, model, unk1, unk2);
+	Log::Debug(L"ALLOCATE_SCRIPT_TO_RANDOM_PED");
+	Log::Debug(L"('%s', 0x%x, %d, %d)", script, model, unk1, unk2);
 }*/
 
 int sub_A002B0(void * th, char *script, int a3, int a4, int a5, int a6, int a7, int a8)
@@ -772,6 +780,12 @@ bool IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE(int a1)
 	Log::Debug(L"> IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE");
 	Log::Debug(L">>> (%d)", a1);
 	return 0;
+}
+
+void REGISTER_WORLD_POINT_SCRIPT_BRAIN(char *script, float unk1)
+{
+	Log::Debug(L"REGISTER_WORLD_POINT_SCRIPT_BRAIN");
+	Log::Debug(L"%s with %f", script, unk1);
 }
 
 Vector4 GetSpawnPos(Vector4 *pos, float angle, Vector4 *result) //8E6840
@@ -806,6 +820,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 
 			JmpHook(ADDRESS_IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE, (DWORD)IS_WORLD_POINT_WITHIN_BRAIN_ACTIVATION_RANGE);
 			JmpHook(ADDRESS_IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE, (DWORD)IS_OBJECT_WITHIN_BRAIN_ACTIVATION_RANGE);
+			JmpHook(ADDRESS_REGISTER_WORLD_POINT_SCRIPT_BRAIN, (DWORD)REGISTER_WORLD_POINT_SCRIPT_BRAIN);
 			JmpHook(ADDRESS_GET_SPAWN_POS, (DWORD)GetSpawnPos);
 			SetString(GAME_NAME,"GTA IV: FOUR-MP");
 			SetString(ADDRESS_STR_POPCYCLE_DAT, "FMP/popcycle.dat");

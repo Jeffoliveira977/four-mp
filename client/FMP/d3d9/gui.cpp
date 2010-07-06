@@ -453,6 +453,7 @@ namespace CALLBACKS
 			if(tab == 3)
 			{
 				Gui.UpdateServer(tmp_msi);
+				Log::Debug(L"Server: %s:%d", tmp_msi->ip, tmp_msi->port);
 				nm.Ping(tmp_msi->ip, tmp_msi->port);
 			}
 			server_list_fav.push_back(tmp_msi);

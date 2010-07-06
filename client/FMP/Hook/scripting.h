@@ -165,6 +165,8 @@ namespace Natives
     static void RemovePlayerHelmet(Player playerIndex, bool remove) { NativeInvoke::Invoke<NATIVE_REMOVE_PLAYER_HELMET, ScriptVoid>(playerIndex, remove); }
     static void AddHospitalRestart(float x, float y, float z, float r, int num_x3) { NativeInvoke::Invoke<NATIVE_ADD_HOSPITAL_RESTART, ScriptVoid>(x, y, z, r, num_x3); }
     static void AddPoliceRestart(float x, float y, float z, float r, int num_x3) { NativeInvoke::Invoke<NATIVE_ADD_POLICE_RESTART, ScriptVoid>(x, y, z, r, num_x3); }
+	static void ThisScriptShouldBeSaved() { NativeInvoke::Invoke<NATIVE_THIS_SCRIPT_SHOULD_BE_SAVED, ScriptVoid>(); }
+	static void SetSleepModeActive(bool active) { NativeInvoke::Invoke<NATIVE_SET_SLEEP_MODE_ACTIVE, bool>(active); }
 
     // Ped
     static void AddAmmoToChar(Ped ped, eWeapon weapon, unsigned int amount) { NativeInvoke::Invoke<NATIVE_ADD_AMMO_TO_CHAR, ScriptVoid>(ped, weapon, amount); }

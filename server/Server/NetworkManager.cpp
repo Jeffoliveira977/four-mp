@@ -385,7 +385,7 @@ void NetworkManager::HandlePlayerFootSync(NetworkPlayerFootData *data, const Sys
 	}
 	memcpy(playm.playerbuffer[client]->position, data->position, sizeof(float) * 3);
 	playm.playerbuffer[client]->angle = data->angle;
-	this->SendDataToAllExceptOne(client, &data, NetworkPackPlayerFootSync, 1);
+	this->SendDataToAllExceptOne(client, data, NetworkPackPlayerFootSync, 1);
 }
 
 void NetworkManager::HandlePlayerVehicleSync(NetworkPlayerVehicleData *data, const SystemAddress sa)
