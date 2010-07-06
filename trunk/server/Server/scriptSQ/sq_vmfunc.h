@@ -1,4 +1,4 @@
-#include "sq/squirrel.h"
+#include "../sq/squirrel.h"
 
 // SQ Functions
 SQInteger register_global_func(HSQUIRRELVM v, SQFUNCTION f, const wchar_t *fname);
