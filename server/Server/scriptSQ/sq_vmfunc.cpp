@@ -6,7 +6,7 @@
 
 #include "sq_vmfunc.h"
 
-#include "VirtualMachineManager.h"
+#include "../VirtualMachineManager.h"
 
 extern VirtualMachineManager vmm;
 

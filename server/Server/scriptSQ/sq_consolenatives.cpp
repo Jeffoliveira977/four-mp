@@ -11,12 +11,12 @@
 #endif
 
 #include "sq_consolenatives.h"
-#include "logging.h"
-#include "HandleManager.h"
-#include "CoreHandleTypesManager.h"
+#include "../logging.h"
+#include "../HandleManager.h"
+#include "../CoreHandleTypesManager.h"
 #include "../../Shared/Console/ConsoleCore.h"
-#include "con_fmpcommands.h"
-#include "VirtualMachineManager.h"
+#include "../con_fmpcommands.h"
+#include "../VirtualMachineManager.h"
 
 extern HandleManager hm;
 extern CoreHandleTypesManager chtm;
