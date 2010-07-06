@@ -1,6 +1,5 @@
 #include "RakPeerInterface.h"
 #include "RakNetworkFactory.h"
-#include "MessageIdentifiers.h"
 #include "MasterServerManager.h"
 #include "BitStream.h"
 
@@ -663,7 +662,7 @@ short NetworkManager::RegisterNewClient(const SystemAddress address)
 	return index;
 }
 
-void NetworkManager::HandleClientDisconnection(const SystemAddress address)
+void NetworkManager::HandleClientDisconnection(const SystemAddress address, const DefaultMessageIDTypes type)
 {
 	short client = this->GetClientIndex(address);
 	if (client == INVALID_PLAYER_INDEX)
