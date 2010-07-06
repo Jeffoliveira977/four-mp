@@ -7,6 +7,7 @@
 
 #include <vector>
 #include "RakPeerInterface.h"
+#include "MessageIdentifiers.h"
 #include "../../Shared/Network/GtaEnums.h"
 #include "../../Shared/Network/NetworkProtocol.h"
 
@@ -58,7 +59,7 @@ private:
 
 	bool CheckClientName(const wchar_t name[MAX_CLIENT_NAME_LENGTH]);
 	short RegisterNewClient(const SystemAddress address);
-	void HandleClientDisconnection(const SystemAddress address, const DefaultMessageIDTypes type);
+	void HandleClientDisconnection(const SystemAddress address, const DefaultMessageIDTypes type = ID_INTERNAL_PING);
 	short GetClientIndex(const SystemAddress address);
 	short GetClientFreeSlot(void);
 	void SendConnectionError(const SystemAddress address, const NetworkPlayerConnectionError error);
