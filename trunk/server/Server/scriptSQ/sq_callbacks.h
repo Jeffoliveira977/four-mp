@@ -3,7 +3,7 @@
 /// \details These are the functions that host calls from outside.
 /// \author WNeZRoS, FaTony
 
-#include "sq/squirrel.h"
+#include "../sq/squirrel.h"
 
 // SQ Callbacks
 
@@ -60,3 +60,5 @@ bool sc_OnPlayerCommandText(HSQUIRRELVM v, const short index, const wchar_t * cm
 /// \param[in] numargs Number of arguments to pass.
 /// \return No return.
 void sc_CommandCallback(HSQUIRRELVM v, const wchar_t *callback, const unsigned char numargs);
+
+void sc_OnPlayerShoot(HSQUIRRELVM v, const short index, float shoot[3]);

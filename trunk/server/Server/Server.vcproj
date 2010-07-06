@@ -219,26 +219,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\sq_callbacks.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_consolenatives.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_playernatives.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_scriptfunc.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_vmfunc.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\VehicleManager.cpp"
 				>
 			</File>
@@ -246,6 +226,46 @@
 				RelativePath=".\VirtualMachineManager.cpp"
 				>
 			</File>
+			<Filter
+				Name="scriptSQ"
+				>
+				<File
+					RelativePath=".\scriptSQ\sq_callbacks.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_consolenatives.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_filenatives.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_gamenatives.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_playernatives.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_scriptfunc.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_uinatives.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_vehiclenatives.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_vmfunc.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -301,26 +321,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\sq.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_callbacks.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_consolenatives.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_playernatives.h"
-				>
-			</File>
-			<File
-				RelativePath=".\sq_vmfunc.h"
-				>
-			</File>
-			<File
 				RelativePath=".\VehicleManager.h"
 				>
 			</File>
@@ -328,6 +328,46 @@
 				RelativePath=".\VirtualMachineManager.h"
 				>
 			</File>
+			<Filter
+				Name="scriptSQ"
+				>
+				<File
+					RelativePath=".\scriptSQ\sq.h"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_callbacks.h"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_consolenatives.h"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_filenatives.h"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_gamenatives.h"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_playernatives.h"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_uinatives.h"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_vehiclenatives.h"
+					>
+				</File>
+				<File
+					RelativePath=".\scriptSQ\sq_vmfunc.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
