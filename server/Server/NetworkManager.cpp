@@ -2,6 +2,7 @@
 #include "RakNetworkFactory.h"
 #include "MessageIdentifiers.h"
 #include "MasterServerManager.h"
+#include "BitStream.h"
 
 #include "NetworkManager.h"
 #include "../../Shared/Console/common.h"
@@ -311,7 +312,7 @@ void NetworkManager::HandleClientConnectionConfirmation(NetworkPlayerConnectionC
 			playerdata = this->GetPlayerFullUpdateData(i);
 			if (playerdata != NULL)
 			{
-				this->SendDataToOne(client, &playerdata, NetworkPackPlayerFullUpdate, 1);
+				this->SendDataToOne(client, playerdata, NetworkPackPlayerFullUpdate, 1);
 				delete playerdata;
 			}
 		}
@@ -322,7 +323,7 @@ void NetworkManager::HandleClientConnectionConfirmation(NetworkPlayerConnectionC
 		vehicledata = this->GetVehicleFullUpdateData(i);
 		if (vehicledata != NULL)
 		{
-			this->SendDataToOne(client, &vehicledata, NetworkPackVehicleFullUpdate, 1);
+			this->SendDataToOne(client, vehicledata, NetworkPackVehicleFullUpdate, 1);
 			delete vehicledata;
 		}
 	}
@@ -336,7 +337,7 @@ void NetworkManager::HandleClientConnectionConfirmation(NetworkPlayerConnectionC
 		clientbuffer[data->client] = NULL;
 		return;
 	}
-	this->SendDataToAll(&playerdata, NetworkPackPlayerConnection, 1);
+	this->SendDataToAll(playerdata, NetworkPackPlayerConnection, 1);
 	delete playerdata;
 	server.UpdateServerInfo();
 
@@ -1020,8 +1021,6 @@ void NetworkManager::SendDataToAll(const DATATYPE * data, const NetworkPackType 
 	}
 }
 
-#include "BitStream.h"
-
 template <typename DATATYPE>
 bool NetworkManager::SendDataToOne(const short index, const DATATYPE *data, const NetworkPackType type, const char pp)
 {
@@ -1032,6 +1031,11 @@ bool NetworkManager::SendDataToOne(const short index, const DATATYPE *data, cons
 	if (clientbuffer[index] == NULL)
 	{
 		return false;
+	}
+
+	if(sizeof(DATATYPE) == 4)
+	{
+		debug(L"Bad data at %d", type);
 	}
 
 	int size = sizeof(DATATYPE);

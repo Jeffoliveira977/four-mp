@@ -9,6 +9,7 @@
 
 enum NetworkPackType
 {
+	NetworkPackNull,
 	NetworkPackPlayerConnection,
 	NetworkPackPlayerConnectionRequest,
 	NetworkPackPlayerConnectionError,
@@ -35,14 +36,6 @@ enum NetworkPackType
 	NetworkPackPlayerPosition
 };
 
-struct NetworkPlayerConnectionRequestData
-{
-	short protocol;
-	wchar_t name[MAX_CLIENT_NAME_LENGTH];
-	unsigned int sessionkey;
-	int fmpid;
-};
-
 enum NetworkPlayerConnectionError
 {
 	NetworkPlayerConnectionErrorServerFull,
@@ -53,6 +46,15 @@ enum NetworkPlayerConnectionError
 	NetworkPlayerConnectionErrorAlreadyConnected,
 	NetworkPlayerConnectionErrorAllocationError,
 	NetworkPlayerConnectionErrorScriptLock
+};
+
+#pragma pack(push, 1)
+struct NetworkPlayerConnectionRequestData
+{
+	short protocol;
+	wchar_t name[MAX_CLIENT_NAME_LENGTH];
+	unsigned int sessionkey;
+	int fmpid;
 };
 
 struct NetworkPlayerConnectionErrorData
@@ -270,3 +272,5 @@ struct NetworkPlayerPositionData
 	float pos[3];
 	float angle;
 };
+
+#pragma pack(pop)
