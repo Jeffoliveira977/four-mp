@@ -56,11 +56,12 @@ void NetworkManager::Tick(void)
 	static Packet *pack;
 	for (pack = net->Receive(); pack; net->DeallocatePacket(pack), pack = net->Receive())
 	{
+		Log::Debug(L"%02X %02X %02X %02X %02X %02X", pack->data[0], pack->data[1], pack->data[2], pack->data[3], pack->data[4], pack->data[5]); 
 		switch(pack->data[0])
 		{
 		case FMP_PACKET_SIGNATURE:
 			{
-				HandleOurPacket(pack->data + 1, pack->length, pack->systemAddress);	
+				HandleOurPacket(pack->data + 1, pack->length - 1, pack->systemAddress);	
 			} break;
 		case ID_CONNECTION_REQUEST_ACCEPTED:
 			{
@@ -191,6 +192,8 @@ void NetworkManager::Tick(void)
 void NetworkManager::HandleOurPacket(unsigned char * pack, unsigned int length, SystemAddress sa)
 {
 	short type = *(short*)pack;
+
+	Log::Debug(L"Type %d - Length %d", type, length);
 
 	switch (type)
 	{
@@ -344,6 +347,7 @@ void NetworkManager::HandleOurPacket(unsigned char * pack, unsigned int length, 
 		{
 #if defined (FMP_CLIENT)
 			NetworkVehicleFullUpdateData data = *(NetworkVehicleFullUpdateData*)(pack + 2);
+			
 			//TODO: Do NOT load at connect, redo the whole thing.
 			HOOK.CreateCar(data.index, data.model, data.position, data.angle, data.color);
 #endif
