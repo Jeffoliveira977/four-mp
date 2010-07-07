@@ -62,3 +62,4 @@ bool sc_OnPlayerCommandText(HSQUIRRELVM v, const short index, const wchar_t * cm
 void sc_CommandCallback(HSQUIRRELVM v, const wchar_t *callback, const unsigned char numargs);
 
 void sc_OnPlayerShoot(HSQUIRRELVM v, const short index, float shoot[3]);
+bool sc_CallSomeCallback(HSQUIRRELVM v, const wchar_t *callback, const int param);
