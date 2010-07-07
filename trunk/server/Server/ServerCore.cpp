@@ -1,4 +1,5 @@
 #include <time.h>
+
 #include "ServerCore.h"
 #include "../../Shared/logging/log.h"
 #include "../../Shared/logging/logFile.h"
@@ -29,6 +30,18 @@ extern PluginManager plugm;
 extern VirtualMachineManager vmm;
 extern PlayerManager playm;
 
+long msec_time()
+{
+#ifdef _WIN32
+	return GetTickCount();
+#else
+	struct timeval tv;
+	if(gettimeofday(&tv, NULL) != 0) return 0;
+
+	return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+#endif
+}
+
 ServerCore::ServerCore(void)
 {
 	isrunning = false;
@@ -48,6 +61,8 @@ ServerCore::ServerCore(void)
 	gametime.time[1] = 0;
 	cmd_chars[0] = L'/';
 	cmd_chars[1] = 0;
+
+	memset(&scripttimers, 0, sizeof(ScriptTimer)*MAX_TIMERS);
 }
 
 ServerCore::~ServerCore(void)
@@ -166,25 +181,44 @@ void ServerCore::Tick(void)
 	conscreen.CheckUserInput();
 	nm.Tick();
 	gametime.tickcount++;
+
+	curtime = time(0);
+
 	if (gametime.tickcount == gametime.ticksperminute)
 	{
 		gametime.tickcount = 0;
 		this->IncrementGameTime();
 		this->UpdateCaption();
 	}
-	if(GetTickCount() - lastcheck >= 30000)
+	if(curtime - lastcheck >= 30000)
 	{
-		lastcheck = GetTickCount();
+		lastcheck = curtime;
 		nm.CheckClients();
 	}
 	if (!lan)
 	{
-		if (time(0) - lastmasterservercheck >= 3600000)
+		if (curtime - lastmasterservercheck >= 3600000)
 		{
-			lastmasterservercheck = time(0);
+			lastmasterservercheck = curtime;
 			if (!msm.RegisterServer(port, hostname, gamemodename, L"World", maxplayers, password))
 			{
 				Log::Warning(L"Unable to register server.");
+			}
+		}
+	}
+	long curmtime = msec_time();
+	for(int i = 0; i < MAX_TIMERS; i++)
+	{
+		if(scripttimers[i].timeout > 0)
+		{
+			if(curmtime >= scripttimers[i].time)
+			{
+				if(!vmm.CallSomeCallback(scripttimers[i].callback, scripttimers[i].param))
+				{
+					KillTimer(i);
+				}
+				else
+					scripttimers[i].time = curmtime + scripttimers[i].timeout;
 			}
 		}
 	}
@@ -303,4 +337,23 @@ void ServerCore::UpdateCaption(void)
 	wchar_t caption[81];
 	swprintf(caption, 81, L"FOUR-MP %02d / %02d %-58.58s %02d:%02d", playm.GetNumberOfPlayers(), playm.GetMaxPlayers(), gamemodename, gametime.time[0], gametime.time[1]);
 	conscreen.SetCaption(caption);
+}
+
+int ServerCore::AddTimer(const wchar_t * callback, int timeout, int param)
+{
+	int i;
+	for(i = 0; i < MAX_TIMERS; i++)
+	{
+		if(scripttimers[i].timeout <= 0) break;
+	}
+	wcscpy(scripttimers[i].callback, callback);
+	scripttimers[i].param = param;
+	scripttimers[i].timeout = timeout;
+	scripttimers[i].time = msec_time() + timeout;
+	return i;
+}
+void ServerCore::KillTimer(short timerid)
+{
+	memset(&scripttimers[timerid], 0, sizeof(ScriptTimer));
+	Log::Info(L"Kill %d", timerid);
 }

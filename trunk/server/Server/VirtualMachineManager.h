@@ -171,6 +171,8 @@ public:
 
 	bool OnPlayerCommandText(const short playerindex, const wchar_t *cmd, const wchar_t *data);
 
+	bool CallSomeCallback(const wchar_t *callback, const int param);
+
 	/// \brief Fires a dynamic command callback.
 	/// \param[in] index Index of the virtual machine.
 	/// \param[in] callback Name of the callback to call.

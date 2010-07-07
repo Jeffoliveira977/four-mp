@@ -22,6 +22,8 @@ public:
 	bool SetGameTime(const unsigned char time[2]);
 	void SetCmdChar(char index, wchar_t ch);
 	wchar_t GetCmdChars(char index);
+	int AddTimer(const wchar_t * callback, int timeout, int param);
+	void KillTimer(short timerid);
 private:
 	bool isrunning;
 	short sleepcount;
@@ -37,12 +39,22 @@ private:
 	wchar_t *rconpassword;
 	bool componentselect;
 	ConVar *componentselectcvar;
+	time_t curtime;
 	struct GameTime
 	{
 		short ticksperminute;
 		short tickcount;
 		unsigned char time[2];
 	};
+	struct ScriptTimer
+	{
+		wchar_t callback[256];
+		int timeout;
+		int param;
+		long time;
+	};
+#define MAX_TIMERS 32
+	ScriptTimer scripttimers[MAX_TIMERS];
 	GameTime gametime;
 	wchar_t cmd_chars[2];
 	void IncrementGameTime(void);

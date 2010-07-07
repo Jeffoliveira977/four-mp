@@ -177,3 +177,20 @@ void sc_OnPlayerShoot(HSQUIRRELVM v, const short index, float shoot[3])
 	}
 	sq_settop(v, top);
 }
+
+bool sc_CallSomeCallback(HSQUIRRELVM v, const wchar_t *callback, const int param)
+{
+	int top = sq_gettop(v);
+	int result = 0;
+	sq_pushroottable(v);
+
+	sq_pushstring(v, callback, -1);
+	if(SQ_SUCCEEDED(sq_get(v, -2))) {
+		sq_pushroottable(v);
+		sq_pushinteger(v, param);
+		sq_call(v, 2, 1, 1);
+		sq_getinteger(v, sq_gettop(v), &result);
+	}
+	sq_settop(v, top);
+	return result == 1;
+}

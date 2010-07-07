@@ -631,6 +631,8 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			// Time func
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetGameTime, L"GetGameTime");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetGameTime, L"SetGameTime");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetTimer, L"SetTimer");
+			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_KillTimer, L"KillTimer");
 
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SendMessageToAll, L"SendMessageToAll");
 			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SendMessageToPlayer, L"SendMessageToPlayer");
@@ -816,4 +818,23 @@ void VirtualMachineManager::OnFilterScriptExit(const unsigned char index)
 			break;
 		}
 	}
+}
+
+bool VirtualMachineManager::CallSomeCallback(const wchar_t *callback, const int param)
+{
+	for (unsigned char i = 0; i < vmbuffersize; i++)
+	{
+		if ((vmbuffer[i] != NULL) && (!vmbuffer[i]->paused))
+		{
+			switch (vmbuffer[i]->lang)
+			{
+			case VMLanguageSquirrel:
+				{
+					return sc_CallSomeCallback(*vmbuffer[i]->ptr.squirrel, callback, param);
+					break;
+				}
+			}
+		}
+	}
+	return false;
 }

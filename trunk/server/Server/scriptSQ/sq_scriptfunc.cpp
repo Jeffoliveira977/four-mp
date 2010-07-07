@@ -60,3 +60,27 @@ void sq_enableComponentSelect(HSQUIRRELVM v)
 	sq_getbool(v, 2, &enable);
 	server.EnableComponentSelect(enable);
 }
+
+SQInteger sq_SetTimer(SQVM *v)
+{
+	const SQChar *callback;
+	SQInteger timeout;
+	SQInteger param;
+	sq_getstring(v, 2, &callback);
+	sq_getinteger(v, 3, &timeout);
+	sq_getinteger(v, 4, &param);
+	
+	server.AddTimer(callback, timeout, param);
+
+	return 1;
+}
+
+SQInteger sq_KillTimer(SQVM *v)
+{
+	SQInteger timer;
+	sq_getinteger(v, 2, &timer);
+	
+	server.KillTimer(timer);
+
+	return 1;
+}
