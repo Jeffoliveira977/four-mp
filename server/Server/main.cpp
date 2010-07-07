@@ -19,6 +19,10 @@
 #include "PlayerManager.h"
 #include "VehicleManager.h"
 
+#include "../../Shared/logging/log.h"
+#include "../../Shared/logging/logFile.h"
+#include "../../Shared/logging/logStd.h"
+
 ServerCore server;
 CoreHandleTypesManager chtm;
 ConsoleCore concore;
@@ -31,8 +35,15 @@ PluginManager plugm;
 HandleManager hm;
 VehicleManager vm;
 
+LogFile logfile(L"server.log");
+LogStd logserver;
+
 int main()
 {
+	Log::SetState( LOG_INFO|LOG_ERROR|LOG_WARNING|LOG_DEBUG );
+	Log::AddLogger(&logfile);
+	Log::AddLogger(&logserver);
+
 	if (!server.Load())
 	{
 		return 1;

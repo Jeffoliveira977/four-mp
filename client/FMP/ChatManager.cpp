@@ -4,7 +4,7 @@
 #include "ChatManager.h"
 #include "../../Shared/Network/Limits.h"
 #include "../../Shared/Console/common.h"
-#include "log.h"
+#include "../../Shared/logging/log.h"
 #include "d3d9/d3d9int.h"
 #include "../Shared/ClientCore.h"
 #include "../Shared/NetworkManager.h"

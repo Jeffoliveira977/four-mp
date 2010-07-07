@@ -2,7 +2,7 @@
 #include "Hook\types.h"
 #include "Hook\classes.h"
 #include "Hook\scripting.h"
-#include "log.h"
+#include "../../Shared/logging/log.h"
 #include "VehicleManager.h"
 
 extern FVehicle gVehicle[MAX_VEHICLES];

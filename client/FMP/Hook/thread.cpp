@@ -1,7 +1,6 @@
 #include "classes.h"
 #include "hook.h"
-#include "../log.h"
-
+#include "../../../Shared/logging/log.h"
 // Получить массив потоков...
 sysArray<GtaThread>* GetThreadsArray()
 {

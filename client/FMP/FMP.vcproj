@@ -211,14 +211,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\log.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\logFile.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
@@ -294,6 +286,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="log"
+				>
+				<File
+					RelativePath="..\..\Shared\logging\log.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\logging\logFile.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -326,14 +330,6 @@
 			</File>
 			<File
 				RelativePath=".\functions.h"
-				>
-			</File>
-			<File
-				RelativePath=".\log.h"
-				>
-			</File>
-			<File
-				RelativePath=".\logFile.h"
 				>
 			</File>
 			<File
@@ -405,6 +401,18 @@
 				</File>
 				<File
 					RelativePath=".\d3d9\gui.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="log"
+				>
+				<File
+					RelativePath="..\..\Shared\logging\log.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\logging\logFile.h"
 					>
 				</File>
 			</Filter>

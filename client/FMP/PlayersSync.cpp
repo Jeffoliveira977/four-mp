@@ -1,6 +1,6 @@
 #include <vector>
 
-#include "log.h"
+#include "../../Shared/logging/log.h"
 #include "Hook/types.h"
 #include "Hook/classes.h"
 //#include "Hook\hook.h"
@@ -101,7 +101,18 @@ void FMPHook::PlayerFootSync(NetworkPlayerFootData* data)
 {
 	t_index = data->client;
 	
-	if(!SafeCheckPlayer(t_index)) return;
+	if(!SafeCheckPlayer(t_index)) 
+	{
+		Log::Error(L"Unknown player %d", t_index);
+		return;
+	}
+
+	if(t_index == client.GetIndex())
+	{
+		Log::Warning(L"wtf? wtf? wtf? wtf? wtf?");
+		return;
+	}
+	else Log::Debug(L"-+-+-+- %d / %d -+-+-+-", t_index, client.GetIndex());
 
 	// read sync
 	Natives::SetCharHealth(gPlayer[t_index].PedID,data->health);

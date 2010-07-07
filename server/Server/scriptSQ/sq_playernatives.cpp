@@ -3,7 +3,7 @@
 #include "sq_playernatives.h"
 #include "../PlayerManager.h"
 #include "../NetworkManager.h"
-#include "../logging.h"
+#include "../../Shared/logging/log.h"
 
 extern PlayerManager playm;
 extern NetworkManager nm;
@@ -169,7 +169,7 @@ void sq_SetPlayerSpawnPosition(HSQUIRRELVM v)
 	sq_getfloat(v, 5, &position[2]);
 	sq_getfloat(v, 6, &position[3]);
 
-	PrintToServer(L"SPAWN POS %d: %f %f %f %f", index, position[0], position[1], position[2], position[3]);
+	Log::Info(L"SPAWN POS %d: %f %f %f %f", index, position[0], position[1], position[2], position[3]);
 
 	sq_pushbool(v, playm.SetPlayerSpawnPosition(index, position));
 }

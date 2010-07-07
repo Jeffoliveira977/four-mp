@@ -9,7 +9,7 @@
 
 #include "PluginManager.h"
 #include "../../Shared/Console/common.h"
-#include "logging.h"
+#include "../../Shared/logging/log.h"
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 #include "../../Shared/Console/ConsoleCore.h"
@@ -444,7 +444,7 @@ void PluginManager::PluginHandler::PrintToServer(const wchar_t *string, ...)
     va_start(arglist, string);
 	wchar_t *tempstring = (wchar_t *)calloc(_vscwprintf(string, arglist) + 1, sizeof(wchar_t));
 	vswprintf(tempstring, string, arglist);
-	::PrintToServer(tempstring);
+	Log::Info(tempstring);
 	free(tempstring);
 	va_end(arglist);
 }

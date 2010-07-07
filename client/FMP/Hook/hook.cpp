@@ -1,6 +1,6 @@
 #include "classes.h"
 #include "hook.h"
-#include "../log.h"
+#include "../../../Shared/logging/log.h"
 
 DWORD dwLoadOffset = ((DWORD)GetModuleHandle (NULL)-0x400000);
 /* DirectX */

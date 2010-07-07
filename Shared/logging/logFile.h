@@ -1,12 +1,11 @@
 #pragma once
 #include "log.h"
-#include <stdio.h>
-#include <windows.h>
+#include "../../Shared/Console/ConsoleScreen.h"
 
 class LogFile : public Logger
 {
 public:
-	LogFile();
+	LogFile(wchar_t*);
 	~LogFile();
 
 	virtual void Log(const wchar_t *type, const wchar_t *string, char*);

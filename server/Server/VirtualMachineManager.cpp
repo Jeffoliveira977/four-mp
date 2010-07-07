@@ -18,7 +18,7 @@
 
 #include "VirtualMachineManager.h"
 #include "../../Shared/Console/common.h"
-#include "logging.h"
+#include "../../Shared/logging/log.h"
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 
@@ -60,7 +60,7 @@ bool VirtualMachineManager::LoadGameMode(const wchar_t *string)
 	if (_waccess(L"gamemodes", 0) == -1)
 	{
 		_wmkdir(L"gamemodes");
-		PrintToServer(L"Unable to load game mode. Directory \"gamemodes\" does not exist");
+		Log::Info(L"Unable to load game mode. Directory \"gamemodes\" does not exist");
 		return false;
 	}
 	size_t length = wcslen(string);

@@ -7,7 +7,7 @@
 
 #include "HandleManager.h"
 #include "../../Shared/Console/common.h"
-#include "logging.h"
+#include "../../Shared/logging/log.h"
 #include "CoreHandleTypesManager.h"
 #include "PluginManager.h"
 #include "VirtualMachineManager.h"
@@ -462,7 +462,7 @@ bool HandleManager::IncreaseHandleCount(const short owner)
 	}
 	if (countbuffer[owner][0] == maxhandlesperowner)
 	{
-		PrintToServer(L"MEMORY LEAK IN MODULE %d. Unloading.", owner);
+		Log::Info(L"MEMORY LEAK IN MODULE %d. Unloading.", owner);
 		this->CloseAllHandles(owner);
 		return false;
 	}

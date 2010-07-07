@@ -2,7 +2,7 @@
 #include <psapi.h>
 #include <stdlib.h>
 
-#include "log.h"
+#include "../../Shared/logging/log.h"
 #include "Hook/classes.h"
 extern DWORD dwLoadOffset;
 

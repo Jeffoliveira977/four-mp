@@ -13,8 +13,8 @@
 #include <vector>
 // our includes
 
-#include "log.h"
-#include "logFile.h"
+#include "../../Shared/logging/log.h"
+#include "../../Shared/logging/logFile.h"
 #include "Hook\types.h"
 #include "Hook\classes.h"
 #include "Hook\hook.h"
@@ -41,7 +41,7 @@ HANDLE MainThreadHandle;
 
 ConsoleCore concore;
 NetworkManager nm;
-LogFile fileLogger;
+LogFile fileLogger(L"FMP/log.txt");
 
 FMPGUI Gui;
 ConsoleWindow conwindow;
