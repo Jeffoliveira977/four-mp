@@ -6,10 +6,12 @@
 #pragma once
 
 #include <vector>
-#include "RakPeerInterface.h"
-#include "MessageIdentifiers.h"
+#include "../../Shared/RakNet/RakNetTypes.h"
+#include "../../Shared/RakNet/MessageIdentifiers.h"
 #include "../../Shared/Network/GtaEnums.h"
 #include "../../Shared/Network/NetworkProtocol.h"
+
+class RakPeerInterface;
 
 /// \brief A network manager. It handles all network traffic.
 /// \details TODO:

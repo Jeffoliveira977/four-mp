@@ -3,7 +3,7 @@
 #include "sq_playernatives.h"
 #include "../PlayerManager.h"
 #include "../NetworkManager.h"
-#include "../../Shared/logging/log.h"
+#include "../../../Shared/logging/log.h"
 
 extern PlayerManager playm;
 extern NetworkManager nm;

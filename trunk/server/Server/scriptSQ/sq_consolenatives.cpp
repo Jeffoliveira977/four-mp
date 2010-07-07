@@ -11,10 +11,10 @@
 #endif
 
 #include "sq_consolenatives.h"
-#include "../../Shared/logging/log.h"
+#include "../../../Shared/logging/log.h"
 #include "../HandleManager.h"
 #include "../CoreHandleTypesManager.h"
-#include "../../Shared/Console/ConsoleCore.h"
+#include "../../../Shared/Console/ConsoleCore.h"
 #include "../con_fmpcommands.h"
 #include "../VirtualMachineManager.h"
 

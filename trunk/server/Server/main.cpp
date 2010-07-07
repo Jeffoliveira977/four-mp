@@ -8,6 +8,9 @@
 #pragma comment (lib ,"sqstdlib.lib")
 
 #include "ServerCore.h"
+#include "../../Shared/logging/log.h"
+#include "../../Shared/logging/logFile.h"
+#include "../../Shared/logging/logStd.h"
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 #include "../../Shared/Console/ConsoleCore.h"
@@ -19,11 +22,9 @@
 #include "PlayerManager.h"
 #include "VehicleManager.h"
 
-#include "../../Shared/logging/log.h"
-#include "../../Shared/logging/logFile.h"
-#include "../../Shared/logging/logStd.h"
-
 ServerCore server;
+LogFile logfile(L"server.log");
+LogStd logserver;
 CoreHandleTypesManager chtm;
 ConsoleCore concore;
 ConsoleScreen conscreen(&concore);
@@ -35,15 +36,8 @@ PluginManager plugm;
 HandleManager hm;
 VehicleManager vm;
 
-LogFile logfile(L"server.log");
-LogStd logserver;
-
 int main()
 {
-	Log::SetState( LOG_INFO|LOG_ERROR|LOG_WARNING|LOG_DEBUG );
-	Log::AddLogger(&logfile);
-	Log::AddLogger(&logserver);
-
 	if (!server.Load())
 	{
 		return 1;

@@ -4,7 +4,7 @@
 #include "../PlayerManager.h"
 #include "../VehicleManager.h"
 #include "../NetworkManager.h"
-#include "../../Shared/logging/log.h"
+#include "../../../Shared/logging/log.h"
 
 extern ServerCore server;
 extern PlayerManager playm;
