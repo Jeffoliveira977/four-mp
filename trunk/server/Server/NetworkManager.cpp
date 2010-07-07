@@ -5,7 +5,7 @@
 
 #include "NetworkManager.h"
 #include "../../Shared/Console/common.h"
-#include "logging.h"
+#include "../../Shared/logging/log.h"
 #include "ServerCore.h"
 #include "VirtualMachineManager.h"
 #include "PlayerManager.h"
@@ -67,11 +67,11 @@ void NetworkManager::Tick(void)
 			} break;
 		case ID_CONNECTION_REQUEST:
 			{
-				debug(L"New connection request");
+				Log::Debug(L"New connection request");
 			} break;
 		case ID_NEW_INCOMING_CONNECTION:
 			{
-				debug(L"New connection from %S:%d", pack->systemAddress.ToString(0), pack->systemAddress.port);
+				Log::Debug(L"New connection from %S:%d", pack->systemAddress.ToString(0), pack->systemAddress.port);
 			} break;
 		case ID_DISCONNECTION_NOTIFICATION:
 			{
@@ -213,14 +213,14 @@ void NetworkManager::HandleClientConnectionRequest(NetworkPlayerConnectionReques
 	}
 	if (data->protocol != PROTOCOL_VERSION)
 	{
-		PrintToServer(L"Client has different protocol version.");
+		Log::Error(L"Client has different protocol version.");
 		this->SendConnectionError(sa, NetworkPlayerConnectionErrorInvalidProtocol);
 		net->CloseConnection(sa, true);
 		return;
 	}
 	if (wcslen(data->name) == 0)
 	{
-		PrintToServer(L"Client has invalid name.");
+		Log::Error(L"Client has invalid name.");
 		this->SendConnectionError(sa, NetworkPlayerConnectionErrorInvalidName);
 		net->CloseConnection(sa, true);
 		return;
@@ -229,7 +229,7 @@ void NetworkManager::HandleClientConnectionRequest(NetworkPlayerConnectionReques
 	{
 		if(wcscmp(badnick[i], data->name) == 0)
 		{
-			PrintToServer(L"Client banned.");
+			Log::Error(L"Client banned.");
 			net->AddToBanList(sa.ToString(0));
 			this->SendConnectionError(sa, NetworkPlayerConnectionErrorBanned);
 			net->CloseConnection(sa, true);
@@ -241,7 +241,7 @@ void NetworkManager::HandleClientConnectionRequest(NetworkPlayerConnectionReques
 	{
 		if(!msm.QueryUserCheck(data->fmpid, sa.ToString(0), data->sessionkey))
 		{
-			PrintToServer(L"Client has failed to pass an authentication.");
+			Log::Error(L"Client has failed to pass an authentication.");
 			this->SendConnectionError(sa, NetworkPlayerConnectionErrorInvalidAuth);
 			net->CloseConnection(sa, true);
 			return;
@@ -255,7 +255,7 @@ void NetworkManager::HandleClientConnectionRequest(NetworkPlayerConnectionReques
 	short client = this->GetClientIndex(sa);
 	if (client != INVALID_PLAYER_INDEX)
 	{
-		PrintToServer(L"Player %s has tried to connect twice.", playm.playerbuffer[client]->name);
+		Log::Error(L"Player %s has tried to connect twice.", playm.playerbuffer[client]->name);
 		this->SendConnectionError(sa, NetworkPlayerConnectionErrorAlreadyConnected);
 		net->CloseConnection(sa, true);
 		return;
@@ -263,14 +263,14 @@ void NetworkManager::HandleClientConnectionRequest(NetworkPlayerConnectionReques
 	client = this->RegisterNewClient(sa);
 	if (client == INVALID_PLAYER_INDEX)
 	{
-		PrintToServer(L"Unable to register new client.");
+		Log::Error(L"Unable to register new client.");
 		this->SendConnectionError(sa, NetworkPlayerConnectionErrorAllocationError);
 		net->CloseConnection(sa, true);
 		return;
 	}
 	if (!vmm.OnPlayerConnect(client, data->name))
 	{
-		PrintToServer(L"Server script has disabled new client.");
+		Log::Warning(L"Server script has disabled new client.");
 		this->SendConnectionError(sa, NetworkPlayerConnectionErrorScriptLock);
 		net->CloseConnection(sa, true);
 		delete clientbuffer[client];
@@ -279,14 +279,14 @@ void NetworkManager::HandleClientConnectionRequest(NetworkPlayerConnectionReques
 	}
 	if (!playm.RegisterNewPlayer(client, data->name))
 	{
-		PrintToServer(L"Unable to register new client.");
+		Log::Error(L"Unable to register new client.");
 		this->SendConnectionError(sa, NetworkPlayerConnectionErrorAllocationError);
 		net->CloseConnection(sa, true);
 		delete clientbuffer[client];
 		clientbuffer[client] = NULL;
 		return;
 	}
-	PrintToServer(L"Player %s[%d] connected", playm.playerbuffer[client]->name, client);
+	Log::Info(L"Player %s[%d] connected", playm.playerbuffer[client]->name, client);
 	NetworkPlayerInfoData infodata;
 	infodata.index = client;
 	infodata.sessionkey = data->sessionkey;
@@ -329,7 +329,7 @@ void NetworkManager::HandleClientConnectionConfirmation(NetworkPlayerConnectionC
 	playerdata = this->GetPlayerFullUpdateData(data->client);
 	if (playerdata == NULL)
 	{
-		PrintToServer(L"Unable to read player data.");
+		Log::Error(L"Unable to read player data.");
 		this->SendConnectionError(clientbuffer[data->client]->address, NetworkPlayerConnectionErrorAllocationError);
 		net->CloseConnection(clientbuffer[data->client]->address, true);
 		delete clientbuffer[data->client];
@@ -379,11 +379,12 @@ void NetworkManager::HandlePlayerFootSync(NetworkPlayerFootData *data, const Sys
 		playm.playerbuffer[client]->health = data->health;
 		playm.playerbuffer[client]->armor = data->armour;
 	}
-	if (playm.playerbuffer[client]->health < 100)
+	if (playm.playerbuffer[client]->health < 100 && playm.playerbuffer[client]->health != -1)
 	{
 		vmm.OnPlayerDeath(client, INVALID_PLAYER_INDEX, 46);
 		playm.playerbuffer[client]->health = -1;
 	}
+	//PrintToServer(L"Foot %d to %f %f %f", client, data->position[0], data->position[1], data->position[2]);
 	memcpy(playm.playerbuffer[client]->position, data->position, sizeof(float) * 3);
 	playm.playerbuffer[client]->angle = data->angle;
 	this->SendDataToAllExceptOne(client, data, NetworkPackPlayerFootSync, 1);
@@ -633,7 +634,7 @@ void NetworkManager::HandlePlayerChat(NetworkPlayerChatData *data, const SystemA
 	wchar_t tempstring[MAX_CHAT_MESSAGE_LENGTH];
 	_snwprintf(tempstring, MAX_CHAT_MESSAGE_LENGTH, L"%s: %s", playm.playerbuffer[data->client]->name, data->message);
 	tempstring[MAX_CHAT_MESSAGE_LENGTH-1] = L'\0';
-	PrintToServer(tempstring);
+	Log::Info(tempstring);
 	wcscpy(data->message, tempstring);
 	this->SendDataToAll(data, NetworkPackPlayerChat);
 }
@@ -679,7 +680,7 @@ void NetworkManager::HandleClientDisconnection(const SystemAddress address, cons
 		return;
 	}
 	vmm.OnPlayerDisconnect(client);
-	PrintToServer(L"Player %s disconnected", playm.playerbuffer[client]->name);
+	Log::Info(L"Player %s disconnected", playm.playerbuffer[client]->name);
 	delete playm.playerbuffer[client];
 	playm.playerbuffer[client] = NULL;
 	playm.numplayers--;
@@ -1035,7 +1036,7 @@ bool NetworkManager::SendDataToOne(const short index, const DATATYPE *data, cons
 
 	if(sizeof(DATATYPE) == 4)
 	{
-		debug(L"Bad data at %d", type);
+		Log::Debug(L"Bad data at %d", type);
 	}
 
 	int size = sizeof(DATATYPE);

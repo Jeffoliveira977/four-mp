@@ -7,7 +7,7 @@
 
 #include <windows.h>
 #include "..\GUI\CGUI.h"
-#include "log.h"
+#include "../../Shared/logging/log.h"
 
 class ConsoleWindow : public Logger
 {

@@ -1,6 +1,6 @@
 #include <time.h>
 #include "ServerCore.h"
-#include "logging.h"
+#include "../../Shared/logging/log.h"
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 #include "../../Shared/Console/ConsoleCore.h"
@@ -68,7 +68,7 @@ ServerCore::~ServerCore(void)
 
 bool ServerCore::Load(void)
 {
-	concore.SetOutputFunction(PrintToServer);
+	concore.SetOutputFunction(Log::Info);
 	concore.SetExecPath(L"cfg/");
 	conscreen.SetCaption(L"FOUR-MP");
 	//Core console functions
@@ -125,7 +125,7 @@ bool ServerCore::Load(void)
 	ConVar *portcvar = concore.AddConVar(L"sv_port", 7777, L"Server port.", 0, true, 0, true, 65535);
 	portcvar->HookChange(ConVarHookSvPort);
 	hm.AddNewHandle(0, HandleTypeConVar, portcvar);
-	PrintToServer(L"FOUR-MP. Copyright 2009-2010 Four-mp team.");
+	Log::Void(L"FOUR-MP. Copyright 2009-2010 Four-mp team.");
 	concore.InterpretLine(L"exec server.cfg");
 	sleepcount = 1000 / SERVER_TICKRATE;
 	gametime.ticksperminute = SERVER_TICKRATE * 2;
@@ -135,7 +135,7 @@ bool ServerCore::Load(void)
 	vmm.LoadFilterScripts();
 	if (!vmm.LoadGameMode(gamemode))
 	{
-		PrintToServer(L"Can't load gamemode.");
+		Log::Error(L"Can't load gamemode.");
 		return false;
 	}
 	gamemodename = vmm.GetGameModeName();
@@ -146,7 +146,7 @@ bool ServerCore::Load(void)
 	this->UpdateServerInfo();
 	this->UpdateCaption();
 	isrunning = true;
-	debug(L"Started");
+	Log::Debug(L"Started");
 	return true;
 }
 
@@ -177,7 +177,7 @@ void ServerCore::Tick(void)
 			lastmasterservercheck = time(0);
 			if (!msm.RegisterServer(port, hostname, gamemodename, L"World", maxplayers, password))
 			{
-				PrintToServer(L"Unable to register server.");
+				Log::Warning(L"Unable to register server.");
 			}
 		}
 	}
@@ -207,7 +207,7 @@ void ServerCore::UpdateServerInfo(void)
 	{
 		if (!msm.RegisterServer(port, hostname, gamemodename, L"World", maxplayers, password))
 		{
-			PrintToServer(L"Unable to register server.");
+			Log::Warning(L"Unable to register server.");
 		}
 		lastmasterservercheck = time(0);
 	}

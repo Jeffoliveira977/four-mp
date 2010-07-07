@@ -3,7 +3,7 @@
 
 #include "PlayerManager.h"
 #include "../../Shared/Console/common.h"
-#include "logging.h"
+#include "../../Shared/logging/log.h"
 #include "NetworkManager.h"
 #include "VirtualMachineManager.h"
 #include "VehicleManager.h"
@@ -392,7 +392,7 @@ bool PlayerManager::AddPlayerClass(const unsigned int model, const float positio
 {
 	if (!this->GetClassFreeSlot(index))
 	{
-		PrintToServer(L"Unable to add player class. No free slots.");
+		Log::Warning(L"Unable to add player class. No free slots.");
 		return false;
 	}
 	if (index >= classbuffersize)

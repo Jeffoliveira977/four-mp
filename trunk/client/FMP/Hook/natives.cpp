@@ -1,5 +1,5 @@
 #include <windows.h>
-#include "../log.h"
+#include "../../../Shared/logging/log.h"
 #include "hook.h"
 #include "natives.h"
 

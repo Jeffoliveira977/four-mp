@@ -7,7 +7,7 @@
 #include "../../Shared/RakNet/GetTime.h"
 
 #include "MasterServerManager.h"
-#include "logging.h"
+#include "../../Shared/logging/log.h"
 
 using namespace std;
 using namespace RakNet;
@@ -120,12 +120,12 @@ void MasterServerManager::ReadPacket(const RakString data)
 		} break;
 	case MSS_WAIT_CLAN_CHECK:
 		{
-			debug(L"%S\n", data.C_String());
+			Log::Debug(L"%S\n", data.C_String());
 
 			if(data.C_String()[1] == 'O') state = MSS_NONE;
 			else state = MSS_ERROR;
 		} break;
-	default: PrintToServer(L"Recieved unknown packet from the master server."); break;
+	default: Log::Warning(L"Recieved unknown packet from the master server."); break;
 	}
 }
 
@@ -144,7 +144,7 @@ void MasterServerManager::Process(void)
 		int code;
 		RakNet::RakString data;
 		if(http->HasBadResponse(&code, &data))
-			PrintToServer(L"Master server error %d: %S", code, data.C_String());
+			Log::Error(L"Master server error %d: %S", code, data.C_String());
 		else
 			ReadPacket(http->Read());
 	}

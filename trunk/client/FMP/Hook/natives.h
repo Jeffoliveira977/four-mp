@@ -1,7 +1,7 @@
 #pragma once
 
 #include "types.h"
-#include "../log.h"
+#include "../../../Shared/logging/log.h"
 #include "natives_list.h"
 
 int GetNativeAddressByHash(unsigned int a1);

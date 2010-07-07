@@ -6,7 +6,7 @@
 #include "../../GUI/CGUI.h"
 
 #include "gui.h"
-#include "../log.h"
+#include "../../../Shared/logging/log.h"
 #include "../../Shared/ClientCore.h"
 #include "../ConsoleWindow.h"
 #include "../Hook/classes.h"

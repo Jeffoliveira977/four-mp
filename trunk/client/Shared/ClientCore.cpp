@@ -8,12 +8,11 @@
 #include "con_sharedcvarhooks.h"
 #include "../../Shared/Network/PlayerDefines.h"
 #include "NetworkManager.h"
+#include "../../Shared/logging/log.h"
 #if defined (FMP_CLIENT)
-#include "../FMP/log.h"
 #include "../FMP/con_debugcommands.h"
 #include "../FMP/ConsoleWindow.h"
 #elif defined (FMP_CONSOLE_CLIENT)
-#include "../ConsoleClient/logging.h"
 #include "../../Shared/Console/ConsoleScreen.h"
 #endif
 
@@ -60,7 +59,7 @@ void ClientCore::GetPath(const wchar_t *file, wchar_t *path)
 
 bool ClientCore::Load(void)
 {
-	concore.SetOutputFunction(PrintToConsole);
+	concore.SetOutputFunction(Log::Info);
 	concore.RegisterStandardLibrary();
 	concore.AddConCmd(L"connect", ConCmdConnect, L"Connect to specified server.", 0);
 	concore.AddConCmd(L"exit", ConCmdQuit, L"Exit the engine.", 0);

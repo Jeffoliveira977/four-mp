@@ -1,9 +1,10 @@
 #include "logFile.h"
+#include <time.h>
 
-LogFile::LogFile()
+LogFile::LogFile(wchar_t * filename)
 {
 	InitializeCriticalSection(&critSect);
-	fopen_s(&fileHandle, "FMP\\log.txt", "a");
+	fileHandle = _wfopen(filename, L"a");
 	if(!fileHandle) exit(1);
 }
 
@@ -19,12 +20,17 @@ void LogFile::Log(const wchar_t *type, const wchar_t *string, char *arglist)
 	EnterCriticalSection(&critSect);
 	if(!fileHandle) return;
 
-	SYSTEMTIME time;
-	GetLocalTime(&time);
+	wchar_t * tempstring = new wchar_t[128];
+	time_t now;
+	time(&now);
+	wcsftime(tempstring, 128, L"[%d.%m %H:%M:%S]", localtime(&now));
+	fputws(tempstring, fileHandle);
+	delete tempstring;
+ 
 	if(wcslen(type) > 0)
-		fwprintf(fileHandle, L"[%02d:%02d:%02d:%03d] %s: ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds, type);
+		fwprintf(fileHandle, L" %s: ", type);
 	else
-		fwprintf(fileHandle, L"[%02d:%02d:%02d:%03d]: ", time.wHour, time.wMinute, time.wSecond, time.wMilliseconds);
+		fwprintf(fileHandle, L": ");
 	vfwprintf(fileHandle, string, arglist);
 	fwprintf(fileHandle, L"\n");
 	fflush(fileHandle);

@@ -191,10 +191,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\logging.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\Shared\NetworkManager.cpp"
 				>
 			</File>
@@ -202,6 +198,22 @@
 				RelativePath=".\stdafx.cpp"
 				>
 			</File>
+			<Filter
+				Name="log"
+				>
+				<File
+					RelativePath="..\..\Shared\logging\log.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\logging\logFile.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\logging\logStd.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -221,10 +233,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\logging.h"
-				>
-			</File>
-			<File
 				RelativePath="..\Shared\NetworkManager.h"
 				>
 			</File>
@@ -236,6 +244,22 @@
 				RelativePath=".\targetver.h"
 				>
 			</File>
+			<Filter
+				Name="log"
+				>
+				<File
+					RelativePath="..\..\Shared\logging\log.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\logging\logFile.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Shared\logging\logStd.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
