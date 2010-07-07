@@ -368,6 +368,11 @@ void NetworkManager::HandlePlayerFootSync(NetworkPlayerFootData *data, const Sys
 	{
 		return;
 	}
+#pragma message(" ")
+#pragma message(" ")
+#pragma message("To FaTony: Почини спам вызовов OnPlayerDeath")
+#pragma message(" ")
+#pragma message(" ")
 	if ((playm.playerbuffer[client]->health < 100) && (data->health >= 100))
 	{
 		playm.playerbuffer[client]->health = data->health;
@@ -1062,7 +1067,7 @@ void NetworkManager::SendDataToAllExceptOne(const short index, const DATATYPE *d
 	{
 		if ((i != index) && (clientbuffer[i] != NULL))
 		{
-			net->Send(pack, size + 3, (PacketPriority)pp, RELIABLE_ORDERED, NULL, clientbuffer[index]->address, false);
+			net->Send(pack, size + 3, (PacketPriority)pp, RELIABLE_ORDERED, NULL, clientbuffer[i]->address, false);
 		}
 	}
 }
