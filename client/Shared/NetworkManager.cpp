@@ -1,8 +1,8 @@
-#include "RakPeerInterface.h"
-#include "RakNetworkFactory.h"
-#include "MessageIdentifiers.h"
-#include "GetTime.h"
-#include "BitStream.h"
+#include "../../Shared/RakNet/RakPeerInterface.h"
+#include "../../Shared/RakNet/RakNetworkFactory.h"
+#include "../../Shared/RakNet/MessageIdentifiers.h"
+#include "../../Shared/RakNet/GetTime.h"
+#include "../../Shared/RakNet/BitStream.h"
 
 #include "NetworkManager.h"
 #include "ClientCore.h"
@@ -544,7 +544,7 @@ void NetworkManager::SendDataToServer(const DATATYPE * data, const NetworkPackTy
 {
 	int size = sizeof(DATATYPE);
 	char * pack = new char[3 + size];
-	pack[0] = FMP_PACKET_SIGNATURE;
+	pack[0] = (char)FMP_PACKET_SIGNATURE;
 	*(short*)(pack + 1) = type;
 	memcpy(pack + 3, data, size);
 

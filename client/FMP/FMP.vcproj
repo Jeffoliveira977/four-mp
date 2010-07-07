@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\Shared\Boost; ..\..\Shared\RakNet"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;CONUNICODE;FMPHOOK_EXPORTS;FMP_CLIENT"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="0"
@@ -121,7 +121,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="..\..\Shared\Boost; ..\..\Shared\RakNet"
+				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;CONUNICODE;FMPHOOK_EXPORTS;FMP_CLIENT"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -286,18 +286,6 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="log"
-				>
-				<File
-					RelativePath="..\..\Shared\logging\log.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Shared\logging\logFile.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -404,18 +392,6 @@
 					>
 				</File>
 			</Filter>
-			<Filter
-				Name="log"
-				>
-				<File
-					RelativePath="..\..\Shared\logging\log.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\Shared\logging\logFile.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Check"
@@ -468,6 +444,22 @@
 			</File>
 			<File
 				RelativePath="..\..\Shared\Network\Limits.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Shared\logging\log.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Shared\logging\log.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Shared\logging\logFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Shared\logging\logFile.h"
 				>
 			</File>
 			<File

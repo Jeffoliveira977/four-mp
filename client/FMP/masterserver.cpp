@@ -1,9 +1,9 @@
-#include "RakNetworkFactory.h"
-#include "RakPeerInterface.h"
-#include "TCPInterface.h"
-#include "HTTPConnection.h"
-#include "RakString.h"
-#include "GetTime.h"
+#include "../../Shared/RakNet/RakNetworkFactory.h"
+#include "../../Shared/RakNet/RakPeerInterface.h"
+#include "../../Shared/RakNet/TCPInterface.h"
+#include "../../Shared/RakNet/HTTPConnection.h"
+#include "../../Shared/RakNet/RakString.h"
+#include "../../Shared/RakNet/GetTime.h"
 
 #include "masterserver.h"
 

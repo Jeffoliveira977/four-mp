@@ -1,8 +1,10 @@
 #pragma once
 
 #include <windows.h>
-#include "RakPeerInterface.h"
+#include "../../Shared/RakNet/RakNetTypes.h"
 #include "../../Shared/Network/NetworkProtocol.h"
+
+class RakPeerInterface;
 
 class NetworkManager
 {

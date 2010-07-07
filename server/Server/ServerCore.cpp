@@ -1,6 +1,8 @@
 #include <time.h>
 #include "ServerCore.h"
 #include "../../Shared/logging/log.h"
+#include "../../Shared/logging/logFile.h"
+#include "../../Shared/logging/logStd.h"
 #include "HandleManager.h"
 #include "CoreHandleTypesManager.h"
 #include "../../Shared/Console/ConsoleCore.h"
@@ -16,6 +18,8 @@
 
 #define SERVER_TICKRATE 10
 
+extern LogFile logfile;
+extern LogStd logserver;
 extern HandleManager hm;
 extern ConsoleCore concore;
 extern ConsoleScreen conscreen;
@@ -68,6 +72,9 @@ ServerCore::~ServerCore(void)
 
 bool ServerCore::Load(void)
 {
+	Log::SetState( LOG_INFO|LOG_ERROR|LOG_WARNING|LOG_DEBUG );
+	Log::AddLogger(&logfile);
+	Log::AddLogger(&logserver);
 	concore.SetOutputFunction(Log::Info);
 	concore.SetExecPath(L"cfg/");
 	conscreen.SetCaption(L"FOUR-MP");
