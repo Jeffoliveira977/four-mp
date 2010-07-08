@@ -11,8 +11,6 @@ public:
 	~PlayerManager(void);
 	short GetMaxPlayers(void);
 	short GetNumberOfPlayers(void);
-	bool IsServerFull(void);
-	bool IsPlayerConnected(const short index);
 	wchar_t *GetPlayerName(const short index);
 	unsigned int GetPlayerModel(const short index);
 	bool GetPlayerPosition(const short index, float (&postion)[3]);
@@ -24,11 +22,17 @@ public:
 	char GetPlayerWantedLevel(const short index);
 	bool GetPlayerColor(const short index, unsigned char (&color)[4]);
 	bool GetPlayerSpawnPosition(const short index, float (&position)[4]);
+	unsigned char GetNumberOfPlayerClasses(void);
+
+	bool GivePlayerWeapon(const short index, const eWeapon weapon, const unsigned short ammo);
+
+	bool IsServerFull(void);
+	bool IsPlayerConnected(const short index);
+
 	bool SetPlayerModel(const short index, const unsigned int model);
 	bool SetPlayerPosition(const short index, const float position[3]);
-	bool GivePlayerWeapon(const short index, const eWeapon weapon, const unsigned short ammo);
 	bool SetPlayerSpawnPosition(const short index, const float position[4]);
-	unsigned char GetNumberOfPlayerClasses(void);
+	
 	bool AddPlayerClass(const unsigned int model, const float position[3], const float angle, const char weapons[8], const short ammo[8], unsigned char &index);
 	bool GetPlayerClassData(const unsigned char index, unsigned int &model, float (&position)[3], float &angle, char (&weapons)[8], short (&ammo)[8]);
 private:
