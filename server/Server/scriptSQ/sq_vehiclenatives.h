@@ -2,4 +2,6 @@
 
 #include "../sq/squirrel.h"
 
-void sq_CreateCar(HSQUIRRELVM v);
+void sq_CreateVehicle(HSQUIRRELVM v);
+
+void RegVehicleSQFunc(SQVM * v);

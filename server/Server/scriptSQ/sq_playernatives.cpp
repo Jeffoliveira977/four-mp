@@ -1,6 +1,6 @@
 #include <stddef.h>
 
-#include "sq_playernatives.h"
+#include "sq.h"
 #include "../PlayerManager.h"
 #include "../NetworkManager.h"
 #include "../../../Shared/logging/log.h"
@@ -206,4 +206,26 @@ void sq_ReloadBanList(HSQUIRRELVM v)
 void sq_ClearBanList(HSQUIRRELVM v)
 {
 	nm.ClearBanList();
+}
+
+void RegPlayerSQFunc(SQVM * v)
+{
+	register_global_func(v, (SQFUNCTION)sq_GetPlayerName, L"GetPlayerName");
+	register_global_func(v, (SQFUNCTION)sq_GetPlayerModel, L"GetPlayerModel");
+	register_global_func(v, (SQFUNCTION)sq_GetPlayerPosition, L"GetPlayerPosition");
+	register_global_func(v, (SQFUNCTION)sq_GetPlayerAngle, L"GetPlayerAngle");
+	register_global_func(v, (SQFUNCTION)sq_GetPlayerScore, L"GetPlayerScore");
+	register_global_func(v, (SQFUNCTION)sq_GetPlayerHealth, L"GetPlayerHealth");
+	register_global_func(v, (SQFUNCTION)sq_GetPlayerArmor, L"GetPlayerArmor");
+	register_global_func(v, (SQFUNCTION)sq_GetPlayerWantedLevel, L"GetPlayerWantedLevel");
+	register_global_func(v, (SQFUNCTION)sq_GetPlayerSpawnPosition, L"GetPlayerSpawnPosition");
+	register_global_func(v, (SQFUNCTION)sq_SetPlayerModel, L"SetPlayerModel");
+	register_global_func(v, (SQFUNCTION)sq_GivePlayerWeapon, L"GivePlayerWeapon");
+	register_global_func(v, (SQFUNCTION)sq_SetPlayerSpawnPosition, L"SetPlayerSpawnPosition");
+	register_global_func(v, (SQFUNCTION)sq_SetPlayerPos, L"SetPlayerPos");
+
+	register_global_func(v, (SQFUNCTION)sq_Kick, L"Kick");
+	register_global_func(v, (SQFUNCTION)sq_Ban, L"Ban");
+	register_global_func(v, (SQFUNCTION)sq_ReloadBanList, L"ReloadBanList");
+	register_global_func(v, (SQFUNCTION)sq_ClearBanList, L"ClearBanList");
 }

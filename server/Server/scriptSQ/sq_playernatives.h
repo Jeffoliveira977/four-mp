@@ -22,3 +22,5 @@ void sq_Kick(HSQUIRRELVM v);
 void sq_Ban(HSQUIRRELVM v);
 void sq_ReloadBanList(HSQUIRRELVM v);
 void sq_ClearBanList(HSQUIRRELVM v);
+
+void RegPlayerSQFunc(SQVM * v);

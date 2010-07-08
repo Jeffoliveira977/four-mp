@@ -11,3 +11,5 @@ void sq_SetScriptVersion(HSQUIRRELVM v);
 
 /// \brief Sets the virtual machine author.
 void sq_SetScriptAuthor(HSQUIRRELVM v);
+
+void RegVMSQFunc(SQVM * v);

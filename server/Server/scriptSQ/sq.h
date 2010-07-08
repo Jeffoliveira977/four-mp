@@ -22,3 +22,5 @@ void sq_enableComponentSelect(HSQUIRRELVM v);
 
 SQInteger sq_SetTimer(SQVM *v);
 SQInteger sq_KillTimer(SQVM *v);
+
+void RegSQFunc(SQVM * v);

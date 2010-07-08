@@ -16,4 +16,4 @@ SQInteger sq_access(SQVM *v);
 SQInteger sq_remove(SQVM *v);
 SQInteger sq_rename(SQVM *v);
 
-void sq_register_file_func(SQVM * v);
+void RegFileSQFunc(SQVM * v);

@@ -4,6 +4,7 @@
 *	Last Modifed:		-
 */
 
+#include "sq.h"
 #include "../sq/squirrel.h"
 #include "../sq/sqstdsystem.h"
 #include "../sq/sqstdio.h"
@@ -83,4 +84,24 @@ SQInteger sq_KillTimer(SQVM *v)
 	server.KillTimer(timer);
 
 	return 1;
+}
+
+void RegOtherSQFunc(SQVM * v)
+{
+	register_global_func(v, sq_SetTimer, L"SetTimer");
+	register_global_func(v, sq_KillTimer, L"KillTimer");
+	register_global_func(v, (SQFUNCTION)sq_addPlayerClass, L"addPlayerClass");
+	register_global_func(v, (SQFUNCTION)sq_enableComponentSelect, L"enableComponentSelect");
+}
+
+void RegSQFunc(SQVM * v)
+{
+	RegOtherSQFunc(v);
+	RegConsoleSQFunc(v);
+	RegGameSQFunc(v);
+	RegPlayerSQFunc(v);
+	RegVehicleSQFunc(v);
+	RegFileSQFunc(v);
+	RegVMSQFunc(v);
+	RegUISQFunc(v);
 }

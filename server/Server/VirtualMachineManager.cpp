@@ -583,70 +583,7 @@ bool VirtualMachineManager::LoadVirtualMachine(const unsigned char index, const 
 			sqstd_register_mathlib(*vmbuffer[index]->ptr.squirrel);
 			sqstd_register_stringlib(*vmbuffer[index]->ptr.squirrel);
 
-			// Register Script Funcions
-			// Script identity functions
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptName, L"SetScriptName");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptVersion, L"SetScriptVersion");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetScriptAuthor, L"SetScriptAuthor");
-			// Console functions
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateConVar, L"CreateConVar");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_FindConVar, L"FindConVar");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ResetConVar, L"ResetConVar");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarName, L"GetConVarName");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarFloat, L"GetConVarFloat");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarInt, L"GetConVarInt");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarString, L"GetConVarString");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarFlags, L"GetConVarFlags");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarBoundFloat, L"GetConVarBoundFloat");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetConVarBoundInt, L"GetConVarBoundInt");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarFloat, L"SetConVarFloat");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarInt, L"SetConVarInt");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarString, L"SetConVarString");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarFlags, L"SetConVarFlags");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarBoundFloat, L"SetConVarBoundFloat");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetConVarBoundInt, L"SetConVarBoundInt");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_RegServerCmd, L"RegServerCmd");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgs, L"GetCmdArgs");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgsAsString, L"GetCmdArgsAsString");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgType, L"GetCmdArgType");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgString, L"GetCmdArgString");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgInt, L"GetCmdArgInt");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetCmdArgFloat, L"GetCmdArgFloat");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ServerCommand, L"ServerCommand");
-			// Player functions
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerName, L"GetPlayerName");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerModel, L"GetPlayerModel");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerPosition, L"GetPlayerPosition");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerAngle, L"GetPlayerAngle");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerScore, L"GetPlayerScore");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerHealth, L"GetPlayerHealth");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerArmor, L"GetPlayerArmor");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerWantedLevel, L"GetPlayerWantedLevel");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetPlayerSpawnPosition, L"GetPlayerSpawnPosition");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetPlayerModel, L"SetPlayerModel");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GivePlayerWeapon, L"GivePlayerWeapon");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetPlayerSpawnPosition, L"SetPlayerSpawnPosition");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_addPlayerClass, L"addPlayerClass");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_enableComponentSelect, L"enableComponentSelect");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetPlayerPos, L"SetPlayerPos");
-			// Time func
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_GetGameTime, L"GetGameTime");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetGameTime, L"SetGameTime");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SetTimer, L"SetTimer");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_KillTimer, L"KillTimer");
-
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SendMessageToAll, L"SendMessageToAll");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_SendMessageToPlayer, L"SendMessageToPlayer");
-
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_Kick, L"Kick");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_Ban, L"Ban");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ReloadBanList, L"ReloadBanList");
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_ClearBanList, L"ClearBanList");
-
-			sq_register_file_func(*vmbuffer[index]->ptr.squirrel);
-
-			// Car functions
-			register_global_func(*vmbuffer[index]->ptr.squirrel, (SQFUNCTION)sq_CreateCar, L"CreateCar");
+			RegSQFunc(*vmbuffer[index]->ptr.squirrel);
 
 			sqstd_seterrorhandlers(*vmbuffer[index]->ptr.squirrel);
 

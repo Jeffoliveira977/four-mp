@@ -10,7 +10,7 @@
 #include <windows.h>
 #endif
 
-#include "sq_consolenatives.h"
+#include "sq.h"
 #include "../../../Shared/logging/log.h"
 #include "../HandleManager.h"
 #include "../CoreHandleTypesManager.h"
@@ -519,4 +519,32 @@ void sq_ServerCommand(HSQUIRRELVM v)
 	const wchar_t *cmdstring;
 	sq_getstring(v, 2, &cmdstring);
 	concore.InterpretLine(cmdstring);
+}
+
+void RegConsoleSQFunc(SQVM * v)
+{
+	register_global_func(v, (SQFUNCTION)sq_CreateConVar, L"CreateConVar");
+	register_global_func(v, (SQFUNCTION)sq_FindConVar, L"FindConVar");
+	register_global_func(v, (SQFUNCTION)sq_ResetConVar, L"ResetConVar");
+	register_global_func(v, (SQFUNCTION)sq_GetConVarName, L"GetConVarName");
+	register_global_func(v, (SQFUNCTION)sq_GetConVarFloat, L"GetConVarFloat");
+	register_global_func(v, (SQFUNCTION)sq_GetConVarInt, L"GetConVarInt");
+	register_global_func(v, (SQFUNCTION)sq_GetConVarString, L"GetConVarString");
+	register_global_func(v, (SQFUNCTION)sq_GetConVarFlags, L"GetConVarFlags");
+	register_global_func(v, (SQFUNCTION)sq_GetConVarBoundFloat, L"GetConVarBoundFloat");
+	register_global_func(v, (SQFUNCTION)sq_GetConVarBoundInt, L"GetConVarBoundInt");
+	register_global_func(v, (SQFUNCTION)sq_SetConVarFloat, L"SetConVarFloat");
+	register_global_func(v, (SQFUNCTION)sq_SetConVarInt, L"SetConVarInt");
+	register_global_func(v, (SQFUNCTION)sq_SetConVarString, L"SetConVarString");
+	register_global_func(v, (SQFUNCTION)sq_SetConVarFlags, L"SetConVarFlags");
+	register_global_func(v, (SQFUNCTION)sq_SetConVarBoundFloat, L"SetConVarBoundFloat");
+	register_global_func(v, (SQFUNCTION)sq_SetConVarBoundInt, L"SetConVarBoundInt");
+	register_global_func(v, (SQFUNCTION)sq_RegServerCmd, L"RegServerCmd");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgs, L"GetCmdArgs");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgsAsString, L"GetCmdArgsAsString");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgType, L"GetCmdArgType");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgString, L"GetCmdArgString");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgInt, L"GetCmdArgInt");
+	register_global_func(v, (SQFUNCTION)sq_GetCmdArgFloat, L"GetCmdArgFloat");
+	register_global_func(v, (SQFUNCTION)sq_ServerCommand, L"ServerCommand");
 }
