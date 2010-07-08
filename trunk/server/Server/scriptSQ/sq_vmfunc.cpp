@@ -4,7 +4,7 @@
 *	Last Modifed:		-
 */
 
-#include "sq_vmfunc.h"
+#include "sq.h"
 
 #include "../VirtualMachineManager.h"
 
@@ -55,4 +55,11 @@ void sq_SetScriptAuthor(HSQUIRRELVM v)
 		return;
 	}
 	vmm.SetVirtualMachineAuthor(index, string);
+}
+
+void RegVMSQFunc(SQVM * v)
+{
+	register_global_func(v, (SQFUNCTION)sq_SetScriptName, L"SetScriptName");
+	register_global_func(v, (SQFUNCTION)sq_SetScriptVersion, L"SetScriptVersion");
+	register_global_func(v, (SQFUNCTION)sq_SetScriptAuthor, L"SetScriptAuthor");
 }

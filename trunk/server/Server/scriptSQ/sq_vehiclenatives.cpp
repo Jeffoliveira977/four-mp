@@ -1,4 +1,4 @@
-#include "sq_vehiclenatives.h"
+#include "sq.h"
 
 #include "../ServerCore.h"
 #include "../PlayerManager.h"
@@ -11,7 +11,7 @@ extern PlayerManager playm;
 extern VehicleManager vm;
 extern NetworkManager nm;
 
-void sq_CreateCar(HSQUIRRELVM v) 
+void sq_CreateVehicle(HSQUIRRELVM v) 
 { 
 	int model = 0;
 	float position[3], angle;
@@ -32,4 +32,9 @@ void sq_CreateCar(HSQUIRRELVM v)
 		return;
 	}
 	sq_pushinteger(v, index);
+}
+
+void RegVehicleSQFunc(SQVM * v)
+{
+	register_global_func(v, (SQFUNCTION)sq_CreateVehicle, L"CreateVehicle");
 }

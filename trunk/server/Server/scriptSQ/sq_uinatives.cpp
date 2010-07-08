@@ -1,4 +1,4 @@
-#include "sq_uinatives.h"
+#include "sq.h"
 
 #include "../ServerCore.h"
 #include "../PlayerManager.h"
@@ -25,4 +25,10 @@ void sq_SendMessageToPlayer(HSQUIRRELVM v)
 	sq_getinteger(v, 2, (SQInteger*)&index);
 	sq_getstring(v, 3, &msg);
 	nm.SendChatMessageToOne(index, msg);
+}
+
+void RegUISQFunc(SQVM * v)
+{
+	register_global_func(v, (SQFUNCTION)sq_SendMessageToAll, L"SendMessageToAll");
+	register_global_func(v, (SQFUNCTION)sq_SendMessageToPlayer, L"SendMessageToPlayer");
 }

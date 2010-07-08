@@ -82,3 +82,5 @@ void sq_GetCmdArgFloat(HSQUIRRELVM v);
 
 /// \brief Executes a server command as if it were on the server console.
 void sq_ServerCommand(HSQUIRRELVM v);
+
+void RegConsoleSQFunc(SQVM * v);

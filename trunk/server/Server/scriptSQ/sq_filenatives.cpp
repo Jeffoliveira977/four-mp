@@ -1,8 +1,7 @@
 #include <io.h>
 #include <stdio.h>
 
-#include "sq_vmfunc.h"
-#include "sq_filenatives.h"
+#include "sq.h"
 
 SQInteger sq_fopen(SQVM *v)
 {
@@ -175,7 +174,7 @@ SQInteger sq_rename(SQVM *v)
 	return 1;
 }
 
-void sq_register_file_func(SQVM * v)
+void RegFileSQFunc(SQVM * v)
 {
 	register_global_func(v, sq_fopen, L"fopen");
 	register_global_func(v, sq_fclose, L"fclose");

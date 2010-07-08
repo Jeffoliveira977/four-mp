@@ -1,4 +1,4 @@
-#include "sq_gamenatives.h"
+#include "sq.h"
 
 #include "../ServerCore.h"
 #include "../PlayerManager.h"
@@ -26,14 +26,14 @@ void sq_GetGameTime(HSQUIRRELVM v)
 void sq_SetGameTime(HSQUIRRELVM v)
 {
 	int h, m;
-	sq_pushnull(v);
-	sq_next(v, -2);
-	sq_getinteger(v, -1, &h);
-	sq_pop(v, 2);
-	sq_next(v, -2);
-	sq_getinteger(v, -1, &m);
-	sq_pop(v, 2);
-	sq_pop(v, 1);
+	sq_getinteger(v, 2, &h);
+	sq_getinteger(v, 3, &m);
 	unsigned char time[2] = { h, m };
 	sq_pushbool(v, server.SetGameTime(time));
+}
+
+void RegGameSQFunc(SQVM * v)
+{
+	register_global_func(v, (SQFUNCTION)sq_GetGameTime, L"GetGameTime");
+	register_global_func(v, (SQFUNCTION)sq_SetGameTime, L"SetGameTime");
 }
