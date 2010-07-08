@@ -367,26 +367,22 @@ void NetworkManager::HandlePlayerFootSync(NetworkPlayerFootData *data, const Sys
 	{
 		return;
 	}
-#pragma message(" ")
-#pragma message(" ")
-#pragma message("To FaTony: Почини спам вызовов OnPlayerDeath")
-#pragma message(" ")
-#pragma message(" ")
+
 	if ((playm.playerbuffer[client]->health < 100) && (data->health >= 100))
 	{
 		playm.playerbuffer[client]->health = data->health;
 		playm.playerbuffer[client]->armor = data->armour;
 		vmm.OnPlayerSpawn(client);
 	}
-	else if(playm.playerbuffer[client]->health != -1) // already death
+	else if(playm.playerbuffer[client]->health != 255) // already death
 	{
 		playm.playerbuffer[client]->health = data->health;
 		playm.playerbuffer[client]->armor = data->armour;
 	}
-	if (playm.playerbuffer[client]->health < 100 && playm.playerbuffer[client]->health != -1)
+	if (data->health < 100 && playm.playerbuffer[client]->health != 255)
 	{
 		vmm.OnPlayerDeath(client, INVALID_PLAYER_INDEX, 46);
-		playm.playerbuffer[client]->health = -1;
+		playm.playerbuffer[client]->health = 255;
 	}
 	//PrintToServer(L"Foot %d to %f %f %f", client, data->position[0], data->position[1], data->position[2]);
 	memcpy(playm.playerbuffer[client]->position, data->position, sizeof(float) * 3);
