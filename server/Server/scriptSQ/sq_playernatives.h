@@ -16,6 +16,7 @@ void sq_GetPlayerSpawnPosition(HSQUIRRELVM v);
 void sq_SetPlayerModel(HSQUIRRELVM v);
 void sq_GivePlayerWeapon(HSQUIRRELVM v);
 void sq_SetPlayerSpawnPosition(HSQUIRRELVM v);
+void sq_SetPlayerPos(HSQUIRRELVM v);
 
 void sq_Kick(HSQUIRRELVM v);
 void sq_Ban(HSQUIRRELVM v);

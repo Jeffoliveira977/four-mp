@@ -172,6 +172,18 @@ void sq_SetPlayerSpawnPosition(HSQUIRRELVM v)
 	sq_pushbool(v, playm.SetPlayerSpawnPosition(index, position));
 }
 
+void sq_SetPlayerPos(HSQUIRRELVM v)
+{
+	int index;
+	sq_getinteger(v, 2, &index);
+	float position[3];
+	sq_getfloat(v, 3, &position[0]);
+	sq_getfloat(v, 4, &position[1]);
+	sq_getfloat(v, 5, &position[2]);
+
+	sq_pushbool(v, playm.SetPlayerPosition(index, position));
+}
+
 void sq_Kick(HSQUIRRELVM v)
 {
 	short index;
