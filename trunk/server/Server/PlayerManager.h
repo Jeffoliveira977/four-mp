@@ -60,6 +60,7 @@ private:
 		unsigned char color[4]; ///< Holds the color of the player.
 		int compT[11], compD[11];
 		float spawnposition[4];
+		bool isDead;
 	};
 	short maxplayerbuffersize;
 	short playerbuffersize;
