@@ -3,6 +3,8 @@
 #include "CScriptThread.h"
 #include "CD3DManager.h"
 
+#define D3DMAN_COUNT 2
+
 class CGameHook
 {
 public:
@@ -11,8 +13,6 @@ public:
 
 	DWORD GetBase();
 	DWORD GetGameVersion();
-
-	CD3DManager * GetD3DManager();
 
 	scrThread* GetActiveThread();
 	DWORD GetHash(char *ThreadName);
@@ -26,6 +26,12 @@ public:
 	void SetThreadID(DWORD id);
 
 	void CGameHook::ThreadTick(scrThread *, unsigned int);
+
+	void OnD3DCreateDevice(IDirect3DDevice9 *);
+	void OnD3DDraw();
+	void OnD3DLostDevice();
+	void OnD3DResetDevice();
+	void OnD3DRelease();
 
 	bool InstallScriptHook(CScriptThread *);
 	bool InstallXLiveHook();
@@ -45,8 +51,7 @@ private:
 	DWORD m_dwLoadOffset;
 	DWORD m_dwGameVersion;
 
-	// enough a one hook
-	CD3DManager * m_pD3DManager;
+	CD3DManager * m_pD3DManager[D3DMAN_COUNT];
 	CScriptThread * m_pScriptThread;
 
 	struct XLiveAddresses

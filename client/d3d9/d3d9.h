@@ -290,27 +290,7 @@ typedef struct IDirect3D9 *LPDIRECT3D9, *PDIRECT3D9;
 #define IDirect3D9_CreateDevice(p,a,b,c,d,e,f) (p)->CreateDevice(a,b,c,d,e,f)
 #endif
 
-
-
-
-
-
-
 /* SwapChain */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #undef INTERFACE
 #define INTERFACE IDirect3DDevice9

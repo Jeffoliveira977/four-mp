@@ -35,10 +35,21 @@ bool CGameHook::InstallScriptHook(CScriptThread * pScriptThread)
 
 bool CGameHook::InstallDirect3DHook(CD3DManager * pD3DManager)
 {
-	if(m_pD3DManager || !pD3DManager)
+	if(!pD3DManager)
 		return false;
-	m_pD3DManager = pD3DManager;
-	return true;
+
+	if(!m_pD3DManager[0])
+	{
+		m_pD3DManager[0] = pD3DManager;
+		return true;
+	}
+	if(!m_pD3DManager[1])
+	{
+		m_pD3DManager[1] = pD3DManager;
+		return true;
+	}
+
+	return false;
 }
 
 bool CGameHook::InstallXLiveHook()
@@ -710,7 +721,46 @@ DWORD WINAPI CGameHook::ScriptHookThread(void * p)
 	return 0;
 }
 
-CD3DManager * CGameHook::GetD3DManager()
+void CGameHook::OnD3DCreateDevice(IDirect3DDevice9 * pd3dDevice)
 {
-	return m_pD3DManager;
+	Log::Debug("OnCreateDevice");
+	for(int i = 0; i < D3DMAN_COUNT; i++)
+	{
+		if(m_pD3DManager[i]) m_pD3DManager[i]->OnCreateDevice(pd3dDevice);
+	}
+}
+
+void CGameHook::OnD3DDraw()
+{
+	for(int i = 0; i < D3DMAN_COUNT; i++)
+	{
+		if(m_pD3DManager[i]) m_pD3DManager[i]->OnDraw();
+	}
+}
+
+void CGameHook::OnD3DLostDevice()
+{
+	Log::Debug("OnLostDevice");
+	for(int i = 0; i < D3DMAN_COUNT; i++)
+	{
+		if(m_pD3DManager[i]) m_pD3DManager[i]->OnLostDevice();
+	}
+}
+
+void CGameHook::OnD3DResetDevice()
+{
+	Log::Debug("OnResetDevice");
+	for(int i = 0; i < D3DMAN_COUNT; i++)
+	{
+		if(m_pD3DManager[i]) m_pD3DManager[i]->OnResetDevice();
+	}
+}
+
+void CGameHook::OnD3DRelease()
+{
+	Log::Debug("OnRelease");
+	for(int i = 0; i < D3DMAN_COUNT; i++)
+	{
+		if(m_pD3DManager[i]) m_pD3DManager[i]->OnRelease();
+	}
 }

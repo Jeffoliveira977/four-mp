@@ -42,9 +42,9 @@ ULONG myIDirect3DDevice9::Release(void)
 
 	ULONG count = m_pIDirect3DDevice9->Release();
 		
-    if (count==0)
+    if (count == 0)
 	{
-		pGameHook->GetD3DManager()->OnRelease();
+		pGameHook->OnD3DRelease();
 		gl_pmyIDirect3DDevice9 = NULL;
 		delete this; 
 	}
@@ -135,13 +135,13 @@ UINT myIDirect3DDevice9::GetNumberOfSwapChains(void)
 
 HRESULT myIDirect3DDevice9::Reset(D3DPRESENT_PARAMETERS *pPresentationParameters)
 {
-	pGameHook->GetD3DManager()->OnLostDevice();
+	pGameHook->OnD3DLostDevice();
 
 	HRESULT hRet = m_pIDirect3DDevice9->Reset(pPresentationParameters);
 
 	if( SUCCEEDED(hRet) )
 	{
-		pGameHook->GetD3DManager()->OnResetDevice();
+		pGameHook->OnD3DResetDevice();
 	}
     return hRet;
 }
@@ -273,7 +273,7 @@ HRESULT myIDirect3DDevice9::BeginScene(void)
 
 HRESULT myIDirect3DDevice9::EndScene(void)
 {
-	pGameHook->GetD3DManager()->OnDraw();
+	pGameHook->OnD3DDraw();
     return m_pIDirect3DDevice9->EndScene();
 }
 

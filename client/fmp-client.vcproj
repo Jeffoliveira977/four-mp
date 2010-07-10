@@ -184,6 +184,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\CChat.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CGameD3D.cpp"
 				>
 			</File>
@@ -262,6 +266,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\CChat.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CGameD3D.h"
 				>
 			</File>
@@ -278,10 +286,6 @@
 				>
 				<File
 					RelativePath=".\d3d9\d3d9.h"
-					>
-				</File>
-				<File
-					RelativePath=".\d3d9\d3dx9.h"
 					>
 				</File>
 				<File

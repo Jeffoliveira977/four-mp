@@ -1,5 +1,5 @@
 #pragma once
-#include "hook/CScriptThread.h"
+#include "./hook/CScriptThread.h"
 
 class CGameScript : public CScriptThread
 {
