@@ -127,7 +127,7 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType
 		gl_pmyIDirect3DDevice9 = new myIDirect3DDevice9(*ppReturnedDeviceInterface);
 		Log::Debug("Origianl D3DDevice %08X", *ppReturnedDeviceInterface);
 		*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
-		pGameHook->OnD3DCreateDevice(gl_pmyIDirect3DDevice9);
+		if(pGameHook) pGameHook->OnD3DCreateDevice(gl_pmyIDirect3DDevice9);
 	}
 
 	return hRet; 
