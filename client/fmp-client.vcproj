@@ -188,6 +188,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CFont.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CGameD3D.cpp"
 				>
 			</File>
@@ -267,6 +271,10 @@
 			>
 			<File
 				RelativePath=".\CChat.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CFont.h"
 				>
 			</File>
 			<File
