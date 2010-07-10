@@ -17,7 +17,7 @@ bool IsFMPNeed()
 {
 	char *cmdline = GetCommandLineA();
 	int cmdlen = strlen(cmdline) - 1;
-	for(int i = cmdlen; i != 5; i--)
+	for(int i = cmdlen; i > 6; i--)
 	{
 		if((cmdline[i] == 'p' || cmdline[i] == 'P') && (cmdline[i - 1] == 'm' || cmdline[i - 1] == 'M') && 
 			(cmdline[i - 2] == 'f' || cmdline[i - 2] == 'F') && (cmdline[i - 3] == '-' || cmdline[i - 3] == '-') && 
