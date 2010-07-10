@@ -1,5 +1,6 @@
 #pragma once
 #include "./hook/CD3DManager.h"
+#include "CFont.h"
 #include <d3dx9.h>
 
 #define MAX_CHAT_MESSAGE_LENGTH 0x200
@@ -19,7 +20,7 @@ public:
 	void AddMessage(const wchar_t *);
 
 private:
-	ID3DXFont * m_pFont;
+	CFont * m_pFont;
 
 	wchar_t ** m_pMessages;
 	wchar_t ** m_pMessagesHistory;

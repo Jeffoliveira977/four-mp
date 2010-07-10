@@ -1,22 +1,6 @@
 #include "CChat.h"
 #include "./log/log.h"
 
-HRESULT CreateD3DXFont( IDirect3DDevice9 * dDev, ID3DXFont** ppd3dxFont, char* pstrFont, DWORD dwSize, bool bold, bool Italic )
-{
-    HRESULT hr;
-    HDC hDC;
-    int nHeight;
-
-    hDC = GetDC( NULL );
-    nHeight = -MulDiv( dwSize, GetDeviceCaps(hDC, LOGPIXELSY), 72 );
-    ReleaseDC( NULL, hDC );
-
-    hr = D3DXCreateFontA( dDev, nHeight, 0, bold*FW_BOLD, 0, Italic, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, 
-		DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, pstrFont, ppd3dxFont);
-
-    return hr;
-}
-
 CChat::CChat(const int maxMessages, const int maxHistory, const int maxMyHistory) : CD3DManager()
 {
 	m_pMessages = new wchar_t*[maxMessages];
@@ -57,9 +41,7 @@ void CChat::OnCreateDevice(IDirect3DDevice9 * pd3dDevice)
 {
 	CD3DManager::OnCreateDevice(pd3dDevice);
 
-	CreateD3DXFont(pd3dDevice, &m_pFont, "Arial", 10, 0, 0);
-	m_pFont->PreloadCharacters(0, 255);
-	m_pFont->PreloadGlyphs(0, 255);
+	m_pFont = new CFont(pd3dDevice, "Arial", 10, false, false);
 }
 
 void CChat::OnLostDevice()
