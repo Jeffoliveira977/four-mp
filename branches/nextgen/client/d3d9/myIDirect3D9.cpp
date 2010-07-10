@@ -5,6 +5,7 @@
 #include "myIDirect3DDevice9.h"
 #include "myIDirect3DSwapChain9.h"
 #include "../hook/CGameHook.h"
+#include "../log/log.h"
 
 extern CGameHook * pGameHook;
 
@@ -120,13 +121,15 @@ HRESULT __stdcall myIDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType
 {
 	extern myIDirect3DDevice9* gl_pmyIDirect3DDevice9;
 
-	HRESULT hRes = m_pIDirect3D9->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
-	gl_pmyIDirect3DDevice9 = new myIDirect3DDevice9(*ppReturnedDeviceInterface);
-	
-	*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
+	HRESULT hRet = m_pIDirect3D9->CreateDevice( Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
+	if( SUCCEEDED(hRet) )
+	{
+		gl_pmyIDirect3DDevice9 = new myIDirect3DDevice9(*ppReturnedDeviceInterface);
+		Log::Debug("Origianl D3DDevice %08X", *ppReturnedDeviceInterface);
+		*ppReturnedDeviceInterface = gl_pmyIDirect3DDevice9;
+		pGameHook->OnD3DCreateDevice(gl_pmyIDirect3DDevice9);
+	}
 
-	pGameHook->GetD3DManager()->OnCreateDevice(gl_pmyIDirect3DDevice9);
-
-	return hRes ; 
+	return hRet; 
 }
   

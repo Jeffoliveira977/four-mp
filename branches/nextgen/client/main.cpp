@@ -1,15 +1,17 @@
 #include <stdio.h>
 #include <windows.h>
-#include "log/log.h"
-#include "log/logFile.h"
-#include "hook/CGameHook.h"
-#include "CGameScript.h"
-#include "CGameD3D.h"
+#include "./log/log.h"
+#include "./log/logFile.h"
+#include "./hook/CGameHook.h"
+#include "./CGameScript.h"
+#include "./CGameD3D.h"
+#include "./CChat.h"
 
 LogFile * logfile = NULL;
 CGameHook * pGameHook = NULL;
 CGameScript * pGameScript = NULL;
 CGameD3D * pGameD3D = NULL;
+CChat * pChat = NULL;
 
 bool IsFMPNeed()
 {
@@ -45,6 +47,7 @@ void Start(HANDLE hModule)
 
 	pGameScript = new CGameScript;
 	pGameD3D = new CGameD3D;
+	pChat = new CChat;
 	pGameHook = new CGameHook;
 
 	if(!pGameHook->UnprotectData())
@@ -62,14 +65,25 @@ void Start(HANDLE hModule)
 		Log::Error("Can't hook xlive");
 	}
 
-	pGameHook->InstallScriptHook(pGameScript);
-	pGameHook->InstallDirect3DHook(pGameD3D);
-	
+	if(!pGameHook->InstallScriptHook(pGameScript))
+	{
+		Log::Error("Can't install ScriptHook");
+	}
+	if(!pGameHook->InstallDirect3DHook(pGameD3D))
+	{
+		Log::Error("Can't install D3D Hook");
+	}
+	if(!pGameHook->InstallDirect3DHook(pChat))
+	{
+		Log::Error("Can't install D3D Hook for chat");
+	}
 }
 
 void Close()
 {
 	if(pGameScript) delete pGameScript;
+	if(pChat) delete pChat;
+	if(pGameD3D) delete pGameD3D;
 	if(pGameHook) delete pGameHook;
 	if(logfile) delete logfile;
 }
