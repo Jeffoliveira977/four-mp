@@ -1,1 +1,0 @@
-Please refer to the online documentation at http://wiki.four-mp.com/wiki/Server_Documentation
