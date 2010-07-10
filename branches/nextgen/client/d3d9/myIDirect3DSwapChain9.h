@@ -6,7 +6,6 @@ public:
     myIDirect3DSwapChain9(IDirect3DSwapChain9* pOriginal, IDirect3DDevice9* pDevice);
     virtual ~myIDirect3DSwapChain9(void);
 
-    // START: The original DX9 function definitions
 	HRESULT __stdcall QueryInterface (REFIID riid, void** ppvObj);
     ULONG   __stdcall AddRef(void);
     ULONG   __stdcall Release(void);
@@ -17,7 +16,6 @@ public:
     HRESULT __stdcall GetDisplayMode(D3DDISPLAYMODE* pMode);
     HRESULT __stdcall GetDevice(IDirect3DDevice9** ppDevice);
     HRESULT __stdcall GetPresentParameters(D3DPRESENT_PARAMETERS* pPresentationParameters);
-    // END: The original DX9 function definitions
 
 private:
     IDirect3DSwapChain9   *m_pIDirect3DSwapChain9;

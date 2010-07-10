@@ -6,7 +6,6 @@ public:
     myIDirect3D9(IDirect3D9 *pOriginal);
     virtual ~myIDirect3D9(void);
 
-    // The original DX9 function definitions
 	HRESULT  __stdcall QueryInterface(REFIID riid, void** ppvObj);
     ULONG    __stdcall AddRef(void);
 	ULONG    __stdcall Release(void);
@@ -24,7 +23,6 @@ public:
     HRESULT  __stdcall GetDeviceCaps(UINT Adapter,D3DDEVTYPE DeviceType,D3DCAPS9* pCaps) ;
 	HMONITOR __stdcall GetAdapterMonitor(UINT Adapter) ;
 	HRESULT  __stdcall CreateDevice(UINT Adapter,D3DDEVTYPE DeviceType,HWND hFocusWindow,DWORD BehaviorFlags,D3DPRESENT_PARAMETERS* pPresentationParameters,IDirect3DDevice9** ppReturnedDeviceInterface) ;
-    // The original DX9 function definitions
 
 private:
    	IDirect3D9 *m_pIDirect3D9;
