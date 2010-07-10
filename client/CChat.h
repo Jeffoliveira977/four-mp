@@ -21,25 +21,27 @@ public:
 	void DeleteMessage(const int index);
 	void Clear();
 
+	void Update();
+
 private:
 	CFont * m_pFont;
 	ID3DXSprite * m_pSprite;
 
 	struct MESSAGE
 	{
-		MESSAGE(wchar_t * msg, D3DCOLOR color) 
+		MESSAGE(wchar_t * pszMsg, D3DCOLOR Color) 
 		{ 
 			this->msg = new wchar_t[0x100];
 			memset(this->msg, 0, 0x100 * sizeof(wchar_t));
 
-			int len = wcslen(msg);
+			int len = wcslen(pszMsg);
 			for(int i = 0; i < len; i++)
 			{
-				if(msg[i] < 32) break;
-				this->msg[i] = msg[i];
+				if(pszMsg[i] < 32) break;
+				this->msg[i] = pszMsg[i];
 			}
 
-			this->color = color; 
+			this->color = Color; 
 			this->next = NULL;
 		}
 		~MESSAGE() 

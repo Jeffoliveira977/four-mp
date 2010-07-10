@@ -44,7 +44,6 @@ void CChat::OnResetDevice()
 
 void CChat::OnDraw()
 {
-	
 }
 
 void CChat::OnRelease()
@@ -59,17 +58,17 @@ void CChat::AddMessage(wchar_t * pszMsg)
 
 	// Color: 0001 AARR GGBB
 
-	MESSAGE ** tmp_msg = NULL;
+	MESSAGE ** ppTmpMsg = NULL;
 	for(int i = 0; i < m_iMaxHistory; i++)
 	{
 		if(!m_pMessages[i]) 
 		{
-			tmp_msg = &m_pMessages[i];
+			ppTmpMsg = &m_pMessages[i];
 			break;
 		}
 	}
 
-	if(!tmp_msg)
+	if(!ppTmpMsg)
 	{
 		delete m_pMessages[0];
 		m_pMessages[0] = NULL;
@@ -79,25 +78,25 @@ void CChat::AddMessage(wchar_t * pszMsg)
 			m_pMessages[i - 1] = m_pMessages[i];
 			m_pMessages[i] = NULL;
 		}
-		tmp_msg = &m_pMessages[m_iMaxHistory - 1];
+		ppTmpMsg = &m_pMessages[m_iMaxHistory - 1];
 	}
 
-	if(!tmp_msg)
+	if(!ppTmpMsg)
 	{
 		Log::Error("Can't add message to chat");
 		return;
 	}
 
-	int len = wcslen(pszMsg);
-	wchar_t * tmp_txt = pszMsg;
-	D3DCOLOR clr = 0xFFFFFFFF;
+	wchar_t * szTmpTxt = pszMsg;
+	D3DCOLOR Color = 0xFFFFFFFF;
+
 	int i = 0;
 	while(pszMsg[i] != NULL)
 	{
 		if(pszMsg[i] == 1)
 		{
-			D3DCOLOR tclr = clr;
-			clr = *(DWORD *)(pszMsg + i + 1);
+			D3DCOLOR tColor = Color;
+			Color = *(DWORD *)(pszMsg + i + 1);
 
 			pszMsg[i] = 0;
 			pszMsg[i + 1] = 0;
@@ -105,13 +104,13 @@ void CChat::AddMessage(wchar_t * pszMsg)
 
 			if(i != 0)
 			{
-				*tmp_msg = new MESSAGE(tmp_txt, tclr);
-				tmp_msg = &(*tmp_msg)->next;
+				*ppTmpMsg = new MESSAGE(szTmpTxt, tColor);
+				ppTmpMsg = &(*ppTmpMsg)->next;
 			}
 
 			i += 3;
 			
-			tmp_txt = pszMsg + i;
+			szTmpTxt = pszMsg + i;
 
 			i++;
 			continue;
@@ -119,15 +118,22 @@ void CChat::AddMessage(wchar_t * pszMsg)
 		i++;
 	}
 
-	if(tmp_txt[0] != 0)
+	if(szTmpTxt[0] != 0)
 	{
-		*tmp_msg = new MESSAGE(tmp_txt, clr);
+		*ppTmpMsg = new MESSAGE(szTmpTxt, Color);
 	}
+	this->Update();
 }
 
 void CChat::DeleteMessage(const int index)
 {
-	
+	if(index < 0 || index > m_iMaxHistory) return;
+	if(m_pMessages[index]) 
+	{
+		delete m_pMessages[index];
+		m_pMessages[index] = NULL;
+	}
+	this->Update();
 }
 
 void CChat::Clear()
@@ -135,6 +141,12 @@ void CChat::Clear()
 	for(int i = 0; i < m_iMaxHistory; i++)
 	{
 		delete m_pMessages[i];
+		m_pMessages[i] = NULL;
 	}
-	//m_pSprite->
+	this->Update();
+}
+
+void CChat::Update()
+{
+
 }
