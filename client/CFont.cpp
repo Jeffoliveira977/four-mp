@@ -18,37 +18,23 @@ CFont::~CFont()
 
 }
 
-bool CFont::DrawText(const char *pszText, const float iX, const float iY, ID3DXSprite *pSprite, const D3DCOLOR Color)
+bool CFont::DrawText(const char *pszText, const int iX, const int iY, ID3DXSprite *pSprite, const D3DCOLOR Color)
 {
 	if(!m_pFont) return false;
 	if(!pszText) return false;
 
-	if(pSprite)
-	{
-		D3DXMATRIX mat;
-		D3DXMatrixTranslation(&mat, iX, iY, 0);
-		pSprite->SetTransform(&mat);
-	}
-
-	RECT rct = { 0 };
+	RECT rct = { iX, iY, 2000, 2000 };
 	m_pFont->DrawTextA(pSprite, pszText, -1, &rct, 0, Color);
 
 	return true;
 }
 
-bool CFont::DrawText(const wchar_t * pszText, const float iX, const float iY, ID3DXSprite *pSprite, const D3DCOLOR Color)
+bool CFont::DrawText(const wchar_t * pszText, const int iX, const int iY, ID3DXSprite *pSprite, const D3DCOLOR Color)
 {
 	if(!m_pFont) return false;
 	if(!pszText) return false;
 
-	if(pSprite)
-	{
-		D3DXMATRIX mat;
-		D3DXMatrixTranslation(&mat, iX, iY, 0);
-		pSprite->SetTransform(&mat);
-	}
-
-	RECT rct = { 0 };
+	RECT rct = { iX, iY, 2000, 2000 };
 	m_pFont->DrawTextW(pSprite, pszText, -1, &rct, 0, Color);
 
 	return true;

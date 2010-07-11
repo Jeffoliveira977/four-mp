@@ -1,55 +1,102 @@
 #include "CChat.h"
 #include "./log/log.h"
 
-CChat::CChat(const int maxMessages, const int maxHistory, const int maxMyHistory) : CD3DManager()
+CChat::CChat(const int iMaxMessages, const int iMaxHistory, const int iMaxMyHistory, const int iFontSize, const char * pszFontName, const bool bFontBold, const bool bFontItalic) : CD3DManager()
 {
-	m_pMessages = new MESSAGE*[maxHistory];
-	memset(m_pMessages, 0, 4 * maxHistory);
+	m_pMessages = new MESSAGE*[iMaxHistory];
+	memset(m_pMessages, 0, 4 * iMaxHistory);
 
-	m_pMyMsgHistory = new MESSAGE*[maxMyHistory];
-	memset(m_pMyMsgHistory, 0, 4 * maxMyHistory);
+	m_pMyMsgHistory = new MESSAGE*[iMaxMyHistory];
+	memset(m_pMyMsgHistory, 0, 4 * iMaxMyHistory);
 
 	m_pMyMsg = new wchar_t[MAX_CHAT_MESSAGE_LENGTH];
 	memset(m_pMyMsg, 0, MAX_CHAT_MESSAGE_LENGTH * sizeof(wchar_t));
 
-	m_iMaxMessages = maxMessages;
-	m_iMaxHistory = maxHistory;
-	m_iMaxMyHistory = maxMyHistory;
+	m_iMaxMessages = iMaxMessages;
+	m_iMaxHistory = iMaxHistory;
+	m_iMaxMyHistory = iMaxMyHistory;
+
+	m_iScrollPos = 0;
+	m_iCursorPos = 0;
+
+	m_iFontSize = iFontSize;
+	m_pszFontName = pszFontName;
+	m_bFontBold = bFontBold;
+	m_bFontItalic = bFontItalic;
+
+	InitializeCriticalSection(&critSect);
 }
 
 CChat::~CChat()
 {
-
+	DeleteCriticalSection(&critSect);
 }
 
-void CChat::OnCreateDevice(IDirect3DDevice9 * pd3dDevice)
+void CChat::OnCreateDevice(IDirect3DDevice9 * pd3dDevice, HWND hWnd)
 {
-	CD3DManager::OnCreateDevice(pd3dDevice);
+	CD3DManager::OnCreateDevice(pd3dDevice, hWnd);
+
+	RECT rct;
+	GetWindowRect(hWnd, &rct);
+	m_dwWidth = rct.right - rct.left;
+	m_dwHeight = rct.bottom - rct.top;
+
+	EnterCriticalSection(&critSect);
 
 	D3DXCreateSprite(pd3dDevice, &m_pSprite);
-	m_pFont = new CFont(pd3dDevice, "Arial", 10, false, false);
+	D3DXCreateTexture(pd3dDevice, m_dwWidth, m_dwHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pChatTexture);
+	m_pFont = new CFont(pd3dDevice, m_pszFontName, m_iFontSize, m_bFontBold, m_bFontItalic);
+
+	LeaveCriticalSection(&critSect);
 }
 
 void CChat::OnLostDevice()
 {
-	m_pSprite->OnLostDevice();
-	m_pFont->OnLostDevice();
+	EnterCriticalSection(&critSect);
+
+	if(m_pChatTexture) 
+	{
+		m_pChatTexture->Release();
+		m_pChatTexture = NULL;
+	}
+	if(m_pSprite) m_pSprite->OnLostDevice();
+	if(m_pFont) m_pFont->OnLostDevice();
+
+	LeaveCriticalSection(&critSect);
 }
 
 void CChat::OnResetDevice()
 {
-	m_pSprite->OnResetDevice();
-	m_pFont->OnResetDevice();
+	EnterCriticalSection(&critSect);
+
+	if(m_pSprite) m_pSprite->OnResetDevice();
+	if(m_pFont) m_pFont->OnResetDevice();
+	D3DXCreateTexture(m_pd3dDevice, m_dwWidth, m_dwHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pChatTexture);
+
+	LeaveCriticalSection(&critSect);
 }
 
 void CChat::OnDraw()
 {
+	EnterCriticalSection(&critSect);
+
+	m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
+
+	m_pSprite->Draw(m_pChatTexture, NULL, NULL, NULL, 0xFFFFFFFF);
+	m_pSprite->End();
+
+	LeaveCriticalSection(&critSect);
 }
 
 void CChat::OnRelease()
 {
-	m_pSprite->Release();
-	m_pFont->Release();
+	EnterCriticalSection(&critSect);
+
+	if(m_pSprite) m_pSprite->Release();
+	if(m_pFont) m_pFont->Release();
+	if(m_pChatTexture) m_pChatTexture->Release();
+
+	LeaveCriticalSection(&critSect);
 }
 
 void CChat::AddMessage(wchar_t * pszMsg)
@@ -148,5 +195,45 @@ void CChat::Clear()
 
 void CChat::Update()
 {
+	EnterCriticalSection(&critSect);
 
+	IDirect3DSurface9 *pTextureTarget, *pOldRenderTarget;
+	m_pChatTexture->GetSurfaceLevel(0, &pTextureTarget);
+	Log::Debug("Update");
+	if(pTextureTarget)
+	{
+		Log::Debug("Render to texture");
+
+		m_pd3dDevice->GetRenderTarget(0, &pOldRenderTarget);
+		m_pd3dDevice->SetRenderTarget(0, pTextureTarget);
+
+		m_pd3dDevice->Clear(0, 0, D3DCLEAR_TARGET, 0, 1.0f, 0);
+		m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
+	
+		int iY = 1;
+		for(int i = m_iScrollPos; i < m_iScrollPos + m_iMaxMessages && i < m_iMaxHistory; i++)
+		{
+			if(m_pMessages[i])
+			{
+				MESSAGE * pTmpMsg = m_pMessages[i];
+				int iX = 1;
+				while(pTmpMsg)
+				{
+					Log::Debug(L"Draw at (%d;%d) '%s' witd color #%X", iX, iY, pTmpMsg->msg, pTmpMsg->color);
+					m_pFont->DrawText(pTmpMsg->msg, iX, iY, m_pSprite, pTmpMsg->color);
+					iX += m_pFont->GetTextWidth(pTmpMsg->msg);
+					pTmpMsg = pTmpMsg->next;
+				}
+			}
+			iY += m_iFontSize + 2;
+		}
+
+		m_pSprite->End();
+
+		pTextureTarget->Release();
+		m_pd3dDevice->SetRenderTarget(0, pOldRenderTarget);
+		pOldRenderTarget = NULL;
+	}
+
+	LeaveCriticalSection(&critSect);
 }

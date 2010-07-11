@@ -721,12 +721,12 @@ DWORD WINAPI CGameHook::ScriptHookThread(void * p)
 	return 0;
 }
 
-void CGameHook::OnD3DCreateDevice(IDirect3DDevice9 * pd3dDevice)
+void CGameHook::OnD3DCreateDevice(IDirect3DDevice9 * pd3dDevice, HWND hWnd)
 {
 	Log::Debug("OnCreateDevice");
 	for(int i = 0; i < D3DMAN_COUNT; i++)
 	{
-		if(m_pD3DManager[i]) m_pD3DManager[i]->OnCreateDevice(pd3dDevice);
+		if(m_pD3DManager[i]) m_pD3DManager[i]->OnCreateDevice(pd3dDevice, hWnd);
 	}
 }
 

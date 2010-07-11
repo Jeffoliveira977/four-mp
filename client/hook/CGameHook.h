@@ -27,7 +27,7 @@ public:
 
 	void CGameHook::ThreadTick(scrThread *, unsigned int);
 
-	void OnD3DCreateDevice(IDirect3DDevice9 *);
+	void OnD3DCreateDevice(IDirect3DDevice9 *, HWND);
 	void OnD3DDraw();
 	void OnD3DLostDevice();
 	void OnD3DResetDevice();
