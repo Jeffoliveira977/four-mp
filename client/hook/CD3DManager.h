@@ -11,6 +11,7 @@ public:
 	virtual void OnLostDevice() = 0;
 	virtual void OnResetDevice() = 0;
 	virtual void OnDraw() = 0;
+	virtual void OnBeginDraw() = 0;
 	virtual void OnRelease() = 0;
 
 protected:

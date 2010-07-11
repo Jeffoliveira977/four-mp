@@ -15,18 +15,22 @@ public:
 	void OnLostDevice();
 	void OnResetDevice();
 	void OnDraw();
+	void OnBeginDraw();
 	void OnRelease();
 
 	void AddMessage(wchar_t *);
 	void DeleteMessage(const int index);
 	void Clear();
 
-	void Update();
+	bool ScrollDown();
+	bool ScrollUp();
+	void ScrollEnd();
 
 private:
 	CFont * m_pFont;
 	ID3DXSprite * m_pSprite;
-	IDirect3DTexture9 * m_pChatTexture;
+	//IDirect3DTexture9 * m_pChatTexture;
+	//IDirect3DSurface9 * m_pTextureTarget;
 
 	CRITICAL_SECTION critSect;
 
@@ -76,4 +80,6 @@ private:
 	const char *m_pszFontName;
 	bool m_bFontBold;
 	bool m_bFontItalic;
+
+	bool m_bUserScroll;
 };

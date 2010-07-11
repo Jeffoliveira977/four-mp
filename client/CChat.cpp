@@ -24,6 +24,8 @@ CChat::CChat(const int iMaxMessages, const int iMaxHistory, const int iMaxMyHist
 	m_bFontBold = bFontBold;
 	m_bFontItalic = bFontItalic;
 
+	m_bUserScroll = true;
+
 	InitializeCriticalSection(&critSect);
 }
 
@@ -44,7 +46,6 @@ void CChat::OnCreateDevice(IDirect3DDevice9 * pd3dDevice, HWND hWnd)
 	EnterCriticalSection(&critSect);
 
 	D3DXCreateSprite(pd3dDevice, &m_pSprite);
-	D3DXCreateTexture(pd3dDevice, m_dwWidth, m_dwHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pChatTexture);
 	m_pFont = new CFont(pd3dDevice, m_pszFontName, m_iFontSize, m_bFontBold, m_bFontItalic);
 
 	LeaveCriticalSection(&critSect);
@@ -54,11 +55,6 @@ void CChat::OnLostDevice()
 {
 	EnterCriticalSection(&critSect);
 
-	if(m_pChatTexture) 
-	{
-		m_pChatTexture->Release();
-		m_pChatTexture = NULL;
-	}
 	if(m_pSprite) m_pSprite->OnLostDevice();
 	if(m_pFont) m_pFont->OnLostDevice();
 
@@ -71,7 +67,6 @@ void CChat::OnResetDevice()
 
 	if(m_pSprite) m_pSprite->OnResetDevice();
 	if(m_pFont) m_pFont->OnResetDevice();
-	D3DXCreateTexture(m_pd3dDevice, m_dwWidth, m_dwHeight, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &m_pChatTexture);
 
 	LeaveCriticalSection(&critSect);
 }
@@ -82,10 +77,38 @@ void CChat::OnDraw()
 
 	m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
 
-	m_pSprite->Draw(m_pChatTexture, NULL, NULL, NULL, 0xFFFFFFFF);
+	D3DXVECTOR2 vTransformation = D3DXVECTOR2(0.0f, 0.0f);
+	D3DXVECTOR2 vScaling(1.0f, 1.0f);
+
+	D3DXMATRIX mainMatrix;
+	D3DXMatrixTransformation2D(&mainMatrix, 0, 0, &vScaling, 0, 0, &vTransformation);
+	m_pSprite->SetTransform(&mainMatrix);
+
+	int iY = 1;
+	for(int i = m_iScrollPos; i < m_iScrollPos + m_iMaxMessages && i < m_iMaxHistory; i++)
+	{
+		if(m_pMessages[i])
+		{
+			MESSAGE * pTmpMsg = m_pMessages[i];
+			int iX = 1;
+			while(pTmpMsg)
+			{
+				m_pFont->DrawText(pTmpMsg->msg, iX, iY, m_pSprite, pTmpMsg->color);
+				iX += m_pFont->GetTextWidth(pTmpMsg->msg);
+				pTmpMsg = pTmpMsg->next;
+			}
+		}
+		iY += m_iFontSize + 2;
+	}
+
 	m_pSprite->End();
 
 	LeaveCriticalSection(&critSect);
+}
+
+void CChat::OnBeginDraw()
+{
+
 }
 
 void CChat::OnRelease()
@@ -94,7 +117,6 @@ void CChat::OnRelease()
 
 	if(m_pSprite) m_pSprite->Release();
 	if(m_pFont) m_pFont->Release();
-	if(m_pChatTexture) m_pChatTexture->Release();
 
 	LeaveCriticalSection(&critSect);
 }
@@ -104,6 +126,8 @@ void CChat::AddMessage(wchar_t * pszMsg)
 	if(!pszMsg) return;
 
 	// Color: 0001 AARR GGBB
+
+	EnterCriticalSection(&critSect);
 
 	MESSAGE ** ppTmpMsg = NULL;
 	for(int i = 0; i < m_iMaxHistory; i++)
@@ -131,6 +155,7 @@ void CChat::AddMessage(wchar_t * pszMsg)
 	if(!ppTmpMsg)
 	{
 		Log::Error("Can't add message to chat");
+		LeaveCriticalSection(&critSect);
 		return;
 	}
 
@@ -169,71 +194,87 @@ void CChat::AddMessage(wchar_t * pszMsg)
 	{
 		*ppTmpMsg = new MESSAGE(szTmpTxt, Color);
 	}
-	this->Update();
+
+	if(!m_bUserScroll) this->ScrollEnd();
+	LeaveCriticalSection(&critSect);
 }
 
 void CChat::DeleteMessage(const int index)
 {
 	if(index < 0 || index > m_iMaxHistory) return;
+
+	EnterCriticalSection(&critSect);
 	if(m_pMessages[index]) 
 	{
 		delete m_pMessages[index];
 		m_pMessages[index] = NULL;
 	}
-	this->Update();
+	
+	LeaveCriticalSection(&critSect);
 }
 
 void CChat::Clear()
 {
+	EnterCriticalSection(&critSect);
 	for(int i = 0; i < m_iMaxHistory; i++)
 	{
 		delete m_pMessages[i];
 		m_pMessages[i] = NULL;
 	}
-	this->Update();
+	this->ScrollEnd();
+	LeaveCriticalSection(&critSect);
 }
 
-void CChat::Update()
+bool CChat::ScrollDown()
 {
-	EnterCriticalSection(&critSect);
+	if(m_iScrollPos + m_iMaxMessages > m_iMaxHistory) return false;
+	if(!m_pMessages[m_iScrollPos + m_iMaxMessages]) return false;
 
-	IDirect3DSurface9 *pTextureTarget, *pOldRenderTarget;
-	m_pChatTexture->GetSurfaceLevel(0, &pTextureTarget);
-	Log::Debug("Update");
-	if(pTextureTarget)
+	m_bUserScroll = true;
+	m_iScrollPos++;
+
+	int i = 0;
+	for(i = 0; i < m_iMaxHistory; i++)
 	{
-		Log::Debug("Render to texture");
-
-		m_pd3dDevice->GetRenderTarget(0, &pOldRenderTarget);
-		m_pd3dDevice->SetRenderTarget(0, pTextureTarget);
-
-		m_pd3dDevice->Clear(0, 0, D3DCLEAR_TARGET, 0, 1.0f, 0);
-		m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
-	
-		int iY = 1;
-		for(int i = m_iScrollPos; i < m_iScrollPos + m_iMaxMessages && i < m_iMaxHistory; i++)
-		{
-			if(m_pMessages[i])
-			{
-				MESSAGE * pTmpMsg = m_pMessages[i];
-				int iX = 1;
-				while(pTmpMsg)
-				{
-					Log::Debug(L"Draw at (%d;%d) '%s' witd color #%X", iX, iY, pTmpMsg->msg, pTmpMsg->color);
-					m_pFont->DrawText(pTmpMsg->msg, iX, iY, m_pSprite, pTmpMsg->color);
-					iX += m_pFont->GetTextWidth(pTmpMsg->msg);
-					pTmpMsg = pTmpMsg->next;
-				}
-			}
-			iY += m_iFontSize + 2;
-		}
-
-		m_pSprite->End();
-
-		pTextureTarget->Release();
-		m_pd3dDevice->SetRenderTarget(0, pOldRenderTarget);
-		pOldRenderTarget = NULL;
+		if(!m_pMessages[i]) break;
 	}
 
-	LeaveCriticalSection(&critSect);
+	if(i - m_iMaxMessages < 0) 
+	{
+		if(m_iScrollPos == 0) m_bUserScroll = false;
+	}
+	else
+	{
+		if(m_iScrollPos == i - m_iMaxMessages) m_bUserScroll = false;
+	}
+
+	return true;
+}
+
+bool CChat::ScrollUp()
+{
+	if(m_iScrollPos <= 0) return false;
+	m_bUserScroll = true;
+	m_iScrollPos--;
+	return true;
+}
+
+void CChat::ScrollEnd()
+{
+	m_bUserScroll = false;
+
+	int i = 0;
+	for(i = 0; i < m_iMaxHistory; i++)
+	{
+		if(!m_pMessages[i]) break;
+	}
+
+	if(i - m_iMaxMessages < 0) 
+	{
+		m_iScrollPos = 0;
+	}
+	else
+	{
+		m_iScrollPos = i - m_iMaxMessages;
+	}
 }

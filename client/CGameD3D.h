@@ -11,6 +11,7 @@ public:
 	void OnLostDevice();
 	void OnResetDevice();
 	void OnDraw();
+	void OnBeginDraw();
 	void OnRelease();
 
 private:
