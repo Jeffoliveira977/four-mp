@@ -268,6 +268,7 @@ HRESULT myIDirect3DDevice9::GetDepthStencilSurface(IDirect3DSurface9 **ppZStenci
 
 HRESULT myIDirect3DDevice9::BeginScene(void)
 {
+	if(pGameHook) pGameHook->OnD3DBeginDraw();
     return m_pIDirect3DDevice9->BeginScene();
 }
 

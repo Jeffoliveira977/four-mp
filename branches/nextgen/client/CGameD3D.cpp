@@ -30,6 +30,11 @@ void CGameD3D::OnDraw()
 
 }
 
+void CGameD3D::OnBeginDraw()
+{
+
+}
+
 void CGameD3D::OnRelease()
 {
 

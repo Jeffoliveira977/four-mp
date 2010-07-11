@@ -29,6 +29,7 @@ public:
 
 	void OnD3DCreateDevice(IDirect3DDevice9 *, HWND);
 	void OnD3DDraw();
+	void OnD3DBeginDraw();
 	void OnD3DLostDevice();
 	void OnD3DResetDevice();
 	void OnD3DRelease();

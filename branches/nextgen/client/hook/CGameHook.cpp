@@ -738,6 +738,14 @@ void CGameHook::OnD3DDraw()
 	}
 }
 
+void CGameHook::OnD3DBeginDraw()
+{
+	for(int i = 0; i < D3DMAN_COUNT; i++)
+	{
+		if(m_pD3DManager[i]) m_pD3DManager[i]->OnBeginDraw();
+	}
+}
+
 void CGameHook::OnD3DLostDevice()
 {
 	Log::Debug("OnLostDevice");
