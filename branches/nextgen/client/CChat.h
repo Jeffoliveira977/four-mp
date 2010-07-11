@@ -8,10 +8,10 @@
 class CChat : public CD3DManager
 {
 public:
-	CChat(const int maxMessages = 16, const int maxHistory = 64, const int maxMyHistory = 16);
+	CChat(const int iMaxMessages = 16, const int iMaxHistory = 64, const int iMaxMyHistory = 16, const int iFontSize = 10, const char * pszFontName = "Arial", const bool bFontBold = false, const bool bFontItalic = false);
 	~CChat();
 
-	void OnCreateDevice(IDirect3DDevice9 *);
+	void OnCreateDevice(IDirect3DDevice9 *, HWND);
 	void OnLostDevice();
 	void OnResetDevice();
 	void OnDraw();
@@ -26,6 +26,12 @@ public:
 private:
 	CFont * m_pFont;
 	ID3DXSprite * m_pSprite;
+	IDirect3DTexture9 * m_pChatTexture;
+
+	CRITICAL_SECTION critSect;
+
+	DWORD m_dwWidth;
+	DWORD m_dwHeight;
 
 	struct MESSAGE
 	{
@@ -62,4 +68,12 @@ private:
 	int m_iMaxMessages;
 	int m_iMaxHistory;
 	int m_iMaxMyHistory;
+
+	int m_iScrollPos;
+	int m_iCursorPos;
+
+	int m_iFontSize;
+	const char *m_pszFontName;
+	bool m_bFontBold;
+	bool m_bFontItalic;
 };

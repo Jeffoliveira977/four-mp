@@ -7,7 +7,7 @@ public:
 	CD3DManager();
 	~CD3DManager();
 
-	virtual void OnCreateDevice(IDirect3DDevice9 *) = 0;
+	virtual void OnCreateDevice(IDirect3DDevice9 *, HWND) = 0;
 	virtual void OnLostDevice() = 0;
 	virtual void OnResetDevice() = 0;
 	virtual void OnDraw() = 0;

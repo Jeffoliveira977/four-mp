@@ -10,9 +10,9 @@ CGameD3D::~CGameD3D()
 
 }
 
-void CGameD3D::OnCreateDevice(IDirect3DDevice9 * pd3dDevice)
+void CGameD3D::OnCreateDevice(IDirect3DDevice9 * pd3dDevice, HWND hWnd)
 {
-	CD3DManager::OnCreateDevice(pd3dDevice);
+	CD3DManager::OnCreateDevice(pd3dDevice, hWnd);
 }
 
 void CGameD3D::OnLostDevice()

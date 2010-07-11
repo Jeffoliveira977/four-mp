@@ -7,7 +7,7 @@ public:
 	CGameD3D();
 	~CGameD3D();
 
-	void OnCreateDevice(IDirect3DDevice9 *);
+	void OnCreateDevice(IDirect3DDevice9 *, HWND);
 	void OnLostDevice();
 	void OnResetDevice();
 	void OnDraw();
