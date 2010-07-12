@@ -8,10 +8,12 @@
 class CChat : public CD3DManager
 {
 public:
-	CChat(const int iMaxMessages = 16, const int iMaxHistory = 64, const int iMaxMyHistory = 16, const int iFontSize = 10, const char * pszFontName = "Arial", const bool bFontBold = false, const bool bFontItalic = false);
+	CChat(const int iMaxMessages = 16, const int iMaxHistory = 64, const int iMaxMyHistory = 16, const int iFontSize = 10, 
+		const char * pszFontName = "Arial", const bool bFontBold = false, const bool bFontItalic = false);
 	~CChat();
 
-	void SetChatColors(D3DCOLOR dwFrameColor = 0xAA000000, D3DCOLOR dwScrollColor = 0xFFFFFFFF, D3DCOLOR dwScrollBackgroundColor = 0xBB000000, D3DCOLOR dwEnterBackgroundColor = 0xDD000000, D3DCOLOR dwEnterBorderColor = 0xFFFFFFFF, D3DCOLOR dwEnterTextColor = 0xFFFFDD00);
+	void SetChatColors(D3DCOLOR dwFrameColor = 0xAA000000, D3DCOLOR dwScrollColor = 0xFFFFFFFF, 
+		D3DCOLOR dwScrollBackgroundColor = 0xBB000000, D3DCOLOR dwEnterBackgroundColor = 0xDD000000, D3DCOLOR dwEnterTextColor = 0xFFFFDD00);
 	void SetChatTransform(float fPosX = 10.0f, float fPosY = 10.0f);
 
 	void OnCreateDevice(IDirect3DDevice9 *, HWND);
@@ -24,6 +26,21 @@ public:
 	void AddMessage(wchar_t *);
 	void DeleteMessage(const int index);
 	void Clear();
+
+	void ChangeEnterMessageState();
+	void ChangeChatState();
+
+	bool IsMessageEnterActive();
+	bool IsMessageNotNull();
+
+	void AddCharToMessage(wchar_t sChar);
+	void DeleteCharFromMessage();
+	void GetMyMessage(wchar_t * pszMsg);
+
+	void ScrollDownHistory();
+	void ScrollUpHistory();
+	void MoveCursorLeft();
+	void MoveCursorRight();
 
 	bool ScrollDown();
 	bool ScrollUp();
@@ -43,8 +60,8 @@ private:
 	{
 		MESSAGE(wchar_t * pszMsg, D3DCOLOR Color) 
 		{ 
-			this->msg = new wchar_t[0x100];
-			memset(this->msg, 0, 0x100 * sizeof(wchar_t));
+			this->msg = new wchar_t[MAX_CHAT_MESSAGE_LENGTH];
+			memset(this->msg, 0, MAX_CHAT_MESSAGE_LENGTH * sizeof(wchar_t));
 
 			int len = wcslen(pszMsg);
 			for(int i = 0; i < len; i++)
@@ -68,7 +85,7 @@ private:
 	};
 
 	MESSAGE ** m_pMessages;
-	MESSAGE ** m_pMyMsgHistory;
+	wchar_t ** m_pMyMsgHistory;
 	wchar_t * m_pMyMsg;
 
 	int m_iMaxMessages;
@@ -82,7 +99,7 @@ private:
 
 	bool m_bUserScroll;
 	int m_iScrollPos;
-	int m_iCursorPos;
+	DWORD m_dwCursorPos;
 	int m_iHistoryPos;
 
 	float m_iFrameWidth;
@@ -92,9 +109,11 @@ private:
 	D3DCOLOR m_dwScrollColor;
 	D3DCOLOR m_dwScrollBackgroundColor;
 	D3DCOLOR m_dwEnterBackgroundColor;
-	D3DCOLOR m_dwEnterBorderColor;
 	D3DCOLOR m_dwEnterTextColor;
 
 	float m_fPosX;
 	float m_fPosY;
+
+	bool m_bEnterMessage;
+	char m_bChatShow;
 };

@@ -8,6 +8,8 @@ CGameHook::CGameHook()
 {
 	m_dwLoadOffset = (DWORD)GetModuleHandleA(NULL) - 0x400000;
 	Log::Info("Base game address %08X", m_dwLoadOffset);
+
+	m_OriginalProc = NULL;
 	
 	if(DetectGameVersion())
 	{
@@ -50,6 +52,12 @@ bool CGameHook::InstallDirect3DHook(CD3DManager * pD3DManager)
 	}
 
 	return false;
+}
+
+bool CGameHook::InstallWindowHook(WNDPROC wndProc)
+{
+	m_OriginalProc = wndProc;
+	return true;
 }
 
 bool CGameHook::InstallXLiveHook()
@@ -724,6 +732,13 @@ DWORD WINAPI CGameHook::ScriptHookThread(void * p)
 void CGameHook::OnD3DCreateDevice(IDirect3DDevice9 * pd3dDevice, HWND hWnd)
 {
 	Log::Debug("OnCreateDevice");
+	if(m_OriginalProc)
+	{
+		WNDPROC wndProc = (WNDPROC)GetWindowLong(hWnd, GWL_WNDPROC);
+		SetWindowLong(hWnd, GWL_WNDPROC,(LONG)m_OriginalProc);
+		m_OriginalProc = wndProc;
+	}
+
 	for(int i = 0; i < D3DMAN_COUNT; i++)
 	{
 		if(m_pD3DManager[i]) m_pD3DManager[i]->OnCreateDevice(pd3dDevice, hWnd);
@@ -771,4 +786,9 @@ void CGameHook::OnD3DRelease()
 	{
 		if(m_pD3DManager[i]) m_pD3DManager[i]->OnRelease();
 	}
+}
+
+LRESULT CGameHook::CallOriginalWindowProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+{
+	return CallWindowProc(m_OriginalProc, hWnd, Msg, wParam, lParam);
 }
