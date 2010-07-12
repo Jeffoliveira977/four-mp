@@ -18,13 +18,20 @@ CChat::CChat(const int iMaxMessages, const int iMaxHistory, const int iMaxMyHist
 
 	m_iScrollPos = 0;
 	m_iCursorPos = 0;
+	m_iHistoryPos = 0;
 
 	m_iFontSize = iFontSize;
 	m_pszFontName = pszFontName;
 	m_bFontBold = bFontBold;
 	m_bFontItalic = bFontItalic;
 
-	m_bUserScroll = true;
+	m_bUserScroll = false;
+
+	m_iFrameWidth = 0;
+	m_iFrameHeight = 0;
+
+	this->SetChatColors();
+	this->SetChatTransform();
 
 	InitializeCriticalSection(&critSect);
 }
@@ -32,6 +39,22 @@ CChat::CChat(const int iMaxMessages, const int iMaxHistory, const int iMaxMyHist
 CChat::~CChat()
 {
 	DeleteCriticalSection(&critSect);
+}
+
+void CChat::SetChatColors(D3DCOLOR dwFrameColor, D3DCOLOR dwScrollColor, D3DCOLOR dwScrollBackgroundColor, D3DCOLOR dwEnterBackgroundColor, D3DCOLOR dwEnterBorderColor, D3DCOLOR dwEnterTextColor)
+{
+	m_dwFrameColor = dwFrameColor;
+	m_dwScrollColor = dwScrollColor;
+	m_dwScrollBackgroundColor = dwScrollBackgroundColor;
+	m_dwEnterBackgroundColor = dwEnterBackgroundColor;
+	m_dwEnterBorderColor = dwEnterBorderColor;
+	m_dwEnterTextColor = dwEnterTextColor;
+}
+
+void CChat::SetChatTransform(float fPosX, float fPosY)
+{
+	m_fPosX = fPosX;
+	m_fPosY = fPosY;
 }
 
 void CChat::OnCreateDevice(IDirect3DDevice9 * pd3dDevice, HWND hWnd)
@@ -46,6 +69,7 @@ void CChat::OnCreateDevice(IDirect3DDevice9 * pd3dDevice, HWND hWnd)
 	EnterCriticalSection(&critSect);
 
 	D3DXCreateSprite(pd3dDevice, &m_pSprite);
+	D3DXCreateLine(pd3dDevice, &m_pLine);
 	m_pFont = new CFont(pd3dDevice, m_pszFontName, m_iFontSize, m_bFontBold, m_bFontItalic);
 
 	LeaveCriticalSection(&critSect);
@@ -57,6 +81,7 @@ void CChat::OnLostDevice()
 
 	if(m_pSprite) m_pSprite->OnLostDevice();
 	if(m_pFont) m_pFont->OnLostDevice();
+	if(m_pLine) m_pLine->OnLostDevice();
 
 	LeaveCriticalSection(&critSect);
 }
@@ -67,6 +92,7 @@ void CChat::OnResetDevice()
 
 	if(m_pSprite) m_pSprite->OnResetDevice();
 	if(m_pFont) m_pFont->OnResetDevice();
+	if(m_pLine) m_pLine->OnResetDevice();
 
 	LeaveCriticalSection(&critSect);
 }
@@ -75,9 +101,58 @@ void CChat::OnDraw()
 {
 	EnterCriticalSection(&critSect);
 
+	m_iFrameHeight = 0;
+	m_iFrameWidth = 0;
+	for(int i = m_iScrollPos; i < m_iScrollPos + m_iMaxMessages && i < m_iMaxHistory; i++)
+	{
+		if(m_pMessages[i])
+		{
+			MESSAGE * pTmpMsg = m_pMessages[i];
+			int iX = 0;
+			while(pTmpMsg)
+			{
+				iX += m_pFont->GetTextWidth(pTmpMsg->msg);
+				pTmpMsg = pTmpMsg->next;
+			}
+			if(iX > m_iFrameWidth) m_iFrameWidth = (float)iX;
+		}
+		m_iFrameHeight += m_iFontSize + 2;
+	}
+
+	if(m_iFrameWidth > 0 && m_iFrameHeight > 0)
+	{
+		m_iFrameHeight += 8;
+		m_iFrameWidth += 22;
+
+		D3DXVECTOR2 d3dxVector[2];
+
+		m_pLine->SetWidth(m_iFrameWidth);
+		m_pLine->Begin();
+		d3dxVector[0] = D3DXVECTOR2(m_fPosX + m_iFrameWidth/2, m_fPosY);
+		d3dxVector[1] = D3DXVECTOR2(m_fPosX + m_iFrameWidth/2, m_fPosY + m_iFrameHeight);
+		m_pLine->Draw(d3dxVector, 2, m_dwFrameColor);
+		m_pLine->End();
+
+		m_pLine->SetWidth(10);
+		m_pLine->Begin();
+		d3dxVector[0] = D3DXVECTOR2(m_fPosX + 6, m_fPosY + 1);
+		d3dxVector[1] = D3DXVECTOR2(m_fPosX + 6, m_fPosY + m_iFrameHeight - 2);
+		m_pLine->Draw(d3dxVector, 2, m_dwScrollBackgroundColor);
+		m_pLine->End();
+
+		float fPos = ((m_iFrameHeight - 14) / (m_iMaxHistory - m_iMaxMessages)) * m_iScrollPos;
+
+		m_pLine->SetWidth(8);
+		m_pLine->Begin();
+		d3dxVector[0] = D3DXVECTOR2(m_fPosX + 7, m_fPosY + 2 + fPos);
+		d3dxVector[1] = D3DXVECTOR2(m_fPosX + 7, m_fPosY + 12 + fPos);
+		m_pLine->Draw(d3dxVector, 2, m_dwScrollColor);
+		m_pLine->End();
+	}
+
 	m_pSprite->Begin(D3DXSPRITE_ALPHABLEND);
 
-	D3DXVECTOR2 vTransformation = D3DXVECTOR2(0.0f, 0.0f);
+	D3DXVECTOR2 vTransformation = D3DXVECTOR2(m_fPosX + 15, m_fPosY + 2);
 	D3DXVECTOR2 vScaling(1.0f, 1.0f);
 
 	D3DXMATRIX mainMatrix;
@@ -117,6 +192,7 @@ void CChat::OnRelease()
 
 	if(m_pSprite) m_pSprite->Release();
 	if(m_pFont) m_pFont->Release();
+	if(m_pLine) m_pLine->Release();
 
 	LeaveCriticalSection(&critSect);
 }
@@ -227,7 +303,7 @@ void CChat::Clear()
 
 bool CChat::ScrollDown()
 {
-	if(m_iScrollPos + m_iMaxMessages > m_iMaxHistory) return false;
+	if(m_iScrollPos + m_iMaxMessages >= m_iMaxHistory) return false;
 	if(!m_pMessages[m_iScrollPos + m_iMaxMessages]) return false;
 
 	m_bUserScroll = true;

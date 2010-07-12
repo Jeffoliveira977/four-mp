@@ -11,6 +11,9 @@ public:
 	CChat(const int iMaxMessages = 16, const int iMaxHistory = 64, const int iMaxMyHistory = 16, const int iFontSize = 10, const char * pszFontName = "Arial", const bool bFontBold = false, const bool bFontItalic = false);
 	~CChat();
 
+	void SetChatColors(D3DCOLOR dwFrameColor = 0xAA000000, D3DCOLOR dwScrollColor = 0xFFFFFFFF, D3DCOLOR dwScrollBackgroundColor = 0xBB000000, D3DCOLOR dwEnterBackgroundColor = 0xDD000000, D3DCOLOR dwEnterBorderColor = 0xFFFFFFFF, D3DCOLOR dwEnterTextColor = 0xFFFFDD00);
+	void SetChatTransform(float fPosX = 10.0f, float fPosY = 10.0f);
+
 	void OnCreateDevice(IDirect3DDevice9 *, HWND);
 	void OnLostDevice();
 	void OnResetDevice();
@@ -29,8 +32,7 @@ public:
 private:
 	CFont * m_pFont;
 	ID3DXSprite * m_pSprite;
-	//IDirect3DTexture9 * m_pChatTexture;
-	//IDirect3DSurface9 * m_pTextureTarget;
+	ID3DXLine * m_pLine;
 
 	CRITICAL_SECTION critSect;
 
@@ -73,13 +75,26 @@ private:
 	int m_iMaxHistory;
 	int m_iMaxMyHistory;
 
-	int m_iScrollPos;
-	int m_iCursorPos;
-
 	int m_iFontSize;
 	const char *m_pszFontName;
 	bool m_bFontBold;
 	bool m_bFontItalic;
 
 	bool m_bUserScroll;
+	int m_iScrollPos;
+	int m_iCursorPos;
+	int m_iHistoryPos;
+
+	float m_iFrameWidth;
+	float m_iFrameHeight;
+
+	D3DCOLOR m_dwFrameColor;
+	D3DCOLOR m_dwScrollColor;
+	D3DCOLOR m_dwScrollBackgroundColor;
+	D3DCOLOR m_dwEnterBackgroundColor;
+	D3DCOLOR m_dwEnterBorderColor;
+	D3DCOLOR m_dwEnterTextColor;
+
+	float m_fPosX;
+	float m_fPosY;
 };
