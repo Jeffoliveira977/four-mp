@@ -149,7 +149,7 @@
 				EnableCOMDATFolding="2"
 				RandomizedBaseAddress="2"
 				DataExecutionPrevention="0"
-				ImportLibrary="$(OutDir)/proxydll.lib"
+				ImportLibrary="$(OutDir)/d3d9.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -201,6 +201,10 @@
 			</File>
 			<File
 				RelativePath=".\main.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\window.cpp"
 				>
 			</File>
 			<Filter
@@ -287,6 +291,10 @@
 			</File>
 			<File
 				RelativePath=".\main.h"
+				>
+			</File>
+			<File
+				RelativePath=".\window.h"
 				>
 			</File>
 			<Filter

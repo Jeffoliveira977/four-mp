@@ -34,9 +34,12 @@ public:
 	void OnD3DResetDevice();
 	void OnD3DRelease();
 
+	LRESULT CallOriginalWindowProc(HWND, UINT, WPARAM, LPARAM);
+
 	bool InstallScriptHook(CScriptThread *);
 	bool InstallXLiveHook();
 	bool InstallDirect3DHook(CD3DManager *);
+	bool InstallWindowHook(WNDPROC);
 
 	bool injectFunction(DWORD from, DWORD to);
 
@@ -54,6 +57,7 @@ private:
 
 	CD3DManager * m_pD3DManager[D3DMAN_COUNT];
 	CScriptThread * m_pScriptThread;
+	WNDPROC m_OriginalProc;
 
 	struct XLiveAddresses
 	{

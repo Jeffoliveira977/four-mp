@@ -6,6 +6,7 @@
 #include "./CGameScript.h"
 #include "./CGameD3D.h"
 #include "./CChat.h"
+#include "./window.h"
 
 LogFile * logfile = NULL;
 CGameHook * pGameHook = NULL;
@@ -77,6 +78,7 @@ void Start(HANDLE hModule)
 	{
 		Log::Error("Can't install D3D Hook for chat");
 	}
+	pGameHook->InstallWindowHook(DefWndProc);
 }
 
 void Close()
