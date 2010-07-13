@@ -91,6 +91,7 @@ private:
 	int m_iMaxMessages;
 	int m_iMaxHistory;
 	int m_iMaxMyHistory;
+	int m_iMessagesCount;
 
 	int m_iFontSize;
 	const char *m_pszFontName;
