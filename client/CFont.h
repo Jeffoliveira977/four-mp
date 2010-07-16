@@ -5,6 +5,7 @@ class CFont
 {
 public:
 	CFont(IDirect3DDevice9 *pd3dDevice, const char * pszFontName, const int iFontSize, const bool bFontBold = false, const bool bFontItalic = false);
+	CFont(IDirect3DDevice9 *pd3dDevice, const wchar_t * pszFontName, const int iFontSize, const bool bFontBold = false, const bool bFontItalic = false);
 	~CFont();
 
 	bool DrawText(const char *, const int iX, const int iY, ID3DXSprite *pSprite, const D3DCOLOR Color); 
