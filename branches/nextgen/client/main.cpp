@@ -6,6 +6,7 @@
 #include "./CGameScript.h"
 #include "./CGameD3D.h"
 #include "./CChat.h"
+#include "./CConfig.h"
 #include "./window.h"
 
 LogFile * logfile = NULL;
@@ -13,6 +14,7 @@ CGameHook * pGameHook = NULL;
 CGameScript * pGameScript = NULL;
 CGameD3D * pGameD3D = NULL;
 CChat * pChat = NULL;
+CConfig * pConfig = NULL;
 
 bool IsFMPNeed()
 {
@@ -46,9 +48,20 @@ void Start(HANDLE hModule)
 	logfile = new LogFile();
 	Log::Info("Second attach, run hook");
 
+	pConfig = new CConfig("FMP/fmp.cfg");
 	pGameScript = new CGameScript;
 	pGameD3D = new CGameD3D;
-	pChat = new CChat;
+
+	pChat = new CChat(pConfig->GetIntValue(L"ChatMaxMessagesOnScreen", 16), pConfig->GetIntValue(L"ChatMaxMessages", 64),
+		pConfig->GetIntValue(L"ChatMaxHistory", 16), pConfig->GetIntValue(L"ChatFontSize", 10), 
+		pConfig->GetStringValue(L"ChatFontName", L"Arial"), pConfig->GetBoolValue(L"ChatFontBold", false), 
+		pConfig->GetBoolValue(L"ChatFontItalic", false));
+
+	pChat->SetChatColors(pConfig->GetIntValue(L"ChatBackgroundColor", 0xAA000000), pConfig->GetIntValue(L"ChatScrollColor", 0xFFFFFFFF),
+		pConfig->GetIntValue(L"ChatScrollBackgroundColor", 0xBB000000), pConfig->GetIntValue(L"ChatEnterBackgroundColor", 0xDD000000),
+		pConfig->GetIntValue(L"ChatEnterTextColor", 0xFFFFDD00));
+	pChat->SetChatTransform(pConfig->GetFloatValue(L"ChatPositionX", 10.0f), pConfig->GetFloatValue(L"ChatPositionY", 10.0f));
+
 	pGameHook = new CGameHook;
 
 	if(!pGameHook->UnprotectData())
@@ -87,6 +100,7 @@ void Close()
 	if(pChat) delete pChat;
 	if(pGameD3D) delete pGameD3D;
 	if(pGameHook) delete pGameHook;
+	if(pConfig) delete pConfig;
 	if(logfile) delete logfile;
 }
 

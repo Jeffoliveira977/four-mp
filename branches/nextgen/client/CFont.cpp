@@ -13,6 +13,19 @@ CFont::CFont(IDirect3DDevice9 *pd3dDevice, const char *pszFontName, const int iF
 	m_pFont->PreloadGlyphs(0, 255);
 }
 
+CFont::CFont(IDirect3DDevice9 *pd3dDevice, const wchar_t *pszFontName, const int iFontSize, const bool bFontBold, const bool bFontItalic)
+{
+	HDC hDC = GetDC( NULL );
+	int nHeight = -MulDiv( iFontSize, GetDeviceCaps(hDC, LOGPIXELSY), 72 );
+	ReleaseDC( NULL, hDC );
+
+	D3DXCreateFontW(pd3dDevice, nHeight, 0, (bFontBold ? FW_BOLD : FW_NORMAL), 0, bFontItalic, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, 
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, pszFontName, &m_pFont);
+
+	m_pFont->PreloadCharacters(0, 255);
+	m_pFont->PreloadGlyphs(0, 255);
+}
+
 CFont::~CFont()
 {
 

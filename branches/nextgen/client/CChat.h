@@ -9,7 +9,7 @@ class CChat : public CD3DManager
 {
 public:
 	CChat(const int iMaxMessages = 16, const int iMaxHistory = 64, const int iMaxMyHistory = 16, const int iFontSize = 10, 
-		const char * pszFontName = "Arial", const bool bFontBold = false, const bool bFontItalic = false);
+		const wchar_t * pszFontName = L"Arial", const bool bFontBold = false, const bool bFontItalic = false);
 	~CChat();
 
 	void SetChatColors(D3DCOLOR dwFrameColor = 0xAA000000, D3DCOLOR dwScrollColor = 0xFFFFFFFF, 
@@ -94,7 +94,7 @@ private:
 	int m_iMessagesCount;
 
 	int m_iFontSize;
-	const char *m_pszFontName;
+	const wchar_t *m_pszFontName;
 	bool m_bFontBold;
 	bool m_bFontItalic;
 

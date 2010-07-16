@@ -132,19 +132,19 @@ void CConfig::Dump()
     }
 }
 
-char CConfig::GetCharValue(const wchar_t * pszKey, const char cDefValue)
+bool CConfig::GetBoolValue(const wchar_t * pszKey, const bool bDefValue)
 {
 	std::map<const wchar_t *, const wchar_t *>::iterator it = m_mKeyValues.begin();
     while(it != m_mKeyValues.end())
     {
 		if(wcscmp(it->first, pszKey) == 0)
 		{
-			return (char)it->second;
+			return it->second[0] != L'0';
 			break;
 		}
         it++;
     }
-    return cDefValue;
+    return bDefValue;
 }
 
 int CConfig::GetIntValue(const wchar_t * pszKey, const int iDefValue)
@@ -192,12 +192,12 @@ wchar_t * CConfig::GetStringValue(const wchar_t * pszKey, const wchar_t * pszDef
     return (wchar_t *)pszDefValue;
 }
 
-void CConfig::SetCharValue(const wchar_t * pszKey, const char cValue)
+void CConfig::SetBoolValue(const wchar_t * pszKey, const bool bValue)
 {
 	m_bChanged = true;
 
 	wchar_t * pNewValue = new wchar_t[1];
-	pNewValue = (wchar_t *)cValue;
+	pNewValue = bValue ? L"1" : L"0";
 
 	std::map<const wchar_t *, const wchar_t *>::iterator it = m_mKeyValues.begin();
     while(it != m_mKeyValues.end())
