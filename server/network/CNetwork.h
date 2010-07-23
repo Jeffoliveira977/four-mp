@@ -4,8 +4,7 @@
 #include "RakNet/RakNetworkFactory.h"
 #include "RakNet/RakNetTypes.h"
 #include "RakNet/MessageIdentifiers.h"
-
-#define FMP_PACKET_SIGNATURE 0xFF
+#include "NetworkData.h"
 
 class CNetwork
 {
@@ -19,9 +18,6 @@ public:
 	void Tick();
 	bool IsReady();
 
-	template <typename DATATYPE>
-	void Send(const DATATYPE * pData, const short iType, const char PackPriority = 2);
-
 	void CloseConnection(const SystemAddress addr);
 	void AddToBanList(const SystemAddress addr, wchar_t * pszNick);
 	void ClearBanList();
@@ -31,4 +27,13 @@ public:
 private:
 	RakPeerInterface * m_pNet;
 	std::vector<wchar_t *> m_vBadNick;
+	SystemAddress * m_pPlayerAddress;
+	short iMaxPlayers;
+
+	template <typename DATATYPE> 
+	bool SendTo(const short iPlayer, const DATATYPE * pData, const NetworkData::Types iType, const char PackPriority = 2);
+	template <typename DATATYPE> 
+	bool SendToAll(const DATATYPE * pData, const NetworkData::Types iType, const short iExceptPlayer = -1, const char PackPriority = 2);
+	template <typename DATATYPE> 
+	bool SendTo(const SystemAddress sysAddr, const DATATYPE * pData, const NetworkData::Types iType, const char PackPriority = 2);
 };

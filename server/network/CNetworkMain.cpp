@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include "CNetwork.h"
-#include "../main.h"
 #include "log/log.h"
 
 CNetwork::CNetwork()
 {
 	m_pNet = NULL;
+	iMaxPlayers = 0;
 }
 
 CNetwork::~CNetwork()
@@ -19,6 +19,11 @@ bool CNetwork::Load(const unsigned short iPort, const unsigned short iMaxPlayers
 	SocketDescriptor s(iPort, 0);
 	m_pNet->SetMaximumIncomingConnections(iMaxPlayers);
 	m_pNet->Startup(iMaxPlayers, 1, &s, 1);
+
+	m_pPlayerAddress = new SystemAddress[iMaxPlayers];
+	memset(m_pPlayerAddress, 0, sizeof(SystemAddress) * iMaxPlayers);
+
+	this->iMaxPlayers = iMaxPlayers;
 
 	this->LoadBanList();
 	return true;
@@ -37,22 +42,6 @@ bool CNetwork::Unload()
 bool CNetwork::IsReady()
 {
 	return this->m_pNet != NULL;
-}
-
-template <typename DATATYPE>
-void CNetwork::Send(const DATATYPE * pData, const short iType, const char PackPriority)
-{
-	int iSize = sizeof(DATATYPE);
-	if(iSize == 4) Log::Warning("Send %d: sizeof(pData) == 4", iType);
-
-    char * pszData = new char[iSize + 3];
-    pszData[0] = (char)FMP_PACKET_SIGNATURE;
-    *(short*)(pszData + 1) = iType;
-    memcpy(pszData + 3, pData, iSize);
-
-	m_pNet->Send(pszData, iSize + 3, (PacketPriority)PackPriority, RELIABLE_ORDERED, NULL, m_ServerAddress, false);
-
-	delete pszData;
 }
 
 void CNetwork::Tick()
