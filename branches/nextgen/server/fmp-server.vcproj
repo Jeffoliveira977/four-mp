@@ -192,6 +192,10 @@
 					RelativePath=".\network\CNetworkMain.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\network\CNetworkSend.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="log"
@@ -217,6 +221,10 @@
 			>
 			<File
 				RelativePath=".\main.h"
+				>
+			</File>
+			<File
+				RelativePath="..\shared\NetworkData.h"
 				>
 			</File>
 			<Filter

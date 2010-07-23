@@ -316,6 +316,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\shared\NetworkData.h"
+				>
+			</File>
+			<File
 				RelativePath=".\window.h"
 				>
 			</File>
