@@ -1,8 +1,8 @@
 #include <windows.h>
 #include "window.h"
 #include "./hook/CGameHook.h"
-#include "./CChat.h"
-#include "./log/log.h"
+#include "CChat.h"
+#include "log/log.h"
 
 extern CGameHook *pGameHook;
 extern CChat * pChat;

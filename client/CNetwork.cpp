@@ -1,42 +1,40 @@
 #include <stdio.h>
 #include "CNetwork.h"
-#include "../main.h"
 #include "log/log.h"
 
 CNetwork::CNetwork()
 {
 	m_pNet = NULL;
+	m_pNet = RakNetworkFactory::GetRakPeerInterface();
+	SocketDescriptor socketDescriptor(0,0);
+	m_pNet->Startup(1, 1, &socketDescriptor, 1);
 }
 
 CNetwork::~CNetwork()
-{
-	this->Unload();
-}
-
-bool CNetwork::Load(const unsigned short iPort, const unsigned short iMaxPlayers)
-{
-	m_pNet = RakNetworkFactory::GetRakPeerInterface();
-	SocketDescriptor s(iPort, 0);
-	m_pNet->SetMaximumIncomingConnections(iMaxPlayers);
-	m_pNet->Startup(iMaxPlayers, 1, &s, 1);
-
-	this->LoadBanList();
-	return true;
-}
-
-bool CNetwork::Unload()
 {
 	if (m_pNet)
 	{
 		m_pNet->Shutdown(100,0);
 		RakNetworkFactory::DestroyRakPeerInterface(m_pNet);
 	}
-	return true;
+}
+
+bool CNetwork::Connect(const char * pszServer, const unsigned short iPort, const char * pszPassword)
+{
+	m_serverAddress.SetBinaryAddress(pszServer);
+	m_serverAddress.port = iPort;
+
+	return m_pNet->Connect(pszServer, iPort, pszPassword, strlen(pszPassword));
 }
 
 bool CNetwork::IsReady()
 {
 	return this->m_pNet != NULL;
+}
+
+bool CNetwork::IsConnected()
+{
+	return m_pNet->IsConnected(m_serverAddress);
 }
 
 template <typename DATATYPE>
@@ -50,7 +48,7 @@ void CNetwork::Send(const DATATYPE * pData, const short iType, const char PackPr
     *(short*)(pszData + 1) = iType;
     memcpy(pszData + 3, pData, iSize);
 
-	m_pNet->Send(pszData, iSize + 3, (PacketPriority)PackPriority, RELIABLE_ORDERED, NULL, m_ServerAddress, false);
+	m_pNet->Send(pszData, iSize + 3, (PacketPriority)PackPriority, RELIABLE_ORDERED, NULL, m_serverAddress, false);
 
 	delete pszData;
 }

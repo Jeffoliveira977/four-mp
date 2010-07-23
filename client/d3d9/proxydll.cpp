@@ -5,7 +5,7 @@
 #include "myIDirect3DDevice9.h"
 #include "myIDirect3DSwapChain9.h"
 #include "proxydll.h"
-#include "../log/log.h"
+#include "log/log.h"
 #include "../main.h"
 
 myIDirect3DSwapChain9 * gl_pmyIDirect3DSwapChain9;

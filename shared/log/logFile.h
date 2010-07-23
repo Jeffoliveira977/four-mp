@@ -6,7 +6,7 @@
 class LogFile : public Logger
 {
 public:
-	LogFile();
+	LogFile(const char * pszFileName);
 	~LogFile();
 
 	virtual void Log(const wchar_t *type, const wchar_t *string, char*);

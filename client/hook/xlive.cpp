@@ -1,6 +1,6 @@
 #include <windows.h>
 #include "xlive.h"
-#include "../log/log.h"
+#include "log/log.h"
 
 // #1: XWSAStartup
 int __stdcall XWSAStartup (WORD wVersionRequested, LPWSADATA lpWsaData) 

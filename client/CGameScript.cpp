@@ -1,6 +1,6 @@
 #include "CGameScript.h"
 #include "CChat.h"
-#include "./log/log.h"
+#include "log/log.h"
 
 extern CChat *pChat;
 

@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <windows.h>
-#include "./log/log.h"
-#include "./log/logFile.h"
-#include "./hook/CGameHook.h"
-#include "./CGameScript.h"
-#include "./CGameD3D.h"
-#include "./CChat.h"
-#include "./CConfig.h"
-#include "./window.h"
+#include "log/log.h"
+#include "log/logFile.h"
+#include "hook/CGameHook.h"
+#include "CGameScript.h"
+#include "CGameD3D.h"
+#include "CChat.h"
+#include "CConfig.h"
+#include "window.h"
 
 LogFile * logfile = NULL;
 CGameHook * pGameHook = NULL;
@@ -45,7 +45,7 @@ void Start(HANDLE hModule)
 		return;
 	}
 	
-	logfile = new LogFile();
+	logfile = new LogFile("FMP/log");
 	Log::Info("Second attach, run hook");
 
 	pConfig = new CConfig("FMP/fmp.cfg");
