@@ -197,15 +197,15 @@
 				Name="log"
 				>
 				<File
-					RelativePath=".\log\log.cpp"
+					RelativePath="..\shared\log\log.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\log\logFile.cpp"
+					RelativePath="..\shared\log\logFile.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\log\logStd.cpp"
+					RelativePath="..\shared\log\logStd.cpp"
 					>
 				</File>
 			</Filter>
@@ -231,15 +231,15 @@
 				Name="log"
 				>
 				<File
-					RelativePath=".\log\log.h"
+					RelativePath="..\shared\log\log.h"
 					>
 				</File>
 				<File
-					RelativePath=".\log\logFile.h"
+					RelativePath="..\shared\log\logFile.h"
 					>
 				</File>
 				<File
-					RelativePath=".\log\logStd.h"
+					RelativePath="..\shared\log\logStd.h"
 					>
 				</File>
 			</Filter>

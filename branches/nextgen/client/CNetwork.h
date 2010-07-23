@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include "RakNet/RakPeerInterface.h"
 #include "RakNet/RakNetworkFactory.h"
 #include "RakNet/RakNetTypes.h"
@@ -13,22 +12,16 @@ public:
 	CNetwork();
 	~CNetwork();
 
-	bool Load(const unsigned short iPort, const unsigned short iMaxPlayers);
-	bool Unload();
+	bool Connect(const char * pszServer, const unsigned short iPort, const char * pszPassword = NULL);
 
 	void Tick();
 	bool IsReady();
+	bool IsConnected();
 
 	template <typename DATATYPE>
 	void Send(const DATATYPE * pData, const short iType, const char PackPriority = 2);
 
-	void CloseConnection(const SystemAddress addr);
-	void AddToBanList(const SystemAddress addr, wchar_t * pszNick);
-	void ClearBanList();
-	void ReloadBanList();
-	void LoadBanList();
-
 private:
 	RakPeerInterface * m_pNet;
-	std::vector<wchar_t *> m_vBadNick;
+	SystemAddress m_serverAddress;
 };

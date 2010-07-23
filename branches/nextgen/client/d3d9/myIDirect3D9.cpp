@@ -5,7 +5,7 @@
 #include "myIDirect3DDevice9.h"
 #include "myIDirect3DSwapChain9.h"
 #include "../hook/CGameHook.h"
-#include "../log/log.h"
+#include "log/log.h"
 
 extern CGameHook * pGameHook;
 

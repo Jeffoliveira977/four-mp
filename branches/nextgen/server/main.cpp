@@ -5,15 +5,14 @@
 #include "log/logFile.h"
 #include "log/logStd.h"
 
-LogFile logfile;
-LogStd logstd;
-
 CNetwork * pNetwork;
 
 int main(int argc, char *argv[])
 {
-	Log::AddLogger(&logfile);
-	Log::AddLogger(&logstd);
+	LogFile * pLogFile = new LogFile("server_log");
+	LogStd * pLogStd = new LogStd();
+	Log::AddLogger(pLogFile);
+	Log::AddLogger(pLogStd);
 	Log::Void("FOUR-MP Server %s loaded", FMP_VERSION);
 
 	// Initialize
@@ -28,5 +27,7 @@ int main(int argc, char *argv[])
 
 	// Uninitialize
 	delete pNetwork;
+	delete pLogFile;
+	delete pLogStd;
 	return 0;
 }

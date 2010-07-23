@@ -1,6 +1,6 @@
 #include "CScriptThread.h"
 #include "CGameHook.h"
-#include "../log/log.h"
+#include "log/log.h"
 
 extern CGameHook * pGameHook;
 

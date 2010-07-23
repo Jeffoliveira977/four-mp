@@ -1,21 +1,21 @@
 #include "logFile.h"
 
-LogFile::LogFile()
+LogFile::LogFile(const char * pszFileName)
 {
 	InitializeCriticalSection(&critSect);
 
 	char fileName[256];
-	strcpy_s(fileName, 256, "d3d9.txt");
+	sprintf(fileName, "%s.txt", pszFileName);
 	char tryID = 0;
 
-	fopen_s(&fileHandle, fileName, "a");
+	fileHandle = fopen(fileName, "a");
 	while(!fileHandle)
 	{
 		if(tryID == 255) exit(1);
 
 		tryID++;
-		sprintf_s(fileName, 256, "d3d9_%d.txt", tryID);
-		fopen_s(&fileHandle, fileName, "a");
+		sprintf(fileName, "%s_%d.txt", pszFileName, tryID);
+		fileHandle = fopen(fileName, "a");
 	}
 
 	if(fileHandle)

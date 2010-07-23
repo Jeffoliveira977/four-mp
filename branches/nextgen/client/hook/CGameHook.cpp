@@ -1,6 +1,6 @@
 #include "CGameHook.h"
 #include "xlive.h"
-#include "../log/log.h"
+#include "log/log.h"
 
 CGameHook::GameAddresses * CGameHook::m_pGame = NULL;
 
