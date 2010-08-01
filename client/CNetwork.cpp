@@ -38,8 +38,10 @@ bool CNetwork::IsConnected()
 }
 
 template <typename DATATYPE>
-void CNetwork::Send(const DATATYPE * pData, const NetworkData::Types iType, const char PackPriority)
+bool CNetwork::Send(const DATATYPE * pData, const NetworkData::eTypes iType, const char PackPriority)
 {
+	if(!pData) return false;
+
 	int iSize = sizeof(DATATYPE);
 	if(iSize == 4) Log::Warning("Send %d: sizeof(pData) == 4", iType);
 
@@ -51,6 +53,19 @@ void CNetwork::Send(const DATATYPE * pData, const NetworkData::Types iType, cons
 	m_pNet->Send(pszData, iSize + 3, (PacketPriority)PackPriority, RELIABLE_ORDERED, NULL, m_serverAddress, false);
 
 	delete pszData;
+
+	return true;
+}
+
+bool CNetwork::SendConnect(const wchar_t * pszNick, const unsigned int dwGame)
+{
+	NetworkData::Connect * pConnect = new NetworkData::Connect;
+	pConnect->game = dwGame;
+	wcscpy(pConnect->nick, pszNick);
+	pConnect->version = FMP_NETWORK_VERSION;
+	bool bResult = this->Send(pConnect, NetworkData::NetworkConnect, 1);
+	delete pConnect;
+	return bResult;
 }
 
 bool CNetwork::Ping(const char * pszServer, const unsigned short iPort)
@@ -67,11 +82,12 @@ void CNetwork::Tick()
 		{
 		case FMP_PACKET_SIGNATURE:
 		{
-			//HandlePacket(pack->data + 1, pack->length - 1, pack->systemAddress); 
+			this->HandlePacket(pPack->data + 1, pPack->length - 1, pPack->systemAddress); 
 		} break;
 		case ID_CONNECTION_REQUEST_ACCEPTED:
 		{
 			Log::Info(L"Connection accepted. Sending client info...");
+			this->SendConnect(L"Player1", 0x1070);
 		} break;
 		case ID_ALREADY_CONNECTED:
 		{
@@ -118,5 +134,25 @@ void CNetwork::Tick()
 			Log::Info(L"RakNet: Unknown message (0x%x)", pPack->data[0]);
 		} break;
 		}
+	}
+}
+
+void CNetwork::HandlePacket(const unsigned char * pData, const unsigned int dwLength, const SystemAddress saAddr)
+{
+	short sType = *(short *)(pData);
+	switch(sType)
+	{
+	case NetworkData::NetworkConnectResult:
+		{
+
+		} break;
+	case NetworkData::NetworkDisconnect:
+		{
+
+		} break;
+	default:
+		{
+			Log::Warning("Unknown packet %d (Length: %d) from %s", sType, dwLength, saAddr.ToString());
+		} break;
 	}
 }

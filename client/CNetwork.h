@@ -18,10 +18,15 @@ public:
 	bool IsReady();
 	bool IsConnected();
 
+	bool SendConnect(const wchar_t * pszNick, const unsigned int dwGame);
+
+
 private:
 	RakPeerInterface * m_pNet;
 	SystemAddress m_serverAddress;
 
+	void HandlePacket(const unsigned char * pData, const unsigned int dwLength, const SystemAddress saAddr);
+
 	template <typename DATATYPE>
-	void Send(const DATATYPE * pData, const NetworkData::Types iType, const char PackPriority = 2);
+	bool Send(const DATATYPE * pData, const NetworkData::eTypes iType, const char PackPriority = 2);
 };

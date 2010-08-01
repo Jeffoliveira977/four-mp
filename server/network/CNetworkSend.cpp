@@ -1,9 +1,8 @@
-#include <stdio.h>
 #include "CNetwork.h"
 #include "log/log.h"
 
 template <typename DATATYPE>
-bool CNetwork::SendTo(const short iPlayer, const DATATYPE * pData, const NetworkData::Types iType, const char PackPriority)
+bool CNetwork::SendTo(const short iPlayer, const DATATYPE * pData, const NetworkData::eTypes iType, const char PackPriority)
 {
 	if(pData == NULL) return false;
 	if(iPlayer > iMaxPlayers || iPlayer < 0) return false;
@@ -19,12 +18,12 @@ bool CNetwork::SendTo(const short iPlayer, const DATATYPE * pData, const Network
 
 	m_pNet->Send(pszData, iSize + 3, (PacketPriority)PackPriority, RELIABLE_ORDERED, NULL, m_pPlayerAddress[iPlayer], false);
 
-	delete pszData;
+	delete [] pszData;
 	return true;
 }
 
-template <typename DATATYPE>
-bool CNetwork::SendToAll(const DATATYPE * pData, const NetworkData::Types iType, const short iExceptPlayer, const char PackPriority)
+template <typename DATATYPE> 
+bool CNetwork::SendToAll(const DATATYPE * pData, const NetworkData::eTypes iType, const short iExceptPlayer, const char PackPriority)
 {
 	if(pData == NULL) return false;
 
@@ -40,12 +39,12 @@ bool CNetwork::SendToAll(const DATATYPE * pData, const NetworkData::Types iType,
 		if(i != iExceptPlayer)
 			m_pNet->Send(pszData, iSize + 3, (PacketPriority)PackPriority, RELIABLE_ORDERED, NULL, m_pPlayerAddress[i], false);
 
-	delete pszData;
+	delete [] pszData;
 	return true;
 }
 
 template <typename DATATYPE>
-bool CNetwork::SendTo(const SystemAddress sysAddr, const DATATYPE * pData, const NetworkData::Types iType, const char PackPriority)
+bool CNetwork::SendTo(const SystemAddress sysAddr, const DATATYPE * pData, const NetworkData::eTypes iType, const char PackPriority)
 {
 	if(pData == NULL) return false;
 
@@ -59,6 +58,29 @@ bool CNetwork::SendTo(const SystemAddress sysAddr, const DATATYPE * pData, const
 
 	m_pNet->Send(pszData, iSize + 3, (PacketPriority)PackPriority, RELIABLE_ORDERED, NULL, sysAddr, false);
 
-	delete pszData;
-	return false;
+	delete [] pszData;
+	return true;
+}
+
+bool CNetwork::SendClientConnect(const short iID, const char iResult, const SystemAddress saAddr)
+{
+	NetworkData::ConnectResult * pConnect = new NetworkData::ConnectResult;
+	pConnect->id = iID;
+	pConnect->result = iResult;
+	bool bResult = this->SendTo(saAddr, pConnect, NetworkData::NetworkConnectResult, 1);
+	delete pConnect;
+
+	return bResult;
+}
+
+bool CNetwork::SendClientDisconnect(const short iID)
+{
+	if(iID < 0 || iID >= this->iMaxPlayers) return false;
+
+	NetworkData::Disconnect * pDisconnect = new NetworkData::Disconnect;
+	pDisconnect->id = iID;
+	bool bResult = this->SendToAll(pDisconnect, NetworkData::NetworkDisconnect, pDisconnect->id, 1);
+	delete pDisconnect;
+
+	return bResult;
 }

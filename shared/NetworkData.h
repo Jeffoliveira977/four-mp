@@ -5,18 +5,27 @@
 
 namespace NetworkData
 {
-	enum Types
+	enum eTypes
 	{
 		NetworkConnect,
 		NetworkConnectResult,
 		NetworkDisconnect,
 	};
 
+	enum eConnectResult
+	{
+		CR_OK,
+		CR_NOFREESLOTS,
+		CR_BANNED,
+		CR_SCRIPTKICK,
+		CR_OLDFMP,
+	};
+
 	struct Connect
 	{
 		wchar_t nick[32];
 		short version;
-		char game;
+		unsigned int game;
 	};
 
 	struct ConnectResult
