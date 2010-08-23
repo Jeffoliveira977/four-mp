@@ -215,6 +215,30 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="scripting"
+				>
+				<File
+					RelativePath=".\scripting\CScript.cpp"
+					>
+				</File>
+				<Filter
+					Name="squirrel"
+					>
+					<File
+						RelativePath=".\scripting\squirrel\CSQFile.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\scripting\squirrel\CSQMysql.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\scripting\squirrel\CSquirrel.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -252,6 +276,30 @@
 					RelativePath="..\shared\log\logStd.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="scripting"
+				>
+				<File
+					RelativePath=".\scripting\CScript.h"
+					>
+				</File>
+				<Filter
+					Name="squirrel"
+					>
+					<File
+						RelativePath=".\scripting\squirrel\CSQFile.h"
+						>
+					</File>
+					<File
+						RelativePath=".\scripting\squirrel\CSQMysql.h"
+						>
+					</File>
+					<File
+						RelativePath=".\scripting\squirrel\CSquirrel.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
